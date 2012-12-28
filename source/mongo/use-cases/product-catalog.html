@@ -1,0 +1,587 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Product Catalog &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/use-cases/product-catalog" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Use Cases" href="../use-cases.html" />
+<link rel="next" title="Inventory Management" href="inventory-management.html" />
+<link rel="prev" title="Hierarchical Aggregation" href="hierarchical-aggregation.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="product-catalog">
+<h1>Product Catalog<a class="headerlink" href="#product-catalog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document describes the basic patterns and principles for
+designing an E-Commerce product catalog system using MongoDB as a
+storage engine.</p>
+<div class="section" id="problem">
+<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this headline">¶</a></h3>
+<p>Product catalogs must have the capacity to store many differed types
+of objects with different sets of attributes. These kinds of data
+collections are quite compatible with MongoDB&#8217;s data model, but many
+important considerations and design decisions remain.</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>For relational databases, there are several solutions that address
+this problem, each with a different performance profile. This section
+examines several of these options and then describes the preferred
+MongoDB solution.</p>
+</div>
+<div class="section" id="sql-and-relational-data-models">
+<h3>SQL and Relational Data Models<a class="headerlink" href="#sql-and-relational-data-models" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="concrete-table-inheritance">
+<span id="e-commerce-catalog-concrete-table-inheritance"></span><h4>Concrete Table Inheritance<a class="headerlink" href="#concrete-table-inheritance" title="Permalink to this headline">¶</a></h4>
+<p>One approach, in a relational model, is to create a table for each
+product category. Consider the following example SQL statement for
+creating database tables:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product_audio_album</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">artist</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_0</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_1</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...,</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+<span class="p">...</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product_film</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">title</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">rating</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...,</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>This approach has limited flexibility for two key reasons:</p>
+<ul class="simple">
+<li>You must create a new table for every new category of products.</li>
+<li>You must explicitly tailor all queries for the exact type of
+product.</li>
+</ul>
+</div>
+<div class="section" id="single-table-inheritance">
+<span id="e-commerce-catalog-single-table-inheritance"></span><h4>Single Table Inheritance<a class="headerlink" href="#single-table-inheritance" title="Permalink to this headline">¶</a></h4>
+<p>Another relational data model uses a single table for all product
+categories and adds new columns anytime you need to store data
+regarding a new type of product. Consider the following SQL statement:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">artist</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_0</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_1</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">title</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">rating</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...,</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This approach is more flexible than concrete table inheritance: it
+allows single queries to span different product types, but at the
+expense of space.</p>
+</div>
+<div class="section" id="multiple-table-inheritance">
+<span id="e-commerce-catalog-multiple-table-inheritance"></span><h4>Multiple Table Inheritance<a class="headerlink" href="#multiple-table-inheritance" title="Permalink to this headline">¶</a></h4>
+<p>Also in the relational model, you may use a &#8220;multiple table
+inheritance&#8221; pattern to represent common attributes in a generic
+&#8220;product&#8221; table, with some variations in individual category product
+tables. Consider the following SQL statement:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">title</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">description</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">price</span><span class="o">`</span><span class="p">,</span> <span class="p">...</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product_audio_album</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">artist</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_0</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">genre_1</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...,</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">),</span>
+    <span class="k">FOREIGN</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="o">`</span><span class="n">product</span><span class="o">`</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+<span class="p">...</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="o">`</span><span class="n">product_film</span><span class="o">`</span> <span class="p">(</span>
+    <span class="o">`</span><span class="n">sku</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...</span>
+    <span class="o">`</span><span class="n">title</span><span class="o">`</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="o">`</span><span class="n">rating</span><span class="o">`</span> <span class="nb">char</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="p">...,</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">),</span>
+    <span class="k">FOREIGN</span> <span class="k">KEY</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="o">`</span><span class="n">product</span><span class="o">`</span><span class="p">(</span><span class="o">`</span><span class="n">sku</span><span class="o">`</span><span class="p">))</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>Multiple table inheritance is more space-efficient than <a class="reference internal" href="#e-commerce-catalog-single-table-inheritance"><em>single
+table inheritance</em></a> and
+somewhat more flexible than <a class="reference internal" href="#e-commerce-catalog-single-table-inheritance"><em>concrete table inheritance</em></a>.  However, this model
+does require an expensive <tt class="docutils literal"><span class="pre">JOIN</span></tt> operation to obtain all relevant
+attributes relevant to a product.</p>
+</div>
+<div class="section" id="entity-attribute-values">
+<span id="e-commerce-catalog-entity-attribute-values"></span><h4>Entity Attribute Values<a class="headerlink" href="#entity-attribute-values" title="Permalink to this headline">¶</a></h4>
+<p>The final substantive pattern from relational modeling is the
+entity-attribute-value schema where you would create a meta-model for
+product data. In this approach, you maintain a table with three
+columns, e.g. <tt class="docutils literal"><span class="pre">entity_id</span></tt>, <tt class="docutils literal"><span class="pre">attribute_id</span></tt>, <tt class="docutils literal"><span class="pre">value</span></tt>, and these
+triples describe each product.</p>
+<p>Consider the description of an audio recording. You may have a series
+of rows representing the following relationships:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="27%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Entity</th>
+<th class="head">Attribute</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>sku_00e8da9b</td>
+<td>type</td>
+<td>Audio Album</td>
+</tr>
+<tr class="row-odd"><td>sku_00e8da9b</td>
+<td>title</td>
+<td>A Love Supreme</td>
+</tr>
+<tr class="row-even"><td>sku_00e8da9b</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="row-odd"><td>sku_00e8da9b</td>
+<td>artist</td>
+<td>John Coltrane</td>
+</tr>
+<tr class="row-even"><td>sku_00e8da9b</td>
+<td>genre</td>
+<td>Jazz</td>
+</tr>
+<tr class="row-odd"><td>sku_00e8da9b</td>
+<td>genre</td>
+<td>General</td>
+</tr>
+<tr class="row-even"><td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<p>This schema is totally flexible:</p>
+<ul class="simple">
+<li>any entity can have any set of any attributes.</li>
+<li>New product categories do not require <em>any</em> changes to the data model in the database.</li>
+</ul>
+<p>The downside for these models, is that all nontrivial queries require
+large numbers of <tt class="docutils literal"><span class="pre">JOIN</span></tt> operations that results in large performance
+penalties.</p>
+</div>
+<div class="section" id="avoid-modeling-product-data">
+<h4>Avoid Modeling Product Data<a class="headerlink" href="#avoid-modeling-product-data" title="Permalink to this headline">¶</a></h4>
+<p>Additionally some e-commerce solutions with relational database
+systems avoid choosing one of the data models above, and serialize
+all of this data into a <tt class="docutils literal"><span class="pre">BLOB</span></tt> column. While simple, the details
+become difficult to access for search and sort.</p>
+</div>
+<div class="section" id="non-relational-data-model">
+<h4>Non-Relational Data Model<a class="headerlink" href="#non-relational-data-model" title="Permalink to this headline">¶</a></h4>
+<p>Because MongoDB is a non-relational database, the data model for your
+product catalog can benefit from this additional flexibility. The best
+models use a single MongoDB collection to store all the product data,
+which is similar to the <a class="reference internal" href="#e-commerce-catalog-single-table-inheritance"><em>single table inheritance</em></a> relational model. MongoDB&#8217;s dynamic schema
+means that each <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a> need not conform to the same
+schema. As a result, the document for each product only needs to
+contain attributes relevant to that product.</p>
+</div>
+</div>
+<div class="section" id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<p>At the beginning of the document, the schema must contain general
+product information, to facilitate searches of the entire
+catalog. Then, a <tt class="docutils literal"><span class="pre">details</span></tt> sub-document that contains fields that
+vary between product types. Consider the following example document
+for an album product.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;00e8da9b&quot;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;Audio Album&quot;</span><span class="p">,</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Love Supreme&quot;</span><span class="p">,</span>
+  <span class="nx">description</span><span class="o">:</span> <span class="s2">&quot;by John Coltrane&quot;</span><span class="p">,</span>
+  <span class="nx">asin</span><span class="o">:</span> <span class="s2">&quot;B0000A118M&quot;</span><span class="p">,</span>
+
+  <span class="nx">shipping</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">weight</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="nx">dimensions</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">width</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+      <span class="nx">height</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+      <span class="nx">depth</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+
+  <span class="nx">pricing</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">list</span><span class="o">:</span> <span class="mi">1200</span><span class="p">,</span>
+    <span class="nx">retail</span><span class="o">:</span> <span class="mi">1100</span><span class="p">,</span>
+    <span class="nx">savings</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="nx">pct_savings</span><span class="o">:</span> <span class="mi">8</span>
+  <span class="p">},</span>
+
+  <span class="nx">details</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;A Love Supreme [Original Recording Reissued]&quot;</span><span class="p">,</span>
+    <span class="nx">artist</span><span class="o">:</span> <span class="s2">&quot;John Coltrane&quot;</span><span class="p">,</span>
+    <span class="nx">genre</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Jazz&quot;</span><span class="p">,</span> <span class="s2">&quot;General&quot;</span> <span class="p">],</span>
+        <span class="p">...</span>
+    <span class="nx">tracks</span><span class="o">:</span> <span class="p">[</span>
+      <span class="s2">&quot;A Love Supreme Part I: Acknowledgement&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;A Love Supreme Part II - Resolution&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;A Love Supreme, Part III: Pursuance&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;A Love Supreme, Part IV-Psalm&quot;</span>
+    <span class="p">],</span>
+  <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A movie item would have the same fields for general product
+information, shipping, and pricing, but have different details
+sub-document. Consider the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;00e8da9d&quot;</span><span class="p">,</span>
+  <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;Film&quot;</span><span class="p">,</span>
+  <span class="p">...,</span>
+  <span class="nx">asin</span><span class="o">:</span> <span class="s2">&quot;B000P0J0AQ&quot;</span><span class="p">,</span>
+
+  <span class="nx">shipping</span><span class="o">:</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+
+  <span class="nx">pricing</span><span class="o">:</span> <span class="p">{</span> <span class="p">...</span> <span class="p">},</span>
+
+  <span class="nx">details</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;The Matrix&quot;</span><span class="p">,</span>
+    <span class="nx">director</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Andy Wachowski&quot;</span><span class="p">,</span> <span class="s2">&quot;Larry Wachowski&quot;</span> <span class="p">],</span>
+    <span class="nx">writer</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Andy Wachowski&quot;</span><span class="p">,</span> <span class="s2">&quot;Larry Wachowski&quot;</span> <span class="p">],</span>
+    <span class="p">...,</span>
+    <span class="nx">aspect_ratio</span><span class="o">:</span> <span class="s2">&quot;1.66:1&quot;</span>
+  <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In MongoDB, you can have fields that hold multiple values
+(i.e. arrays) without any restrictions on the number of fields or
+values (as with <tt class="docutils literal"><span class="pre">genre_0</span></tt> and <tt class="docutils literal"><span class="pre">genre_1</span></tt>) and also without
+the need for a JOIN operation.</p>
+</div>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>For most deployments the primary use of the product catalog is to
+perform search operations. This section provides an overview of
+various types of queries that may be useful for supporting an e-commerce
+site. All examples in this document use the Python programming
+language and the <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a> <a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> for
+MongoDB, but you can implement this system using any language you
+choose.</p>
+<div class="section" id="find-albums-by-genre-and-sort-by-year-produced">
+<h3>Find Albums by Genre and Sort by Year Produced<a class="headerlink" href="#find-albums-by-genre-and-sort-by-year-produced" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="querying">
+<h4>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h4>
+<p>This query returns the documents for the products of a specific genre,
+sorted in reverse chronological order:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">query</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;Audio Album&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;details.genre&#39;</span><span class="p">:</span> <span class="s">&#39;jazz&#39;</span><span class="p">})</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sort</span><span class="p">([(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indexing">
+<h4>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h4>
+<p>To support this query, create a compound index on all the properties
+used in the filter and in the sort:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+    <span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;details.genre&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The final component of the index is the sort field. This allows
+MongoDB to traverse the index in the sorted order to preclude a
+slow in-memory sort.</p>
+</div>
+</div>
+</div>
+<div class="section" id="find-products-sorted-by-percentage-discount-descending">
+<h3>Find Products Sorted by Percentage Discount Descending<a class="headerlink" href="#find-products-sorted-by-percentage-discount-descending" title="Permalink to this headline">¶</a></h3>
+<p>While most searches will be for a particular type of product (e.g
+album, movie, etc.,) in some situations you may want to return all
+products in a certain price range, or discount percentage.</p>
+<div class="section" id="id1">
+<h4>Querying<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>To return this data use the pricing information that exists in all
+products to find the products with the highest percentage discount:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">query</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="p">{</span> <span class="s">&#39;pricing.pct_savings&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$gt&#39;</span><span class="p">:</span> <span class="mi">25</span> <span class="p">})</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sort</span><span class="p">([(</span><span class="s">&#39;pricing.pct_savings&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Indexing<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>To support this type of query, you will want to create an index on the
+<tt class="docutils literal"><span class="pre">pricing.pct_savings</span></tt> field:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;pricing.pct_savings&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since MongoDB can read indexes in ascending or descending order, the
+order of the index does not matter.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you want to preform range queries (e.g. &#8220;return all products
+over $25&#8221;) and then sort by another property like <tt class="docutils literal"><span class="pre">pricing.retail</span></tt>,
+MongoDB cannot use the index as effectively in this situation.</p>
+<p class="last">The field that you want to select a range, or perform sort
+operations, must be the <em>last</em> field in a compound index in order
+to avoid scanning an entire collection. Using different properties
+within a single combined range query and sort operation requires
+some scanning which will limit the speed of your query.</p>
+</div>
+</div>
+</div>
+<div class="section" id="find-movies-based-on-staring-actor">
+<h3>Find Movies Based on Staring Actor<a class="headerlink" href="#find-movies-based-on-staring-actor" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>Querying<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>Use the following query to select documents within the details of a
+specified product type (i.e. <tt class="docutils literal"><span class="pre">Film</span></tt>) of product (a movie) to find
+products that contain a certain value (i.e. a specific actor in the
+<tt class="docutils literal"><span class="pre">details.actor</span></tt> field,) with the results sorted by date descending:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">query</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;Film&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;details.actor&#39;</span><span class="p">:</span> <span class="s">&#39;Keanu Reeves&#39;</span><span class="p">})</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sort</span><span class="p">([(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h4>Indexing<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>To support this query, you may want to create the following index.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+    <span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;details.actor&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>This index begins with the <tt class="docutils literal"><span class="pre">type</span></tt> field and then narrows by the
+other search field, where the final component of the index is the sort
+field to maximize index efficiency.</p>
+</div>
+</div>
+<div class="section" id="find-movies-with-a-particular-word-in-the-title">
+<h3>Find Movies with a Particular Word in the Title<a class="headerlink" href="#find-movies-with-a-particular-word-in-the-title" title="Permalink to this headline">¶</a></h3>
+<p>Regardless of database engine, in order to retrieve this information
+the system will need to scan some number of documents or records to
+satisfy this query.</p>
+<div class="section" id="id5">
+<h4>Querying<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB supports regular expressions within queries. In Python, you
+can use the &#8220;<a class="reference external" href="http://docs.python.org/library/re.html#re" title="(in Python v2.7)"><tt class="docutils literal"><span class="pre">re</span></tt></a>&#8221; module to construct the query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">re_hacker</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;.*hacker.*&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+
+<span class="n">query</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;Film&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">re_hacker</span><span class="p">})</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sort</span><span class="p">([(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>MongoDB provides a special syntax for regular expression queries
+without the need for the <a class="reference external" href="http://docs.python.org/library/re.html#re" title="(in Python v2.7)"><tt class="xref py py-mod docutils literal"><span class="pre">re</span></tt></a> module. Consider the following
+alternative which is equivalent to the above example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">query</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">find</span><span class="p">({</span>
+    <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;Film&#39;</span><span class="p">,</span>
+    <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$regex&#39;</span><span class="p">:</span> <span class="s">&#39;.*hacker.*&#39;</span><span class="p">,</span> <span class="s">&#39;$options&#39;</span><span class="p">:</span><span class="s">&#39;i&#39;</span><span class="p">}})</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sort</span><span class="p">([(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$options</span></tt></a> operator specifies a case
+insensitive match.</p>
+</div>
+<div class="section" id="id6">
+<h4>Indexing<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>The indexing strategy for these kinds of queries is different from
+previous attempts. Here, create an index on <tt class="docutils literal"><span class="pre">{</span> <span class="pre">type:</span> <span class="pre">1,</span>
+<span class="pre">details.issue_date:</span> <span class="pre">-1,</span> <span class="pre">title:</span> <span class="pre">1</span> <span class="pre">}</span></tt> using the following command at
+the Python/PyMongo console:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+    <span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;details.issue_date&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>This index makes it possible to avoid scanning whole documents by
+using the index for scanning the title rather than forcing MongoDB to
+scan whole documents for the title field. Additionally, to support the
+sort on the <tt class="docutils literal"><span class="pre">details.issue_date</span></tt> field, by placing this field
+<em>before</em> the <tt class="docutils literal"><span class="pre">title</span></tt> field, ensures that the result set is already
+ordered before MongoDB filters title field.</p>
+</div>
+</div>
+</div>
+<div class="section" id="scaling">
+<h2>Scaling<a class="headerlink" href="#scaling" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sharding">
+<h3>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h3>
+<p>Database performance for these kinds of deployments are dependent on
+indexes. You may use <a class="reference internal" href="../reference/glossary.html#term-sharding"><em class="xref std std-term">sharding</em></a> to enhance performance by
+allowing MongoDB to keep larger portions of those indexes in RAM. In
+sharded configurations, select a <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> that allows
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to route queries directly to a single shard or small
+group of shards.</p>
+<p>Since most of the queries in this system include the <tt class="docutils literal"><span class="pre">type</span></tt> field,
+include this in the shard key. Beyond this, the remainder of the shard
+key is difficult to predict without information about your database&#8217;s
+actual activity and distribution. Consider that:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">details.issue_date</span></tt> would be a poor addition to the shard key
+because, although it appears in a number of queries, no query was
+were <em>selective</em> by this field.</li>
+<li>you should include one or more fields in the <tt class="docutils literal"><span class="pre">detail</span></tt> document
+that you query frequently, and a field that has quasi-random
+features, to prevent large unsplitable chunks.</li>
+</ul>
+<p>In the following example, assume that the <tt class="docutils literal"><span class="pre">details.genre</span></tt> field is
+the second-most queried field after <tt class="docutils literal"><span class="pre">type</span></tt>. Enable sharding using
+the following <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a> operation at the
+Python/PyMongo console:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;product&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">key</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;details.genre&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;sku&#39;</span><span class="p">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="go">{ &quot;collectionsharded&quot; : &quot;details.genre&quot;, &quot;ok&quot; : 1 }</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Even if you choose a &#8220;poor&#8221; shard key that requires
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to broadcast all to all shards, you will still
+see  some benefits from sharding, because:</p>
+<ol class="last arabic simple">
+<li>Sharding makes a larger amount of memory
+available to store indexes, and</li>
+<li>MongoDB will parallelize queries across shards, reducing
+latency.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="read-preference">
+<h3>Read Preference<a class="headerlink" href="#read-preference" title="Permalink to this headline">¶</a></h3>
+<p>While <a class="reference internal" href="../reference/glossary.html#term-sharding"><em class="xref std std-term">sharding</em></a> is the best way to scale operations, some data
+sets make it impossible to partition data so that <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+can route queries to specific shards. In these situations
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> sends the query to all shards and then combines the
+results before returning to the client.</p>
+<p>In these situations, you can add additional read performance by
+allowing <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to read from the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>
+instances in a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> by configuring <a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read
+preference</em></a> in your client. Read preference is configurable on a
+per-connection or per-operation basis. In <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a>, set the <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.read_preference" title="(in PyMongo v2.4.1)"><tt class="xref py py-attr docutils literal"><span class="pre">read_preference</span></tt></a> argument.</p>
+<p>The
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/connection.html#pymongo.connection.Connection.read_preference" title="(in PyMongo v2.4.1)"><tt class="xref py py-attr docutils literal"><span class="pre">SECONDARY</span></tt></a>
+property in the following example, permits reads from a
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> (as well as a primary) for the entire connection .</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">read_preference</span><span class="o">=</span><span class="n">pymongo</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Conversely, the
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/connection.html#pymongo.connection.Connection.read_preference" title="(in PyMongo v2.4.1)"><tt class="xref py py-attr docutils literal"><span class="pre">SECONDARY_ONLY</span></tt></a>
+read preference means that the
+client will only send read operation only to the secondary member</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">read_preference</span><span class="o">=</span><span class="n">pymongo</span><span class="o">.</span><span class="n">SECONDARY_ONLY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also specify
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.read_preference" title="(in PyMongo v2.4.1)"><tt class="xref py py-attr docutils literal"><span class="pre">read_preference</span></tt></a>
+for specific queries,
+as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">results</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">read_preference</span><span class="o">=</span><span class="n">pymongo</span><span class="o">.</span><span class="n">SECONDARY</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">results</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">read_preference</span><span class="o">=</span><span class="n">pymongo</span><span class="o">.</span><span class="n">SECONDARY_ONLY</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>Replica Set Read Preference</em></a>.&#8221;</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="hierarchical-aggregation.html" title="Previous Section: Hierarchical Aggregation">&lt; &nbsp; Hierarchical Aggregation</a></li>
+<li id="btnvup"><a href="../use-cases.html" title="Parent Section: Use Cases" >&#47;&#92;&nbsp; Use Cases</a></li>
+<li id="btnvnx"><a href="inventory-management.html" title="Next Section: Inventory Management">Inventory Management &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

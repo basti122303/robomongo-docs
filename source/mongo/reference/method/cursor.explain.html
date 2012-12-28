@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.explain() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.explain" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.forEach()" href="cursor.forEach.html" />
+<link rel="prev" title="cursor.count()" href="cursor.count.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-explain">
+<h1>cursor.explain()<a class="headerlink" href="#cursor-explain" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.explain">
+<tt class="descclassname">cursor.</tt><tt class="descname">explain</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.explain" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.explain()</span></tt></a> method provides information on the
+query plan. The query plan is the plan the server uses to find the
+matches for a query. This information may be useful when optimizing
+a query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>verbose</strong> (<em>boolean</em>) &#8211; Specifies the level of detail to include in the output. If
+<tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">1</span></tt>, include the <tt class="docutils literal"><span class="pre">allPlans</span></tt> and <tt class="docutils literal"><span class="pre">oldPlan</span></tt>
+fields in the <a class="reference internal" href="../explain.html"><em>output document</em></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A <a class="reference internal" href="../explain.html"><em>document</em></a> that
+describes the process used to return the query results.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Retrieve the query plan by appending <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> to a <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt> query, as in the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">explain</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For details on the output, see <a class="reference internal" href="../explain.html"><em>Explain Output</em></a>.</p>
+<p><a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> runs the actual query to
+determine the result. Although there are some differences between
+running the query with <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> and
+running without, generally, the performance will be similar between
+the two. So, if the query is slow, the <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> operation is also slow.</p>
+<p>Additionally, the <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> operation reevaluates a set
+of candidate query plans, which may cause the <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a>
+operation to perform differently than a normal query. As a result,
+these operations generally provide an accurate account of <em>how</em>
+MongoDB would perform the query, but do not reflect the length of
+these queries.</p>
+<p>To determine the performance of a particular index, you can use
+<a class="reference internal" href="cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a>  and in conjunction with
+<a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a>, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">hint</span><span class="p">(</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">explain</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>When you run <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> with
+<a class="reference internal" href="cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a>, the query optimizer does not
+reevaluate the query plans.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In some situations, the <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a>
+operation may differ from the actual query plan used by MongoDB
+in a normal query.</p>
+<p class="last">The <a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> operation evaluates
+the set of query plans and reports on the winning plan for the
+query. In normal operations the query optimizer caches winning
+query plans and uses them for similar related queries in the
+future.  As a result MongoDB may sometimes select query plans
+from the cache that are different from the plan displayed using
+<a class="reference internal" href="#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a>.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../operator/explain.html#_S_explain" title="$explain"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$explain</span></tt></a></li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Optimization">Optimization</a> wiki page for information regarding
+optimization strategies.</li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Database Profiler">Database Profiler</a> wiki page for information regarding
+optimization strategies.</li>
+<li><a class="reference internal" href="../current-op.html"><em>Current Operation Reporting</em></a></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.count.html" title="Previous Section: cursor.count()">&lt; &nbsp; cursor.count()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.forEach.html" title="Next Section: cursor.forEach()">cursor.forEach() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

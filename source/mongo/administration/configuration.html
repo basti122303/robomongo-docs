@@ -1,0 +1,404 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Run-time Database Configuration &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/configuration" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Journaling" href="journaling.html" />
+<link rel="prev" title="Administration" href="../administration.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="run-time-database-configuration">
+<span id="configuration-file"></span><h1>Run-time Database Configuration<a class="headerlink" href="#run-time-database-configuration" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="../reference/mongod.html"><em>command line</em></a> and <a class="reference internal" href="../reference/configuration-options.html"><em>configuration
+file</em></a> interfaces provide MongoDB
+administrators with a large number of options and settings for
+controlling the operation of the database system. This document
+provides an overview of common configurations and examples of
+best-practice configurations for common use cases.</p>
+<p>While both interfaces provide access the same collection of options
+and settings, this document primarily uses the configuration file
+interface. If you run MongoDB using a control script or packaged for
+your operating system, you likely already have a configuration file
+located at <tt class="docutils literal"><span class="pre">/etc/mongodb.conf</span></tt>. Confirm this by checking the content
+of the <tt class="docutils literal"><span class="pre">/etc/init.d/mongod</span></tt> or <tt class="docutils literal"><span class="pre">/etc/rc.d/mongod</span></tt> script to
+insure that the <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control scripts</em></a> start the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with the appropriate configuration file (see below.)</p>
+<p>To start MongoDB instance using this configuration issue a command in
+the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --config /etc/mongodb.conf
+mongod -f /etc/mongodb.conf
+</pre></div>
+</div>
+<p>Modify the values in the <tt class="docutils literal"><span class="pre">/etc/mongodb.conf</span></tt> file on your system to
+control the configuration of your database instance.</p>
+<div class="section" id="starting-stopping-and-running-the-database">
+<span id="base-config"></span><h2>Starting, Stopping, and Running the Database<a class="headerlink" href="#starting-stopping-and-running-the-database" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following basic configuration:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">fork</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">bind_ip</span> <span class="o">=</span> <span class="s">127.0.0.1</span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">27017</span>
+<span class="na">quiet</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">dbpath</span> <span class="o">=</span> <span class="s">/srv/mongodb</span>
+<span class="na">logpath</span> <span class="o">=</span> <span class="s">/var/log/mongodb/mongod.log</span>
+<span class="na">logappend</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">journal</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+<p>For most standalone servers, this is a sufficient base
+configuration. It makes several assumptions, but consider the
+following explanation:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#fork" title="fork"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">fork</span></tt></a>&#8221; is <tt class="docutils literal"><span class="pre">true</span></tt>, which enables a
+<a class="reference internal" href="../reference/glossary.html#term-daemon"><em class="xref std std-term">daemon</em></a> mode for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, which detaches (i.e. &#8220;forks&#8221;)
+the MongoDB from the current session and allows you to run the
+database as a conventional server.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a> is <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt>, which forces the
+server to only listen for requests on the localhost IP. Only bind to
+secure interfaces that the application-level systems can access with
+access control provided by system network filtering
+(i.e. &#8220;<a class="reference internal" href="../reference/glossary.html#term-firewall"><em class="xref std std-term">firewall</em></a>) systems.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a> is <tt class="docutils literal"><span class="pre">27017</span></tt>, which is the default
+MongoDB port for database instances. MongoDB can bind to any
+port. You can also filter access based on port using network
+filtering tools.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">UNIX-like systems require superuser privileges to attach processes
+to ports lower than 1000.</p>
+</div>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#quiet" title="quiet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">quiet</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt>. This disables all but
+the most critical entries in output/log file. In normal operation
+this is the preferable operation to avoid log noise. In diagnostic
+or testing situations, set this value to <tt class="docutils literal"><span class="pre">false</span></tt>. Use
+<a class="reference internal" href="../reference/commands.html#setParameter" title="setParameter"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">setParameter</span></tt></a> to modify this setting during
+run time.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> is <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>, which
+specifies where MongoDB will store its data files. <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>
+and <tt class="docutils literal"><span class="pre">/var/lib/mongodb</span></tt> are popular locations. The user account
+that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> runs under will need read and write access to this
+directory.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> is <tt class="docutils literal"><span class="pre">/var/log/mongodb/mongod.log</span></tt>
+which is where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will write its output. If you do not set
+this value, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> writes all output to standard output
+(e.g. <tt class="docutils literal"><span class="pre">stdout</span></tt>.)</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#logappend" title="logappend"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logappend</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt>, which ensures that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> does not overwrite an existing log file
+following the server start operation.</p>
+</li>
+<li><dl class="first docutils">
+<dt><a class="reference internal" href="../reference/connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt>, which enables <a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journaling</em></a>.</dt>
+<dd><p class="first last">Journaling ensures single instance write-durability. 64-bit builds
+of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> enable journaling by default. Thus, this
+setting may be redundant.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Given the default configuration, some of these values may be
+redundant. However, in many situations explicitly stating the
+configuration increases overall system intelligibility.</p>
+</div>
+<div class="section" id="security-considerations">
+<span id="configuration-security"></span><h2>Security Considerations<a class="headerlink" href="#security-considerations" title="Permalink to this headline">¶</a></h2>
+<p>The following collection of configuration options are useful for
+limiting access to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. Consider the
+following:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">bind_ip</span> <span class="o">=</span> <span class="s">127.0.0.1,10.8.0.10,192.168.4.24</span>
+<span class="na">nounixsocket</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">auth</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+<p>Consider the following explanation for these configuration decisions:</p>
+<ul>
+<li><p class="first">&#8220;<a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a>&#8221; has three values: <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt>, the localhost
+interface; <tt class="docutils literal"><span class="pre">10.8.0.10</span></tt>, a private IP address typically used for
+local networks and VPN interfaces; and <tt class="docutils literal"><span class="pre">192.168.4.24</span></tt>, a private
+network interface typically used for local networks.</p>
+<p>Because production MongoDB instances need to be accessible from
+multiple database servers, it is important to bind MongoDB to
+multiple interfaces that are accessible from your application
+servers. At the same time it&#8217;s important to limit these interfaces
+to interfaces controlled and protected at the network layer.</p>
+</li>
+<li><p class="first">&#8220;<a class="reference internal" href="../reference/configuration-options.html#nounixsocket" title="nounixsocket"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nounixsocket</span></tt></a>&#8221; is  <tt class="docutils literal"><span class="pre">true</span></tt> which disables the
+UNIX Socket, which is otherwise enabled by default. This limits
+access on the local system. This is desirable when running MongoDB
+on with shared access, but in most situations has minimal impact.</p>
+</li>
+<li><p class="first">&#8220;<a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>&#8221; is <tt class="docutils literal"><span class="pre">true</span></tt> which enables the authentication
+system within MongoDB. If enabled you will need to log in, by
+connecting over the <tt class="docutils literal"><span class="pre">localhost</span></tt> interface for the first time to
+create user credentials.</p>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="security.html"><em>Security Practices and Management</em></a></p>
+</div>
+</div>
+<div class="section" id="replication-and-sharding-configuration">
+<h2>Replication and Sharding Configuration<a class="headerlink" href="#replication-and-sharding-configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="replication-configuration">
+<h3>Replication Configuration<a class="headerlink" href="#replication-configuration" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica set</em></a> configuration is straightforward, and only
+requires that the <a class="reference internal" href="../reference/configuration-options.html#replSet" title="replSet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt></a> have a value that is consistent
+among all members of the set. Consider the following:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">replSet</span> <span class="o">=</span> <span class="s">set0</span>
+</pre></div>
+</div>
+<p>Use descriptive names for sets. Once configured use the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to add hosts to the replica set.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Replica set reconfiguration</em></a>.</p>
+</div>
+<p>To enable authentication for the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>, add the
+following option:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">keyFile</span> <span class="o">=</span> <span class="s">/srv/mongodb/keyfile</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8: </span>for replica sets, and 1.9.1 for sharded replica sets.<p>Setting <a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a> enables authentication and specifies a key
+file for the replica set member use to when authenticating to each
+other. The content of the key file is arbitrary, but must be the same
+on all members of the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances that connect to the set. The keyfile must be less one
+kilobyte in size and may only contain characters in the base64 set and
+file must not have group or &#8220;world&#8221; permissions on UNIX systems.</p>
+</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The &#8220;<a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Replica set Reconfiguration</em></a>
+section for information regarding the process for changing replica
+set during operation.</p>
+<p>Additionally, consider the &#8220;<a class="reference internal" href="replica-sets.html#replica-set-security"><em>Replica Set Security</em></a>&#8221;
+section for information on configuring authentication with replica
+sets.</p>
+<p class="last">Finally, see the &#8220;<a class="reference internal" href="../replication.html"><em>Replication</em></a>&#8221; index and the
+&#8220;<a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a>&#8221; document for more information on
+replication in MongoDB and replica set configuration in general.</p>
+</div>
+</div>
+<div class="section" id="sharding-configuration">
+<h3>Sharding Configuration<a class="headerlink" href="#sharding-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Sharding requires a number of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances with
+different configurations. The config servers store the cluster&#8217;s
+metadata, while the cluster distributes data among one or more shard
+servers.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">Config servers</em></a> are not <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica
+sets</em></a>.</p>
+</div>
+<p>To set up one or three &#8220;config server&#8221; instances as <a class="reference internal" href="#base-config"><em>normal</em></a> <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances, and then add the following
+configuration option:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">configsvr</span> <span class="o">=</span> <span class="s">true</span>
+
+<span class="na">bind_ip</span> <span class="o">=</span> <span class="s">10.8.0.12</span>
+<span class="na">port</span> <span class="o">=</span> <span class="s">27001</span>
+</pre></div>
+</div>
+<p>This creates a config server running on the private IP address
+<tt class="docutils literal"><span class="pre">10.8.0.12</span></tt> on port <tt class="docutils literal"><span class="pre">27001</span></tt>. Make sure that there are no port
+conflicts, and that your config server is accessible from all of your
+&#8220;<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>&#8221; and &#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>&#8221; instances.</p>
+<p>To set up shards, configure two or more <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+using your <a class="reference internal" href="#base-config"><em>base configuration</em></a>, adding the
+<a class="reference internal" href="../reference/configuration-options.html#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a> setting:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">shardsvr</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+<p>Finally, to establish the cluster, configure at least one
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process with the following settings:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">configdb</span> <span class="o">=</span> <span class="s">10.8.0.12:27001</span>
+<span class="na">chunkSize</span> <span class="o">=</span> <span class="s">64</span>
+</pre></div>
+</div>
+<p>You can specify multiple <a class="reference internal" href="../reference/configuration-options.html#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> instances by
+specifying hostnames and ports in the form of a comma separated
+list. In general, avoid modifying the <a class="reference internal" href="../reference/configuration-options.html#chunkSize" title="chunkSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">chunkSize</span></tt></a> from
+the default value of 64, <a class="footnote-reference" href="#chunksize" id="id1">[1]</a> and <em>should</em> ensure this setting is consistent
+among all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<table class="docutils footnote" frame="void" id="chunksize" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">Chunk</em></a> size is 64 megabytes by default, which
+provides the ideal balance between the most even distribution of
+data, for which smaller chunk sizes are best, and minimizing chunk
+migration, for which larger chunk sizes are optimal.</td></tr>
+</tbody>
+</table>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The &#8220;<a class="reference internal" href="../sharding.html"><em>Sharding</em></a>&#8221; section of the manual for more
+information on sharding and cluster configuration.</p>
+</div>
+</div>
+</div>
+<div class="section" id="running-multiple-database-instances-on-the-same-system">
+<h2>Running Multiple Database Instances on the Same System<a class="headerlink" href="#running-multiple-database-instances-on-the-same-system" title="Permalink to this headline">¶</a></h2>
+<p>In many cases running multiple instances of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on a
+single system is not recommended, on some types of deployments
+<a class="footnote-reference" href="#multimongod" id="id2">[2]</a> and for testing purposes you may need to run more than
+one <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on a single system.</p>
+<p>In these cases, use a <a class="reference internal" href="#base-config"><em>base configuration</em></a> for each
+instance, but consider the following configuration values:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">dbpath</span> <span class="o">=</span> <span class="s">/srv/mongodb/db0/</span>
+<span class="na">pidfilepath</span> <span class="o">=</span> <span class="s">/srv/mongodb/db0.pid</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> value controls the location of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance&#8217;s data directory. Ensure that each database
+has a distinct and well labeled data directory. The
+<a class="reference internal" href="../reference/configuration-options.html#pidfilepath" title="pidfilepath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">pidfilepath</span></tt></a> controls where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process
+places it&#8217;s <a class="reference internal" href="../reference/glossary.html#term-pid"><em class="xref std std-term">pid</em></a> file. As this tracks the specific
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> file, it is crucial that file be unique and well
+labeled to make it easy to start and stop these processes.</p>
+<p>Create additional <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control scripts</em></a> and/or
+adjust your existing MongoDB configuration and control script as
+needed to control these processes.</p>
+<table class="docutils footnote" frame="void" id="multimongod" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Single-tenant systems with <a class="reference internal" href="../reference/glossary.html#term-ssd"><em class="xref std std-term">SSD</em></a> or other high
+performance disks may provide acceptable performance levels for
+multiple <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances. Additionally, you may find that
+multiple databases with small working sets may function acceptably
+on a single system.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="diagnostic-configurations">
+<h2>Diagnostic Configurations<a class="headerlink" href="#diagnostic-configurations" title="Permalink to this headline">¶</a></h2>
+<p>The following configuration options control various <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+behaviors for diagnostic purposes. The following settings have default
+values that tuned for general production purposes:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">slowms</span> <span class="o">=</span> <span class="s">50</span>
+<span class="na">profile</span> <span class="o">=</span> <span class="s">3</span>
+<span class="na">verbose</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">diaglog</span> <span class="o">=</span> <span class="s">3</span>
+<span class="na">objcheck</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">cpu</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+<p>Use the <a class="reference internal" href="#base-config"><em>base configuration</em></a> and add these options
+if you are experiencing some unknown issue or performance problem as
+needed:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#slowms" title="slowms"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slowms</span></tt></a> configures the threshold for the <a class="reference internal" href="../reference/glossary.html#term-database-profiler"><em class="xref std std-term">database
+profiler</em></a> to consider a query &#8220;slow.&#8221; The default value is 100
+milliseconds. Set a lower value if the database profiler does not
+return useful results. See <a class="reference internal" href="../applications/optimization.html"><em>Optimization Strategies for MongoDB Applications</em></a>
+for more information on optimizing operations in MongoDB.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#profile" title="profile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">profile</span></tt></a> sets the <a class="reference internal" href="../reference/glossary.html#term-database-profiler"><em class="xref std std-term">database profiler</em></a>
+level. The profiler is not active by default because of the possible
+impact on the profiler itself on performance. Unless this setting
+has a value, queries are not profiled.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#verbose" title="verbose"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">verbose</span></tt></a> enables a verbose logging mode that
+modifies <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> output and increases logging to include a
+greater number of events. Only use this option if you are
+experiencing an issue that is not reflected in the normal logging
+level. If you require additional verbosity, consider the following
+options:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">v</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">vv</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">vvv</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">vvvv</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">vvvvv</span> <span class="o">=</span> <span class="s">true</span>
+</pre></div>
+</div>
+<p>Each additional level <tt class="docutils literal"><span class="pre">v</span></tt> adds additional verbosity to the
+logging. The <tt class="docutils literal"><span class="pre">verbose</span></tt> option  is equal to <tt class="docutils literal"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">true</span></tt>.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#diaglog" title="diaglog"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">diaglog</span></tt></a> enables <a class="reference internal" href="../reference/glossary.html#term-diagnostic-log"><em class="xref std std-term">diagnostic logging</em></a>. Level <tt class="docutils literal"><span class="pre">3</span></tt>
+logs all read and write options.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#objcheck" title="objcheck"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">objcheck</span></tt></a> forces <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to validate all
+requests from clients upon receipt. Use this option to ensure that
+invalid requests are not causing errors, particularly when running a
+database with untrusted clients. This option may affect database
+performance.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/configuration-options.html#cpu" title="cpu"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">cpu</span></tt></a> forces <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to report the percentage of
+the last interval spent in <a class="reference internal" href="../reference/glossary.html#term-write-lock"><em class="xref std std-term">write-lock</em></a>. The interval is
+typically 4 seconds, and each output line in the log includes both
+the actual interval since the last report and the percentage of
+time spent in write lock.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../administration.html" title="Previous Section: Administration">&lt; &nbsp; Administration</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="journaling.html" title="Next Section: Journaling">Journaling &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

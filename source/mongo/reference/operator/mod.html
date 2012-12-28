@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$mod &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/mod" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$natural" href="natural.html" />
+<link rel="prev" title="$min" href="min.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mod">
+<h1>$mod<a class="headerlink" href="#mod" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_mod">
+<tt class="descname">$mod</tt><a class="headerlink" href="#_S_mod" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">field:</span> <span class="pre">{</span> <span class="pre">$mod:</span> <span class="pre">[</span> <span class="pre">divisor,</span> <span class="pre">remainder</span> <span class="pre">]}</span> <span class="pre">}</span></tt></p>
+<p><a class="reference internal" href="../operators.html#_S_mod" title="$mod"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$mod</span></tt></a> selects the documents where the <tt class="docutils literal"><span class="pre">field</span></tt> value divided
+by the <tt class="docutils literal"><span class="pre">divisor</span></tt> has the specified <tt class="docutils literal"><span class="pre">remainder</span></tt>.</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$mod</span><span class="o">:</span> <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection
+where the <tt class="docutils literal"><span class="pre">qty</span></tt> field value modulo <tt class="docutils literal"><span class="pre">4</span></tt> equals <tt class="docutils literal"><span class="pre">0</span></tt>, such as
+documents with <tt class="docutils literal"><span class="pre">qty</span></tt> value equal to <tt class="docutils literal"><span class="pre">0</span></tt> or <tt class="docutils literal"><span class="pre">12</span></tt>.</p>
+<p>In some cases, you can query using the <a class="reference internal" href="../operators.html#_S_mod" title="$mod"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$mod</span></tt></a> operator
+rather than the more expensive <a class="reference internal" href="../operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> operator. Consider
+the following example using the <a class="reference internal" href="../operators.html#_S_mod" title="$mod"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$mod</span></tt></a> operator:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$mod</span><span class="o">:</span> <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The above query is less expensive than the following query which
+uses the <a class="reference internal" href="../operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> operator:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$where</span><span class="o">:</span> <span class="s2">&quot;this.qty % 4 == 0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>, <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="min.html" title="Previous Section: $min">&lt; &nbsp; $min</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="natural.html" title="Next Section: $natural">$natural &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

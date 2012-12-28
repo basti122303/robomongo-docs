@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Copy Databases Between Instances &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/copy-databases-between-instances" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Analyze Performance of Database Operations" href="manage-the-database-profiler.html" />
+<link rel="prev" title="Convert a Replica Set to a Replicated Sharded Cluster" href="convert-replica-set-to-replicated-shard-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="copy-databases-between-instances">
+<h1>Copy Databases Between Instances<a class="headerlink" href="#copy-databases-between-instances" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB provides the <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> and <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a>
+<a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database commands</em></a> to support migrations of
+entire logical databases between <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances. With
+these commands you can copy data between instances with a simple
+interface without the need for an intermediate stage. The
+<a class="reference internal" href="../reference/method/db.cloneDatabase.html#db.cloneDatabase" title="db.cloneDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.cloneDatabase()</span></tt></a> and <a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a> provide
+helpers for these operations in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>Data migrations that require an intermediate stage or that involve
+more than one database instance are beyond the scope of this
+tutorial. <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> and <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> are more ideal
+for use cases that resemble the following use cases:</p>
+<ul class="simple">
+<li>data migrations,</li>
+<li>data warehousing, and</li>
+<li>seeding test environments.</li>
+</ul>
+<p>Also consider the <a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a> and
+<a class="reference internal" href="../administration/import-export.html"><em>Importing and Exporting MongoDB Data</em></a> documentation for more related
+information.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> and <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> do not produce
+point-in-time snapshots of the source database. Write traffic to
+the source or destination database during the copy process will
+result divergent data sets.</p>
+</div>
+</div>
+<div class="section" id="considerations">
+<h2>Considerations<a class="headerlink" href="#considerations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>You must run <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> or <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> on the
+destination server.</li>
+<li>You cannot use <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> or <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> with
+databases that have a sharded collection in a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>,
+or any database via a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>.</li>
+<li>You <em>can</em> use <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> or <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> with
+databases that do not have sharded collections in a <a class="reference internal" href="../reference/glossary.html#term-cluster"><em class="xref std std-term">cluster</em></a>
+when you&#8217;re connected directly to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</li>
+<li>You can run <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> or <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> commands on a
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> member of a replica set, with properly configured
+<a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a>.</li>
+<li>Each destination <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance must have enough
+free disk space on the destination server for the database you are
+copying. Use the <a class="reference internal" href="../reference/method/db.stats.html#db.stats" title="db.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.stats()</span></tt></a> operation to check the size of
+the database on the source <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. For more
+information on the output of <a class="reference internal" href="../reference/method/db.stats.html#db.stats" title="db.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.stats()</span></tt></a> see
+<a class="reference internal" href="../reference/database-statistics.html"><em>Database Statistics Reference</em></a> document.</li>
+</ul>
+</div>
+<div class="section" id="processes">
+<h2>Processes<a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="copy-and-rename-a-database">
+<h3>Copy and Rename a Database<a class="headerlink" href="#copy-and-rename-a-database" title="Permalink to this headline">¶</a></h3>
+<p>To copy a database from one MongoDB instance to another and rename
+the database in the process, use the <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> command, or
+the <a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>Use the following procedure to copy the database named <tt class="docutils literal"><span class="pre">test</span></tt> on
+server <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> to the server named <tt class="docutils literal"><span class="pre">db1.example.net</span></tt> and
+rename it to <tt class="docutils literal"><span class="pre">records</span></tt> in the process:</p>
+<ul>
+<li><p class="first">Verify that the database, <tt class="docutils literal"><span class="pre">test</span></tt> exists on the source
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> host.</p>
+</li>
+<li><p class="first">Connect to the destination server, running on the
+<tt class="docutils literal"><span class="pre">db1.example.net</span></tt> host, using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Model your operation on the following command:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">copyDatabase</span><span class="p">(</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="nx">db0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="rename-a-database">
+<h3>Rename a Database<a class="headerlink" href="#rename-a-database" title="Permalink to this headline">¶</a></h3>
+<p>You can also use <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> or the
+<a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a> helper to:</p>
+<ul class="simple">
+<li>rename a database within a single MongoDB instance or</li>
+<li>create a duplicate database for testing purposes.</li>
+</ul>
+<p>Use the following procedure to rename the <tt class="docutils literal"><span class="pre">test</span></tt> database
+<tt class="docutils literal"><span class="pre">records</span></tt> on a single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance:</p>
+<ul>
+<li><p class="first">Connect to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Model your operation on the following command:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">copyDatabase</span><span class="p">(</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;records&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="copy-a-database-with-authentication">
+<h3>Copy a Database with Authentication<a class="headerlink" href="#copy-a-database-with-authentication" title="Permalink to this headline">¶</a></h3>
+<p>To copy a database from a source MongoDB instance that has
+authentication enabled, you can specify authentication credentials to
+the <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> command or the <a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a>
+helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>In the following operation, you will copy the <tt class="docutils literal"><span class="pre">test</span></tt> database from
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running on <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> to the
+<tt class="docutils literal"><span class="pre">records</span></tt> database on the local instance (e.g. <tt class="docutils literal"><span class="pre">db1.example.net</span></tt>.)
+Because the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on <tt class="docutils literal"><span class="pre">db0.example.net</span></tt>
+requires authentication for all connections, you will need to pass
+<a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a> authentication credentials, as in the
+following procedure:</p>
+<ul>
+<li><p class="first">Connect to the destination <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the
+<tt class="docutils literal"><span class="pre">db1.example.net</span></tt> host using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">copyDatabase</span><span class="p">(</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="nx">db0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span> <span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;username&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;password&gt;</span></tt> with your authentication
+credentials.</p>
+</div>
+<div class="section" id="clone-a-database">
+<h3>Clone a Database<a class="headerlink" href="#clone-a-database" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> command copies a database between
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances like <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a>; however,
+<a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> preserves the database name from the source
+instance on the destination <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+<p>For many operations, <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> is functionally equivalent to
+<a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a>, but it has a more simple syntax and a more narrow
+use. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides the
+<a class="reference internal" href="../reference/method/db.cloneDatabase.html#db.cloneDatabase" title="db.cloneDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.cloneDatabase()</span></tt></a> helper as a wrapper around
+<a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a>.</p>
+<p>You can use the following procedure to clone a database from the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running on <tt class="docutils literal"><span class="pre">db1.example.net</span></tt>:</p>
+<ul>
+<li><p class="first">Connect to the destination <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the
+<tt class="docutils literal"><span class="pre">db1.example.net</span></tt> host using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command to specify the name of the database you
+want to copy:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">records</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">Use the following operation to initiate the <a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a>
+operation:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">cloneDatabase</span><span class="p">(</span> <span class="s2">&quot;db0.example.net&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="convert-replica-set-to-replicated-shard-cluster.html" title="Previous Section: Convert a Replica Set to a Replicated Sharded Cluster">&lt; &nbsp; Convert a Replica Set to a Replicated Sharded Cluster</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="manage-the-database-profiler.html" title="Next Section: Analyze Performance of Database Operations">Analyze Performance of Database Operations &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

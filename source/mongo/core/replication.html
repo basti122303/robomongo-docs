@@ -1,0 +1,481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replication Fundamentals &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/core/replication" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Replica Set Administration" href="../administration/replica-sets.html" />
+<link rel="prev" title="Replication" href="../replication.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replication-fundamentals">
+<h1>Replication Fundamentals<a class="headerlink" href="#replication-fundamentals" title="Permalink to this headline">¶</a></h1>
+<p>A MongoDB <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> is a cluster of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances that
+replicate amongst one another and ensure automated failover. Most replica
+sets consists of two or more <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances with at most one
+of these designated as the primary and the rest as secondary
+members. Clients direct all writes to the primary, while
+the secondary members replicate from the primary asynchronously.</p>
+<p>Database replication with MongoDB adds redundancy, helps to
+ensure high availability, simplifies certain administrative tasks
+such as backups, and may increase read capacity. Most production
+deployments use replication.</p>
+<p>If you&#8217;re familiar with other database systems, you may think about
+replica sets as a more sophisticated form of traditional master-slave
+replication. <a class="footnote-reference" href="#master-slave" id="id1">[1]</a> In master-slave replication, a
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> node accepts writes while one or more <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a>
+nodes replicate those write operations and thus maintain data sets
+identical to the master. For MongoDB deployments, the member that accepts write
+operations is the <strong>primary</strong>, and the replicating members are <strong>secondaries</strong>.</p>
+<p>MongoDB&#8217;s replica sets provide automated failover. If a
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> fails, the remaining members will automatically
+try to elect a new primary.</p>
+<p>A replica set can have up to 12 members, but only 7 members can have
+votes. For information regarding non-voting members, see
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-non-voting-members"><em>non-voting members</em></a></p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="../replication.html"><em>Replication</em></a> index for a list of the documents in
+this manual that describe the operation and use of replica sets.</p>
+</div>
+<table class="docutils footnote" frame="void" id="master-slave" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>MongoDB also provides conventional master/slave
+replication. Master/slave replication operates by way of the same
+mechanism as replica sets, but lacks the automatic failover
+capabilities. While replica sets are the recommended solution for
+production, a replica set can support only 12 members in total.
+If your deployment requires more than 11 <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> members, you&#8217;ll
+need to use master/slave replication.</td></tr>
+</tbody>
+</table>
+<div class="section" id="member-configuration-properties">
+<span id="index-0"></span><h2>Member Configuration Properties<a class="headerlink" href="#member-configuration-properties" title="Permalink to this headline">¶</a></h2>
+<p>You can configure replica set members in a variety of ways, as listed
+here. In most cases, members of a replica set have the default
+proprieties.</p>
+<ul class="simple">
+<li><strong>Secondary-Only</strong>: These members have data but cannot become
+primary under any circumstance. See
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-secondary-only-members"><em>Secondary-Only Members</em></a>.</li>
+<li><strong>Hidden</strong>: These members are invisible to client
+applications. See <a class="reference internal" href="../administration/replica-sets.html#replica-set-hidden-members"><em>Hidden Members</em></a>.</li>
+<li><strong>Delayed</strong>: These members apply operations from the
+primary&#8217;s <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> after a specified delay. You can think of a
+delayed member as a form of &#8220;rolling backup.&#8221;
+See <a class="reference internal" href="../administration/replica-sets.html#replica-set-delayed-members"><em>Delayed Members</em></a>.</li>
+<li><strong>Arbiters</strong>: These members have no data and exist solely to
+participate in <a class="reference internal" href="#replica-set-elections"><em>elections</em></a>. See
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>Arbiters</em></a>.</li>
+<li><strong>Non-Voting</strong>: These members do not vote in elections. Non-voting
+members are only used for larger sets with more than 12 members. See
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-non-voting-members"><em>Non-Voting Members</em></a>.</li>
+</ul>
+<p>For more information about each member configuration, see the
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-member-configurations"><em>Member Configurations</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</p>
+</div>
+<div class="section" id="failover">
+<span id="replica-set-failover"></span><h2>Failover<a class="headerlink" href="#failover" title="Permalink to this headline">¶</a></h2>
+<p>Replica sets feature automated failover. If the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>
+goes offline or becomes unresponsive and a majority of the original
+set members can still connect to each other, the set will elect a new
+primary.</p>
+<p>For a detailed explanation of failover, see the
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-failover-administration"><em>Failover and Recovery</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</p>
+<span class="target" id="index-1"></span><div class="section" id="elections">
+<span id="replica-set-elections"></span><span id="index-2"></span><h3>Elections<a class="headerlink" href="#elections" title="Permalink to this headline">¶</a></h3>
+<p>When any failover occurs, an election takes place to decide which
+member should become primary.</p>
+<p>Elections provide a mechanism for the members of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>
+to autonomously select a new <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> without
+administrator intervention. The election allows replica sets to
+recover from failover situations very quickly and robustly.</p>
+<p>Whenever the primary becomes unreachable, the secondary members
+trigger an election. The first member to
+receive votes from a majority of the set will become primary. The most
+important feature of replica set elections is that a majority of the
+original number of members in the replica set must be present for
+election to succeed. If you have a three-member replica set, the set can
+elect a primary when two or three members can connect to each other. If
+two members in the replica go offline, then the remaining member will
+remain a secondary.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When the current <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> steps down and triggers an
+election, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances will close all client
+connections. This ensures that the clients maintain an accurate
+view of the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> and helps prevent <a class="reference internal" href="../reference/glossary.html#term-rollback"><em class="xref std std-term">rollbacks</em></a>.</p>
+</div>
+<p>For more information on elections and failover, see:</p>
+<ul class="simple">
+<li>The <a class="reference internal" href="../administration/replica-sets.html#replica-set-failover-administration"><em>Failover and Recovery</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</li>
+<li>The <a class="reference internal" href="replication-internals.html#replica-set-election-internals"><em>Election Internals</em></a> section in the
+<a class="reference internal" href="replication-internals.html"><em>Replication Internals</em></a> document</li>
+</ul>
+</div>
+<div class="section" id="member-priority">
+<span id="replica-set-member-priority"></span><span id="replica-set-node-priority"></span><span id="index-3"></span><h3>Member Priority<a class="headerlink" href="#member-priority" title="Permalink to this headline">¶</a></h3>
+<p>In a replica set, every member has a &#8220;priority,&#8221; that helps determine
+eligibility for <a class="reference internal" href="#replica-set-elections"><em>election</em></a> to
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>. By default, all members have a priority of <tt class="docutils literal"><span class="pre">1</span></tt>,
+unless you modify the <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> value. All members
+have a single vote in elections.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Always configure the <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> value to control
+which members will become primary. Do not configure
+<a class="reference internal" href="../reference/replica-configuration.html#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].votes</span></tt></a> except to permit more than 7 secondary
+members.</p>
+</div>
+<p>For more information on member priorities, see the
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-node-priority-configuration"><em>Adjusting Priority</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</p>
+</div>
+</div>
+<div class="section" id="consistency">
+<span id="replica-set-consistency"></span><span id="index-4"></span><h2>Consistency<a class="headerlink" href="#consistency" title="Permalink to this headline">¶</a></h2>
+<p>This section provides an overview of the concepts that underpin
+database consistency and the MongoDB mechanisms to ensure that users
+have access to consistent data.</p>
+<p>In MongoDB, all read operations issued to the primary of a
+replica set are <a class="reference internal" href="../reference/glossary.html#term-strict-consistency"><em class="xref std std-term">consistent</em></a> with the last
+write operation.</p>
+<p>If clients configure the <a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a> to permit allow secondary reads,
+read operations cannot return from <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members that have not
+replicated more recent updates or operations. In these situations the
+query results may reflect a previous state.</p>
+<p>This behavior is sometimes characterized as <a class="reference internal" href="../reference/glossary.html#term-eventual-consistency"><em class="xref std std-term">eventual
+consistency</em></a> because the secondary member&#8217;s state will <em>eventually</em>
+reflect the primary&#8217;s state and MongoDB cannot guarantee <a class="reference internal" href="../reference/glossary.html#term-strict-consistency"><em class="xref std std-term">strict
+consistency</em></a> for read operations from secondary members.</p>
+<p>There is no way to guarantee consistency for reads from <em>secondary
+members,</em> except by configuring the <a class="reference internal" href="../reference/glossary.html#term-client"><em class="xref std std-term">client</em></a> and <a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> to
+ensure that write operations succeed on all members before completing
+successfully.</p>
+<div class="section" id="rollbacks">
+<span id="replica-set-rollback"></span><span id="replica-set-rollbacks"></span><span id="index-5"></span><h3>Rollbacks<a class="headerlink" href="#rollbacks" title="Permalink to this headline">¶</a></h3>
+<p>In some <a class="reference internal" href="../reference/glossary.html#term-failover"><em class="xref std std-term">failover</em></a> situations <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primaries</em></a> will have
+accepted write operations that have <em>not</em> replicated to the
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondaries</em></a> after a failover occurs. This case is
+rare and typically occurs as a result of a network partition with
+replication lag. When this member (the former primary) rejoins the
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> and attempts to continue replication as a
+secondary the former primary must revert these operations or &#8220;roll
+back&#8221; these operations to maintain database consistency across the
+replica set.</p>
+<p>MongoDB writes the rollback data to a <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> file in the
+database&#8217;s <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory. Use <a class="reference internal" href="../reference/bsondump.html"><em>bsondump</em></a> to read the contents of these rollback files
+and then manually apply the changes to the new primary. There is no
+way for MongoDB to appropriately and fairly handle rollback situations
+automatically. Therefore you must intervene manually to apply rollback
+data. Even after the member completes the rollback and returns to
+secondary status, administrators will need to apply or decide to
+ignore the rollback data. MongoDB writes rollback data to a
+<tt class="docutils literal"><span class="pre">rollback/</span></tt> folder within the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory to files
+with filenames in the following form:</p>
+<div class="highlight-none"><div class="highlight"><pre>&lt;database&gt;.&lt;collection&gt;.&lt;timestamp&gt;.bson
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-none"><div class="highlight"><pre>records.accounts.2011-05-09T18-10-04.0.bson
+</pre></div>
+</div>
+<p>The best strategy for avoiding all rollbacks is to ensure <a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>write
+propagation</em></a> to all or some of the
+members in the set. Using
+these kinds of policies prevents situations
+that might create rollbacks.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>A <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance will not rollback more than 300
+megabytes of data. If your system needs to rollback more than 300
+MB, you will need to manually intervene to recover this data. If
+this is the case, you will find the following line in your
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> log:</p>
+<div class="highlight-none"><div class="highlight"><pre>[replica set sync] replSet syncThread: 13410 replSet too much data to roll back
+</pre></div>
+</div>
+<p class="last">In these situations you will need to manually intervene to either
+save data manually, or resync from a &#8220;current&#8221; member of the set by
+deleting the content of the existing:setting:<cite>dbpath</cite> directory to
+resume normal operation.</p>
+</div>
+<p>For more information on failover, see:</p>
+<ul class="simple">
+<li>The <a class="reference internal" href="#replica-set-failover"><em>Failover</em></a> section in this document.</li>
+<li>The <a class="reference internal" href="../administration/replica-sets.html#replica-set-failover-administration"><em>Failover and Recovery</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</li>
+</ul>
+</div>
+<div class="section" id="application-concerns">
+<h3>Application Concerns<a class="headerlink" href="#application-concerns" title="Permalink to this headline">¶</a></h3>
+<p>Client applications are indifferent to the configuration and operation
+of replica sets. While specific configuration depends to some extent
+on the client <a class="reference internal" href="../applications/drivers.html"><em>drivers</em></a>, there is often
+minimal or no difference between applications using
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> or standalone instances.</p>
+<p>There are two major concepts that <em>are</em> important to consider when
+working with replica sets:</p>
+<ol class="arabic">
+<li><p class="first"><a class="reference internal" href="write-operations.html#write-concern"><em>Write Concern</em></a>.</p>
+<p>Write concern sends a MongoDB client a response from the server to
+confirm successful write operations. In replica sets you can
+configure <a class="reference internal" href="write-operations.html#write-concern-replica-acknowledged"><em>replica acknowledged</em></a>
+write concern to ensure that secondary members of the set have
+replicated operations before the write returns.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>Read Preference</em></a></p>
+<p>By default, read operations issued against a replica set return
+results from the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>. Users may
+configure <a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a> on a per-connection basis to
+prefer that read operations return on the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>
+members.</p>
+</li>
+</ol>
+<p><a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">Read preference</em></a> and <a class="reference internal" href="../reference/glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a> have particular
+<a class="reference internal" href="#replica-set-consistency"><em>consistency</em></a> implications.</p>
+<p>For a more detailed discussion of application concerns, see <a class="reference internal" href="../applications/replication.html"><em>Application Development with Replica Sets</em></a>.</p>
+</div>
+</div>
+<div class="section" id="administration-and-operations">
+<h2>Administration and Operations<a class="headerlink" href="#administration-and-operations" title="Permalink to this headline">¶</a></h2>
+<p>This section provides a brief overview of concerns relevant to
+administrators of <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> deployments.</p>
+<p>For more information on replica set administration, operations, and
+architecture, see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a></li>
+<li><a class="reference internal" href="../administration/replication-architectures.html"><em>Replication Architectures</em></a></li>
+</ul>
+<div class="section" id="oplog">
+<span id="replica-set-oplog-sizing"></span><span id="index-6"></span><h3>Oplog<a class="headerlink" href="#oplog" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> (operations log) is a special <a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped
+collection</em></a> that keeps a rolling record of all operations that modify
+that data stored in your databases. MongoDB applies database operations
+on the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and then records the operations on the primary&#8217;s
+oplog. The <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members then replicate this log and apply
+the operations to themselves in an asynchronous process. All replica set
+members contain a copy of the oplog, allowing them to maintain the
+current state of the database. Operations in the oplog are <a class="reference internal" href="../reference/glossary.html#term-idempotent"><em class="xref std std-term">idempotent</em></a>.</p>
+<p>By default, the size of the oplog is as follows:</p>
+<ul>
+<li><p class="first">For 64-bit Linux, Solaris, and FreeBSD systems, MongoDB will
+allocate 5% of the available free disk space to the oplog.</p>
+<p>If this amount is smaller than a gigabyte, then MongoDB will
+allocate 1 gigabyte of space.</p>
+</li>
+<li><p class="first">For 64-bit OS X systems, MongoDB allocates 183 megabytes of space to
+the oplog.</p>
+</li>
+<li><p class="first">For 32-bit systems, MongoDB allocates about 48 megabytes of space to
+the oplog.</p>
+</li>
+</ul>
+<p>Before oplog creation, you can specify the size of your oplog with the
+<a class="reference internal" href="../reference/configuration-options.html#oplogSize" title="oplogSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">oplogSize</span></tt></a> option. After you start a replica set member for
+the first time, you can only change the size of the oplog by using the
+<a class="reference internal" href="../tutorial/change-oplog-size.html"><em>Change the Size of the Oplog</em></a> tutorial.</p>
+<p>In most cases, the default oplog size is sufficient. For example, if an
+oplog that is 5% of free disk space fills up in 24 hours of operations, then
+secondaries can stop copying entries from the oplog for 24 hours before
+they require full resyncing. However, most replica sets have much
+lower operation volumes, and their oplogs can hold a much larger
+number of operations.</p>
+<p>The following factors affect how MongoDB uses space in the oplog:</p>
+<ul>
+<li><p class="first">Update operations that affect multiple documents at once.</p>
+<p>The oplog must translate multi-updates into individual operations,
+in order to maintain <a class="reference internal" href="../reference/glossary.html#term-idempotent"><em class="xref std std-term">idempotency</em></a>. This can use
+a great deal of oplog space without a corresponding increase
+in disk utilization.</p>
+</li>
+<li><p class="first">If you delete roughly the same amount of data as you insert.</p>
+<p>In this situation the database will not grow significantly in disk
+utilization, but the size of the operation log can be quite large.</p>
+</li>
+<li><p class="first">If a significant portion of your workload entails in-place updates.</p>
+<p>In-place updates create a large number of operations but do not
+change the quantity data on disk.</p>
+</li>
+</ul>
+<p>If you can predict your replica set&#8217;s workload to resemble one
+of the above patterns, then you may want to consider creating an oplog
+that is larger than the default. Conversely, if the predominance of
+activity of your MongoDB-based application are reads and you are
+writing a small amount of data, you may find that you need a much
+smaller oplog.</p>
+<p>To view oplog status, including the size and the time range of
+operations, issue the <a class="reference internal" href="../reference/method/db.printReplicationInfo.html#db.printReplicationInfo" title="db.printReplicationInfo"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printReplicationInfo()</span></tt></a> method. For
+more information on oplog status, see
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-troubleshooting-check-oplog-size"><em>Check the Size of the Oplog</em></a>.</p>
+<p>For additional information about oplog behavior, see
+<a class="reference internal" href="replication-internals.html#replica-set-oplog"><em>Oplog Internals</em></a> and <a class="reference internal" href="replication-internals.html#replica-set-syncing"><em>Syncing</em></a>.</p>
+</div>
+<div class="section" id="replica-set-deployment">
+<h3>Replica Set Deployment<a class="headerlink" href="#replica-set-deployment" title="Permalink to this headline">¶</a></h3>
+<p>Without replication, a standalone MongoDB instance represents a single
+point of failure and any disruption of the MongoDB system will render
+the database unusable and potentially unrecoverable. Replication
+increase the reliability of the database instance, and replica sets
+are capable of distributing reads to <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members depending
+on <a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a>. For database work loads dominated by read
+operations, (i.e. &#8220;read heavy&#8221;) replica sets can greatly increase the
+capability of the database system.</p>
+<p>The minimum requirements for a replica set include two members with
+data, for a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and a secondary, and an <a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>arbiters</em></a>. In most circumstances, however, you will want
+to deploy three data members.</p>
+<p>For those deployments that rely heavily on distributing reads to
+secondary instances, add additional members to the set as load
+increases. As your deployment grows, consider adding or moving
+replica set members to secondary data centers or to geographically
+distinct locations for additional redundancy. While many architectures
+are possible, always ensure that the quorum of members required to elect
+a primary remains in your main facility.</p>
+<p>Depending on your operational requirements, you may consider adding
+members configured for a specific purpose including, a <a class="reference internal" href="../reference/glossary.html#term-delayed-member"><em class="xref std std-term">delayed
+member</em></a> to help provide protection against human errors and change
+control, a <a class="reference internal" href="../reference/glossary.html#term-hidden-member"><em class="xref std std-term">hidden member</em></a> to provide an isolated member for
+reporting and monitoring, and/or a <a class="reference internal" href="../administration/replica-sets.html#replica-set-secondary-only-members"><em>secondary only member</em></a> for dedicated backups.</p>
+<p>The process of establishing a new replica set member can be resource
+intensive on existing members. As a result, deploy new members to
+existing replica sets significantly before current demand saturates
+the existing members.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">Journaling</em></a>, provides single-instance write
+durability. The journaling greatly improves the reliability and
+durability of a database. Unless MongoDB runs with journaling, when
+a MongoDB instance terminates ungracefully, the database can end in
+a corrupt and unrecoverable state.</p>
+<p>You should assume that a database, running without journaling, that
+suffers a crash or unclean shutdown is in corrupt or inconsistent
+state.</p>
+<p><strong>Use journaling</strong>, however, do not forego proper replication
+because of journaling.</p>
+<p class="last">64-bit versions of MongoDB after version 2.0 have journaling
+enabled by default.</p>
+</div>
+</div>
+<div class="section" id="security">
+<span id="index-7"></span><h3>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h3>
+<p>In most cases, <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> administrators do not have to keep
+additional considerations in mind beyond the normal security
+precautions that all MongoDB administrators must take. However, ensure
+that:</p>
+<ul class="simple">
+<li>Your network configuration will allow every member of the replica
+set to contact every other member of the replica set.</li>
+<li>If you use MongoDB&#8217;s authentication system to limit access to your
+infrastructure, ensure that you configure a
+<a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a> on all members to permit authentication.</li>
+</ul>
+<p>For more information, see the <a class="reference internal" href="../administration/replica-sets.html#replica-set-security"><em>Security Considerations for Replica Sets</em></a> section in the
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</p>
+</div>
+<div class="section" id="architectures">
+<span id="replica-set-architecture"></span><span id="replica-set-deployment-overview"></span><h3>Architectures<a class="headerlink" href="#architectures" title="Permalink to this headline">¶</a></h3>
+<p>The architecture and design of the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> deployment can have a
+great impact on the set&#8217;s capacity and capability. This section
+provides a general overview of best practices for replica set
+architectures.</p>
+<p>This document provides an overview of the <em>complete</em> functionality of
+replica sets, which highlights the flexibility of the replica set and
+its configuration. However, for most production deployments a
+conventional 3-member replica set with <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a>
+values of <tt class="docutils literal"><span class="pre">1</span></tt> are sufficient.</p>
+<p>While the additional flexibility discussed is below helpful for
+managing a variety of operational complexities, it always makes sense
+to let those complex requirements dictate complex architectures,
+rather than add unnecessary complexity to your deployment.</p>
+<p>Consider the following factors when developing an architecture for
+your replica set:</p>
+<ul class="simple">
+<li>Ensure that the members of the replica set will always be able to
+elect a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>. Run an odd number of members or run an <a class="reference internal" href="../reference/glossary.html#term-arbiter"><em class="xref std std-term">arbiter</em></a>
+on one of your application servers if you have an even number of
+members.</li>
+<li>With geographically distributed members, know where the &#8220;quorum&#8221; of
+members will be in the case of any network partitions.  Attempt to
+ensure that the set can elect a primary among the members in the
+primary data center.</li>
+<li>Consider including a <a class="reference internal" href="../administration/replica-sets.html#replica-set-hidden-members"><em>hidden</em></a>
+or <a class="reference internal" href="../administration/replica-sets.html#replica-set-delayed-members"><em>delayed member</em></a> in your replica
+set to support dedicated functionality, like backups, reporting, and
+testing.</li>
+<li>Consider keeping one or two members of the set in an off-site data
+center, but make sure to configure the <a class="reference internal" href="#replica-set-node-priority"><em>priority</em></a> to prevent it from becoming primary.</li>
+</ul>
+<p>For more information regarding replica set configuration and
+deployments see <a class="reference internal" href="../administration/replication-architectures.html"><em>Replication Architectures</em></a>.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../replication.html" title="Previous Section: Replication">&lt; &nbsp; Replication</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="../administration/replica-sets.html" title="Next Section: Replica Set Administration">Replica Set Administration &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

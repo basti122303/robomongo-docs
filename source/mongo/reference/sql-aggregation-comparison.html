@@ -1,0 +1,388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>SQL to Aggregation Framework Mapping Chart &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/sql-aggregation-comparison" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="MongoDB Package Components" href="components.html" />
+<link rel="prev" title="SQL to MongoDB Mapping Chart" href="sql-comparison.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sql-to-aggregation-framework-mapping-chart">
+<h1>SQL to Aggregation Framework Mapping Chart<a class="headerlink" href="#sql-to-aggregation-framework-mapping-chart" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="../applications/aggregation.html"><em>aggregation framework</em></a> allows
+MongoDB to provide native aggregation capabilities that corresponds to
+many common data aggregation operations in SQL. If you&#8217;re new to
+MongoDB you might want to consider the <a class="reference internal" href="../faq.html"><em>Frequently Asked Questions</em></a> section for a
+selection of common questions.</p>
+<p>The following table provides an overview of common SQL aggregation
+terms, functions, and concepts and the corresponding MongoDB
+<a class="reference internal" href="aggregation.html#aggregation-pipeline-operator-reference"><em>aggregation operators</em></a>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">SQL Terms, Functions, and Concepts</th>
+<th class="head">MongoDB Aggregation Operators</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>WHERE</td>
+<td><a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td>GROUP BY</td>
+<td><a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a></td>
+</tr>
+<tr class="row-even"><td>HAVING</td>
+<td><a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td>SELECT</td>
+<td><a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a></td>
+</tr>
+<tr class="row-even"><td>ORDER BY</td>
+<td><a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td>LIMIT</td>
+<td><a class="reference internal" href="aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a></td>
+</tr>
+<tr class="row-even"><td>SUM()</td>
+<td><a class="reference internal" href="aggregation/sum.html#_S_sum" title="$sum"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sum</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td>COUNT()</td>
+<td><a class="reference internal" href="aggregation/sum.html#_S_sum" title="$sum"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sum</span></tt></a></td>
+</tr>
+<tr class="row-even"><td>join</td>
+<td>No direct corresponding operator;
+<em>however</em>, the <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> operator
+allows for somewhat similar functionality,
+but with fields embedded within the document.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>The following table presents a quick reference of SQL aggregation
+statements and the corresponding MongoDB statements. The examples in
+the table assume the following conditions:</p>
+<ul>
+<li><p class="first">The SQL examples assume <em>two</em> tables, <tt class="docutils literal"><span class="pre">orders</span></tt> and
+<tt class="docutils literal"><span class="pre">order_lineitem</span></tt> that join by the <tt class="docutils literal"><span class="pre">order_lineitem.order_id</span></tt> and
+the <tt class="docutils literal"><span class="pre">orders.id</span></tt> columns.</p>
+</li>
+<li><p class="first">The MongoDB examples assume <em>one</em> collection <tt class="docutils literal"><span class="pre">orders</span></tt> that contain
+documents of the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
+  <span class="nx">ord_date</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-11-02T17:04:11.102Z&quot;</span><span class="p">),</span>
+  <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+  <span class="nx">price</span><span class="o">:</span> <span class="mi">50</span><span class="p">,</span>
+  <span class="nx">items</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;xxx&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">25</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+           <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;yyy&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">25</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The MongoDB statements prefix, the names of the fields from the
+<a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">documents</em></a> in the collection <tt class="docutils literal"><span class="pre">orders</span></tt> with a
+<tt class="docutils literal"><span class="pre">$</span></tt> character when they appear as operands to the aggregation
+operations.</p>
+</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="36%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">SQL Example</th>
+<th class="head">MongoDB Example</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">AS</span> <span class="k">count</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">count</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>Count all records
+from <tt class="docutils literal"><span class="pre">orders</span></tt></td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">AS</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>Sum the <tt class="docutils literal"><span class="pre">price</span></tt> field
+from <tt class="docutils literal"><span class="pre">orders</span></tt></td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">AS</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>,
+sum the <tt class="docutils literal"><span class="pre">price</span></tt> field.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">AS</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">total</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$sort</span><span class="o">:</span> <span class="p">{</span> <span class="nx">total</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>,
+sum the <tt class="docutils literal"><span class="pre">price</span></tt> field,
+results sorted by sum.</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="n">ord_date</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">AS</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span><span class="p">,</span> <span class="n">ord_date</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="p">{</span> <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">                      <span class="nx">ord_date</span><span class="o">:</span> <span class="s2">&quot;$ord_date&quot;</span> <span class="p">},</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique
+<tt class="docutils literal"><span class="pre">cust_id</span></tt>, <tt class="docutils literal"><span class="pre">ord_date</span></tt> grouping,
+sum the <tt class="docutils literal"><span class="pre">price</span></tt> field.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+<span class="k">HAVING</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">count</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$match</span><span class="o">:</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For <tt class="docutils literal"><span class="pre">cust_id</span></tt> with multiple records,
+return the <tt class="docutils literal"><span class="pre">cust_id</span></tt> and
+the corresponding record count.</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="n">ord_date</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">AS</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span><span class="p">,</span> <span class="n">ord_date</span>
+<span class="k">HAVING</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">250</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="p">{</span> <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">                      <span class="nx">ord_date</span><span class="o">:</span> <span class="s2">&quot;$ord_date&quot;</span> <span class="p">},</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$match</span><span class="o">:</span> <span class="p">{</span> <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">250</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>, <tt class="docutils literal"><span class="pre">ord_date</span></tt>
+grouping, sum the <tt class="docutils literal"><span class="pre">price</span></tt> field
+and return only where the
+sum is greater than 250.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">WHERE</span> <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$match</span><span class="o">:</span> <span class="p">{</span> <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>
+with status <tt class="docutils literal"><span class="pre">A</span></tt>,
+sum the <tt class="docutils literal"><span class="pre">price</span></tt> field.</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="k">as</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">WHERE</span> <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+<span class="k">HAVING</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">250</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$match</span><span class="o">:</span> <span class="p">{</span> <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$price&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$match</span><span class="o">:</span> <span class="p">{</span> <span class="nx">total</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">250</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>
+with status <tt class="docutils literal"><span class="pre">A</span></tt>,
+sum the <tt class="docutils literal"><span class="pre">price</span></tt> field and return
+only where the
+sum is greater than 250.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span>
+       <span class="k">SUM</span><span class="p">(</span><span class="n">li</span><span class="p">.</span><span class="n">qty</span><span class="p">)</span> <span class="k">as</span> <span class="n">qty</span>
+<span class="k">FROM</span> <span class="n">orders</span> <span class="n">o</span><span class="p">,</span>
+     <span class="n">order_lineitem</span> <span class="n">li</span>
+<span class="k">WHERE</span> <span class="n">li</span><span class="p">.</span><span class="n">order_id</span> <span class="o">=</span> <span class="n">o</span><span class="p">.</span><span class="n">id</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$unwind</span><span class="o">:</span> <span class="s2">&quot;$items&quot;</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">               <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="s2">&quot;$items.qty&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="hll"><span class="p">]</span> <span class="p">)</span>
+</span></pre></div>
+</div>
+</td>
+<td>For each unique <tt class="docutils literal"><span class="pre">cust_id</span></tt>,
+sum the corresponding
+line item <tt class="docutils literal"><span class="pre">qty</span></tt> fields
+associated with the
+orders.</td>
+</tr>
+<tr class="row-even"><td><div class="first last highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span>
+<span class="k">FROM</span> <span class="p">(</span><span class="k">SELECT</span> <span class="n">cust_id</span><span class="p">,</span> <span class="n">ord_date</span>
+      <span class="k">FROM</span> <span class="n">orders</span>
+      <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_id</span><span class="p">,</span> <span class="n">ord_date</span><span class="p">)</span> <span class="k">as</span> <span class="n">DerivedTable</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span>
+<span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="p">{</span> <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;$cust_id&quot;</span><span class="p">,</span>
+</span><span class="hll">                      <span class="nx">ord_date</span><span class="o">:</span> <span class="s2">&quot;$ord_date&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+</span><span class="hll">   <span class="p">{</span> <span class="nx">$group</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">count</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+</span><span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>Count the number of distinct
+<tt class="docutils literal"><span class="pre">cust_id</span></tt>, <tt class="docutils literal"><span class="pre">ord_date</span></tt> groupings.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sql-comparison.html" title="Previous Section: SQL to MongoDB Mapping Chart">&lt; &nbsp; SQL to MongoDB Mapping Chart</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="components.html" title="Next Section: MongoDB Package Components">MongoDB Package Components &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

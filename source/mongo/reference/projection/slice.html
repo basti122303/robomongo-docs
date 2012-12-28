@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$slice (projection) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/projection/slice" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$add (aggregation)" href="../aggregation/add.html" />
+<link rel="prev" title="$elemMatch (projection)" href="elemMatch.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="slice-projection">
+<h1>$slice (projection)<a class="headerlink" href="#slice-projection" title="Permalink to this headline">¶</a></h1>
+<dl class="projection">
+<dt id="_S_slice">
+<tt class="descname">$slice</tt><a class="headerlink" href="#_S_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#_S_slice" title="$slice"><tt class="xref mongodb mongodb-projection docutils literal"><span class="pre">$slice</span></tt></a> operator controls the number of items of an array
+that a query returns. Consider the following prototype query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">array</span><span class="o">:</span> <span class="p">{</span><span class="nx">$slice</span><span class="o">:</span> <span class="nx">count</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation selects the document <tt class="docutils literal"><span class="pre">collection</span></tt> identified by a
+field named <tt class="docutils literal"><span class="pre">field</span></tt> that holds <tt class="docutils literal"><span class="pre">value</span></tt> and returns the number
+of elements specified by the value of <tt class="docutils literal"><span class="pre">count</span></tt> from the array
+stored in the <tt class="docutils literal"><span class="pre">array</span></tt> field. If <tt class="docutils literal"><span class="pre">count</span></tt> has a value greater
+than the number of elements in <tt class="docutils literal"><span class="pre">array</span></tt> the query returns all
+elements of the array.</p>
+<p><a class="reference internal" href="#_S_slice" title="$slice"><tt class="xref mongodb mongodb-projection docutils literal"><span class="pre">$slice</span></tt></a> accepts arguments in a number of formats,
+including negative values and arrays. Consider the following
+examples:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">comments</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$slice</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, <a class="reference internal" href="#_S_slice" title="$slice"><tt class="xref mongodb mongodb-projection docutils literal"><span class="pre">$slice</span></tt></a> selects the first five items in an array
+in the <tt class="docutils literal"><span class="pre">comments</span></tt> field.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">comments</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$slice</span><span class="o">:</span> <span class="o">-</span><span class="mi">5</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation returns the last five items in array.</p>
+<p>The following examples specify an array as an argument to
+slice. Arrays take the form of <tt class="docutils literal"><span class="pre">[</span> <span class="pre">skip</span> <span class="pre">,</span> <span class="pre">limit</span> <span class="pre">]</span></tt>, where the
+first value indicates the number of items in the array to skip and
+the second value indicates the number of items to return.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">comments</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$slice</span><span class="o">:</span> <span class="p">[</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, the query will only return 10 items, after skipping the first
+20 items of that array.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">comments</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$slice</span><span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation returns 10 items as well, beginning with the item
+that is 20th from the last item of the array.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="elemMatch.html" title="Previous Section: $elemMatch (projection)">&lt; &nbsp; $elemMatch (projection)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="../aggregation/add.html" title="Next Section: $add (aggregation)">$add (aggregation) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Release Notes for MongoDB 1.8 &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/1.8" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Release Notes for MongoDB 2.4 (2.3 Development Series)" href="2.4.html" />
+<link rel="prev" title="Release Notes for MongoDB 2.0" href="2.0.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="release-notes-for-mongodb-1-8">
+<h1>Release Notes for MongoDB 1.8<a class="headerlink" href="#release-notes-for-mongodb-1-8" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="see-the-full-index-of-this-page-for-a-complete-list-of-changes-included-in-1-8">
+<p class="topic-title first">See the <a class="reference internal" href="1.8-changes.html"><em>full index of this page</em></a> for
+           a complete list of changes included in 1.8.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#upgrading" id="id20">Upgrading</a></li>
+<li><a class="reference internal" href="#changes" id="id21">Changes</a></li>
+<li><a class="reference internal" href="#resources" id="id22">Resources</a></li>
+</ul>
+</div>
+<div class="section" id="upgrading">
+<h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB 1.8 is a standard, incremental production release and works as
+a drop-in replacement for MongoDB 1.6, except:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica set</em></a> members should be upgraded in a
+particular order, as described in <a class="reference internal" href="#upgrade-replica-set"><em>Upgrading a Replica Set</em></a>.</li>
+<li>The <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> command has changed in 1.8, causing
+incompatibility with previous releases. <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> no
+longer generates temporary collections (thus, <tt class="docutils literal"><span class="pre">keepTemp</span></tt> has been
+removed). Now, you must always supply a value for <tt class="docutils literal"><span class="pre">out</span></tt>. See the
+<tt class="docutils literal"><span class="pre">out</span></tt> field options in the <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> document. If you
+use MapReduce, this also likely means you need a recent version of
+your client driver.</li>
+</ul>
+<div class="section" id="preparation">
+<h3>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h3>
+<p>Read through all release notes before upgrading and ensure that no
+changes will affect your deployment.</p>
+</div>
+<div class="section" id="upgrading-a-standalone-mongod">
+<span id="upgrade-standalone"></span><h3>Upgrading a Standalone <tt class="docutils literal"><span class="pre">mongod</span></tt><a class="headerlink" href="#upgrading-a-standalone-mongod" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download the v1.8.x binaries from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+<li>Shutdown your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</li>
+<li>Replace the existing binary with the 1.8.x <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary.</li>
+<li>Restart MongoDB.</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-replica-set">
+<span id="upgrade-replica-set"></span><h3>Upgrading a Replica Set<a class="headerlink" href="#upgrading-a-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>1.8.x <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondaries</em></a> <strong>can</strong> replicate from 1.6.x
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primaries</em></a>.</p>
+<p>1.6.x secondaries <strong>cannot</strong> replicate from 1.8.x primaries.</p>
+<p>Thus, to upgrade a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> you must replace all of your
+secondaries first, then the primary.</p>
+<p>For example, suppose you have a replica set with a primary, an
+<a class="reference internal" href="../reference/glossary.html#term-arbiter"><em class="xref std std-term">arbiter</em></a> and several secondaries. To upgrade the set, do the
+following:</p>
+<ol class="arabic">
+<li><p class="first">For the arbiter:</p>
+<ol class="loweralpha simple">
+<li>Shut down the arbiter.</li>
+<li>Restart it with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+</ol>
+</li>
+<li><p class="first">Change your config (optional) to prevent election of a new primary.</p>
+<p>It is possible that, when you start shutting down members of the set,
+a new primary will be elected. To prevent this, you can give
+all of the secondaries a priority of <tt class="docutils literal"><span class="pre">0</span></tt> before
+upgrading, and then change them back afterwards. To do so:</p>
+<ol class="loweralpha">
+<li><p class="first">Record your current config. Run <a class="reference internal" href="../reference/replica-commands.html#rs.config" title="rs.config"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.config()</span></tt></a> and paste the
+results into a text file.</p>
+</li>
+<li><p class="first">Update your config so that all secondaries have
+priority <tt class="docutils literal"><span class="pre">0</span></tt>. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">config</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+<span class="p">{</span>
+     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+     <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27017&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27018&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27019&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;arbiterOnly&quot;</span> <span class="o">:</span> <span class="kc">true</span>
+             <span class="p">}</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27020&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27021&quot;</span>
+             <span class="p">},</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">version</span><span class="o">++</span>
+<span class="mi">3</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">isMaster</span><span class="p">()</span>
+<span class="p">{</span>
+     <span class="s2">&quot;setName&quot;</span> <span class="o">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;ismaster&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+     <span class="s2">&quot;secondary&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+     <span class="s2">&quot;hosts&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="s2">&quot;ubuntu:27017&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;ubuntu:27018&quot;</span>
+     <span class="p">],</span>
+     <span class="s2">&quot;arbiters&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="s2">&quot;ubuntu:27019&quot;</span>
+     <span class="p">],</span>
+     <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;ubuntu:27018&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+<span class="c1">// for each secondary</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p class="first">For each secondary:</p>
+<ol class="loweralpha simple">
+<li>Shut down the secondary.</li>
+<li>Restart it with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+</ol>
+</li>
+<li><p class="first">If you changed the config, change it back to its original state:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">config</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">version</span><span class="o">++</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">config</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Shut down the primary (the final 1.6 server), and then restart it
+with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-sharded-cluster">
+<span id="upgrade-sharded-cluster"></span><span id="upgrade-shard-cluster"></span><h3>Upgrading a Sharded Cluster<a class="headerlink" href="#upgrading-a-sharded-cluster" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Turn off the balancer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongo</span> <span class="o">&lt;</span><span class="nx">a_mongos_hostname</span><span class="o">&gt;</span>
+<span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span><span class="s2">&quot;balancer&quot;</span><span class="p">},{</span><span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span><span class="nx">stopped</span><span class="o">:</span><span class="kc">true</span><span class="p">}},</span> <span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">For each <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a>:</p>
+<ul class="simple">
+<li>If the shard is a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>, follow the directions above for
+<a class="reference internal" href="#upgrade-replica-set"><em>Upgrading a Replica Set</em></a>.</li>
+<li>If the shard is a single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process, shut it down
+and then restart it with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+</ul>
+</li>
+<li><p class="first">For each <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>:</p>
+<ol class="loweralpha simple">
+<li>Shut down the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process.</li>
+<li>Restart it with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+</ol>
+</li>
+<li><p class="first">For each config server:</p>
+<ol class="loweralpha simple">
+<li>Shut down the config server process.</li>
+<li>Restart it with the 1.8.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+</ol>
+</li>
+<li><p class="first">Turn on the balancer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span><span class="s2">&quot;balancer&quot;</span><span class="p">},{</span><span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span><span class="nx">stopped</span><span class="o">:</span><span class="kc">false</span><span class="p">}})</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="returning-to-1-6">
+<h3>Returning to 1.6<a class="headerlink" href="#returning-to-1-6" title="Permalink to this headline">¶</a></h3>
+<p>If for any reason you must move back to 1.6, follow the steps above in
+reverse. Please be careful that you have not inserted any documents
+larger than 4MB while running on 1.8 (where the max size has increased
+to 16MB). If you have you will get errors when the server tries to read
+those documents.</p>
+<div class="section" id="journaling">
+<h4>Journaling<a class="headerlink" href="#journaling" title="Permalink to this headline">¶</a></h4>
+<p>Returning to 1.6 after using 1.8 <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling">journaling</a> works
+fine, as journaling does not change anything about the data file format.
+Suppose you are running 1.8.x with journaling enabled and you decide to
+switch back to 1.6. There are two scenarios:</p>
+<ul class="simple">
+<li>If you shut down cleanly with 1.8.x, just restart with the 1.6 mongod
+binary.</li>
+<li>If 1.8.x shut down uncleanly, start 1.8.x up again and let the journal
+files run to fix any damage (incomplete writes) that may have existed
+at the crash. Then shut down 1.8.x cleanly and restart with the 1.6
+mongod binary.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Journaling<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB now supports write-ahead <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling">journaling</a> to
+facilitate fast crash recovery and durability in the storage engine.
+With journaling enabled, a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can be quickly restarted
+following a crash without needing to repair the <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collections</em></a>. The aggregation framework makes it possible to do
+aggregation</p>
+</div>
+<div class="section" id="sparse-and-covered-indexes">
+<h3>Sparse and Covered Indexes<a class="headerlink" href="#sparse-and-covered-indexes" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../core/indexes.html#index-type-sparse"><em>Sparse Indexes</em></a> are indexes that only include
+documents that contain the fields specified in the index. Documents
+missing the field will not appear in the index at all. This can
+significantly reduce index size for indexes of fields that contain only a
+subset of documents within a <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a>.</p>
+<p><a class="reference internal" href="../applications/indexes.html#covered-queries"><em>Covered Indexes</em></a> enable MongoDB to answer
+queries entirely from the index when the query only selects fields
+that the index contains.</p>
+</div>
+<div class="section" id="incremental-mapreduce-support">
+<h3>Incremental MapReduce Support<a class="headerlink" href="#incremental-mapreduce-support" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> command supports new options that enable
+incrementally updating existing <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collections</em></a>.
+Previously, a MapReduce job could output either to a temporary
+collection or to a named permanent collection, which it would overwrite
+with new data.</p>
+<p>You now have several options for the output of your MapReduce jobs:</p>
+<ul class="simple">
+<li>You can merge MapReduce output into an existing collection. Output
+from the Reduce phase will replace existing keys in the output
+collection if it already exists. Other keys will remain in the
+collection.</li>
+<li>You can now re-reduce your output with the contents of an existing
+collection. Each key output by the reduce phase will be reduced with
+the existing document in the output collection.</li>
+<li>You can replace the existing output collection with the new results of
+the MapReduce job (equivalent to setting a permanent output
+collection in previous releases)</li>
+<li>You can compute MapReduce inline and return results to the caller
+without persisting the results of the job. This is similar to the
+temporary collections generated in previous releases, except results
+are limited to 8MB.</li>
+</ul>
+<p>For more information, see the <tt class="docutils literal"><span class="pre">out</span></tt> field options in the
+<a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> document.</p>
+</div>
+<div class="section" id="additional-changes-and-enhancements">
+<h3>Additional Changes and Enhancements<a class="headerlink" href="#additional-changes-and-enhancements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>1.8.1<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Sharding migrate fix when moving larger chunks.</li>
+<li>Durability fix with background indexing.</li>
+<li>Fixed mongos concurrency issue with many incoming connections.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>1.8.0<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>All changes from 1.7.x series.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h4>1.7.6<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Bug fixes.</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h4>1.7.5<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling">Journaling</a>.</li>
+<li>Extent allocation improvements.</li>
+<li>Improved <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> connectivity for <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>.</li>
+<li><a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> improvements for <a class="reference internal" href="../reference/glossary.html#term-sharding"><em class="xref std std-term">sharding</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h4>1.7.4<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> routes <tt class="docutils literal"><span class="pre">slaveOk</span></tt> queries to <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondaries</em></a> in <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>.</li>
+<li>New <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> output options.</li>
+<li><a class="reference internal" href="../core/indexes.html#index-type-sparse"><em>Sparse Indexes</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h4>1.7.3<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Initial <a class="reference internal" href="../applications/indexes.html#covered-queries"><em>covered index</em></a> support.</li>
+<li>Distinct can use data from indexes when possible.</li>
+<li><a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> can merge or reduce results into an existing collection.</li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> tracks and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> displays network usage. See <a class="reference internal" href="../reference/mongostat.html#mongostat"><em>mongostat</em></a>.</li>
+<li>Sharding stability improvements.</li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h4>1.7.2<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator allows renaming of fields in a document.</li>
+<li><a class="reference internal" href="../reference/method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> not to block.</li>
+<li>Geo queries with sharding.</li>
+<li><a class="reference internal" href="../reference/mongostat.html#cmdoption-mongostat--discover"><em class="xref std std-option">mongostat --discover</em></a> option</li>
+<li>Chunk splitting enhancements.</li>
+<li>Replica sets network enhancements for servers behind a nat.</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h4>1.7.1<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Many sharding performance enhancements.</li>
+<li>Better support for <a class="reference internal" href="../reference/projection/elemMatch.html#_S_elemMatch" title="$elemMatch"><tt class="xref mongodb mongodb-projection docutils literal"><span class="pre">$elemMatch</span></tt></a> on primitives in embedded arrays.</li>
+<li>Query optimizer enhancements on range queries.</li>
+<li>Window service enhancements.</li>
+<li>Replica set setup improvements.</li>
+<li><a class="reference internal" href="../reference/operators.html#_S_pull" title="$pull"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$pull</span></tt></a> works on primitives in arrays.</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h4>1.7.0<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>Sharding performance improvements for heavy insert loads.</li>
+<li>Slave delay support for replica sets.</li>
+<li><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">getLastErrorDefaults</span></tt> for replica sets.</li>
+<li>Auto completion in the shell.</li>
+<li>Spherical distance for geo search.</li>
+<li>All fixes from 1.6.1 and 1.6.2.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-announcement-forum-pages">
+<h3>Release Announcement Forum Pages<a class="headerlink" href="#release-announcement-forum-pages" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/v09MbhEm62Y">1.8.1</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/JeHQOnam6Qk">1.8.0</a></li>
+<li><a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/3t6GNZ1qGYc">1.7.6</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/S5R0Tx9wkEg">1.7.5</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/9Om3Vuw-y9c">1.7.4</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/DfNUrdbmflI">1.7.3</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/df7mwK6Xixo">1.7.2</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/HUR9zYtTpA8">1.7.1</a>,
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups=#!topic/mongodb-user/TUnJCg9161A">1.7.0</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://mongodb.org/downloads">MongoDB Downloads</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/secure/IssueNavigator.jspa?mode=hide&amp;requestId=10172">All JIRA Issues resolved in 1.8</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="2.0.html" title="Previous Section: Release Notes for MongoDB 2.0">&lt; &nbsp; Release Notes for MongoDB 2.0</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="2.4.html" title="Next Section: Release Notes for MongoDB 2.4 (2.3 Development Series)">Release Notes for MongoDB 2.4 (2.3 Development Series) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

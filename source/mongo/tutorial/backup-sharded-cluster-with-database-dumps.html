@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Create Backup of a Sharded Cluster with Database Dumps &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/backup-sharded-cluster-with-database-dumps" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Restore a Single Shard" href="restore-single-shard.html" />
+<link rel="prev" title="Create Backup of a Sharded Cluster with Filesystem Snapshots" href="backup-sharded-cluster-with-filesystem-snapshots.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="create-backup-of-a-sharded-cluster-with-database-dumps">
+<h1>Create Backup of a Sharded Cluster with Database Dumps<a class="headerlink" href="#create-backup-of-a-sharded-cluster-with-database-dumps" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document describes a procedure for taking a backup of all
+components of a sharded cluster. This procedure
+uses <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to create dumps of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance. An alternate procedure uses file system snapshots to capture
+the backup data, and may be more efficient in some situations if your
+system configuration allows file system backups. See
+<a class="reference internal" href="backup-sharded-cluster-with-filesystem-snapshots.html"><em>Create Backup of a Sharded Cluster with Filesystem Snapshots</em></a>.</p>
+<p>See <a class="reference internal" href="../administration/backups.html#sharded-cluster-backups"><em>Sharded Cluster Backup Considerations</em></a> for a full higher level overview
+of backing up a sharded cluster as well as links to other tutorials that
+provide alternate procedures.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">To capture a point-in-time backup from a sharded
+cluster you <strong>must</strong> stop <em>all</em> writes to the cluster. On a running
+production system, you can only capture an <em>approximation</em> of
+point-in-time snapshot.</p>
+</div>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>In this procedure, you will stop the cluster balancer and take a backup
+up of the <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>, and then take backups of each
+shard in the cluster using <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to capture the backup
+data. If you need an exact moment-in-time snapshot of the system, you will
+need to stop all application writes before taking the filesysem
+snapshots; otherwise the snapshot will only approximate a moment of
+time.</p>
+<p>For approximate point-in-time snapshots, you can improve the quality
+of the backup while minimizing impact on the cluster by taking the
+backup from a secondary member of the replica set that provides each
+shard.</p>
+<ol class="arabic">
+<li><p class="first">Disable the <a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> process that equalizes the
+distribution of data among the <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shards</em></a>. To disable
+the balancer, use the <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.stopBalancer()</span></tt> method in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and see the
+<a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the Balancer</em></a> procedure.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is essential that you stop the balancer before creating
+backups. If the balancer remains active, your resulting backups
+could have duplicate data or miss some data, as <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> migrate while recording backups.</p>
+</div>
+</li>
+<li><p class="first">Lock one member of each replica set in each shard so that your
+backups reflect the state of your database at the nearest possible
+approximation of a single moment in time. Lock these
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances in as short of an interval as possible.</p>
+<p>To lock or freeze a sharded cluster, you must:</p>
+<ul>
+<li><p class="first">Shutdown one member of each replica replica set.</p>
+<p>Ensure that the <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> has sufficient capacity to allow
+these secondaries to catch up to the state of the primaries after
+finishing the backup procedure. See
+<a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>Oplog</em></a> for more information.</p>
+</li>
+<li><p class="first">Shutdown one of the <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a>, to
+prevent all metadata changes during the backup process.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">Use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to backup one of the <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a>. This backs up the cluster&#8217;s
+metadata. You only need to back up one config server, as they all
+hold the same data.</p>
+<p>Issue this command against one of the config <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances or via the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --journal --db config
+</pre></div>
+</div>
+</li>
+<li><p class="first">Back up the replica set members of the shards that shut down using
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> and specifying the <em class="xref std std-option">--dbpath</em>
+option. You may back up the shards in parallel. Consider the
+following invocation:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --journal --dbpath /data/db/ --out /data/backup/
+</pre></div>
+</div>
+<p>You must run this command on the system where the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+ran. This operation will use journaling and create a dump of the
+entire <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with data files stored in
+<tt class="docutils literal"><span class="pre">/data/db/</span></tt>. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> will write the output of this
+dump to the <tt class="docutils literal"><span class="pre">/data/backup/</span></tt> directory.</p>
+</li>
+<li><p class="first">Restart all stopped replica set members of each shard as normal and
+allow them to catch up wit hthe state of the primary.</p>
+</li>
+<li><p class="first">Restore the balancer with the <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.startBalancer()</span></tt> method
+according to the <a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the Balancer</em></a>
+procedure.</p>
+<p>Use the following command sequence when connected to the
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> with the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">startBalancer</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="backup-sharded-cluster-with-filesystem-snapshots.html" title="Previous Section: Create Backup of a Sharded Cluster with Filesystem Snapshots">&lt; &nbsp; Create Backup of a Sharded Cluster with Filesystem Snapshots</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="restore-single-shard.html" title="Next Section: Restore a Single Shard">Restore a Single Shard &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Deploy a Sharded Cluster &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/deploy-shard-cluster" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Add Shards to an Existing Cluster" href="add-shards-to-shard-cluster.html" />
+<link rel="prev" title="Sharding Internals" href="../core/sharding-internals.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="deploy-a-sharded-cluster">
+<h1>Deploy a Sharded Cluster<a class="headerlink" href="#deploy-a-sharded-cluster" title="Permalink to this headline">¶</a></h1>
+<p>This document describes how to deploy a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> for a
+standalone <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. To deploy a cluster for an
+existing replica set, see
+<a class="reference internal" href="convert-replica-set-to-replicated-shard-cluster.html"><em>Convert a Replica Set to a Replicated Sharded Cluster</em></a>.</p>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>Before deploying a sharded cluster, see the requirements listed in
+<a class="reference internal" href="../core/sharding.html#sharding-requirements"><em>Requirements for Sharded Clusters</em></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Sharding and &#8220;localhost&#8221; Addresses</p>
+<p class="last">If you use either &#8220;localhost&#8221; or <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> as the hostname
+portion of any host identifier, for example as the <tt class="docutils literal"><span class="pre">host</span></tt> argument
+to <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> or the value to the
+<a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a>
+run time option, then you must use &#8220;localhost&#8221; or
+<tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> for <em>all</em> host settings for any MongoDB instances in
+the cluster. If you mix localhost addresses and remote host address,
+MongoDB will error.</p>
+</div>
+<div class="section" id="start-the-config-server-database-instances">
+<h3>Start the Config Server Database Instances<a class="headerlink" href="#start-the-config-server-database-instances" title="Permalink to this headline">¶</a></h3>
+<p>The config server database processes are small
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances that store the cluster&#8217;s metadata. You must
+have exactly <em>three</em> instances in production deployments. Each stores a complete copy
+of the cluster&#8217;s metadata. These instances should run on different servers
+to assure good uptime and data safety.</p>
+<p>Since config database <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances receive relatively
+little traffic and demand only a small portion of system resources, you
+can run the instances on systems that run other cluster components.</p>
+<p>By default a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--configsvr"><em class="xref std std-option">--configsvr</em></a> process stores its data files
+in the <cite>/data/configdb</cite> directory.  You can specify a different
+location using the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> run-time option. The config <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+is accessible via port <tt class="docutils literal"><span class="pre">27019</span></tt>. In addition to <a class="reference internal" href="../reference/configuration-options.html#configsvr" title="configsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configsvr</span></tt></a>,
+use other <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+<a class="reference internal" href="../reference/configuration-options.html"><em>runtime options</em></a> as needed.</p>
+<p>To create a data directory for each config server, issue a command
+similar to the following for each:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir /data/db/config
+</pre></div>
+</div>
+<p>To start each config server, issue a command similar to the following
+for each:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr --dbpath &lt;path&gt; --port &lt;port&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="start-the-mongos-instances">
+<h3>Start the <tt class="docutils literal"><span class="pre">mongos</span></tt> Instances<a class="headerlink" href="#start-the-mongos-instances" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance routes queries and operations
+to the appropriate shards and interacts with the config server instances.
+All client operations targeting a cluster go through <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances.</p>
+<p><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances are lightweight and do not require data directories.
+A cluster typically
+has several instances. For example, you might run one <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance on each of your application servers, or you might run a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance
+on each of the servers running a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process.</p>
+<p>You must the specify resolvable hostnames <a class="footnote-reference" href="#names" id="id1">[1]</a> for the <em>3</em> config servers
+when starting the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. You specify the hostnames either in the
+configuration file or as command line parameters.</p>
+<p>The <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance runs on the default MongoDB TCP port:
+<tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To start <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance running on the
+<tt class="docutils literal"><span class="pre">mongos0.example.net</span></tt> host, that connects to the config server
+instances running on the following hosts:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">mongoc0.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongoc1.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongoc2.example.net</span></tt></li>
+</ul>
+<p>You would issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongos --configdb mongoc0.example.net,mongoc1.example.net,mongoc2.example.net
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="names" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Use DNS names for the config servers rather than explicit
+IP addresses for operational flexibility. If you&#8217;re not using resolvable
+hostname,
+you cannot change the config server names or IP addresses
+without a restarting <em>every</em> <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="add-shards-to-the-cluster">
+<h3>Add Shards to the Cluster<a class="headerlink" href="#add-shards-to-the-cluster" title="Permalink to this headline">¶</a></h3>
+<p>You must deploy at least one <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> or one <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> to
+begin. In a production cluster, each shard is a replica set. You
+may add additional shards to a running cluster later. For instructions
+on deploying replica sets, see <a class="reference internal" href="deploy-replica-set.html"><em>Deploy a Replica Set</em></a>.</p>
+<p>This procedure assumes you have two active and initiated replica sets
+and describes how to add the first two shards to the cluster.</p>
+<p>First, connect to one of the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances. For example,
+if a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is accessible at <tt class="docutils literal"><span class="pre">mongos0.example.net</span></tt> on
+port <tt class="docutils literal"><span class="pre">27017</span></tt>, issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo mongos0.example.net
+</pre></div>
+</div>
+<p>Then, from a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance, call the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> method for each shard that
+you want to add to the cluster:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;s0/sfo30.example.net&quot;</span> <span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;s1/sfo40.example.net&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>If the host you are adding is a member of a replica set, you
+<em>must</em> specify the name of the replica set.  <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+will discover the names of other members of the replica set based on
+the name and the hostname you provide.</p>
+<p>These operations add two shards, provided by:</p>
+<ul class="simple">
+<li>the replica set named <tt class="docutils literal"><span class="pre">s0</span></tt>, that includes the
+<tt class="docutils literal"><span class="pre">sfo30.example.net</span></tt> host.</li>
+<li>the replica set name and <tt class="docutils literal"><span class="pre">s1</span></tt>, that includes the
+<tt class="docutils literal"><span class="pre">sfo40.example.net</span></tt> host.</li>
+</ul>
+<div class="admonition-all-shards-should-be-replica-sets admonition">
+<p class="first admonition-title">All shards should be replica sets</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.3.</span></p>
+<p>After version 2.0.3, you may use the above form to add replica
+sets to a cluster. The cluster will automatically discover
+the other members of the replica set and note their names
+accordingly.</p>
+<p>Before version 2.0.3, you must specify the shard in the
+following form: the replica set name, followed by a forward
+slash, followed by a comma-separated list of seeds for the
+replica set. For example, if the name of the replica set is
+<tt class="docutils literal"><span class="pre">sh0</span></tt>, and the replica set were to have three members, then your <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard</span></tt></a> command might resemble:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;sh0/sfo30.example.net,sfo31.example.net,sfo32.example.net&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell is a wrapper for
+the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> <a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>.</p>
+</div>
+<div class="section" id="enable-sharding-for-databases">
+<h3>Enable Sharding for Databases<a class="headerlink" href="#enable-sharding-for-databases" title="Permalink to this headline">¶</a></h3>
+<p>While sharding operates on a per-collection basis, you must enable
+sharding for each database that holds collections you want to shard. A
+single cluster may have many databases, with each database housing
+collections.</p>
+<p>Use the following operation in a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell session
+connected to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance in your cluster:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">enableSharding</span><span class="p">(</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">records</span></tt> is the name of the database that holds the collection
+you want to shard. <a class="reference internal" href="../reference/method/sh.enableSharding.html#sh.enableSharding" title="sh.enableSharding"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.enableSharding()</span></tt></a> is a wrapper
+around the <a class="reference internal" href="../reference/commands.html#enableSharding" title="enableSharding"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">enableSharding</span></tt></a> <a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>. You
+can enable sharding for multiple databases in the cluster.</p>
+</div>
+<div class="section" id="enable-sharding-for-collections">
+<h3>Enable Sharding for Collections<a class="headerlink" href="#enable-sharding-for-collections" title="Permalink to this headline">¶</a></h3>
+<p>You can enable sharding on a per-collection basis. Because
+MongoDB uses &#8220;range based sharding,&#8221; you must specify the <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard
+key</em></a> MongoDB uses to distribute your documents among the
+shards. For more information, see the
+<a class="reference internal" href="../core/sharding.html#sharding-shard-key"><em>overview of shard keys</em></a>.</p>
+<p>To enable sharding for a collection, use the
+<a class="reference internal" href="../reference/method/sh.shardCollection.html#sh.shardCollection" title="sh.shardCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.shardCollection()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.
+The helper provides a wrapper around the <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a>
+<a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a> and has the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span> <span class="nx">shard</span><span class="o">-</span><span class="nx">key</span><span class="o">-</span><span class="nx">pattern</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace the <tt class="docutils literal"><span class="pre">&lt;database&gt;.&lt;collection&gt;</span></tt> string with the full namespace
+of your database, which consists of the name of your database, a dot
+(e.g. <tt class="docutils literal"><span class="pre">.</span></tt>), and the full name of the collection. The <tt class="docutils literal"><span class="pre">shard-key-pattern</span></tt>
+represents your shard key, which you specify in the same form as you
+would an <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">index</span></tt></a> key pattern.</p>
+<p>Consider the following example invocations of
+<a class="reference internal" href="../reference/method/sh.shardCollection.html#sh.shardCollection" title="sh.shardCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.shardCollection()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;records.people&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;zipcode&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;people.addresses&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;state&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;assets.chairs&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;events.alerts&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;hashed_id&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>In order, these operations shard:</p>
+<ol class="arabic">
+<li><p class="first">The <tt class="docutils literal"><span class="pre">people</span></tt> collection in the <tt class="docutils literal"><span class="pre">records</span></tt> database using the shard key
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;zipcode&quot;:</span> <span class="pre">1,</span> <span class="pre">&quot;name&quot;:</span> <span class="pre">1</span> <span class="pre">}</span></tt>.</p>
+<p>This shard key distributes documents by the value of the
+<tt class="docutils literal"><span class="pre">zipcode</span></tt> field. If a number of documents have the same value for
+this field, then that <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> will be <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>splitable</em></a> by the values of the <tt class="docutils literal"><span class="pre">name</span></tt>
+field.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">addresses</span></tt> collection in the <tt class="docutils literal"><span class="pre">people</span></tt> database using the shard key
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;state&quot;:</span> <span class="pre">1,</span> <span class="pre">&quot;_id&quot;:</span> <span class="pre">1</span> <span class="pre">}</span></tt>.</p>
+<p>This shard key distributes documents by the value of the <tt class="docutils literal"><span class="pre">state</span></tt>
+field. If a number of documents have the same value for this field,
+then that <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> will be <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>splitable</em></a> by the values of the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">chairs</span></tt> collection in the <tt class="docutils literal"><span class="pre">assets</span></tt> database using the shard key
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;type&quot;:</span> <span class="pre">1,</span> <span class="pre">&quot;_id&quot;:</span> <span class="pre">1</span> <span class="pre">}</span></tt>.</p>
+<p>This shard key distributes documents by the value of the <tt class="docutils literal"><span class="pre">type</span></tt>
+field. If a number of documents have the same value for this field,
+then that <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> will be <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>splitable</em></a> by the values of the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">alerts</span></tt> collection in the <tt class="docutils literal"><span class="pre">events</span></tt> database using the shard key
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;hashed_id&quot;:</span> <span class="pre">1</span> <span class="pre">}</span></tt>.</p>
+<p>This shard key distributes documents by the value of the
+<tt class="docutils literal"><span class="pre">hashed_id</span></tt> field. Presumably this is a computed value that
+holds the hash of some value in your documents and is able to
+evenly distribute documents throughout your cluster.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/sharding-internals.html" title="Previous Section: Sharding Internals">&lt; &nbsp; Sharding Internals</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="add-shards-to-shard-cluster.html" title="Next Section: Add Shards to an Existing Cluster">Add Shards to an Existing Cluster &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Expire Data from Collections by Setting TTL &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/expire-data" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Model Embedded One-to-One Relationships Between Documents" href="model-embedded-one-to-one-relationships-between-documents.html" />
+<link rel="prev" title="Create an Auto-Incrementing Sequence Field" href="create-an-auto-incrementing-field.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="expire-data-from-collections-by-setting-ttl">
+<span id="ttl-collections"></span><h1>Expire Data from Collections by Setting TTL<a class="headerlink" href="#expire-data-from-collections-by-setting-ttl" title="Permalink to this headline">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>This document provides an introductions to MongoDB&#8217;s &#8220;<em>time to live</em>&#8221;
+or &#8220;<a class="reference internal" href="../reference/glossary.html#term-ttl"><em class="xref std std-term">TTL</em></a>&#8221; collection feature. Implemented as a special index
+type, TTL collections make it possible to store data in MongoDB and
+have the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> automatically remove data after a specified
+period of time. This is ideal for some types of information like
+machine generated event data, logs, and session information that only
+need to persist in a database for a limited period of time.</p>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>Collections expire by way of a special index that keeps track of
+insertion time in conjunction with a background thread in <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+that regularly removes expired <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a>
+from the collection. You can use this feature to expire data from
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> and <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>.</p>
+<p>Use the <tt class="docutils literal"><span class="pre">expireAfterSeconds</span></tt> option to the <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex</span></tt></a> method in conjunction with a TTL value
+in seconds to create an expiring collection. TTL collections set the
+<a class="reference internal" href="../reference/commands.html#usePowerOf2Sizes" title="usePowerOf2Sizes"><tt class="xref mongodb mongodb-collflag docutils literal"><span class="pre">usePowerOf2Sizes</span></tt></a> collection flag, which means MongoDB must
+allocate more disk space relative to data size. This approach helps
+mitigate the possibility of storage fragmentation caused by frequent
+delete operations and leads to more predictable storage use patterns.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When the TTL thread is active, you will see a <a class="reference internal" href="../applications/delete.html"><em>delete</em></a> operation in the output of
+<a class="reference internal" href="../reference/method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> or in the data collected by the
+<a class="reference internal" href="manage-the-database-profiler.html#database-profiler"><em>database profiler</em></a>.</p>
+</div>
+</div>
+<div class="section" id="constraints">
+<h2>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following limitations:</p>
+<ul class="simple">
+<li>the indexed field must be a date <a class="reference internal" href="../reference/glossary.html#term-bson-types"><em class="xref std std-term">BSON type</em></a>. If
+the field does not have a date type, the data will not expire.</li>
+<li>you cannot create this index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field, or a field that
+already has an index.</li>
+<li>the TTL index may not be compound (may not have multiple fields).</li>
+<li>if the field holds an array, and there are multiple date-typed
+data in the index, the document will expire when the <em>lowest</em>
+(i.e. earliest) matches the expiration threshold.</li>
+<li>you cannot use a TTL index on a capped collection, because MongoDB
+cannot remove documents from a capped collection.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>TTL indexes expire data by removing documents in a background task
+that runs once a minute. As a result, the TTL index provides no
+guarantees that expired documents will not exist in the
+collection. Consider that:</p>
+<ul class="last simple">
+<li>Documents may remain in a collection <em>after</em> they expire and before
+the background process runs.</li>
+<li>The duration of the removal operations depend on the workload of
+your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="enabling-a-ttl-for-a-collection">
+<h2>Enabling a TTL for a Collection<a class="headerlink" href="#enabling-a-ttl-for-a-collection" title="Permalink to this headline">¶</a></h2>
+<p>To set a TTL on the collection &#8220;<tt class="docutils literal"><span class="pre">log.events</span></tt>&#8221; for one hour use the
+following command at the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">expireAfterSeconds</span><span class="o">:</span> <span class="mi">3600</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">status</span></tt> field <em>must</em> hold date/time information. MongoDB will
+automatically delete documents from this collection once the value of
+<tt class="docutils literal"><span class="pre">status</span></tt> is one or more hours old.</p>
+</div>
+<div class="section" id="replication">
+<h2>Replication<a class="headerlink" href="#replication" title="Permalink to this headline">¶</a></h2>
+<p>The TTL background thread <em>only</em> runs on <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> members of
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>. <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">Secondaries</em></a>
+members will replicate deletion operations from the primaries.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="create-an-auto-incrementing-field.html" title="Previous Section: Create an Auto-Incrementing Sequence Field">&lt; &nbsp; Create an Auto-Incrementing Sequence Field</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="model-embedded-one-to-one-relationships-between-documents.html" title="Next Section: Model Embedded One-to-One Relationships Between Documents">Model Embedded One-to-One Relationships Between Documents &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

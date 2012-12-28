@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Deploy a Replica Set &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/deploy-replica-set" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Convert a Standalone to a Replica Set" href="convert-standalone-to-replica-set.html" />
+<link rel="prev" title="Master Slave Replication" href="../administration/master-slave.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="deploy-a-replica-set">
+<h1>Deploy a Replica Set<a class="headerlink" href="#deploy-a-replica-set" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial describes how to create a three member
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> from three existing instances of MongoDB.
+The tutorial provides one procedure for development and test systems and
+a separate procedure for production systems.</p>
+<p>To deploy a replica set from a single standalone MongoDB instance, see
+<a class="reference internal" href="convert-standalone-to-replica-set.html"><em>Convert a Standalone to a Replica Set</em></a>.</p>
+<p>For background information on replica set deployments, see
+<a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> and
+<a class="reference internal" href="../administration/replication-architectures.html"><em>Replication Architectures</em></a>.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Three member <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> provide enough redundancy to survive most
+network partitions and other system failures. Additionally, these sets
+have sufficient capacity for many distributed read operations. Most
+deployments require no additional members or configuration.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>A replica set requires three distinct systems so that each system can run its own instance
+of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. For development systems you can run all three
+instances of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process on a local system. (e.g. a
+laptop) or within a virtual instance. For production environments, you
+should endeavor to maintain as much separation between the members as possible.  For
+example, when using VMs in Production, each member should live on
+separate host servers, served by redundant power circuits, and with
+redundant network paths.</p>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>These procedures assume you already have instances of MongoDB
+installed on the systems you will add as members of your
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. If you have not already installed MongoDB, see the
+<a class="reference internal" href="../installation.html#tutorials-installation"><em>installation tutorials</em></a>.</p>
+<div class="section" id="deploy-a-development-or-testing-replica-set">
+<h3>Deploy a Development or Testing Replica Set<a class="headerlink" href="#deploy-a-development-or-testing-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>The examples in this procedure create a new replica set named <tt class="docutils literal"><span class="pre">rs0</span></tt>.</p>
+<ol class="arabic">
+<li><p class="first">Before creating your replica set, verify that every member can
+successfully connect to every other member. The network
+configuration must allow all possible connections between any
+two members. To test connectivity, see
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-troubleshooting-check-connection"><em>Test Connections Between all Members</em></a>.</p>
+</li>
+<li><p class="first">Start three instances of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> as members of a replica
+set named <tt class="docutils literal"><span class="pre">rs0</span></tt>, as described in this step. For ephemeral tests and
+the purposes of this guide, you may run the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances in separate windows of GNU Screen. OS X and most Linux
+distributions come with screen installed by default <a class="footnote-reference" href="#screen" id="id1">[1]</a>
+systems.</p>
+<ol class="loweralpha">
+<li><p class="first">Create the necessary data directories by issuing a command
+similar to the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir -p /srv/mongodb/rs0-0 /srv/mongodb/rs0-1 /srv/mongodb/rs0-2
+</pre></div>
+</div>
+</li>
+<li><p class="first">Issue the following commands, each in a distinct screen window:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 27017 --dbpath /srv/mongodb/rs0-0 --replSet rs0
+mongod --port 27018 --dbpath /srv/mongodb/rs0-1 --replSet rs0
+mongod --port 27019 --dbpath /srv/mongodb/rs0-2 --replSet rs0
+</pre></div>
+</div>
+<p>This starts each instance as a member of a replica set named
+<tt class="docutils literal"><span class="pre">rs0</span></tt>, each running on a distinct port. If you are already using
+these ports, you can select different ports. See the documentation
+of the following options for more information: <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--port"><em class="xref std std-option">--port</em></a>, <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a>, and
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a>.</p>
+</li>
+</ol>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and connect to the first
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. If you&#8217;re running this command remotely,
+replace &#8220;localhost&#8221; with the appropriate hostname. In a new shell
+session, enter the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo localhost:27017
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In a replica set, <em>all</em> members of the set must use
+<tt class="docutils literal"><span class="pre">localhost</span></tt> addresses or <em>no</em> members of the replica set can
+use the <tt class="docutils literal"><span class="pre">localhost</span></tt> addresses.</p>
+</div>
+</li>
+<li><p class="first">Use <a class="reference internal" href="../reference/replica-commands.html#rs.initiate" title="rs.initiate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.initiate()</span></tt></a> to initiate a replica set consisting of
+the current member and using the default configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">initiate</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Display the current <a class="reference internal" href="../reference/replica-configuration.html"><em>replica configuration</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add two members to the replica set by issuing a sequence of commands
+similar to the following.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;localhost:27018&quot;</span><span class="p">)</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;localhost:27019&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After these commands return you have a fully functional replica set.
+New replica sets elect a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> within a seconds.</p>
+</li>
+<li><p class="first">Check the status of your replica set at any time with the
+<a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> operation.</p>
+</li>
+</ol>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The documentation of the following shell functions for
+more information:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.initiate" title="rs.initiate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.initiate()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a></li>
+</ul>
+<p class="last">You may also consider the <a class="reference external" href="https://github.com/mongodb/mongo-snippets/blob/master/replication/simple-setup.py">simple setup script</a>
+as an example of a basic automatically configured replica set.</p>
+</div>
+<table class="docutils footnote" frame="void" id="screen" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://www.gnu.org/software/screen/">GNU Screen</a> is packaged as
+<tt class="docutils literal"><span class="pre">screen</span></tt> on Debian-based, Fedora/Red Hat-based, and Arch Linux.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="deploy-a-production-replica-set">
+<h3>Deploy a Production Replica Set<a class="headerlink" href="#deploy-a-production-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>Production replica sets are very similar to the development or testing
+deployment described above, with the following differences:</p>
+<ul>
+<li><p class="first">Each member of the replica set resides on its own machine, and
+the MongoDB processes all bind to port <tt class="docutils literal"><span class="pre">27017</span></tt>, which is the
+standard MongoDB port.</p>
+</li>
+<li><p class="first">Each member of the replica set must be accessible by way of
+resolvable DNS or hostnames in the following scheme:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">mongodb0.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongodb2.example.net</span></tt></li>
+</ul>
+<p>Configure DNS names appropriately, <em>or</em> set up your systems&#8217;
+<tt class="docutils literal"><span class="pre">/etc/host</span></tt> file to reflect this configuration.</p>
+</li>
+<li><p class="first">You specify run-time configuration on each system in a
+<a class="reference internal" href="../reference/configuration-options.html"><em>configuration file</em></a> stored in
+<tt class="docutils literal"><span class="pre">/etc/mongodb.conf</span></tt> or in a related location. You <em>do not</em> specify
+run-time configuration through command line options.</p>
+<p>For each MongoDB instance, use the following configuration. Set
+configuration values appropriate to your systems:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">port</span> <span class="o">=</span> <span class="s">27017</span>
+
+<span class="na">bind_ip</span> <span class="o">=</span> <span class="s">10.8.0.10</span>
+
+<span class="na">dbpath</span> <span class="o">=</span> <span class="s">/srv/mongodb/</span>
+
+<span class="na">fork</span> <span class="o">=</span> <span class="s">true</span>
+
+<span class="na">replSet</span> <span class="o">=</span> <span class="s">rs0</span>
+</pre></div>
+</div>
+<p>You do not need to specify an interface with <a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a>.
+However, if you do not specify an interface, MongoDB listens for
+connections on all available IPv4 interfaces. Modify
+<a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a> to reflect a secure interface on your system that
+is able to access all other members of the set <em>and</em> on which all
+other members of the replica set can access the current member. The
+DNS or host names must point and resolve to this IP address.
+Configure network rules or a virtual private network (i.e. &#8220;VPN&#8221;) to
+permit this access.</p>
+<p>For more documentation on run time options used above and on
+additional configuration options, see
+<a class="reference internal" href="../reference/configuration-options.html"><em>Configuration File Options</em></a>.</p>
+</li>
+</ul>
+<p>To deploy a production replica set:</p>
+<ol class="arabic">
+<li><p class="first">Before creating your replica set, verify that every member can
+successfully connect to every other member. The network
+configuration must allow all possible connections between any
+two members. To test connectivity, see
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-troubleshooting-check-connection"><em>Test Connections Between all Members</em></a>.</p>
+</li>
+<li><p class="first">On each system start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process by issuing a
+command similar to following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --config /etc/mongodb.conf
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In production deployments you likely want to use and configure a
+<a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control script</em></a> to manage this process based on this
+command. Control scripts are beyond the scope of this document.</p>
+</div>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to this host:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use <a class="reference internal" href="../reference/replica-commands.html#rs.initiate" title="rs.initiate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.initiate()</span></tt></a> to initiate a replica set consisting of
+the current member and using the default configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">initiate</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Display the current <a class="reference internal" href="../reference/replica-configuration.html"><em>replica configuration</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add two members to the replica set by issuing a sequence of commands
+similar to the following.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;mongodb1.example.net&quot;</span><span class="p">)</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;mongodb2.example.net&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After these commands return you have a fully functional replica set.
+New replica sets elect a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> within a seconds.</p>
+</li>
+<li><p class="first">Check the status of your replica set at any time with the
+<a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> operation.</p>
+</li>
+</ol>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The documentation of the following shell functions for
+more information:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.initiate" title="rs.initiate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.initiate()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../administration/master-slave.html" title="Previous Section: Master Slave Replication">&lt; &nbsp; Master Slave Replication</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="convert-standalone-to-replica-set.html" title="Next Section: Convert a Standalone to a Replica Set">Convert a Standalone to a Replica Set &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

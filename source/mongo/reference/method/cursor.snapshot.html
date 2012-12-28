@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.snapshot() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.snapshot" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.sort()" href="cursor.sort.html" />
+<link rel="prev" title="cursor.skip()" href="cursor.skip.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-snapshot">
+<h1>cursor.snapshot()<a class="headerlink" href="#cursor-snapshot" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.snapshot">
+<tt class="descclassname">cursor.</tt><tt class="descname">snapshot</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.snapshot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append the <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.snapshot()</span></tt></a> method to a cursor to toggle
+the &#8220;snapshot&#8221; mode. This ensures that the query will not return a
+document multiple times, even if intervening write operations result
+in a move of the document due to the growth in document size.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<ul class="last simple">
+<li>You must apply <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.snapshot()</span></tt></a> to the cursor before
+retrieving any documents from the database.</li>
+<li>You can only use <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">snapshot()</span></tt></a> with
+<strong>unsharded</strong> collections.</li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">snapshot()</span></tt></a> does not guarantee
+isolation from insertion or deletions.</p>
+<p>The <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.snapshot()</span></tt></a> traverses the index on the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field. As such, <a class="reference internal" href="#cursor.snapshot" title="cursor.snapshot"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">snapshot()</span></tt></a> <strong>cannot</strong>
+be used with <a class="reference internal" href="cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> or <a class="reference internal" href="cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a>.</p>
+<p>Queries with results of less than 1 megabyte are effectively
+implicitly snapshotted.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.skip.html" title="Previous Section: cursor.skip()">&lt; &nbsp; cursor.skip()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.sort.html" title="Next Section: cursor.sort()">cursor.sort() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

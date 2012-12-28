@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$type &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/type" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$uniqueDocs" href="uniqueDocs.html" />
+<link rel="prev" title="$snapshot" href="snapshot.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="type">
+<h1>$type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_type">
+<tt class="descname">$type</tt><a class="headerlink" href="#_S_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">field:</span> <span class="pre">{</span> <span class="pre">$type:</span> <span class="pre">&lt;BSON</span> <span class="pre">type&gt;</span> <span class="pre">}</span> <span class="pre">}</span></tt></p>
+<p><a class="reference internal" href="../operators.html#_S_type" title="$type"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$type</span></tt></a> selects the documents where the <em>value</em> of the
+<tt class="docutils literal"><span class="pre">field</span></tt> is the specified <a class="reference internal" href="../glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> type.</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$type</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection
+where the <tt class="docutils literal"><span class="pre">price</span></tt> field value is a Double.</p>
+<p>If the <tt class="docutils literal"><span class="pre">field</span></tt> holds an array, the <a class="reference internal" href="../operators.html#_S_type" title="$type"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$type</span></tt></a> operator
+performs the type check against the array elements and <strong>not</strong> the
+<tt class="docutils literal"><span class="pre">field</span></tt>.</p>
+<p>Consider the following example where the <tt class="docutils literal"><span class="pre">tags</span></tt> field holds an array:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">tags</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$type</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection
+where the <tt class="docutils literal"><span class="pre">tags</span></tt> array contains an element that is itself an array.</p>
+<p>If instead you want to determine whether the <tt class="docutils literal"><span class="pre">tags</span></tt> field is an
+array type, use the <a class="reference internal" href="../operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> operator:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$where</span> <span class="o">:</span> <span class="s2">&quot;Array.isArray(this.tags)&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-1475">SERVER-1475</a> for more information about the
+array type.</p>
+<p>Refer to the following table for the available <a class="reference internal" href="../glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> types
+and their corresponding numbers.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="70%" />
+<col width="30%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Type</strong></td>
+<td><strong>Number</strong></td>
+</tr>
+<tr class="row-even"><td>Double</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>String</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>Object</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>Array</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td>Binary data</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>Object id</td>
+<td>7</td>
+</tr>
+<tr class="row-even"><td>Boolean</td>
+<td>8</td>
+</tr>
+<tr class="row-odd"><td>Date</td>
+<td>9</td>
+</tr>
+<tr class="row-even"><td>Null</td>
+<td>10</td>
+</tr>
+<tr class="row-odd"><td>Regular Expression</td>
+<td>11</td>
+</tr>
+<tr class="row-even"><td>JavaScript</td>
+<td>13</td>
+</tr>
+<tr class="row-odd"><td>Symbol</td>
+<td>14</td>
+</tr>
+<tr class="row-even"><td>JavaScript (with scope)</td>
+<td>15</td>
+</tr>
+<tr class="row-odd"><td>32-bit integer</td>
+<td>16</td>
+</tr>
+<tr class="row-even"><td>Timestamp</td>
+<td>17</td>
+</tr>
+<tr class="row-odd"><td>64-bit integer</td>
+<td>18</td>
+</tr>
+<tr class="row-even"><td>Min key</td>
+<td>255</td>
+</tr>
+<tr class="row-odd"><td>Max key</td>
+<td>127</td>
+</tr>
+</tbody>
+</table>
+<p><tt class="docutils literal"><span class="pre">MinKey</span></tt> and <tt class="docutils literal"><span class="pre">MaxKey</span></tt> compare less than and greater than all
+other possible <a class="reference internal" href="../glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> element values, respectively, and exist
+primarily for internal use.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>To query if a field value is a <tt class="docutils literal"><span class="pre">MinKey</span></tt>, you must use the <a class="reference internal" href="../operators.html#_S_type" title="$type"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$type</span></tt></a> with
+<tt class="docutils literal"><span class="pre">-1</span></tt> as in the following example:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$type</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Consider the following example operation sequence that
+demonstrates both type comparison <em>and</em> the special <tt class="docutils literal"><span class="pre">MinKey</span></tt>
+and <tt class="docutils literal"><span class="pre">MaxKey</span></tt> values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="mi">3</span><span class="p">});</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="mf">2.9</span><span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">()}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="nx">MaxKey</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span><span class="nx">x</span> <span class="o">:</span> <span class="nx">MinKey</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">({</span><span class="nx">x</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b04094b7c65b846e2090112&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$minKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b03155dce8de6586fb002c7&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mf">2.9</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b03154cce8de6586fb002c6&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b031566ce8de6586fb002c9&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b031563ce8de6586fb002c8&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="s2">&quot;Tue Jul 25 2012 18:42:03 GMT-0500 (EST)&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4b0409487c65b846e2090111&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$maxKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>To query for the minimum value of a <a class="reference internal" href="../glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> of a
+<a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, use the following operation when
+connected to the <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">chunks</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;min.shardKey&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$type</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Storing values of the different types in the same field in a
+collection is <em>strongly</em> discouraged.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>, <a class="reference internal" href="../method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a>, <a class="reference internal" href="../glossary.html#term-bson"><em class="xref std std-term">BSON</em></a>,
+<a class="reference internal" href="../glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>, <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> .</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="snapshot.html" title="Previous Section: $snapshot">&lt; &nbsp; $snapshot</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="uniqueDocs.html" title="Next Section: $uniqueDocs">$uniqueDocs &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Model Data to Support Keyword Search &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/model-data-for-keyword-search" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="prev" title="Model Tree Structures with Nested Sets" href="model-tree-structures-with-nested-sets.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="model-data-to-support-keyword-search">
+<h1>Model Data to Support Keyword Search<a class="headerlink" href="#model-data-to-support-keyword-search" title="Permalink to this headline">¶</a></h1>
+<p>If your application needs to perform queries on the content of a field
+that holds text you can perform exact matches on the text or use
+<a class="reference internal" href="../reference/operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> to use regular expression pattern matches. However,
+for many operations on text, these methods do not satisfy application
+requirements.</p>
+<p>This pattern describes one method for supporting keyword search using
+MongoDB to support application search functionality, that uses
+keywords stored in an array in the same document as the text
+field. Combined with a <a class="reference internal" href="../core/indexes.html#index-type-multikey"><em>multi-key index</em></a>,
+this pattern can support application&#8217;s keyword search operations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Keyword search is <em>not</em> the same as text search or full text
+search, and does not provide stemming or other text-processing
+features. See the <a class="reference internal" href="#limit-keyword-indexes"><em>Limitations of Keyword Indexes</em></a> section for more
+information.</p>
+</div>
+<div class="section" id="pattern">
+<h2>Pattern<a class="headerlink" href="#pattern" title="Permalink to this headline">¶</a></h2>
+<p>To add structures to your document to support keyword-based queries,
+create an array field in your documents and add the keywords as
+strings in the array. You can then create a <a class="reference internal" href="../core/indexes.html#index-type-multi-key"><em>multi-key index</em></a> on the array and create queries that select
+values from the array.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Suppose you have a collection of library volumes that you want to
+make searchable by topics. For each volume, you add the array
+<tt class="docutils literal"><span class="pre">topics</span></tt>, and you add as many keywords as needed for a given
+volume.</p>
+<p>For the <tt class="docutils literal"><span class="pre">Moby-Dick</span></tt> volume you might have the following document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">title</span> <span class="o">:</span> <span class="s2">&quot;Moby-Dick&quot;</span> <span class="p">,</span>
+  <span class="nx">author</span> <span class="o">:</span> <span class="s2">&quot;Herman Melville&quot;</span> <span class="p">,</span>
+  <span class="nx">published</span> <span class="o">:</span> <span class="mi">1851</span> <span class="p">,</span>
+  <span class="nx">ISBN</span> <span class="o">:</span> <span class="mi">0451526996</span> <span class="p">,</span>
+  <span class="nx">topics</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;whaling&quot;</span> <span class="p">,</span> <span class="s2">&quot;allegory&quot;</span> <span class="p">,</span> <span class="s2">&quot;revenge&quot;</span> <span class="p">,</span> <span class="s2">&quot;American&quot;</span> <span class="p">,</span>
+    <span class="s2">&quot;novel&quot;</span> <span class="p">,</span> <span class="s2">&quot;nautical&quot;</span> <span class="p">,</span> <span class="s2">&quot;voyage&quot;</span> <span class="p">,</span> <span class="s2">&quot;Cape Cod&quot;</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You then create a multi-key index on the <tt class="docutils literal"><span class="pre">topics</span></tt> array:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">volumes</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">topics</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The multi-key index creates separate index entries for each keyword in
+the <tt class="docutils literal"><span class="pre">topics</span></tt> array. For example the index contains one entry for
+<tt class="docutils literal"><span class="pre">whaling</span></tt> and another for <tt class="docutils literal"><span class="pre">allegory</span></tt>.</p>
+<p>You then query based on the keywords. For example:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">volumes</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">topics</span> <span class="o">:</span> <span class="s2">&quot;voyage&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An array with a large number many elements, such as one with
+several hundreds or thousands of keywords will incur greater
+indexing costs on insertion.</p>
+</div>
+</div>
+<div class="section" id="limitations-of-keyword-indexes">
+<span id="limit-keyword-indexes"></span><h2>Limitations of Keyword Indexes<a class="headerlink" href="#limitations-of-keyword-indexes" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB can support keyword searches using specific data models and
+<a class="reference internal" href="../core/indexes.html#index-type-multikey"><em>multi-key indexes</em></a>; however, these keyword
+indexes are not sufficient or comparable to full-text products in the
+following respects:</p>
+<ul class="simple">
+<li><em>Stemming</em>. Keyword queries in MongoDB can not parse keywords for
+root or related words.</li>
+<li><em>Synonyms</em>. Keyword-based search features must provide support for
+synonym or related queries in the application layer.</li>
+<li><em>Ranking</em>. The keyword look ups described in this document do not
+provide a way to weight results.</li>
+<li><em>Asynchronous Indexing</em>. MongoDB builds indexes synchronously, which
+means that the indexes used for keyword indexes are always current
+and can operate in real-time. However, asynchronous bulk indexes
+may be more efficient for some kinds of content and workloads.</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="model-tree-structures-with-nested-sets.html" title="Previous Section: Model Tree Structures with Nested Sets">&lt; &nbsp; Model Tree Structures with Nested Sets</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="../mongo.html" title="Next Section: Using the mongo Shell">Using the mongo Shell &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

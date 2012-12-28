@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MongoDB Extended JSON &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongodb-extended-json" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Glossary" href="glossary.html" />
+<link rel="prev" title="MongoDB Limits and Thresholds" href="limits.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodb-extended-json">
+<h1>MongoDB Extended JSON<a class="headerlink" href="#mongodb-extended-json" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB <a class="reference internal" href="../administration/import-export.html"><em>import and export utilities</em></a> (i.e. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>) and MongoDB <a class="reference external" href="http://www.mongodb.org/display/DOCS/Http+Interface">REST Interfaces</a> render an approximation of MongoDB <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a>
+documents in JSON format.</p>
+<p>The REST interface supports three different modes for document output:</p>
+<ul class="simple">
+<li><em>Strict</em> mode that produces output that conforms to the <a class="reference external" href="http://www.json.org">JSON RFC
+specifications</a>.</li>
+<li><em>JavaScript</em> mode that produces output that most JavaScript
+interpreters can process</li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> <em>Shell</em> mode produces output that the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> can process. This is &#8220;extended&#8221; JavaScript format.</li>
+</ul>
+<p>MongoDB can process of these representations in REST input.</p>
+<p>Special representations of <a class="reference internal" href="glossary.html#term-bson-types"><em class="xref std std-term">BSON data</em></a> in JSON
+format make it possible to render information that have no obvious
+corresponding JSON. In some cases MongoDB supports multiple equivelent
+representations of the same type information. Consider the following
+table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">BSON Data Type</th>
+<th class="head">Strict Mode</th>
+<th class="head">JavaScript Mode</th>
+<th class="head">mongo Shell Mode</th>
+<th class="head">Notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><dl class="first last bsontype">
+<dt id="data_binary">
+<tt class="descname">data_binary</tt><a class="headerlink" href="#data_binary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$binary&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;bindata&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$type&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;t&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$binary&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;bindata&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$type&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;t&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$binary&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;bindata&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$type&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;t&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><p class="first"><tt class="docutils literal"><span class="pre">&lt;bindata&gt;</span></tt> is the base64 representation of a binary
+string.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">&lt;t&gt;</span></tt> is the hexadecimal representation of a single byte
+that indicates the data type.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><dl class="first last bsontype">
+<dt id="data_date">
+<tt class="descname">data_date</tt><a class="headerlink" href="#data_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$date&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">date</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nb">Date</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">date</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nb">Date</span> <span class="p">(</span> <span class="o">&lt;</span><span class="nx">date</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><tt class="docutils literal"><span class="pre">&lt;date&gt;</span></tt> is the JSON representation of a 64-bit signed
+integer for milliseconds since epoch (unsigned before
+version 1.9.1).</td>
+</tr>
+<tr class="row-even"><td><dl class="first last bsontype">
+<dt id="data_timestamp">
+<tt class="descname">data_timestamp</tt><a class="headerlink" href="#data_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$timestamp&quot;</span><span class="o">:</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;t&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">t</span><span class="o">&gt;</span><span class="p">,</span>
+         <span class="s2">&quot;i&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">i</span><span class="o">&gt;</span>
+       <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$timestamp&quot;</span><span class="o">:</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;t&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">t</span><span class="o">&gt;</span><span class="p">,</span>
+         <span class="s2">&quot;i&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">i</span><span class="o">&gt;</span>
+       <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">Timestamp</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">t</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">i</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><p class="first"><tt class="docutils literal"><span class="pre">&lt;t&gt;</span></tt> is the JSON representation
+of a 32-bit unsigned integer
+for seconds since epoch.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">&lt;i&gt;</span></tt> is a 32-bit unsigned
+integer for the increment.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><dl class="first last bsontype">
+<dt id="data_regex">
+<tt class="descname">data_regex</tt><a class="headerlink" href="#data_regex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$regex&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;sRegex&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$options&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;sOptions&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="sr">/&lt;jRegex&gt;/</span><span class="o">&lt;</span><span class="nx">jOptions</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="sr">/&lt;jRegex&gt;/</span><span class="o">&lt;</span><span class="nx">jOptions</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</td>
+<td><p class="first"><tt class="docutils literal"><span class="pre">&lt;sRegex&gt;</span></tt> is a string of valid JSON characters.</p>
+<p><tt class="docutils literal"><span class="pre">&lt;jRegex&gt;</span></tt> is a string that may contain valid JSON
+characters and unescaped double quote (<tt class="docutils literal"><span class="pre">&quot;</span></tt>) characters, but may not
+contain unescaped forward slash (<tt class="docutils literal"><span class="pre">/</span></tt>) characters.</p>
+<p><tt class="docutils literal"><span class="pre">&lt;sOptions&gt;</span></tt> is a string containing the regex options
+represented by the letters of the alphabet.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">&lt;jOptions&gt;</span></tt> is a string that may contain only the
+characters &#8216;g&#8217;, &#8216;i&#8217;, &#8216;m&#8217; and &#8216;s&#8217; (added in v1.9). Because
+the <tt class="docutils literal"><span class="pre">JavaScript</span></tt> and <tt class="docutils literal"><span class="pre">mongo</span> <span class="pre">Shell</span></tt> representations
+support a limited range of options, any nonconforming
+options will be dropped when converting to this
+representation.</p>
+</td>
+</tr>
+<tr class="row-even"><td><dl class="first last bsontype">
+<dt id="data_oid">
+<tt class="descname">data_oid</tt><a class="headerlink" href="#data_oid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$oid&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;id&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$oid&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;id&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span> <span class="s2">&quot;&lt;id&gt;&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><tt class="docutils literal"><span class="pre">&lt;id&gt;</span></tt> is a 24-character hexadecimal string.</td>
+</tr>
+<tr class="row-odd"><td><dl class="first last bsontype">
+<dt id="data_ref">
+<tt class="descname">data_ref</tt><a class="headerlink" href="#data_ref" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$ref&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$id&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;id&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$ref&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;$id&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;id&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">DBRef</span><span class="p">(</span><span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;id&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><p class="first"><tt class="docutils literal"><span class="pre">&lt;name&gt;</span></tt> is a string of valid JSON characters.</p>
+<p class="last"><tt class="docutils literal"><span class="pre">&lt;id&gt;</span></tt> is a 24-character hexadecimal string. In the Strict
+and JS representations, the Strict representation for a
+<a class="reference internal" href="#data_oid" title="data_oid"><tt class="xref mongodb mongodb-bsontype docutils literal"><span class="pre">data_oid</span></tt></a> can be used as the value.</p>
+</td>
+</tr>
+<tr class="row-even"><td><dl class="first last bsontype">
+<dt id="data_undefined">
+<tt class="descname">data_undefined</tt><a class="headerlink" href="#data_undefined" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;$undefined&quot;</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="kc">undefined</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="kc">undefined</span>
+</pre></div>
+</div>
+</td>
+<td>The representation for the JavaScript/BSON undefined type.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="limits.html" title="Previous Section: MongoDB Limits and Thresholds">&lt; &nbsp; MongoDB Limits and Thresholds</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="glossary.html" title="Next Section: Glossary">Glossary &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

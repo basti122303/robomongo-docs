@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Install MongoDB on Windows &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/install-mongodb-on-windows" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Installing MongoDB" href="../installation.html" />
+<link rel="next" title="Getting Started with the MongoDB JavaScript Shell" href="getting-started.html" />
+<link rel="prev" title="Install MongoDB on OS X" href="install-mongodb-on-os-x.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="install-mongodb-on-windows">
+<h1>Install MongoDB on Windows<a class="headerlink" href="#install-mongodb-on-windows" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial provides a method for installing and running the
+MongoDB server (i.e. &#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt>&#8221;) on the Microsoft Windows
+platform through the <em class="guilabel">Command Prompt</em> and outlines the process
+for setting up MongoDB as a <em class="guilabel">Windows Service</em>.</p>
+<p>Operating MongoDB with Windows is similar to MongoDB on other
+platforms. Most components share the same operational patterns.</p>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="download-mongodb-for-windows">
+<h3>Download MongoDB for Windows<a class="headerlink" href="#download-mongodb-for-windows" title="Permalink to this headline">¶</a></h3>
+<p>Download the latest production release of MongoDB from the <a class="reference external" href="http://www.mongodb.org/downloads">MongoDB
+downloads page</a>.</p>
+<p>There are three builds of MongoDB for Windows:</p>
+<ul class="simple">
+<li>MongoDB for Windows Server 2008 R2 edition only runs on Windows
+Server 2008 R2, Windows 7 64-bit, and newer versions of Windows. This
+build takes advantage of recent enhancements to the Windows Platform
+and cannot operate on older versions of Windows.</li>
+<li>MongoDB for Windows 64-bit runs on any 64-bit version of Windows
+newer than Windows XP, including Windows Server 2008 R2 and Windows
+7 64-bit.</li>
+<li>MongoDB for Windows 32-bit runs on any 32-bit version of Windows
+newer than Windows XP. 32-bit versions of MongoDB are only intended
+for older systems and for use in testing and development systems.</li>
+</ul>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>MongoDB does not support Windows XP. Please use a more recent
+version of Windows to use more recent releases of MongoDB.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Always download the correct version of MongoDB for your
+Windows system. The 64-bit versions of MongoDB will not
+work with 32-bit Windows.</p>
+<p>32-bit versions of MongoDB are suitable only for testing and evaluation
+purposes and only support databases smaller than 2GB.</p>
+<p>You can find the architecture of your version of Windows
+platform using the following command in the <em class="guilabel">Command
+Prompt</em></p>
+<div class="last highlight-powershell"><div class="highlight"><pre><span class="n">wmic</span> <span class="n">os</span> <span class="n">get</span> <span class="n">osarchitecture</span>
+</pre></div>
+</div>
+</div>
+<p>In Windows Explorer, find the MongoDB download file, typically in the
+default Downloads directory. Extract the archive to <tt class="docutils literal"><span class="pre">C:\</span></tt> by right
+clicking on the archive and selecting <em class="guilabel">Extract All</em> and
+browsing to <tt class="docutils literal"><span class="pre">C:\</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The folder name will be either:</p>
+<div class="highlight-powershell"><pre>C:\mongodb-win32-i386-[version]</pre>
+</div>
+<p>Or:</p>
+<div class="highlight-powershell"><pre>C:\mongodb-win32-x86_64-[version]</pre>
+</div>
+<p class="last">In both examples, replace <tt class="docutils literal"><span class="pre">[version]</span></tt> with the version of MongoDB
+downloaded.</p>
+</div>
+</div>
+<div class="section" id="set-up-the-environment">
+<h3>Set up the Environment<a class="headerlink" href="#set-up-the-environment" title="Permalink to this headline">¶</a></h3>
+<p>Start the <em class="guilabel">Command Prompt</em> by selecting the <em class="guilabel">Start
+Menu</em>, then <em class="guilabel">All Programs</em>, then <em class="guilabel">Accessories</em>,
+then right click <em class="guilabel">Command Prompt</em>, and select <em class="guilabel">Run
+as Administrator</em> from the popup menu. In the <em class="guilabel">Command
+Prompt</em>, issue the following commands:</p>
+<div class="highlight-powershell"><pre>cd \
+move C:\mongodb-win32-* C:\mongodb</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">MongoDB is self-contained and does not have any other system
+dependencies. You can run MongoDB from any folder you choose. You
+may install MongoDB in any directory (e.g. <tt class="docutils literal"><span class="pre">D:\test\mongodb</span></tt>)</p>
+</div>
+<p>MongoDB requires a <a class="reference internal" href="../reference/glossary.html#term-dbpath"><em class="xref std std-term">data folder</em></a> to store its files. The default
+location for the MongoDB data directory is <tt class="docutils literal"><span class="pre">C:\data\db</span></tt>. Create this
+folder using the <em class="guilabel">Command Prompt</em>. Issue the following
+command sequence:</p>
+<div class="highlight-powershell"><div class="highlight"><pre><span class="n">md</span> <span class="n">data</span>
+<span class="n">md</span> <span class="n">data</span><span class="p">\</span><span class="n">db</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You may specify an alternate path for <tt class="docutils literal"><span class="pre">\data\db</span></tt> with the
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> setting for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt>, as in the
+following example:</p>
+<div class="highlight-powershell"><pre>C:\mongodb\bin\mongod.exe --dbpath d:\test\mongodb\data</pre>
+</div>
+<p>If your path includes spaces, enclose the entire path in double
+quotations, for example:</p>
+<div class="last highlight-powershell"><pre>C:\mongodb\bin\mongod.exe --dbpath "d:\test\mongo db data"</pre>
+</div>
+</div>
+</div>
+<div class="section" id="start-mongodb">
+<h3>Start MongoDB<a class="headerlink" href="#start-mongodb" title="Permalink to this headline">¶</a></h3>
+<p>To start MongoDB, execute from the <em class="guilabel">Command Prompt</em>:</p>
+<div class="highlight-powershell"><pre>C:\mongodb\bin\mongod.exe</pre>
+</div>
+<p>This will start the main MongoDB database process. The <tt class="docutils literal"><span class="pre">waiting</span> <span class="pre">for</span> <span class="pre">connections</span></tt> message in the console output
+indicates that the mongod.exe process is running successfully.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Depending on the security level of your system, Windows will issue
+a <em class="guilabel">Security Alert</em> dialog box about blocking &#8220;some
+features&#8221; of <tt class="docutils literal"><span class="pre">C:\\mongodb\bin\mongod.exe</span></tt> from communicating on
+networks. All users should select <tt class="docutils literal"><span class="pre">Private</span> <span class="pre">Networks,</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">my</span>
+<span class="pre">home</span> <span class="pre">or</span> <span class="pre">work</span> <span class="pre">network</span></tt> and click <tt class="docutils literal"><span class="pre">Allow</span> <span class="pre">access</span></tt>. For additional
+information on security and MongoDB, please read the
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Security+and+Authentication">Security and Authentication</a>
+wiki page.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not allow <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> to be accessible to public
+networks without running in &#8220;Secure Mode&#8221; (i.e. <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>.)
+MongoDB is designed to be run in &#8220;trusted environments&#8221; and the
+database does not enable authentication or &#8220;Secure Mode&#8221; by
+default.</p>
+</div>
+<p>Connect to MongoDB using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> shell. Open another
+<em class="guilabel">Command Prompt</em> and issue the following command:</p>
+<div class="highlight-powershell"><pre>C:\mongodb\bin\mongo.exe</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Executing the command <tt class="docutils literal"><span class="pre">start</span> <span class="pre">C:\mongodb\bin\mongo.exe</span></tt> will
+automatically start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> shell in a separate
+<em class="guilabel">Command Prompt</em> window.</p>
+</div>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> shell will connect to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> running on
+the localhost interface and port <tt class="docutils literal"><span class="pre">27017</span></tt> by default. At the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> prompt, issue the following two commands to
+insert a record in the <tt class="docutils literal"><span class="pre">test</span></tt> <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> of the default
+<tt class="docutils literal"><span class="pre">test</span></tt> database and then retrieve that record:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>&#8221; and &#8220;<a class="reference internal" href="../reference/javascript.html"><em>JavaScript Interface</em></a>.&#8221; If
+you want to develop applications using .NET, see the <a class="reference external" href="http://www.mongodb.org/display/DOCS/CSharp+Language+Center">C#
+Language Center</a> wiki page for more
+information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="mongodb-as-a-windows-service">
+<span id="tutorial-mongod-as-windows-service"></span><h2>MongoDB as a Windows Service<a class="headerlink" href="#mongodb-as-a-windows-service" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.0.</span></p>
+<p>Setup MongoDB as a <em class="guilabel">Windows Service</em>, so that the database
+will start automatically following each reboot cycle.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> added support for running as a Windows
+service in version 2.0, and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> added support for
+running as a Windows Service in version 2.1.1.</p>
+</div>
+<div class="section" id="configure-the-system">
+<h3>Configure the System<a class="headerlink" href="#configure-the-system" title="Permalink to this headline">¶</a></h3>
+<p>You should specify two options when running MongoDB as a Windows
+Service: a path for the log output (i.e. <a class="reference internal" href="../reference/configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a>) and a
+<a class="reference internal" href="../reference/configuration-options.html"><em>configuration file</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">Create a specific directory for MongoDB log files:</p>
+<div class="highlight-powershell"><pre>md C:\mongodb\log</pre>
+</div>
+</li>
+<li><p class="first">Create a configuration file for the <a class="reference internal" href="../reference/configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> option for
+MongoDB in the <em class="guilabel">Command Prompt</em> by issuing this command:</p>
+<div class="highlight-powershell"><pre>echo logpath=C:\mongodb\log\mongo.log &gt; C:\mongodb\mongod.cfg</pre>
+</div>
+</li>
+</ol>
+<p>While these optional steps are optional, creating a specific location
+for log files and using the configuration file are good practice.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Consider setting the <a class="reference internal" href="../reference/configuration-options.html#logappend" title="logappend"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logappend</span></tt></a> option. If you do not,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> will delete the contents of the existing log
+file when starting.</p>
+<p class="last versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>The default <a class="reference internal" href="../reference/configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> and <a class="reference internal" href="../reference/configuration-options.html#logappend" title="logappend"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logappend</span></tt></a> behavior
+will change in the 2.2 release.</p>
+</div>
+</div>
+<div class="section" id="install-and-run-the-mongodb-service">
+<h3>Install and Run the MongoDB Service<a class="headerlink" href="#install-and-run-the-mongodb-service" title="Permalink to this headline">¶</a></h3>
+<p>Run all of the following commands in <em class="guilabel">Command Prompt</em> with
+&#8220;Administrative Privileges:&#8221;</p>
+<ol class="arabic">
+<li><p class="first">To install the MongoDB service:</p>
+<div class="highlight-powershell"><pre>C:\mongodb\bin\mongod.exe --config C:\mongodb\mongod.cfg --install</pre>
+</div>
+<p>Modify the path to the <tt class="docutils literal"><span class="pre">mongod.cfg</span></tt> file as needed. For the
+<a class="reference internal" href="../reference/mongod.exe.html#cmdoption-mongod.exe--install"><em class="xref std std-option">--install</em></a> option to succeed, you <em>must</em> specify a
+<a class="reference internal" href="../reference/configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> setting or the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--logpath"><em class="xref std std-option">--logpath</em></a>
+run-time option.</p>
+</li>
+<li><p class="first">To run the MongoDB service:</p>
+<div class="highlight-powershell"><div class="highlight"><pre><span class="n">net</span> <span class="n">start</span> <span class="n">MongoDB</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you wish to use an alternate path for your <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>
+specify it in the config file (e.g. <tt class="docutils literal"><span class="pre">C:\mongodb\mongod.cfg</span></tt>) on
+that you specified in the <a class="reference internal" href="../reference/mongod.exe.html#cmdoption-mongod.exe--install"><em class="xref std std-option">--install</em></a>
+operation. You may also specify <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a>
+on the command line; however, always prefer the configuration file.</p>
+<p class="last">If the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory does not exist,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> will not be able to start. The default value
+for <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> is <tt class="docutils literal"><span class="pre">\data\db</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="stop-or-remove-the-mongodb-service">
+<h3>Stop or Remove the MongoDB Service<a class="headerlink" href="#stop-or-remove-the-mongodb-service" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">To stop the MongoDB service:</p>
+<div class="highlight-powershell"><div class="highlight"><pre><span class="n">net</span> <span class="n">stop</span> <span class="n">MongoDB</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To remove the MongoDB service:</p>
+<div class="highlight-powershell"><pre>C:\mongodb\bin\mongod.exe --remove</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="install-mongodb-on-os-x.html" title="Previous Section: Install MongoDB on OS X">&lt; &nbsp; Install MongoDB on OS X</a></li>
+<li id="btnvup"><a href="../installation.html" title="Parent Section: Installing MongoDB" >&#47;&#92;&nbsp; Installing MongoDB</a></li>
+<li id="btnvnx"><a href="getting-started.html" title="Next Section: Getting Started with the MongoDB JavaScript Shell">Getting Started with the MongoDB JavaScript Shell &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

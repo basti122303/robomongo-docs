@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongos &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongos" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongo" href="mongo.html" />
+<link rel="prev" title="mongod" href="mongod.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongos">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongos</span></tt><a class="headerlink" href="#mongos" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> for &#8220;MongoDB Shard,&#8221; is a routing service for
+MongoDB shard configurations that processes queries from the
+application layer, and determines the location of this data in the
+<a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, in order to complete these operations.
+From the perspective of the application, a
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance behaves identically to any other MongoDB
+instance.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">See the &#8220;<a class="reference external" href="http://www.mongodb.org/display/DOCS/Sharding">Sharding</a>&#8221; wiki page for more information regarding
+MongoDB&#8217;s sharding functionality.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.1.</span></p>
+<p class="last">Some aggregation operations using the <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> will
+cause <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances to require more CPU resources
+than in previous versions. This modified performance profile may
+dictate alternate architecture decisions if you make use the
+<a class="reference internal" href="glossary.html#term-aggregation-framework"><em class="xref std std-term">aggregation framework</em></a> extensively in a sharded environment.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongos</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> daemon.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--config">
+<tt class="descname">--config</tt><tt class="descclassname"> &lt;filename&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-f</tt><tt class="descclassname"> &lt;filename&gt;</tt><a class="headerlink" href="#cmdoption-mongos--config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a configuration file, that you can use to specify
+runtime-configurations. While the options are equivalent and
+accessible via the other command line arguments, the configuration
+file is the preferred method for runtime configuration of
+mongod. See the &#8220;<a class="reference internal" href="configuration-options.html"><em>Configuration File Options</em></a>&#8221; document
+for more information about these options.</p>
+<p>Not all configuration options for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> make sense in
+the context of <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on standard
+output or in the log file specified by <a class="reference internal" href="#cmdoption-mongos--logpath"><em class="xref std std-option">--logpath</em></a>. Use the
+<tt class="docutils literal"><span class="pre">-v</span></tt> form to control the level of verbosity by including the
+option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--quiet">
+<tt class="descname">--quiet</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--quiet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance in a quiet mode that attempts to limit
+the amount of output.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongos--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a TCP port for the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to listen for client
+connections. By default <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> listens for connections on
+port 27017.</p>
+<p>UNIX-like systems require root access to access ports with numbers
+lower than 1000.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--bind_ip">
+<tt class="descname">--bind_ip</tt><tt class="descclassname"> &lt;ip address&gt;</tt><a class="headerlink" href="#cmdoption-mongos--bind_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>The IP address that the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process will bind to and
+listen for connections. By default <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> listens for
+connections on the localhost (i.e. <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> address.) You may
+attach <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to any interface; however, if you attach
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to a publicly accessible interface you must
+implement proper authentication or firewall restrictions to protect
+the integrity of your database.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--maxConns">
+<tt class="descname">--maxConns</tt><tt class="descclassname"> &lt;number&gt;</tt><a class="headerlink" href="#cmdoption-mongos--maxConns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the maximum number of simultaneous connections that
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will accept. This setting will have no effect if
+the value of this setting is higher than your operating system&#8217;s
+configured maximum connection tracking threshold.</p>
+<p>This is particularly useful for <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> if you have a
+client that creates a number of collections but allows them to
+timeout rather than close the collections. When you set
+<a class="reference internal" href="configuration-options.html#maxConns" title="maxConns"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">maxConns</span></tt></a>, ensure the value is slightly higher than the
+size of the connection pool or the total number of connections to
+prevent erroneous connection spikes from propagating to the members
+of a <a class="reference internal" href="glossary.html#term-shard"><em class="xref std std-term">shard</em></a> cluster.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You cannot set <a class="reference internal" href="configuration-options.html#maxConns" title="maxConns"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">maxConns</span></tt></a> to a value higher
+than <cite>20000</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--objcheck">
+<tt class="descname">--objcheck</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--objcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forces the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to validate all requests from clients
+upon receipt to ensure that invalid objects are never inserted into
+the database. This option has a performance impact, and is not
+enabled by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--logpath">
+<tt class="descname">--logpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongos--logpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a path for the log file that will hold all diagnostic
+logging information.</p>
+<p>Unless specified, <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will output all log information
+to the standard output. Additionally, unless you also specify
+<a class="reference internal" href="#cmdoption-mongos--logappend"><em class="xref std std-option">--logappend</em></a>, the logfile will be overwritten when the
+process restarts.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--logappend">
+<tt class="descname">--logappend</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--logappend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify to ensure that <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> appends additional logging
+data to the end of the logfile rather than overwriting the content
+of the log when the process restarts.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--syslog">
+<tt class="descname">--syslog</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--syslog" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.1.0.</span></p>
+<p>Sends all logging output to the host&#8217;s <a class="reference internal" href="glossary.html#term-syslog"><em class="xref std std-term">syslog</em></a> system rather
+than to standard output or a log file as with <a class="reference internal" href="#cmdoption-mongos--logpath"><em class="xref std std-option">--logpath</em></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You cannot use <a class="reference internal" href="#cmdoption-mongos--syslog"><em class="xref std std-option">--syslog</em></a> with <a class="reference internal" href="#cmdoption-mongos--logpath"><em class="xref std std-option">--logpath</em></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--pidfilepath">
+<tt class="descname">--pidfilepath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongos--pidfilepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a file location to hold the &#8220;<a class="reference internal" href="glossary.html#term-pid"><em class="xref std std-term">PID</em></a>&#8221; or process ID of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process. Useful for tracking the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process in
+combination with the <a class="reference internal" href="#cmdoption-mongos--fork"><em class="xref std std-option">mongos --fork</em></a> option.</p>
+<p>Without this option, <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will create a PID file.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--keyFile">
+<tt class="descname">--keyFile</tt><tt class="descclassname"> &lt;file&gt;</tt><a class="headerlink" href="#cmdoption-mongos--keyFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the path to a key file to store authentication
+information. This option is only useful for the connection between
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances and components of the <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../administration/replica-sets.html#replica-set-security"><em>Replica Set Security</em></a>&#8221;
+and &#8220;<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a>.&#8221;</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--nounixsocket">
+<tt class="descname">--nounixsocket</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--nounixsocket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables listening on the UNIX socket. Without this option
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> creates a UNIX socket.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--unixSocketPrefix">
+<tt class="descname">--unixSocketPrefix</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongos--unixSocketPrefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a path for the UNIX socket. Unless specified,
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> creates a socket in the <tt class="docutils literal"><span class="pre">/tmp</span></tt> path.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--fork">
+<tt class="descname">--fork</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--fork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables a <a class="reference internal" href="glossary.html#term-daemon"><em class="xref std std-term">daemon</em></a> mode for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> which forces the
+process to the background. This is the normal mode of operation, in
+production and production-like environments, but may <em>not</em> be
+desirable for testing.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--configdb">
+<tt class="descname">--configdb</tt><tt class="descclassname"> &lt;config1&gt;,&lt;config2&gt;&lt;:port&gt;,&lt;config3&gt;</tt><a class="headerlink" href="#cmdoption-mongos--configdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set this option to specify a configuration database
+(i.e. <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>) for the <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. You must
+specify either 1 configuration server or 3 configuration servers,
+in a comma separated list.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances read from the first <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config
+server</em></a> in the list provided. All
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances <strong>must</strong> specify the hosts to the
+<a class="reference internal" href="#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a> setting in the same order.</p>
+<p class="last">If your configuration databases reside in more that one data
+center, order the hosts in the <a class="reference internal" href="#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a> argument so
+that the config database that is closest to the majority of your
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances is first servers in the list.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Never remove a config server from the <a class="reference internal" href="#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a> parameter, even if
+the config server or servers are not available, or offline.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--test">
+<tt class="descname">--test</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--test" title="Permalink to this definition">¶</a></dt>
+<dd><p>This option is for internal testing use only, and runs unit tests
+without starting a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--upgrade">
+<tt class="descname">--upgrade</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--upgrade" title="Permalink to this definition">¶</a></dt>
+<dd><p>This option updates the meta data format used by the
+<a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--chunkSize">
+<tt class="descname">--chunkSize</tt><tt class="descclassname"> &lt;value&gt;</tt><a class="headerlink" href="#cmdoption-mongos--chunkSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#cmdoption-mongos--chunkSize"><em class="xref std std-option">--chunkSize</em></a> determines the size of each
+<a class="reference internal" href="glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> of data distributed around thee <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded
+cluster</em></a>. The default value is 64 megabytes, which is
+the ideal size for chunks in most deployments: larger chunk size
+can lead to uneven data distribution, smaller chunk size often
+leads to inefficient movement of chunks between nodes. However, in
+some circumstances it may be necessary to set a different chunk
+size.</p>
+<p>This option <em>only</em> sets the chunk size when initializing the
+cluster for the first time. If you modify the run-time option
+later, the new value will have no effect. See the
+&#8220;<a class="reference internal" href="../administration/sharding.html#sharding-balancing-modify-chunk-size"><em>Modify Chunk Size</em></a>&#8221; procedure if you
+need to change the chunk size on an existing sharded cluster.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support to allow clients to connect to <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+using IPv6 networks. MongoDB disables IPv6 support by default in
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and all utilities.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--jsonp">
+<tt class="descname">--jsonp</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--jsonp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permits <a class="reference internal" href="glossary.html#term-jsonp"><em class="xref std std-term">JSONP</em></a> access via an HTTP interface. Consider the
+security implications of allowing this activity before enabling
+this option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--noscripting">
+<tt class="descname">--noscripting</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--noscripting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables the scripting engine.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--nohttpinterface">
+<tt class="descname">--nohttpinterface</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--nohttpinterface" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.1.2.</span></p>
+<p>Disables the HTTP interface.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos--localThreshold">
+<tt class="descname">--localThreshold</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos--localThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p><a class="reference internal" href="#cmdoption-mongos--localThreshold"><em class="xref std std-option">--localThreshold</em></a> affects the logic that program:<cite>mongos</cite>
+uses when selecting <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members to pass reads
+operations to from clients. Specify a value to
+<a class="reference internal" href="#cmdoption-mongos--localThreshold"><em class="xref std std-option">--localThreshold</em></a> in milliseconds. The default value is
+<tt class="docutils literal"><span class="pre">15</span></tt>, which corresponds to the default value in all of the client
+<a class="reference internal" href="../applications/drivers.html"><em>drivers</em></a>.</p>
+<p>When <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> receives a request that permits reads to
+<a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members, the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">find the member of the set with the lowest ping time.</p>
+</li>
+<li><p class="first">construct a list of replica set members that is within a ping
+time of 15 milliseconds of the nearest suitable member of the
+set.</p>
+<p>If you specify a value for <a class="reference internal" href="#cmdoption-mongos--localThreshold"><em class="xref std std-option">--localThreshold</em></a>,
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will construct the list of replica members
+that are within the latency allowed by this value.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will select a member to read from at
+random from this list.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>The ping time used for a set member compared by the
+<a class="reference internal" href="#cmdoption-mongos--localThreshold"><em class="xref std std-option">--localThreshold</em></a> setting is a moving average of recent
+ping times, calculated, at most, every 10 seconds. As a result, some queries
+may reach members above the threshold until the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+recalculates the average.</p>
+<p>See the <a class="reference internal" href="../applications/replication.html#replica-set-read-preference-behavior-member-selection"><em>Member Selection</em></a>
+section of the <a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>read preference</em></a>
+documentation for more information.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongod.html" title="Previous Section: mongod">&lt; &nbsp; mongod</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongo.html" title="Next Section: mongo">mongo &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

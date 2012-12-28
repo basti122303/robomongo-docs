@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Production Notes &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/production-notes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Recover MongoDB Data following Unexpected Shutdown" href="../tutorial/recover-data-following-unexpected-shutdown.html" />
+<link rel="prev" title="Linux ulimit Settings" href="ulimit.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="production-notes">
+<h1>Production Notes<a class="headerlink" href="#production-notes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This page details system configurations that affect MongoDB,
+especially in production.</p>
+</div>
+<div class="section" id="backups">
+<h2>Backups<a class="headerlink" href="#backups" title="Permalink to this headline">¶</a></h2>
+<p>To make backups of your MongoDB database, please refer to the
+<a class="reference internal" href="backups.html#backup-overview"><em>backups section</em></a>.</p>
+</div>
+<div class="section" id="networking">
+<h2>Networking<a class="headerlink" href="#networking" title="Permalink to this headline">¶</a></h2>
+<p>Always run MongoDB in a <em>trusted environment</em>, with network rules that
+prevent access from <em>all</em> unknown machines, systems, or networks. As
+with any sensitive system dependent on network access, your MongoDB
+deployment should only be accessible to specific systems that require
+access: application servers, monitoring services, and other MongoDB
+components.</p>
+<p>See documents in the <a class="reference internal" href="../security.html"><em>Security</em></a> section for additional
+information, specifically:</p>
+<ul class="simple">
+<li><a class="reference internal" href="security.html#security-port-numbers"><em>Interfaces and Port Numbers</em></a></li>
+<li><a class="reference internal" href="security.html#security-firewalls"><em>Firewalls</em></a></li>
+<li><a class="reference internal" href="../tutorial/configure-linux-iptables-firewall.html"><em>Configure Linux iptables Firewall for MongoDB</em></a></li>
+<li><a class="reference internal" href="../tutorial/configure-windows-netsh-firewall.html"><em>Configure Windows netsh Firewall for MongoDB</em></a></li>
+</ul>
+</div>
+<div class="section" id="mongodb-on-linux">
+<h2>MongoDB on Linux<a class="headerlink" href="#mongodb-on-linux" title="Permalink to this headline">¶</a></h2>
+<p>If you use the Linux kernel, the MongoDB user community has
+recommended Linux kernel 2.6.36 or later for running MongoDB in
+production.</p>
+<p>Because MongoDB preallocates its database files before using them and
+because MongoDB uses very large files on average, your should
+use the Ext4 and XFS file systems if using the Linux kernel:</p>
+<ul class="simple">
+<li>If you use the Ext4 file system, use at least version 2.6.23 of the
+Linux Kernel.</li>
+<li>If you use the XFS file system, use at least version 2.6.25 of the
+Linux Kernel.</li>
+</ul>
+<p>For MongoDB on Linux use the following recommended configurations:</p>
+<ul class="simple">
+<li>Turn off <tt class="docutils literal"><span class="pre">atime</span></tt> for the storage volume with the <a class="reference internal" href="../reference/glossary.html#term-dbpath"><em class="xref std std-term">database
+files</em></a>.</li>
+<li>Set file descriptor limit and user process limit to 20,000,
+according to the suggestions in <a class="reference internal" href="ulimit.html"><em>Linux ulimit Settings</em></a>. A low
+ulimit will affect MongoDB when under heavy use and will produce
+weird errors.</li>
+<li>Do not use <tt class="docutils literal"><span class="pre">hugepages</span></tt> virtual memory pages, MongoDB performs
+better with normal virtual memory pages.</li>
+<li>Disable NUMA in your BIOS. If that is not possible see <a class="reference internal" href="#production-numa"><em>NUMA</em></a>.</li>
+<li>Ensure that readahead settings for the block devices that store the
+database files are acceptable. See the <a class="reference internal" href="#production-readahead"><em>Readahead</em></a> section</li>
+<li>Use NTP to synchronize time between your hosts. This is especially
+important in sharded clusters.</li>
+</ul>
+</div>
+<div class="section" id="readahead">
+<span id="production-readahead"></span><h2>Readahead<a class="headerlink" href="#readahead" title="Permalink to this headline">¶</a></h2>
+<p>For random access use patterns set readahead values low, for example
+setting readahead to a small value such as 32 (16KB) often works well.</p>
+</div>
+<div class="section" id="mongodb-on-virtual-environments">
+<span id="production-virtualization"></span><h2>MongoDB on Virtual Environments<a class="headerlink" href="#mongodb-on-virtual-environments" title="Permalink to this headline">¶</a></h2>
+<p>The section describes considerations when running MongoDB in some of the
+more common virtual environments.</p>
+<div class="section" id="ec2">
+<h3>EC2<a class="headerlink" href="#ec2" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB is compatible with EC2 and requires no configuration changes
+specific to the environment.</p>
+</div>
+<div class="section" id="vmware">
+<h3>VMWare<a class="headerlink" href="#vmware" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB is compatible with VMWare. Some in the MongoDB community have
+run into issues with the VMWare&#8217;s memory overcommit feature and suggest
+disabling the feature.</p>
+<p>You can clone a virtual machine running MongoDB. You might use this to
+spin up a new virtual host that will be added as a member of a replica
+set. If Journaling is enabled, the clone snapshot will be consistent. If
+not using journaling, stop <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, clone, and then restart.</p>
+</div>
+<div class="section" id="openvz">
+<h3>OpenVZ<a class="headerlink" href="#openvz" title="Permalink to this headline">¶</a></h3>
+<p>The MongoDB community has encountered issues running MongoDB on OpenVZ.</p>
+</div>
+</div>
+<div class="section" id="disk-and-storage-systems">
+<h2>Disk and Storage Systems<a class="headerlink" href="#disk-and-storage-systems" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="swap">
+<h3>Swap<a class="headerlink" href="#swap" title="Permalink to this headline">¶</a></h3>
+<p>Configure swap space for your systems. Having swap can prevent issues
+with memory contention and can prevent the OOM Killer on Linux systems
+from killing <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. Because of the way <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+maps memory files to memory, the operating system will never store
+MongoDB data in swap.</p>
+</div>
+<div class="section" id="raid">
+<h3>RAID<a class="headerlink" href="#raid" title="Permalink to this headline">¶</a></h3>
+<p>Most MongoDB deployments should use disks backed by RAID-10.</p>
+<p>RAID-5 and RAID-6 do not typically provide sufficient performance to
+support a MongoDB deployment.</p>
+<p>RAID-0 provides good write performance but provides limited
+availability, and reduced performance on read operations, particularly
+using Amazon&#8217;s EBS volumes: as a result, avoid RAID-0 with MongoDB
+deployments.</p>
+</div>
+<div class="section" id="remote-filesystem">
+<span id="production-nfs"></span><h3>Remote Filesystem<a class="headerlink" href="#remote-filesystem" title="Permalink to this headline">¶</a></h3>
+<p>Some versions of NFS perform very poorly with MongoDB and NFS is not
+recommended for use with MongoDB.</p>
+<p>Many MongoDB deployments work successfully with Amazon&#8217;s <em>Elastic
+Block Store</em> (EBS) volumes. There are certain intrinsic performance
+characteristics, with EBS volumes that users should consider.</p>
+</div>
+</div>
+<div class="section" id="hardware-requirements-and-limitations">
+<h2>Hardware Requirements and Limitations<a class="headerlink" href="#hardware-requirements-and-limitations" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB is designed specifically with commodity hardware in mind and
+has few hardware requirements or limitations. MongoDB core components
+runs on little-endian hardware primarily x86/x86_64 processors. Client
+libraries (i.e. drivers) can run on big or little endian systems.</p>
+<p>When installing hardware for MongoDB, consider the following:</p>
+<ul class="simple">
+<li>As with all software, more RAM and a faster CPU clock speed are
+important to productivity.</li>
+<li>Because databases do not perform high amounts of computation,
+increasing the number cores helps but does not provide a high level of
+marginal return.</li>
+<li>MongoDB has good results and good price/performance with SATA SSD
+(Solid State Disk) and with PCI (Peripheral Component Interconnect).</li>
+<li>Commodity (SATA) spinning drives are often a good option as the
+speed increase for random I/O for more expensive drives is not that
+dramatic (only on the order of 2x), spending that money on SSDs or
+RAM may be more effective.</li>
+</ul>
+<div class="section" id="mongodb-on-numa-hardware">
+<span id="production-numa"></span><h3>MongoDB on NUMA Hardware<a class="headerlink" href="#mongodb-on-numa-hardware" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB and NUMA, Non-Uniform Access Memory, do not work well
+together. When running MongoDB on NUMA hardware, disable NUMA for
+MongoDB and running with an interleave memory policy. NUMA can cause a
+number of operational problems with MongoDB, including slow
+performance for periods of time or high system processor usage.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Linux, MongoDB version 2.0 and greater checks these
+settings on start up and prints a warning if the system is
+NUMA-based.</p>
+</div>
+<p>To disable NUMA for MongoDB, use the <tt class="docutils literal"><span class="pre">numactl</span></tt> command and start
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> in the following manner:</p>
+<div class="highlight-sh"><div class="highlight"><pre>numactl --interleave<span class="o">=</span>all /usr/bin/local/mongod
+</pre></div>
+</div>
+<p>Adjust the <tt class="docutils literal"><span class="pre">proc</span></tt> settings using the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">echo </span>0 &gt; /proc/sys/vm/zone_reclaim_mode
+</pre></div>
+</div>
+<p>To fully disable NUMA you must perform both operations. However, can
+change <tt class="docutils literal"><span class="pre">zone_reclaim_mode</span></tt> without restarting mongod. For more
+information, see documentation on <a class="reference external" href="http://www.kernel.org/doc/Documentation/sysctl/vm.txt">Proc/sys/vm</a>.</p>
+<p>See the <a class="reference external" href="http://jcole.us/blog/archives/2010/09/28/mysql-swap-insanity-and-the-numa-architecture/">The MySQL “swap insanity” problem and the effects of NUMA</a>
+post, which describes the effects of NUMA on databases. This blog post
+addresses the impact of NUMA for MySQL; however, the issues for
+MongoDB are similar. The post introduces NUMA its goals, and
+illustrates how these goals are not compatible with production
+databases.</p>
+</div>
+</div>
+<div class="section" id="performance-monitoring">
+<h2>Performance Monitoring<a class="headerlink" href="#performance-monitoring" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="iostat">
+<h3>iostat<a class="headerlink" href="#iostat" title="Permalink to this headline">¶</a></h3>
+<p>On Linux, use the iostat command to check if disk I/O is a bottleneck
+for your database. Specify a number of seconds when running iostat to
+avoid displaying stats covering the time since server boot.</p>
+<p>For example:</p>
+<div class="highlight-bash"><div class="highlight"><pre>iostat -xm 2
+</pre></div>
+</div>
+<p>Use the mount command to see what device your <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">data</span> <span class="pre">directory</span></tt></a> resides on.</p>
+<p>Key fields from <tt class="docutils literal"><span class="pre">iostat</span></tt>:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">%util</span></tt>: this is the most useful field for a quick check, it
+indicates what percent of the time the device/drive is in use.</li>
+<li><tt class="docutils literal"><span class="pre">avgrq-sz</span></tt>: average request size. Smaller number for this value
+reflect more random IO operations.</li>
+</ul>
+</div>
+<div class="section" id="bwm-ng">
+<h3>bwm-ng<a class="headerlink" href="#bwm-ng" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://www.gropp.org/?id=projects&amp;sub=bwm-ng">bwm-ng</a> is a
+command-line tool for monitoring network use. If you suspect a
+network-based bottleneck, you may use <tt class="docutils literal"><span class="pre">bwm-ng</span></tt> to begin your
+diagnostic process.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="ulimit.html" title="Previous Section: Linux ulimit Settings">&lt; &nbsp; Linux ulimit Settings</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="../tutorial/recover-data-following-unexpected-shutdown.html" title="Next Section: Recover MongoDB Data following Unexpected Shutdown">Recover MongoDB Data following Unexpected Shutdown &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

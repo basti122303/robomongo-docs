@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>convertToCapped &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/convertToCapped" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="copydb" href="copydb.html" />
+<link rel="prev" title="connPoolSync (internal)" href="connPoolSync.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="converttocapped">
+<h1>convertToCapped<a class="headerlink" href="#converttocapped" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="convertToCapped">
+<tt class="descname">convertToCapped</tt><a class="headerlink" href="#convertToCapped" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#convertToCapped" title="convertToCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">convertToCapped</span></tt></a> command converts an existing,
+non-capped collection to a <a class="reference internal" href="../glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a> within the same
+database.</p>
+<p>The command has the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span><span class="nx">convertToCapped</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">size</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">capped</span> <span class="nx">size</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../commands.html#convertToCapped" title="convertToCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">convertToCapped</span></tt></a> takes an existing collection
+(<tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt>) and transforms it into a capped collection with
+a maximum size in bytes, specified to the <tt class="docutils literal"><span class="pre">size</span></tt> argument
+(<tt class="docutils literal"><span class="pre">&lt;capped</span> <span class="pre">size&gt;</span></tt>).</p>
+<p>During the conversion process, the <a class="reference internal" href="../commands.html#convertToCapped" title="convertToCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">convertToCapped</span></tt></a>
+command exhibit the following behavior:</p>
+<ul class="simple">
+<li>MongoDB transverses the documents in the original collection in
+<a class="reference internal" href="../glossary.html#term-natural-order"><em class="xref std std-term">natural order</em></a> and loads the documents into a new
+capped collection.</li>
+<li>If the <tt class="docutils literal"><span class="pre">capped</span> <span class="pre">size</span></tt> specified for the capped collection is
+smaller than the size of the original uncapped collection, then
+MongoDB will overwrite documents in the capped collection based
+on insertion order, or <em>first in, first out</em> order.</li>
+<li>Internally, to convert the collection, MongoDB uses the following
+procedure<ul>
+<li><a class="reference internal" href="../commands.html#cloneCollectionAsCapped" title="cloneCollectionAsCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollectionAsCapped</span></tt></a> command creates the capped
+collection and imports the data.</li>
+<li>MongoDB drops the original collection.</li>
+<li><a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> renames the new capped collection
+to the name of the original collection.</li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">MongoDB does not support the <a class="reference internal" href="../commands.html#convertToCapped" title="convertToCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">convertToCapped</span></tt></a>
+command in a sharded cluster.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <a class="reference internal" href="../commands.html#convertToCapped" title="convertToCapped"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">convertToCapped</span></tt></a> will not recreate indexes from
+the original collection on the new collection. If you need
+indexes on this collection you will need to create these indexes
+after the conversion is complete.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../commands.html#create" title="create"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">create</span></tt></a></p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command obtains a global write lock and will block other
+operations until it has completed.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="connPoolSync.html" title="Previous Section: connPoolSync (internal)">&lt; &nbsp; connPoolSync (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="copydb.html" title="Next Section: copydb">copydb &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

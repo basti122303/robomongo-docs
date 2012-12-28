@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$min &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/min" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$mod" href="mod.html" />
+<link rel="prev" title="$maxScan" href="maxScan.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="min">
+<h1>$min<a class="headerlink" href="#min" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_min">
+<tt class="descname">$min</tt><a class="headerlink" href="#_S_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a <a class="reference internal" href="#_S_min" title="$min"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$min</span></tt></a> value to specify the <em>inclusive</em> lower
+bound for a specific index in order to constrain the results of
+<a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+provides the <a class="reference internal" href="../method/cursor.min.html#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.min()</span></tt></a> wrapper method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...</span> <span class="nx">fieldN</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">valueN</span><span class="o">&gt;</span><span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also specify the option with either of the two forms:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">_addSpecial</span><span class="p">(</span> <span class="s2">&quot;$min&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">value1</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...</span> <span class="nx">fieldN</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">valueN</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$query</span><span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span> <span class="p">},</span> <span class="nx">$min</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">value1</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...</span> <span class="nx">fieldN</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">valueN</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#_S_min" title="$min"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$min</span></tt></a> specifies the lower bound for <em>all</em> keys of a
+specific index <em>in order</em>.</p>
+<p>Consider the following operations on a collection named
+<tt class="docutils literal"><span class="pre">collection</span></tt> that has an index <tt class="docutils literal"><span class="pre">{</span> <span class="pre">age:</span> <span class="pre">1</span> <span class="pre">}</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">20</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>These operations limit the query to those documents where the field
+<tt class="docutils literal"><span class="pre">age</span></tt> is at least <tt class="docutils literal"><span class="pre">20</span></tt> using the index <tt class="docutils literal"><span class="pre">{</span> <span class="pre">age:</span> <span class="pre">1</span> <span class="pre">}</span></tt>.</p>
+<p>You can explicitly specify the corresponding index with
+<a class="reference internal" href="../method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.hint()</span></tt></a>. Otherwise, MongoDB selects the index using
+the fields in the <tt class="docutils literal"><span class="pre">indexbounds</span></tt>; however, if multiple indexes
+exist on same fields with different sort orders, the selection of
+the index may be ambiguous.</p>
+<p>Consider a collection named <tt class="docutils literal"><span class="pre">collection</span></tt> that has the following
+two indexes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Without explicitly using <a class="reference internal" href="../method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.hint()</span></tt></a>, it is unclear
+which index the following operation will select:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;C&#39;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can use <a class="reference internal" href="#_S_min" title="$min"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$min</span></tt></a> in conjunction with <a class="reference internal" href="max.html#_S_max" title="$max"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$max</span></tt></a> to
+limit results to a specific range for the <em>same</em> index, as in the
+following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">20</span> <span class="p">}</span> <span class="p">).</span><span class="nx">max</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">25</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Because <a class="reference internal" href="../method/cursor.min.html#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.min()</span></tt></a> requires an index on a field, and
+forces the query to use this index, you may prefer the
+<a class="reference internal" href="../operators.html#_S_gte" title="$gte"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$gte</span></tt></a> operator for the query if possible. Consider the
+following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">7</span> <span class="p">}</span> <span class="p">).</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">25</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">The query will use the index on the <tt class="docutils literal"><span class="pre">age</span></tt> field, even if the
+index on <tt class="docutils literal"><span class="pre">_id</span></tt> may be better.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="maxScan.html" title="Previous Section: $maxScan">&lt; &nbsp; $maxScan</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mod.html" title="Next Section: $mod">$mod &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Data Types in the mongo Shell &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/core/shell-types" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="next" title="Access the mongo Shell Help Information" href="../tutorial/access-mongo-shell-help.html" />
+<link rel="prev" title="Getting Started with the mongo Shell" href="../tutorial/getting-started-with-the-mongo-shell.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="data-types-in-the-mongo-shell">
+<h1>Data Types in the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#data-types-in-the-mongo-shell" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> provide support for additional data types than
+<a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a>. <a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a> provide native
+support for these data types in host languages and the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell also provides several helper classes to support
+the use of these data types in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> JavaScript
+shell. See <a class="reference internal" href="../reference/mongodb-extended-json.html"><em>MongoDB Extended JSON</em></a> for additional
+information.</p>
+<div class="section" id="date">
+<span id="mongo-shell-data-type"></span><h2>Date<a class="headerlink" href="#date" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides various options to return the date,
+either as a string or as an object:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Date()</span></tt> method which returns the current date as a string</li>
+<li><tt class="docutils literal"><span class="pre">Date()</span></tt> constructor which returns an <tt class="docutils literal"><span class="pre">ISODate</span></tt> object when used
+with the <tt class="docutils literal"><span class="pre">new</span></tt> operator.</li>
+<li><tt class="docutils literal"><span class="pre">ISODate()</span></tt> constructor which returns an <tt class="docutils literal"><span class="pre">ISODate</span></tt> object when
+used with <em>or</em> without the <tt class="docutils literal"><span class="pre">new</span></tt> operator.</li>
+</ul>
+<p>Consider the following examples:</p>
+<ul>
+<li><p class="first">To return the date as a string, use the <tt class="docutils literal"><span class="pre">Date()</span></tt> method, as in the
+following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myDateString</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">();</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">To print the value of the variable, type the variable name in the
+shell, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">myDateString</span>
+</pre></div>
+</div>
+<p>The result is the value of <tt class="docutils literal"><span class="pre">myDateString</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">Wed</span> <span class="nx">Dec</span> <span class="mi">19</span> <span class="mi">2012</span> <span class="mi">01</span><span class="o">:</span><span class="mi">03</span><span class="o">:</span><span class="mi">25</span> <span class="nx">GMT</span><span class="o">-</span><span class="mi">0500</span> <span class="p">(</span><span class="nx">EST</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To verify the type, use the <tt class="docutils literal"><span class="pre">typeof</span></tt> operator, as in the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">typeof</span> <span class="nx">myDateString</span>
+</pre></div>
+</div>
+<p>The operation returns <tt class="docutils literal"><span class="pre">string</span></tt>.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">To get the date as an <tt class="docutils literal"><span class="pre">ISODate</span></tt> object, instantiate a new instance
+using the <tt class="docutils literal"><span class="pre">Date()</span></tt> constructor with the <tt class="docutils literal"><span class="pre">new</span></tt> operator, as in the
+following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myDateObject</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">To print the value of the variable, type the variable name in the
+shell, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">myDateObject</span>
+</pre></div>
+</div>
+<p>The result is the value of <tt class="docutils literal"><span class="pre">myDateObject</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-19T06:01:17.171Z&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To verify the type, use the <tt class="docutils literal"><span class="pre">typeof</span></tt> operator, as in the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">typeof</span> <span class="nx">myDateObject</span>
+</pre></div>
+</div>
+<p>The operation returns <tt class="docutils literal"><span class="pre">object</span></tt>.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">To get the date as an <tt class="docutils literal"><span class="pre">ISODate</span></tt> object, instantiate a new instance
+using the <tt class="docutils literal"><span class="pre">ISODate()</span></tt> constructor <em>without</em> the <tt class="docutils literal"><span class="pre">new</span></tt> operator,
+as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myDateObject2</span> <span class="o">=</span> <span class="nx">ISODate</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>You can use the <tt class="docutils literal"><span class="pre">new</span></tt> operator with the <tt class="docutils literal"><span class="pre">ISODate()</span></tt> constructor
+as well.</p>
+<ul>
+<li><p class="first">To print the value of the variable, type the variable name in the
+shell, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">myDateObject2</span>
+</pre></div>
+</div>
+<p>The result is the value of <tt class="docutils literal"><span class="pre">myDateObject2</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-19T06:15:33.035Z&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To verify the type, use the <tt class="docutils literal"><span class="pre">typeof</span></tt> operator, as in the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">typeof</span> <span class="nx">myDateObject2</span>
+</pre></div>
+</div>
+<p>The operation returns <tt class="docutils literal"><span class="pre">object</span></tt>.</p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="objectid">
+<h2>ObjectId<a class="headerlink" href="#objectid" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> wrapper class
+around <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectId</em></a> data types. To generate a new ObjectId, use
+the following operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">new</span> <span class="nx">ObjectId</span>
+</pre></div>
+</div>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last"><a class="reference internal" href="object-id.html"><em>ObjectId</em></a> for full documentation of ObjectIds in
+MongoDB.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../tutorial/getting-started-with-the-mongo-shell.html" title="Previous Section: Getting Started with the mongo Shell">&lt; &nbsp; Getting Started with the mongo Shell</a></li>
+<li id="btnvup"><a href="../mongo.html" title="Parent Section: Using the mongo Shell" >&#47;&#92;&nbsp; Using the mongo Shell</a></li>
+<li id="btnvnx"><a href="../tutorial/access-mongo-shell-help.html" title="Next Section: Access the mongo Shell Help Information">Access the mongo Shell Help Information &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

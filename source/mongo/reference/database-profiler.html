@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Database Profiler Output &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/database-profiler" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Explain Output" href="explain.html" />
+<link rel="prev" title="Current Operation Reporting" href="current-op.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="database-profiler-output">
+<h1>Database Profiler Output<a class="headerlink" href="#database-profiler-output" title="Permalink to this headline">¶</a></h1>
+<p>The database profiler captures data information about read and write
+operations, cursor operations, and database commands. To configure the
+database profile and set the thresholds for capturing profile data,
+see the <a class="reference internal" href="../tutorial/manage-the-database-profiler.html"><em>Analyze Performance of Database Operations</em></a> section.</p>
+<p>The database profiler writes data in the <a class="reference internal" href="system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.profile</span></tt></a> collection,
+which is a <a class="reference internal" href="glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a>. To view the profiler&#8217;s output,
+use normal MongoDB queries on the <a class="reference internal" href="system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.profile</span></tt></a> collection.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because the database profiler writes data to the
+<a class="reference internal" href="system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.profile</span></tt></a> collection in a
+database, the profiler will profile some write activity, even for
+databases that are otherwise read-only.</p>
+</div>
+<div class="section" id="example-system-profile-document">
+<h2>Example <tt class="docutils literal"><span class="pre">system.profile</span></tt> Document<a class="headerlink" href="#example-system-profile-document" title="Permalink to this headline">¶</a></h2>
+<p>The documents in the <a class="reference internal" href="system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.profile</span></tt></a> collection have the following form. This
+example document reflects an update operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;ts&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-10T19:31:28.977Z&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;op&quot;</span> <span class="o">:</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;social.users&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;jane&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;updateobj&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;$set&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;likes&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                <span class="s2">&quot;basketball&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;trekking&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="s2">&quot;moved&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="s2">&quot;nmoved&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;nupdated&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;keyUpdates&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;numYield&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;lockStats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">258</span><span class="p">)</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;millis&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;client&quot;</span> <span class="o">:</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;user&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-reference">
+<h2>Output Reference<a class="headerlink" href="#output-reference" title="Permalink to this headline">¶</a></h2>
+<p>The database profiler reports the following values. The set of values
+reported for a given operation depends on the operation:</p>
+<dl class="stats">
+<dt id="ts">
+<tt class="descname">ts</tt><a class="headerlink" href="#ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestamp of the operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="op">
+<tt class="descname">op</tt><a class="headerlink" href="#op" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of operation. The possible values are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">insert</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">query</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">update</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">remove</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">getmore</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">command</span></tt></li>
+</ul>
+</dd></dl>
+
+<dl class="stats">
+<dt id="ns">
+<tt class="descname">ns</tt><a class="headerlink" href="#ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="glossary.html#term-namespace"><em class="xref std std-term">namespace</em></a> the operation targets. Namespaces in MongoDB
+take the form of the <a class="reference internal" href="glossary.html#term-database"><em class="xref std std-term">database</em></a>, followed by a dot (<tt class="docutils literal"><span class="pre">.</span></tt>),
+followed by the name of
+the <a class="reference internal" href="glossary.html#term-collection"><em class="xref std std-term">collection</em></a>.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="query">
+<tt class="descname">query</tt><a class="headerlink" href="#query" title="Permalink to this definition">¶</a></dt>
+<dd><p>The query document used. See <a class="reference internal" href="../core/document.html#documents-query-selectors"><em>Query Specification Documents</em></a> for
+more information on these documents, and
+<a class="reference internal" href="meta-query-operators.html"><em>Meta Query Operators</em></a> for more information.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="command">
+<tt class="descname">command</tt><a class="headerlink" href="#command" title="Permalink to this definition">¶</a></dt>
+<dd><p>The command operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="updateobj">
+<tt class="descname">updateobj</tt><a class="headerlink" href="#updateobj" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../core/document.html#documents-update-actions"><em>update document</em></a> passed in
+during an <a class="reference internal" href="../applications/update.html"><em>update</em></a> operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="cursorid">
+<tt class="descname">cursorid</tt><a class="headerlink" href="#cursorid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the cursor accessed by a <tt class="docutils literal"><span class="pre">getmore</span></tt> operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="ntoreturn">
+<tt class="descname">ntoreturn</tt><a class="headerlink" href="#ntoreturn" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents the operation specified to return. For
+example, the <a class="reference internal" href="configuration-options.html#profile" title="profile"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">profile</span></tt></a> command would return one document
+(a results document) so the <a class="reference internal" href="#ntoreturn" title="ntoreturn"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">ntoreturn</span></tt></a> value would be <tt class="docutils literal"><span class="pre">1</span></tt>. The
+<a class="reference internal" href="method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit(5)</span></tt></a> command would return five
+documents so the <tt class="docutils literal"><span class="pre">ntoreturn</span></tt> value would be <tt class="docutils literal"><span class="pre">5</span></tt>.</p>
+<p>If the <a class="reference internal" href="#ntoreturn" title="ntoreturn"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">ntoreturn</span></tt></a> value is <tt class="docutils literal"><span class="pre">0</span></tt>, the command did not specify a
+number of documents to return, as would be the case with a simple
+<a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> command with no limit
+specified.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="ntoskip">
+<tt class="descname">ntoskip</tt><a class="headerlink" href="#ntoskip" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents the <a class="reference internal" href="method/cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">skip()</span></tt></a> method
+specified to skip.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="nscanned">
+<tt class="descname">nscanned</tt><a class="headerlink" href="#nscanned" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents that MongoDB scans in the <a class="reference internal" href="../indexes.html"><em>index</em></a> in order to
+carry out the operation.</p>
+<p>In general, if <a class="reference internal" href="explain.html#nscanned" title="nscanned"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">nscanned</span></tt></a> is much higher than <a class="reference internal" href="#nreturned" title="nreturned"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">nreturned</span></tt></a>, the
+database is scanning many objects to find the target objects.
+Consider creating an index to improve this.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="moved">
+<tt class="descname">moved</tt><a class="headerlink" href="#moved" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <a class="reference internal" href="#moved" title="moved"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">moved</span></tt></a> has a value of <tt class="docutils literal"><span class="pre">true</span></tt> indicates that the update operation moved one or
+more documents to a new location on disk. These operations take
+more time than
+in-place updates, and typically occur when documents grow as a
+result of document growth.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="nmoved">
+<tt class="descname">nmoved</tt><a class="headerlink" href="#nmoved" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents moved on disk by the operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="nupdated">
+<tt class="descname">nupdated</tt><a class="headerlink" href="#nupdated" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents updated by the operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="keyUpdates">
+<tt class="descname">keyUpdates</tt><a class="headerlink" href="#keyUpdates" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of <a class="reference internal" href="../indexes.html"><em>index</em></a> keys the update changed in
+the operation. Changing an index key
+carries a small performance cost because the database must remove the old
+key and inserts a new key into the B-tree index.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="numYield">
+<tt class="descname">numYield</tt><a class="headerlink" href="#numYield" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of times the operation yielded to allow other operations
+to complete. Typically, operations yield when they need access to
+data that MongoDB has not yet fully read into memory. This allows
+other operations that have data in memory to complete while MongoDB
+reads in data for the yielding operation. For more information,
+see <a class="reference internal" href="../faq/concurrency.html#faq-concurrency-yielding"><em>the FAQ on when operations yield</em></a>.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="lockStats">
+<tt class="descname">lockStats</tt><a class="headerlink" href="#lockStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time in microseconds the operation spent acquiring and holding
+locks. This field reports data for the following lock types:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">R</span></tt> - global read lock</li>
+<li><tt class="docutils literal"><span class="pre">W</span></tt> - global write lock</li>
+<li><tt class="docutils literal"><span class="pre">r</span></tt> - database-specific read lock</li>
+<li><tt class="docutils literal"><span class="pre">w</span></tt> - database-specific write lock</li>
+</ul>
+<dl class="stats">
+<dt id="lockStats.timeLockedMicros">
+<tt class="descclassname">lockStats.</tt><tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#lockStats.timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time in microseconds the operation held a specific lock.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="lockStats.timeAcquiringMicros">
+<tt class="descclassname">lockStats.</tt><tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#lockStats.timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time in microseconds the operation spent waiting to acquire a
+specific lock.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="stats">
+<dt id="nreturned">
+<tt class="descname">nreturned</tt><a class="headerlink" href="#nreturned" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of documents returned by the operation.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="responseLength">
+<tt class="descname">responseLength</tt><a class="headerlink" href="#responseLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>The length in bytes of the operation&#8217;s result document. A large
+<a class="reference internal" href="#responseLength" title="responseLength"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">responseLength</span></tt></a> can affect performance. To limit the size of a the
+result document for a query operation, you can use any of the
+following:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../core/read-operations.html#read-operations-projection"><em>Projections</em></a></li>
+<li><a class="reference internal" href="method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">The</span> <span class="pre">limit()</span> <span class="pre">method</span></tt></a></li>
+<li><a class="reference internal" href="method/cursor.batchSize.html#cursor.batchSize" title="cursor.batchSize"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">The</span> <span class="pre">batchSize()</span> <span class="pre">method</span></tt></a></li>
+</ul>
+</dd></dl>
+
+<dl class="stats">
+<dt id="millis">
+<tt class="descname">millis</tt><a class="headerlink" href="#millis" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time in milliseconds for the server to perform the operation.
+This time does not include network time nor time to acquire the lock.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="client">
+<tt class="descname">client</tt><a class="headerlink" href="#client" title="Permalink to this definition">¶</a></dt>
+<dd><p>The IP address or hostname of the client connection where the
+operation originates.</p>
+<p>For some operations, such as <a class="reference internal" href="method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a>, the client is
+<tt class="docutils literal"><span class="pre">0.0.0.0:0</span></tt> instead of an actual client.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="user">
+<tt class="descname">user</tt><a class="headerlink" href="#user" title="Permalink to this definition">¶</a></dt>
+<dd><p>The authenticated user who ran the operation.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="current-op.html" title="Previous Section: Current Operation Reporting">&lt; &nbsp; Current Operation Reporting</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="explain.html" title="Next Section: Explain Output">Explain Output &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

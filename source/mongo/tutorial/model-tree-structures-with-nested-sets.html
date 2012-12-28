@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Model Tree Structures with Nested Sets &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/model-tree-structures-with-nested-sets" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Model Data to Support Keyword Search" href="model-data-for-keyword-search.html" />
+<link rel="prev" title="Model Tree Structures with Materialized Paths" href="model-tree-structures-with-materialized-paths.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="model-tree-structures-with-nested-sets">
+<h1>Model Tree Structures with Nested Sets<a class="headerlink" href="#model-tree-structures-with-nested-sets" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Data in MongoDB has a <em>flexible schema</em>. <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">Collections</em></a> do not enforce <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a> structure. Decisions
+that affect how you model data can affect application performance and
+database capacity. See <a class="reference internal" href="../core/data-modeling.html"><em>Data Modeling Considerations for MongoDB Applications</em></a> for a full high
+level overview of data modeling in MongoDB.</p>
+<p>This document describes a data model that describes a tree like
+structure that optimizes discovering subtrees at the expense of tree
+mutability.</p>
+</div>
+<div class="section" id="pattern">
+<h2>Pattern<a class="headerlink" href="#pattern" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Nested Sets</em> pattern identifies each node in the tree as stops in
+a round-trip traversal of the tree. The application visits each node
+in the tree twice; first during the initial trip, and second during
+the return trip. The <em>Nested Sets</em> pattern stores each tree node in a
+document; in addition to the tree node, document stores the id of
+node&#8217;s parent, the node&#8217;s initial stop in the <tt class="docutils literal"><span class="pre">left</span></tt> field, and its
+return stop in the <tt class="docutils literal"><span class="pre">right</span></tt> field.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Nested Sets</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">12</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">11</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">10</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">7</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can query to retrieve the descendants of a node:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">databaseCategory</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">v</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">left</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="nx">databaseCategory</span><span class="p">.</span><span class="nx">left</span> <span class="p">},</span> <span class="nx">right</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span> <span class="nx">databaseCategory</span><span class="p">.</span><span class="nx">right</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>The <em>Nested Sets</em> pattern provides a fast and efficient solution for
+finding subtrees but is inefficient for modifying the tree structure.
+As such, this pattern is best for static trees that do not change.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="model-tree-structures-with-materialized-paths.html" title="Previous Section: Model Tree Structures with Materialized Paths">&lt; &nbsp; Model Tree Structures with Materialized Paths</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="model-data-for-keyword-search.html" title="Next Section: Model Data to Support Keyword Search">Model Data to Support Keyword Search &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

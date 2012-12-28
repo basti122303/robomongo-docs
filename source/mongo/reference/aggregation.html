@@ -1,0 +1,951 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Aggregation Framework Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/aggregation" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Aggregation" href="../aggregation.html" />
+<link rel="next" title="Map-Reduce" href="../applications/map-reduce.html" />
+<link rel="prev" title="Aggregation Framework Examples" href="../tutorial/aggregation-examples.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="aggregation-framework-reference">
+<h1>Aggregation Framework Reference<a class="headerlink" href="#aggregation-framework-reference" title="Permalink to this headline">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1.0.</span></p>
+<p>The aggregation framework provides the ability to project, process,
+and/or control the output of the query, without using <a class="reference internal" href="glossary.html#term-map-reduce"><em class="xref std std-term">map-reduce</em></a>.
+Aggregation uses a syntax that resembles the same syntax and
+form as &#8220;regular&#8221; MongoDB database queries.</p>
+<p>These aggregation operations are all accessible by way of the
+<a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> method. While all examples in this document use this
+method, <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> is merely a wrapper around the
+<a class="reference internal" href="glossary.html#term-database-command"><em class="xref std std-term">database command</em></a> <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a>. The
+following prototype aggregation operations are equivalent:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">pipeline</span><span class="o">&gt;</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span> <span class="p">[</span><span class="o">&lt;</span><span class="nx">pipeline</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">aggregate</span><span class="o">:</span> <span class="s2">&quot;people&quot;</span><span class="p">,</span> <span class="nx">pipeline</span><span class="o">:</span> <span class="p">[</span><span class="o">&lt;</span><span class="nx">pipeline</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>These operations perform aggregation routines on the
+collection named <tt class="docutils literal"><span class="pre">people</span></tt>. <tt class="docutils literal"><span class="pre">&lt;pipeline&gt;</span></tt> is a placeholder for the
+aggregation <a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> definition. <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a>
+accepts the stages of the pipeline (i.e. <tt class="docutils literal"><span class="pre">&lt;pipeline&gt;</span></tt>) as an array,
+or as arguments to the method.</p>
+<p>This documentation provides an overview of all aggregation operators
+available for use in the aggregation pipeline as well as details
+regarding their use and behavior.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../applications/aggregation.html"><em>Aggregation Framework</em></a> overview, the
+<a class="reference internal" href="../aggregation.html#aggregation-framework"><em>Aggregation Framework Documentation Index</em></a>, and the
+<a class="reference internal" href="../tutorial/aggregation-examples.html"><em>Aggregation Framework Examples</em></a> for more information on the
+aggregation functionality.</p>
+</div>
+<div class="contents local topic" id="aggregation-operators">
+<p class="topic-title first">Aggregation Operators:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#pipeline" id="id1">Pipeline</a></li>
+<li><a class="reference internal" href="#expressions" id="id2">Expressions</a><ul>
+<li><a class="reference internal" href="#boolean-operators" id="id3">Boolean Operators</a></li>
+<li><a class="reference internal" href="#comparison-operators" id="id4">Comparison Operators</a></li>
+<li><a class="reference internal" href="#arithmetic-operators" id="id5">Arithmetic Operators</a></li>
+<li><a class="reference internal" href="#string-operators" id="id6">String Operators</a></li>
+<li><a class="reference internal" href="#date-operators" id="id7">Date Operators</a></li>
+<li><a class="reference internal" href="#conditional-expressions" id="id8">Conditional Expressions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="pipeline">
+<span id="aggregation-pipeline-operator-reference"></span><h2>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The pipeline cannot operate on values of the following types:
+<tt class="docutils literal"><span class="pre">Binary</span></tt>, <tt class="docutils literal"><span class="pre">Symbol</span></tt>, <tt class="docutils literal"><span class="pre">MinKey</span></tt>, <tt class="docutils literal"><span class="pre">MaxKey</span></tt>, <tt class="docutils literal"><span class="pre">DBRef</span></tt>,
+<tt class="docutils literal"><span class="pre">Code</span></tt>, and <tt class="docutils literal"><span class="pre">CodeWScope</span></tt>.</p>
+</div>
+<p>Pipeline operators appear in an array. Conceptually, documents pass through
+these operators in a sequence. All examples in this section assume that the
+aggregation pipeline begins with a collection named <tt class="docutils literal"><span class="pre">article</span></tt> that
+contains documents that resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">title</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span> <span class="p">,</span>
+  <span class="nx">author</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span> <span class="p">,</span>
+  <span class="nx">posted</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">()</span> <span class="p">,</span>
+  <span class="nx">pageViews</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">,</span>
+  <span class="nx">tags</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;fun&quot;</span> <span class="p">,</span> <span class="s2">&quot;good&quot;</span> <span class="p">,</span> <span class="s2">&quot;fun&quot;</span> <span class="p">]</span> <span class="p">,</span>
+  <span class="nx">comments</span> <span class="o">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="nx">author</span> <span class="o">:</span><span class="s2">&quot;joe&quot;</span> <span class="p">,</span> <span class="nx">text</span> <span class="o">:</span> <span class="s2">&quot;this is cool&quot;</span> <span class="p">}</span> <span class="p">,</span>
+      <span class="p">{</span> <span class="nx">author</span> <span class="o">:</span><span class="s2">&quot;sam&quot;</span> <span class="p">,</span> <span class="nx">text</span> <span class="o">:</span> <span class="s2">&quot;this is bad&quot;</span> <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nx">other</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">foo</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The current pipeline operators are:</p>
+<dl class="pipeline">
+<dt id="_S_project">
+<tt class="descname">$project</tt><a class="headerlink" href="#_S_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshapes a document stream by renaming, adding, or removing
+fields. Also use <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to create computed values or
+sub-objects. Use <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to:</p>
+<ul class="simple">
+<li>Include fields from the original document.</li>
+<li>Insert computed fields.</li>
+<li>Rename fields.</li>
+<li>Create and populate fields that hold sub-documents.</li>
+</ul>
+<p>Use <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to quickly select the fields that you
+want to include or exclude from the response. Consider the
+following aggregation framework operation.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+    <span class="p">}}</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation includes the <tt class="docutils literal"><span class="pre">title</span></tt> field and the <tt class="docutils literal"><span class="pre">author</span></tt>
+field in the document that returns from the aggregation
+<a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <tt class="docutils literal"><span class="pre">_id</span></tt> field is always included by default. You may
+explicitly exclude <tt class="docutils literal"><span class="pre">_id</span></tt> as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">,</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">Here, the projection excludes the <tt class="docutils literal"><span class="pre">_id</span></tt> field but includes the
+<tt class="docutils literal"><span class="pre">title</span></tt> and <tt class="docutils literal"><span class="pre">author</span></tt> fields.</p>
+</div>
+<p>Projections can also add computed fields to the document stream
+passing through the pipeline. A computed field can use any of the
+<a class="reference internal" href="#aggregation-expression-operators"><em>expression operators</em></a>.
+Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nx">doctoredPageViews</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$add</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, the field <tt class="docutils literal"><span class="pre">doctoredPageViews</span></tt> represents the value of the
+<tt class="docutils literal"><span class="pre">pageViews</span></tt> field after adding 10 to the original field using the
+<a class="reference internal" href="aggregation/add.html#_S_add" title="$add"><tt class="xref agg agg-expression docutils literal"><span class="pre">$add</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must enclose the expression that defines the computed field
+in braces, so that the expression is a valid object.</p>
+</div>
+<p>You may also use <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to rename fields. Consider
+the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">page_views</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span> <span class="p">,</span>
+        <span class="nx">bar</span> <span class="o">:</span> <span class="s2">&quot;$other.foo&quot;</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation renames the <tt class="docutils literal"><span class="pre">pageViews</span></tt> field to <tt class="docutils literal"><span class="pre">page_views</span></tt>,
+and renames the <tt class="docutils literal"><span class="pre">foo</span></tt> field in the <tt class="docutils literal"><span class="pre">other</span></tt> sub-document as
+the top-level field <tt class="docutils literal"><span class="pre">bar</span></tt>. The field references used for
+renaming fields are direct expressions and do not use an operator
+or surrounding braces. All aggregation field references can use
+dotted paths to refer to fields in nested documents.</p>
+<p>Finally, you can use the <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to create and
+populate new sub-documents. Consider the following example that
+creates a new object-valued field named <tt class="docutils literal"><span class="pre">stats</span></tt> that holds a number
+of values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">stats</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">pv</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span>
+            <span class="nx">foo</span> <span class="o">:</span> <span class="s2">&quot;$other.foo&quot;</span><span class="p">,</span>
+            <span class="nx">dpv</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$add</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This projection includes the <tt class="docutils literal"><span class="pre">title</span></tt> field and places
+<a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> into &#8220;inclusive&#8221; mode. Then, it creates the
+<tt class="docutils literal"><span class="pre">stats</span></tt> documents with the following fields:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">pv</span></tt> which includes and renames the <tt class="docutils literal"><span class="pre">pageViews</span></tt> from the
+top level of the original documents.</li>
+<li><tt class="docutils literal"><span class="pre">foo</span></tt> which includes the value of <tt class="docutils literal"><span class="pre">other.foo</span></tt> from the
+original documents.</li>
+<li><tt class="docutils literal"><span class="pre">dpv</span></tt> which is a computed field that adds 10 to the value of
+the <tt class="docutils literal"><span class="pre">pageViews</span></tt> field in the original document using the
+<a class="reference internal" href="aggregation/add.html#_S_add" title="$add"><tt class="xref agg agg-expression docutils literal"><span class="pre">$add</span></tt></a> aggregation expression.</li>
+</ul>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_match">
+<tt class="descname">$match</tt><a class="headerlink" href="#_S_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a query-like interface to filter documents out of the
+aggregation <a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>. The <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> drops
+documents that do not match the condition from the aggregation
+pipeline, and it passes documents that match along the pipeline
+unaltered.</p>
+<p>The syntax passed to the <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> is identical
+to the <a class="reference internal" href="glossary.html#term-query"><em class="xref std std-term">query</em></a> syntax. Consider the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$match</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">match</span><span class="o">-</span><span class="nx">predicate</span><span class="o">&gt;</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The following example performs a simple field equality test:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$match</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">author</span> <span class="o">:</span> <span class="s2">&quot;dave&quot;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation only returns documents where the <tt class="docutils literal"><span class="pre">author</span></tt> field
+holds the value <tt class="docutils literal"><span class="pre">dave</span></tt>. Consider the following example,
+which performs a range test:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$match</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">score</span>  <span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span> <span class="o">:</span> <span class="mi">50</span><span class="p">,</span> <span class="nx">$lte</span> <span class="o">:</span> <span class="mi">90</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, all documents return when the <tt class="docutils literal"><span class="pre">score</span></tt> field holds a value
+that is greater than 50 and less than or equal to 90.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Place the <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> as early in the aggregation
+<a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> as possible. Because <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a>
+limits the total number of documents in the aggregation
+pipeline, earlier <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> operations minimize the
+amount of later processing. If you place a <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a>
+at the very beginning of a pipeline, the query can take
+advantage of <a class="reference internal" href="glossary.html#term-index"><em class="xref std std-term">indexes</em></a> like any other
+<a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a> or <a class="reference internal" href="method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.findOne()</span></tt></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You cannot use <a class="reference internal" href="operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> or <a class="reference internal" href="operators.html#geospatial-query-operators"><em>geospatial
+operations</em></a> in <a class="reference internal" href="aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a>
+queries as part of the aggregation pipeline.</p>
+</div>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_limit">
+<tt class="descname">$limit</tt><a class="headerlink" href="#_S_limit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restricts the number of <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">documents</em></a> that
+pass through the <a class="reference internal" href="aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a> in the <a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>.</p>
+<p><a class="reference internal" href="aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a> takes a single numeric (positive whole number)
+value as a parameter. Once the specified number of documents pass
+through the pipeline operator, no more will. Consider the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$limit</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation returns only the first 5 documents passed to it from
+by the pipeline. <a class="reference internal" href="aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a> has no effect on the content
+of the documents it passes.</p>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_skip">
+<tt class="descname">$skip</tt><a class="headerlink" href="#_S_skip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skips over the specified number of <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">documents</em></a>
+that pass through the <a class="reference internal" href="aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a> in the <a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>
+before passing all of the remaining input.</p>
+<p><a class="reference internal" href="aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a> takes a single numeric (positive whole number)
+value as a parameter. Once the operation has skipped the specified
+number of documents, it passes all the remaining documents along the
+<a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> without alteration. Consider the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$skip</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation skips the first 5 documents passed to it by the
+pipeline. <a class="reference internal" href="aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a> has no effect on the content of the
+documents it passes along the pipeline.</p>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_unwind">
+<tt class="descname">$unwind</tt><a class="headerlink" href="#_S_unwind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Peels off the elements of an array individually, and returns a
+stream of documents. <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> returns one document for
+every member of the unwound array within every source
+document. Take the following aggregation command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">tags</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}},</span>
+    <span class="p">{</span> <span class="nx">$unwind</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The dollar sign (i.e. <tt class="docutils literal"><span class="pre">$</span></tt>) must proceed the field
+specification handed to the <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> operator.</p>
+</div>
+<p>In the above aggregation <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> selects
+(inclusively) the <tt class="docutils literal"><span class="pre">author</span></tt>, <tt class="docutils literal"><span class="pre">title</span></tt>, and <tt class="docutils literal"><span class="pre">tags</span></tt> fields, as
+well as the <tt class="docutils literal"><span class="pre">_id</span></tt> field implicitly. Then the pipeline passes the
+results of the projection to the <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> operator,
+which will unwind the <tt class="docutils literal"><span class="pre">tags</span></tt> field. This operation may return
+a sequence of documents that resemble the following for a
+collection that contains one document holding a <tt class="docutils literal"><span class="pre">tags</span></tt> field
+with an array of 3 items.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;fun&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;good&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;fun&quot;</span>
+             <span class="p">}</span>
+     <span class="p">],</span>
+     <span class="s2">&quot;OK&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A single document becomes 3 documents: each document is identical
+except for the value of the <tt class="docutils literal"><span class="pre">tags</span></tt> field. Each value of <tt class="docutils literal"><span class="pre">tags</span></tt>
+is one of the values in the original &#8220;tags&#8221; array.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> has the following behaviors:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> is most useful in combination
+with <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>.</li>
+<li>You may undo the effects of unwind operation with the
+<a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> pipeline operator.</li>
+<li>If you specify a target field for <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that
+does not exist in an input document, the pipeline ignores the
+input document, and will generate no result documents.</li>
+<li>If you specify a target field for <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that is
+not an array, <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> generates an error.</li>
+<li>If you specify a target field for <a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that
+holds an empty array (<tt class="docutils literal"><span class="pre">[]</span></tt>) in an input document, the
+pipeline ignores the input document, and will generates no
+result documents.</li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_group">
+<tt class="descname">$group</tt><a class="headerlink" href="#_S_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Groups documents together for the purpose of calculating aggregate
+values based on a collection of documents. Practically, group often
+supports tasks such as average page views for each page in a
+website on a daily basis.</p>
+<p>The output of <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> depends on how you define
+groups. Begin by specifying an identifier (i.e. a <tt class="docutils literal"><span class="pre">_id</span></tt> field)
+for the group you&#8217;re creating with this pipeline. You can specify a
+single field from the documents in the pipeline, a previously
+computed value, or an aggregate key made up from several incoming
+fields. Aggregate keys may resemble the following document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;$author&#39;</span><span class="p">,</span> <span class="nx">pageViews</span><span class="o">:</span> <span class="s1">&#39;$pageViews&#39;</span><span class="p">,</span> <span class="nx">posted</span><span class="o">:</span> <span class="s1">&#39;$posted&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>With the exception of the <tt class="docutils literal"><span class="pre">_id</span></tt> field, <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> cannot
+output nested documents.</p>
+<p>Every group expression must specify an <tt class="docutils literal"><span class="pre">_id</span></tt> field.
+You may specify the <tt class="docutils literal"><span class="pre">_id</span></tt> field as a dotted
+field path reference, a document with multiple fields enclosed in
+braces (i.e. <tt class="docutils literal"><span class="pre">{</span></tt> and <tt class="docutils literal"><span class="pre">}</span></tt>), or a constant value.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Use <a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> as needed to rename the grouped field
+after an <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> operation, if necessary.</p>
+</div>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$group</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;$author&quot;</span><span class="p">,</span>
+        <span class="nx">docsPerAuthor</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+        <span class="nx">viewsPerAuthor</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span> <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This groups by the <tt class="docutils literal"><span class="pre">author</span></tt> field and computes two fields, the
+first <tt class="docutils literal"><span class="pre">docsPerAuthor</span></tt> is a counter field that adds one for
+each document with a given author field using the <a class="reference internal" href="aggregation/sum.html#_S_sum" title="$sum"><tt class="xref agg agg-group docutils literal"><span class="pre">$sum</span></tt></a>
+function. The <tt class="docutils literal"><span class="pre">viewsPerAuthor</span></tt> field is the sum of
+all of the <tt class="docutils literal"><span class="pre">pageViews</span></tt> fields in the documents for each group.</p>
+<p>Each field defined for the <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> must use one of the group
+aggregation function listed below to generate its composite value:</p>
+<dl class="group">
+<dt id="_S_addToSet">
+<tt class="descname">$addToSet</tt><a class="headerlink" href="#_S_addToSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all the values found in the selected field
+among the documents in that group. <em>Every unique value only
+appears once</em> in the result set. There is no ordering guarantee
+for the output documents.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_first">
+<tt class="descname">$first</tt><a class="headerlink" href="#_S_first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the first value it encounters for its group .</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only use <a class="reference internal" href="aggregation/group.html#_S_first" title="$first"><tt class="xref agg agg-group docutils literal"><span class="pre">$first</span></tt></a> when the <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> follows
+an <a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operation. Otherwise, the result of this
+operation is unpredictable.</p>
+</div>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_last">
+<tt class="descname">$last</tt><a class="headerlink" href="#_S_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the last value it encounters for its group.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only use <a class="reference internal" href="aggregation/last.html#_S_last" title="$last"><tt class="xref agg agg-group docutils literal"><span class="pre">$last</span></tt></a> when the <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>
+follows an <a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operation. Otherwise, the
+result of this operation is unpredictable.</p>
+</div>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_max">
+<tt class="descname">$max</tt><a class="headerlink" href="#_S_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the highest value among all values of the field in all
+documents selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_min">
+<tt class="descname">$min</tt><a class="headerlink" href="#_S_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lowest value among all values of the field in all
+documents selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_avg">
+<tt class="descname">$avg</tt><a class="headerlink" href="#_S_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the average of all the values of the field in all documents
+selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_push">
+<tt class="descname">$push</tt><a class="headerlink" href="#_S_push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all the values found in the selected field
+among the documents in that group. <em>A value may appear more than
+once</em> in the result set if more than one field in the grouped
+documents has that value.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_sum">
+<tt class="descname">$sum</tt><a class="headerlink" href="#_S_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sum of all the values for a specified
+field in the grouped documents, as in the second use above.</p>
+<p>Alternately, if you specify a value as an argument,
+<a class="reference internal" href="aggregation/sum.html#_S_sum" title="$sum"><tt class="xref agg agg-group docutils literal"><span class="pre">$sum</span></tt></a> will increment this field by the specified value
+for every document in the grouping. Typically, as in the first
+use above, specify a value of <tt class="docutils literal"><span class="pre">1</span></tt> in order to count members of the
+group.</p>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The aggregation system currently stores <a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> operations in
+memory, which may cause problems when processing a larger number
+of groups.</p>
+</div>
+</dd></dl>
+
+<dl class="pipeline">
+<dt id="_S_sort">
+<tt class="descname">$sort</tt><a class="headerlink" href="#_S_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> <a class="reference internal" href="glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> operator sorts all input
+documents and returns them to the pipeline in sorted
+order. Consider the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="o">&lt;</span><span class="nx">collection</span><span class="o">-</span><span class="nx">name</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$sort</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">sort</span><span class="o">-</span><span class="nx">key</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This sorts the documents in the collection named
+<tt class="docutils literal"><span class="pre">&lt;collection-name&gt;</span></tt>, according to the key and specification in
+the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&lt;sort-key&gt;</span> <span class="pre">}</span></tt> document.</p>
+<p>Specify the sort in a document with a field or fields that you want
+to sort by and a value of <tt class="docutils literal"><span class="pre">1</span></tt> or <tt class="docutils literal"><span class="pre">-1</span></tt> to specify an ascending
+or descending sort respectively, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$sort</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">age</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">posts</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation sorts the documents in the <tt class="docutils literal"><span class="pre">users</span></tt> collection,
+in descending order according by the <tt class="docutils literal"><span class="pre">age</span></tt> field and then in
+ascending order according to the value in the <tt class="docutils literal"><span class="pre">posts</span></tt> field.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> cannot begin sorting documents until
+previous operators in the pipeline have returned all output.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a></li>
+</ul>
+</div>
+<p><a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operator can take advantage of an index when
+placed at the <strong>beginning</strong> of the pipeline or placed <strong>before</strong>
+the following aggregation operators:</p>
+<ul class="simple">
+<li><a class="reference internal" href="aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a></li>
+<li><a class="reference internal" href="aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a></li>
+<li><a class="reference internal" href="aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>.</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unless the <a class="reference internal" href="aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operator can use an index,
+in the current release, the sort must fit within memory. This
+may cause problems when sorting large numbers of documents.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="expressions">
+<span id="aggregation-expression-operators"></span><h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h2>
+<p>These operators calculate values within the <a class="reference internal" href="glossary.html#term-aggregation-framework"><em class="xref std std-term">aggregation
+framework</em></a>.</p>
+<div class="section" id="boolean-operators">
+<h3>Boolean Operators<a class="headerlink" href="#boolean-operators" title="Permalink to this headline">¶</a></h3>
+<p>The three boolean operators accept Booleans as arguments and
+return Booleans as results.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These operators convert non-booleans to Boolean values according to
+the BSON standards. Here, <tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">undefined</span></tt>, and <tt class="docutils literal"><span class="pre">0</span></tt> values
+become <tt class="docutils literal"><span class="pre">false</span></tt>, while non-zero numeric values, and all other types,
+such as strings, dates, objects become <tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+</div>
+<dl class="expression">
+<dt id="_S_and">
+<tt class="descname">$and</tt><a class="headerlink" href="#_S_and" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array one or more values and returns <tt class="docutils literal"><span class="pre">true</span></tt> if <em>all</em> of
+the values in the array are <tt class="docutils literal"><span class="pre">true</span></tt>. Otherwise <a class="reference internal" href="operators.html#_S_and" title="$and"><tt class="xref agg agg-expression docutils literal"><span class="pre">$and</span></tt></a>
+returns <tt class="docutils literal"><span class="pre">false</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="operators.html#_S_and" title="$and"><tt class="xref agg agg-expression docutils literal"><span class="pre">$and</span></tt></a> uses short-circuit logic: the operation
+stops evaluation after encountering the first <tt class="docutils literal"><span class="pre">false</span></tt>
+expression.</p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_or">
+<tt class="descname">$or</tt><a class="headerlink" href="#_S_or" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array of one or more values and returns <tt class="docutils literal"><span class="pre">true</span></tt> if <em>any</em> of the values in the
+array are <tt class="docutils literal"><span class="pre">true</span></tt>. Otherwise <a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref agg agg-expression docutils literal"><span class="pre">$or</span></tt></a> returns false.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref agg agg-expression docutils literal"><span class="pre">$or</span></tt></a> uses short-circuit logic: the operation
+stops evaluation after encountering the first <tt class="docutils literal"><span class="pre">true</span></tt> expression.</p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_not">
+<tt class="descname">$not</tt><a class="headerlink" href="#_S_not" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the boolean opposite value passed to it. When passed a
+<tt class="docutils literal"><span class="pre">true</span></tt> value, <a class="reference internal" href="operators.html#_S_not" title="$not"><tt class="xref agg agg-expression docutils literal"><span class="pre">$not</span></tt></a> returns <tt class="docutils literal"><span class="pre">false</span></tt>; when passed
+a <tt class="docutils literal"><span class="pre">false</span></tt> value, <a class="reference internal" href="operators.html#_S_not" title="$not"><tt class="xref agg agg-expression docutils literal"><span class="pre">$not</span></tt></a> returns <tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="comparison-operators">
+<h3>Comparison Operators<a class="headerlink" href="#comparison-operators" title="Permalink to this headline">¶</a></h3>
+<p>These operators perform comparisons between two values and return a
+Boolean, in most cases, reflecting the result of that comparison.</p>
+<p>All comparison operators take an array with a pair of values. You may
+compare numbers, strings, and dates. Except for <a class="reference internal" href="aggregation/cmp.html#_S_cmp" title="$cmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cmp</span></tt></a>,
+all comparison operators return a Boolean value. <a class="reference internal" href="aggregation/cmp.html#_S_cmp" title="$cmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cmp</span></tt></a>
+returns an integer.</p>
+<dl class="expression">
+<dt id="_S_cmp">
+<tt class="descname">$cmp</tt><a class="headerlink" href="#_S_cmp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns an integer. The returned
+value is:</p>
+<ul class="simple">
+<li>A negative number if the first value is less than the second.</li>
+<li>A positive number if the first value is greater than the second.</li>
+<li><tt class="docutils literal"><span class="pre">0</span></tt> if the two values are equal.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_eq">
+<tt class="descname">$eq</tt><a class="headerlink" href="#_S_eq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns a boolean. The returned
+value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the values are equivalent.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the values are <strong>not</strong> equivalent.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_gt">
+<tt class="descname">$gt</tt><a class="headerlink" href="#_S_gt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns an integer. The returned
+value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the first value is <em>greater than</em> the second value.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the first value is <em>less than or equal to</em> the
+second value.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_gte">
+<tt class="descname">$gte</tt><a class="headerlink" href="#_S_gte" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns an integer. The returned
+value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the first value is <em>greater than or equal</em> to the
+second value.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the first value is <em>less than</em> the second value.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_lt">
+<tt class="descname">$lt</tt><a class="headerlink" href="#_S_lt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns an integer. The returned
+value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the first value is <em>less than</em> the second value.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the first value is <em>greater than or equal to</em> the
+second value.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_lte">
+<tt class="descname">$lte</tt><a class="headerlink" href="#_S_lte" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array and returns an integer. The returned
+value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the first value is <em>less than or equal to</em> the
+second value.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the first value is <em>greater than</em> the second
+value.</li>
+</ul>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_ne">
+<tt class="descname">$ne</tt><a class="headerlink" href="#_S_ne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes two values in an array returns an integer. The returned value
+is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">true</span></tt> when the values are <strong>not equivalent</strong>.</li>
+<li><tt class="docutils literal"><span class="pre">false</span></tt> when the values are <strong>equivalent</strong>.</li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="arithmetic-operators">
+<h3>Arithmetic Operators<a class="headerlink" href="#arithmetic-operators" title="Permalink to this headline">¶</a></h3>
+<p>These operators only support numbers.</p>
+<dl class="expression">
+<dt id="_S_add">
+<tt class="descname">$add</tt><a class="headerlink" href="#_S_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array of one or more numbers and adds them together,
+returning the sum.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_divide">
+<tt class="descname">$divide</tt><a class="headerlink" href="#_S_divide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array that contains a pair of numbers and returns the
+value of the first number divided by the second number.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_mod">
+<tt class="descname">$mod</tt><a class="headerlink" href="#_S_mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array that contains a pair of numbers and returns the
+<em>remainder</em> of the first number divided by the second number.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="operators.html#_S_mod" title="$mod"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$mod</span></tt></a></p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_multiply">
+<tt class="descname">$multiply</tt><a class="headerlink" href="#_S_multiply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array of one or more numbers and multiples them, returning the
+resulting product.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_subtract">
+<tt class="descname">$subtract</tt><a class="headerlink" href="#_S_subtract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an array that contains a pair of numbers and subtracts the
+second from the first, returning their difference.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="string-operators">
+<h3>String Operators<a class="headerlink" href="#string-operators" title="Permalink to this headline">¶</a></h3>
+<p>These operators manipulate strings within projection expressions.</p>
+<dl class="expression">
+<dt id="_S_strcasecmp">
+<tt class="descname">$strcasecmp</tt><a class="headerlink" href="#_S_strcasecmp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes in two strings. Returns a number. <a class="reference internal" href="aggregation/strcasecmp.html#_S_strcasecmp" title="$strcasecmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$strcasecmp</span></tt></a>
+is positive if the first string is &#8220;greater than&#8221; the second and
+negative if the first string is &#8220;less than&#8221; the
+second. <a class="reference internal" href="aggregation/strcasecmp.html#_S_strcasecmp" title="$strcasecmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$strcasecmp</span></tt></a> returns 0 if the strings are
+identical.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="aggregation/strcasecmp.html#_S_strcasecmp" title="$strcasecmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$strcasecmp</span></tt></a> may not make sense when applied to
+glyphs outside the Roman alphabet.</p>
+<p class="last"><a class="reference internal" href="aggregation/strcasecmp.html#_S_strcasecmp" title="$strcasecmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$strcasecmp</span></tt></a> internally capitalizes strings before
+comparing them to provide a case-<em>insensitive</em> comparison.
+Use <a class="reference internal" href="aggregation/cmp.html#_S_cmp" title="$cmp"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cmp</span></tt></a> for a case sensitive comparison.</p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_substr">
+<tt class="descname">$substr</tt><a class="headerlink" href="#_S_substr" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="aggregation/substr.html#_S_substr" title="$substr"><tt class="xref agg agg-expression docutils literal"><span class="pre">$substr</span></tt></a> takes a string and two numbers. The first
+number represents the number of bytes in the string to skip,
+and the second number specifies the number of bytes to return
+from the string.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="aggregation/substr.html#_S_substr" title="$substr"><tt class="xref agg agg-expression docutils literal"><span class="pre">$substr</span></tt></a> is not encoding aware and if used
+improperly may produce a result string containing an invalid UTF-8
+character sequence.</p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_toLower">
+<tt class="descname">$toLower</tt><a class="headerlink" href="#_S_toLower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a single string and converts that string to lowercase,
+returning the result. All uppercase letters become lowercase.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="aggregation/toLower.html#_S_toLower" title="$toLower"><tt class="xref agg agg-expression docutils literal"><span class="pre">$toLower</span></tt></a> may not make sense when applied to glyphs outside
+the Roman alphabet.</p>
+</div>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_toUpper">
+<tt class="descname">$toUpper</tt><a class="headerlink" href="#_S_toUpper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a single string and converts that string to uppercase,
+returning the result. All lowercase letters become uppercase.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="aggregation/toUpper.html#_S_toUpper" title="$toUpper"><tt class="xref agg agg-expression docutils literal"><span class="pre">$toUpper</span></tt></a> may not make sense when applied to glyphs outside
+the Roman alphabet.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="date-operators">
+<h3>Date Operators<a class="headerlink" href="#date-operators" title="Permalink to this headline">¶</a></h3>
+<p>All date operators take a &#8220;Date&#8221; typed value as a single
+argument and return a number.</p>
+<dl class="expression">
+<dt id="_S_dayOfYear">
+<tt class="descname">$dayOfYear</tt><a class="headerlink" href="#_S_dayOfYear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the day of the year as a number
+between 1 and 366.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_dayOfMonth">
+<tt class="descname">$dayOfMonth</tt><a class="headerlink" href="#_S_dayOfMonth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the day of the month as a number
+between 1 and 31.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_dayOfWeek">
+<tt class="descname">$dayOfWeek</tt><a class="headerlink" href="#_S_dayOfWeek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the day of the week as a number
+between 1 (Sunday) and 7 (Saturday.)</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_year">
+<tt class="descname">$year</tt><a class="headerlink" href="#_S_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the full year.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_month">
+<tt class="descname">$month</tt><a class="headerlink" href="#_S_month" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the month as a number between 1 and 12.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_week">
+<tt class="descname">$week</tt><a class="headerlink" href="#_S_week" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the week of the year as a number
+between 0 and 53.</p>
+<p>Weeks begin on Sundays, and week 1 begins with the first Sunday
+of the year. Days preceding the first Sunday of the year are in
+week 0. This behavior is the same as the &#8220;<tt class="docutils literal"><span class="pre">%U</span></tt>&#8221; operator to the
+<tt class="docutils literal"><span class="pre">strftime</span></tt> standard library function.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_hour">
+<tt class="descname">$hour</tt><a class="headerlink" href="#_S_hour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the hour between 0 and 23.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_minute">
+<tt class="descname">$minute</tt><a class="headerlink" href="#_S_minute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the minute between 0 and 59.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_second">
+<tt class="descname">$second</tt><a class="headerlink" href="#_S_second" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a date and returns the second between 0 and 59, but can be 60
+to account for leap seconds.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="conditional-expressions">
+<h3>Conditional Expressions<a class="headerlink" href="#conditional-expressions" title="Permalink to this headline">¶</a></h3>
+<dl class="expression">
+<dt id="_S_cond">
+<tt class="descname">$cond</tt><a class="headerlink" href="#_S_cond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="aggregation/cond.html#_S_cond" title="$cond"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cond</span></tt></a> operator with the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">$cond</span><span class="o">:</span> <span class="p">[</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">-</span><span class="nx">expression</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="kc">true</span><span class="o">-</span><span class="k">case</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="kc">false</span><span class="o">-</span><span class="k">case</span><span class="o">&gt;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Takes an array with three expressions, where the first expression
+evaluates to a Boolean value. If the first expression evaluates to true,
+<a class="reference internal" href="aggregation/cond.html#_S_cond" title="$cond"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cond</span></tt></a> returns the value of the second expression. If the
+first expression evaluates to false, <a class="reference internal" href="aggregation/cond.html#_S_cond" title="$cond"><tt class="xref agg agg-expression docutils literal"><span class="pre">$cond</span></tt></a> evaluates and
+returns the third expression.</p>
+</dd></dl>
+
+<dl class="expression">
+<dt id="_S_ifNull">
+<tt class="descname">$ifNull</tt><a class="headerlink" href="#_S_ifNull" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="aggregation/ifNull.html#_S_ifNull" title="$ifNull"><tt class="xref agg agg-expression docutils literal"><span class="pre">$ifNull</span></tt></a> operator with the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">$ifNull</span><span class="o">:</span> <span class="p">[</span> <span class="o">&lt;</span><span class="nx">expression</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">replacement</span><span class="o">-</span><span class="k">if</span><span class="o">-</span><span class="kc">null</span><span class="o">&gt;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Takes an array with two expressions. <a class="reference internal" href="aggregation/ifNull.html#_S_ifNull" title="$ifNull"><tt class="xref agg agg-expression docutils literal"><span class="pre">$ifNull</span></tt></a> returns
+the first expression if it evaluates to a non-null
+value. Otherwise, <a class="reference internal" href="aggregation/ifNull.html#_S_ifNull" title="$ifNull"><tt class="xref agg agg-expression docutils literal"><span class="pre">$ifNull</span></tt></a> returns the second
+expression’s value.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../tutorial/aggregation-examples.html" title="Previous Section: Aggregation Framework Examples">&lt; &nbsp; Aggregation Framework Examples</a></li>
+<li id="btnvup"><a href="../aggregation.html" title="Parent Section: Aggregation" >&#47;&#92;&nbsp; Aggregation</a></li>
+<li id="btnvnx"><a href="../applications/map-reduce.html" title="Next Section: Map-Reduce">Map-Reduce &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

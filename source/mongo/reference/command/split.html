@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>split &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/split" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="splitChunk" href="splitChunk.html" />
+<link rel="prev" title="sleep (internal)" href="sleep.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="split">
+<h1>split<a class="headerlink" href="#split" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">split</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#split" title="split"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">split</span></tt></a> command creates new <a class="reference internal" href="../glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a>
+in a <a class="reference internal" href="../glossary.html#term-sharding"><em class="xref std std-term">sharded</em></a> environment. While splitting is
+typically managed automatically by the <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances,
+this command makes it possible for administrators to manually
+create splits.</p>
+<div class="admonition-in-normal-operation-there-is-no-need-to-manually-split-chunks admonition">
+<p class="first admonition-title">In normal operation there is no need to manually split chunks</p>
+<p class="last">The <a class="reference internal" href="../glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> and other sharding infrastructure will
+automatically create chunks in the course of normal
+operations. See <a class="reference internal" href="../../core/sharding-internals.html"><em>Sharding Internals</em></a> for more
+information.</p>
+</div>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">split</span> <span class="o">:</span> <span class="s2">&quot;test.people&quot;</span> <span class="p">,</span> <span class="nx">find</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">99</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This command inserts a new split in the collection named
+<tt class="docutils literal"><span class="pre">people</span></tt> in the <tt class="docutils literal"><span class="pre">test</span></tt> database. This will split the chunk
+that contains the document that matches the query <tt class="docutils literal"><span class="pre">{</span> <span class="pre">_id</span> <span class="pre">:</span> <span class="pre">99</span>
+<span class="pre">}</span></tt> in half. If the document specified by the query does not (yet)
+exist, the <a class="reference internal" href="../commands.html#split" title="split"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">split</span></tt></a> will divide the chunk where that
+document <em>would</em> exist.</p>
+<p>The split divides the chunk in half, and does <em>not</em> split the chunk
+using the identified document as the middle. To define an arbitrary split
+point, use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">split</span> <span class="o">:</span> <span class="s2">&quot;test.people&quot;</span> <span class="p">,</span> <span class="nx">middle</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">99</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This form is typically used when <a class="reference internal" href="../glossary.html#term-pre-splitting"><em class="xref std std-term">pre-splitting</em></a> data in a
+collection.</p>
+<p><a class="reference internal" href="../commands.html#split" title="split"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">split</span></tt></a> is an administrative command that is only
+available for <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sleep.html" title="Previous Section: sleep (internal)">&lt; &nbsp; sleep (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="splitChunk.html" title="Next Section: splitChunk">splitChunk &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

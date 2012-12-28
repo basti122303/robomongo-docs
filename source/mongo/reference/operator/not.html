@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$not &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/not" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$or" href="or.html" />
+<link rel="prev" title="$nor" href="nor.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="not">
+<h1>$not<a class="headerlink" href="#not" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_not">
+<tt class="descname">$not</tt><a class="headerlink" href="#_S_not" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">field:</span> <span class="pre">{</span> <span class="pre">$not:</span> <span class="pre">{</span> <span class="pre">&lt;operator-expression&gt;</span> <span class="pre">}</span> <span class="pre">}</span> <span class="pre">}</span></tt></p>
+<p><a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a> performs a logical <tt class="docutils literal"><span class="pre">NOT</span></tt> operation on the
+specified <tt class="docutils literal"><span class="pre">&lt;operator-expression&gt;</span></tt> and selects the documents that
+do <em>not</em> match the <tt class="docutils literal"><span class="pre">&lt;operator-expression&gt;</span></tt>. This includes
+documents that do not contain the <tt class="docutils literal"><span class="pre">field</span></tt>.</p>
+<p>Consider the following query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$not</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection where:</p>
+<ul class="simple">
+<li>the <tt class="docutils literal"><span class="pre">price</span></tt> field value is less than or equal to <tt class="docutils literal"><span class="pre">1.99</span></tt> <strong>or</strong></li>
+<li>the <tt class="docutils literal"><span class="pre">price</span></tt> field does not exist</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">{</span> <span class="pre">$not:</span> <span class="pre">{</span> <span class="pre">$gt:</span> <span class="pre">1.99</span> <span class="pre">}</span> <span class="pre">}</span></tt> is different from the <a class="reference internal" href="../operators.html#_S_lte" title="$lte"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$lte</span></tt></a>
+operator. <tt class="docutils literal"><span class="pre">{</span> <span class="pre">$lt:</span> <span class="pre">1.99</span> <span class="pre">}</span></tt> returns <em>only</em> the documents where
+<tt class="docutils literal"><span class="pre">price</span></tt> field exists and its value is less than or equal to
+<tt class="docutils literal"><span class="pre">1.99</span></tt>.</p>
+<p>Remember that the <a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a> operator only affects <em>other
+operators</em> and cannot check fields and documents independently. So,
+use the <a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a> operator for logical disjunctions and the
+<a class="reference internal" href="../operators.html#_S_ne" title="$ne"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$ne</span></tt></a> operator to test the contents of fields directly.</p>
+<p>Consider the following behaviors when using the <a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a>
+operator:</p>
+<ul>
+<li><p class="first">The operation of the <a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a> operator is consistent with
+the behavior of other operators but may yield unexpected results
+with some data types like arrays.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../operators.html#_S_not" title="$not"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$not</span></tt></a> operator does <strong>not</strong> support operations with
+the <a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> operator. Instead use <tt class="docutils literal"><span class="pre">//</span></tt> or in your
+driver interfaces, use your language&#8217;s regular expression
+capability to create regular expression objects.</p>
+<p>Consider the following example which uses the pattern match expression <tt class="docutils literal"><span class="pre">//</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$not</span><span class="o">:</span> <span class="sr">/^p.*/</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt>
+collection where the <tt class="docutils literal"><span class="pre">item</span></tt> field value does <em>not</em> start with
+the letter <tt class="docutils literal"><span class="pre">p</span></tt>.</p>
+<p>If using PyMongo&#8217;s <tt class="docutils literal"><span class="pre">re.compile()</span></tt>, you can write
+the above query as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">re</span>
+<span class="k">for</span> <span class="n">noMatch</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;item&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;$not&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;^p.*&quot;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span> <span class="p">):</span>
+    <span class="k">print</span> <span class="n">noMatch</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>, <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a>, <a class="reference internal" href="../operators.html#_S_gt" title="$gt"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$gt</span></tt></a>,
+<a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a>, <a class="reference external" href="http://api.mongodb.org/pythoncurrent">PyMongo</a>,
+<a class="reference internal" href="../glossary.html#term-driver"><em class="xref std std-term">driver</em></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="nor.html" title="Previous Section: $nor">&lt; &nbsp; $nor</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="or.html" title="Next Section: $or">$or &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

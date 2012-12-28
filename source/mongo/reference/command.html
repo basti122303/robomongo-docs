@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Database Commands &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="addShard" href="command/addShard.html" />
+<link rel="prev" title="$year (aggregation)" href="aggregation/year.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="database-commands">
+<h1>Database Commands<a class="headerlink" href="#database-commands" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="command/addShard.html">addShard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/aggregate.html">aggregate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/applyOps.html">applyOps (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/authenticate.html">authenticate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/availableQueryOptions.html">availableQueryOptions (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/buildInfo.html">buildInfo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/checkShardingIndex.html">checkShardingIndex (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/clean.html">clean (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/clone.html">clone</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/cloneCollection.html">cloneCollection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/cloneCollectionAsCapped.html">cloneCollectionAsCapped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/closeAllDatabases.html">closeAllDatabases (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/collMod.html">collMod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/collStats.html">collStats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/compact.html">compact</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/connPoolStats.html">connPoolStats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/connPoolSync.html">connPoolSync (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/convertToCapped.html">convertToCapped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/copydb.html">copydb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/copydbgetnonce.html">copydbgetnonce (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/count.html">count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/create.html">create</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/cursorInfo.html">cursorInfo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/dataSize.html">dataSize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/dbHash.html">dbHash (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/dbStats.html">dbStats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/diagLogging.html">diagLogging (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/distinct.html">distinct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/driverOIDTest.html">driverOIDTest (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/drop.html">drop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/dropDatabase.html">dropDatabase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/dropIndexes.html">dropIndexes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/emptyCapped.html">emptycapped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/enableSharding.html">enableSharding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/eval.html">eval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/features.html">features (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/filemd5.html">filemd5</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/findAndModify.html">findAndModify</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/flushRouterConfig.html">flushRouterConfig</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/forceerror.html">forceerror (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/fsync.html">fsync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/geoNear.html">geoNear</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/geoSearch.html">geoSearch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/geoWalk.html">geoWalk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getCmdLineOpts.html">getCmdLineOpts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getLastError.html">getLastError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getLog.html">getLog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getParameter.html">getParameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getPrevError.html">getPrevError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getShardMap.html">getShardMap (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getShardVersion.html">getShardVersion (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getnonce.html">getnonce (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/getoptime.html">getoptime (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/godinsert.html">godinsert (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/group.html">group</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/handshake.html">handshake (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/isMaster.html">isMaster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/isSelf.html">isSelf (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/isdbGrid.html">isdbgrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/journalLatencyTest.html">journalLatencyTest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/listCommands.html">listCommands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/listDatabases.html">listDatabases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/listShards.html">listShards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/logRotate.html">logRotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/logout.html">logout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/mapReduce.html">mapReduce</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/mapreduce.shardedfinish.html">mapreduce.shardedfinish (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/medianKey.html">medianKey (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/migrateClone.html">migrateClone (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/moveChunk.html">moveChunk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/movePrimary.html">movePrimary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/netstat.html">netstat (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/ping.html">ping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/printShardingStatus.html">printShardingStatus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/profile.html">profile</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/reIndex.html">reIndex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/recvChunkAbort.html">recvChunkAbort (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/recvChunkCommit.html">recvChunkCommit (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/recvChunkStart.html">recvChunkStart (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/recvChunkStatus.html">recvChunkStatus (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/removeShard.html">removeShard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/renameCollection.html">renameCollection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/repairDatabase.html">repairDatabase</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetElect.html">replSetElect (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetFreeze.html">replSetFreeze</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetFresh.html">replSetFresh (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetGetRBID.html">replSetGetRBID (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetGetStatus.html">replSetGetStatus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetHeartbeat.html">replSetHeartbeat (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetInitiate.html">replSetInitiate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetMaintenance.html">replSetMaintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetReconfig.html">replSetReconfig</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetStepDown.html">replSetStepDown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetSyncFrom.html">replSetSyncFrom</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/replSetTest.html">replSetTest (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/resetError.html">resetError</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/resync.html">resync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/serverStatus.html">serverStatus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/setParameter.html">setParameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/setShardVersion.html">setShardVersion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/shardCollection.html">shardCollection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/shardingState.html">shardingState</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/shutdown.html">shutdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/skewClockCommand.html">skewClockCommand (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/sleep.html">sleep (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/split.html">split</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/splitChunk.html">splitChunk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/testDistLockWithSkew.html">testDistLockWithSkew (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/testDistLockWithSyncCluster.html">testDistLockWithSyncCluster (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/top.html">top</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/touch.html">touch</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/transferMods.html">transferMods (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/unsetSharding.html">unsetSharding (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/validate.html">validate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/whatsMyUri.html">whatsmyuri (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/writeBackListen.html">writebacklisten (internal)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command/writeBacksQueued.html">writeBacksQueued (internal)</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="aggregation/year.html" title="Previous Section: $year (aggregation)">&lt; &nbsp; $year (aggregation)</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="command/addShard.html" title="Next Section: addShard">addShard &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

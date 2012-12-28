@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Metadata and Asset Management &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/use-cases/metadata-and-asset-management" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Use Cases" href="../use-cases.html" />
+<link rel="next" title="Storing Comments" href="storing-comments.html" />
+<link rel="prev" title="Category Hierarchy" href="category-hierarchy.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="metadata-and-asset-management">
+<h1>Metadata and Asset Management<a class="headerlink" href="#metadata-and-asset-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document describes the design and pattern of a content management
+system using MongoDB modeled on the popular <a class="reference external" href="http://www.drupal.org">Drupal</a>
+CMS.</p>
+<div class="section" id="problem">
+<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this headline">¶</a></h3>
+<p>You are designing a content management system (CMS) and you want to
+use MongoDB to store the content of your sites.</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>To build this system you will use MongoDB&#8217;s flexible schema to store
+all content &#8220;nodes&#8221; in a single collection regardless of type. This
+guide will provide prototype schema and describe common operations for
+the following primary node types:</p>
+<dl class="docutils">
+<dt><strong>Basic Page</strong></dt>
+<dd>Basic pages are useful for displaying infrequently-changing text
+such as an &#8216;about&#8217; page. With a basic page, the salient information
+is the title and the content.</dd>
+<dt><strong>Blog entry</strong></dt>
+<dd>Blog entries record a &#8220;stream&#8221; of posts from users on the CMS and
+store title, author, content, and date as relevant information.</dd>
+<dt><strong>Photo</strong></dt>
+<dd>Photos participate in photo galleries, and store title,
+description, author, and date along with the actual photo binary
+data.</dd>
+</dl>
+<p>This solution does not describe schema or process for storing or using
+navigational and organizational information.</p>
+</div>
+<div class="section" id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<p>Although <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> in the <tt class="docutils literal"><span class="pre">nodes</span></tt> collection
+contain content of different times, all documents have a similar
+structure and a set of common fields. Consider the following
+prototype document for a &#8220;basic page&#8221; node type:</p>
+<div class="highlight-javascript"><pre>{
+    _id: ObjectId(…),
+    nonce: ObjectId(…),
+    metadata: {
+        type: 'basic-page'
+        section: 'my-photos',
+        slug: 'about',
+        title: 'About Us',
+        created: ISODate(...),
+        author: { _id: ObjectId(…), name: 'Rick' },
+        tags: [ ... ],
+        detail: { text: '# About Us\n…' }
+    }
+}</pre>
+</div>
+<p>Most fields are descriptively titled. The <tt class="docutils literal"><span class="pre">section</span></tt> field identifies
+groupings of items, as in a photo gallery, or a particular blog . The
+<tt class="docutils literal"><span class="pre">slug</span></tt> field holds a URL-friendly unique representation of the node,
+usually that is unique within its section for generating URLs.</p>
+<p>All documents also have a <tt class="docutils literal"><span class="pre">detail</span></tt> field that varies with the
+document type. For the basic page above, the detail field might hold
+the text of the page. For a blog entry, the <tt class="docutils literal"><span class="pre">detail</span></tt> field might
+hold a sub-document. Consider the following prototype:</p>
+<div class="highlight-javascript"><pre>{
+    …
+    metadata: {
+        …
+        type: 'blog-entry',
+        section: 'my-blog',
+        slug: '2012-03-noticed-the-news',
+        …
+        detail: {
+            publish_on: ISODate(…),
+            text: 'I noticed the news from Washington today…'
+        }
+    }
+}</pre>
+</div>
+<p>Photos require a different approach. Because photos can be potentially
+larger than these documents, it&#8217;s important to separate the binary photo
+storage from the nodes metadata.</p>
+<p><a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> provides the ability to store larger files in MongoDB.
+GridFS stores data in two collections, in this case,
+<tt class="docutils literal"><span class="pre">cms.assets.files</span></tt>, which stores metadata, and <tt class="docutils literal"><span class="pre">cms.assets.chunks</span></tt>
+which stores the data itself. Consider the following prototype
+document from the <tt class="docutils literal"><span class="pre">cms.assets.files</span></tt> collection:</p>
+<div class="highlight-javascript"><pre>{
+    _id: ObjectId(…),
+    length: 123...,
+    chunkSize: 262144,
+    uploadDate: ISODate(…),
+    contentType: 'image/jpeg',
+    md5: 'ba49a...',
+    metadata: {
+        nonce: ObjectId(…),
+        slug: '2012-03-invisible-bicycle',
+        type: 'photo',
+        section: 'my-album',
+        title: 'Kitteh',
+        created: ISODate(…),
+        author: { _id: ObjectId(…), name: 'Jared' },
+        tags: [ … ],
+        detail: {
+            filename: 'kitteh_invisible_bike.jpg',
+            resolution: [ 1600, 1600 ], … }
+    }
+}</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This document embeds the basic node document fields, which allows
+you to use the same code to manipulate nodes, regardless of type.</p>
+</div>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines a number of common operations for building and
+interacting with the metadata and asset layer of the cms for all node
+types.  All examples in this document use the Python programming
+language and the <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a> <a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> for
+MongoDB, but you can implement this system using any language you
+choose.</p>
+<div class="section" id="create-and-edit-content-nodes">
+<h3>Create and Edit Content Nodes<a class="headerlink" href="#create-and-edit-content-nodes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="procedure">
+<h4>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h4>
+<p>The most common operations inside of a CMS center on creating and
+editing content. Consider the following
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">insert()</span></tt></a>
+operation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">insert</span><span class="p">({</span>
+    <span class="s">&#39;nonce&#39;</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">(),</span>
+    <span class="s">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&#39;section&#39;</span><span class="p">:</span> <span class="s">&#39;myblog&#39;</span><span class="p">,</span>
+        <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="s">&#39;2012-03-noticed-the-news&#39;</span><span class="p">,</span>
+        <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;blog-entry&#39;</span><span class="p">,</span>
+        <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Noticed in the News&#39;</span><span class="p">,</span>
+        <span class="s">&#39;created&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+        <span class="s">&#39;author&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Rick&#39;</span> <span class="p">},</span>
+        <span class="s">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s">&#39;news&#39;</span><span class="p">,</span> <span class="s">&#39;musings&#39;</span> <span class="p">],</span>
+        <span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&#39;publish_on&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="s">&#39;I noticed the news from Washington today…&#39;</span> <span class="p">}</span>
+        <span class="p">}</span>
+     <span class="p">})</span>
+</pre></div>
+</div>
+<p>Once inserted, your application must have some way of preventing
+multiple concurrent updates. The schema uses the special <tt class="docutils literal"><span class="pre">nonce</span></tt>
+field to help detect concurrent edits. By using the <tt class="docutils literal"><span class="pre">nonce</span></tt> field in
+the query portion of the <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">update</span></tt></a>
+operation, the application will generate an error if there is an
+editing collision. Consider the following <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">update</span></tt></a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">update_text</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
+          <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
+          <span class="s">&#39;nonce&#39;</span><span class="p">:</span> <span class="n">nonce</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:{</span><span class="s">&#39;metadata.detail.text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="s">&#39;nonce&#39;</span><span class="p">:</span> <span class="n">ObjectId</span><span class="p">()</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;updatedExisting&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">ConflictError</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You may  also want to perform metadata edits to the item such as adding
+tags:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s">&#39;$addToSet&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;tags&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$each&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s">&#39;interesting&#39;</span><span class="p">,</span> <span class="s">&#39;funny&#39;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>In this example the <a class="reference internal" href="../reference/operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> operator will only add
+values to the <tt class="docutils literal"><span class="pre">tags</span></tt> field if they do not already exist in the
+<tt class="docutils literal"><span class="pre">tags</span></tt> array, there&#8217;s no need to supply or update the nonce.</p>
+</div>
+<div class="section" id="index-support">
+<h4>Index Support<a class="headerlink" href="#index-support" title="Permalink to this headline">¶</a></h4>
+<p>To support updates and queries on the <tt class="docutils literal"><span class="pre">metadata.section</span></tt>, and
+<tt class="docutils literal"><span class="pre">metadata.slug</span></tt>, fields <em>and</em> to ensure that two editors don&#8217;t
+create two documents with the same section name or slug. Use the
+following operation at the Python/PyMongo console:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+<span class="gp">... </span>   <span class="p">(</span><span class="s">&#39;metadata.section&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;metadata.slug&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">unique=True</span></tt> option prevents to documents from colliding. If
+you want an index to support queries on the above fields and the
+<tt class="docutils literal"><span class="pre">nonce</span></tt> field create the following index:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+<span class="gp">... </span>   <span class="p">(</span><span class="s">&#39;metadata.section&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;metadata.slug&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;nonce&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">])</span>
+</pre></div>
+</div>
+<p>However, in most cases, the first index will be sufficient to support
+these operations.</p>
+</div>
+</div>
+<div class="section" id="upload-a-photo">
+<h3>Upload a Photo<a class="headerlink" href="#upload-a-photo" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h4>Procedure<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>To update a photo object, use the following operation, which builds
+upon the basic update procedure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">upload_new_photo</span><span class="p">(</span>
+    <span class="n">input_file</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">author</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">details</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s">&#39;cms.assets&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">new_file</span><span class="p">(</span>
+        <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;image/jpeg&#39;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s">&#39;photo&#39;</span><span class="p">,</span>
+            <span class="n">locked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span>
+            <span class="n">slug</span><span class="o">=</span><span class="n">slug</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+            <span class="n">created</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="n">detail</span><span class="p">))</span> <span class="k">as</span> <span class="n">upload_file</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">upload_file</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span> <span class="k">break</span>
+            <span class="n">upload_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="c"># unlock the file</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">upload_file</span><span class="o">.</span><span class="n">_id</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;locked&#39;</span><span class="p">:</span> <span class="bp">None</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Because uploading the photo spans multiple documents and is a
+non-atomic operation, you must &#8220;lock&#8221; the file during upload by
+writing <a class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime.utcnow" title="(in Python v2.7)"><tt class="xref py py-meth docutils literal"><span class="pre">datetime.utcnow()</span></tt></a> in the
+record. This helps when there are multiple concurrent editors and lets
+the application detect stalled file uploads. This operation assumes
+that, for photo upload, the last update will succeed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">update_photo_content</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">slug</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s">&#39;cms.assets&#39;</span><span class="p">)</span>
+
+    <span class="c"># Delete the old version if it&#39;s unlocked or was locked more than 5</span>
+    <span class="c">#    minutes ago</span>
+    <span class="n">file_obj</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span>
+        <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
+          <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
+          <span class="s">&#39;metadata.locked&#39;</span><span class="p">:</span> <span class="bp">None</span> <span class="p">})</span>
+    <span class="k">if</span> <span class="n">file_obj</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">file_obj</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span>
+            <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
+              <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span><span class="p">,</span>
+              <span class="s">&#39;metadata.locked&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">threshold</span> <span class="p">}</span> <span class="p">})</span>
+    <span class="k">if</span> <span class="n">file_obj</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">raise</span> <span class="n">FileDoesNotExist</span><span class="p">()</span>
+    <span class="n">fs</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">file_obj</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">])</span>
+
+    <span class="c"># update content, keep metadata unchanged</span>
+    <span class="n">file_obj</span><span class="p">[</span><span class="s">&#39;locked&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">new_file</span><span class="p">(</span><span class="o">**</span><span class="n">file_obj</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">input_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">upload_file</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span> <span class="k">break</span>
+            <span class="n">upload_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="c"># unlock the file</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">upload_file</span><span class="o">.</span><span class="n">_id</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;locked&#39;</span><span class="p">:</span> <span class="bp">None</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>As with the basic operations, you can use a much more simple operation
+to edit the tags:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s">&#39;$addToSet&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;metadata.tags&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$each&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s">&#39;interesting&#39;</span><span class="p">,</span> <span class="s">&#39;funny&#39;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Index Support<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>Create a unique index on <tt class="docutils literal"><span class="pre">{</span> <span class="pre">metadata.section:</span> <span class="pre">1,</span> <span class="pre">metadata.slug:</span> <span class="pre">1</span> <span class="pre">}</span></tt>
+to support the above operations and prevent users from creating or
+updating the same file concurrently. Use the following operation in
+the Python/PyMongo console:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([</span>
+<span class="gp">... </span>   <span class="p">(</span><span class="s">&#39;metadata.section&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;metadata.slug&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="locate-and-render-a-node">
+<h3>Locate and Render a Node<a class="headerlink" href="#locate-and-render-a-node" title="Permalink to this headline">¶</a></h3>
+<p>To locate a node based on the value of <tt class="docutils literal"><span class="pre">metadata.section</span></tt> and
+<tt class="docutils literal"><span class="pre">metadata.slug</span></tt>, use the following <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">find_one</span></tt></a> operation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">node</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span> <span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The index defined (<tt class="docutils literal"><span class="pre">section</span></tt>, <tt class="docutils literal"><span class="pre">slug</span></tt>) created to support the
+update operation, is sufficient to support this operation as well.</p>
+</div>
+</div>
+<div class="section" id="locate-and-render-a-photo">
+<h3>Locate and Render a Photo<a class="headerlink" href="#locate-and-render-a-photo" title="Permalink to this headline">¶</a></h3>
+<p>To locate an image based on the value of <tt class="docutils literal"><span class="pre">metadata.section</span></tt> and
+<tt class="docutils literal"><span class="pre">metadata.slug</span></tt>, use the following <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">find_one</span></tt></a> operation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fs</span> <span class="o">=</span> <span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s">&#39;cms.assets&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">get_version</span><span class="p">({</span><span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span><span class="p">:</span> <span class="n">slug</span> <span class="p">})</span> <span class="k">as</span> <span class="n">img_fpo</span><span class="p">:</span>
+     <span class="c"># do something with the image file</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The index defined (<tt class="docutils literal"><span class="pre">section</span></tt>, <tt class="docutils literal"><span class="pre">slug</span></tt>) created to support the
+update operation, is sufficient to support this operation as well.</p>
+</div>
+</div>
+<div class="section" id="search-for-nodes-by-tag">
+<h3>Search for Nodes by Tag<a class="headerlink" href="#search-for-nodes-by-tag" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="querying">
+<h4>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h4>
+<p>To retrieve a list of nodes based on their tags, use the following
+query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">nodes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;metadata.tags&#39;</span><span class="p">:</span> <span class="n">tag</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indexing">
+<h4>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h4>
+<p>Create an index on the <tt class="docutils literal"><span class="pre">tags</span></tt> field in the <tt class="docutils literal"><span class="pre">cms.nodes</span></tt> collection,
+to support this query:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;tags&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="search-for-images-by-tag">
+<h3>Search for Images by Tag<a class="headerlink" href="#search-for-images-by-tag" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>Procedure<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>To retrieve a list of images based on their tags, use the following
+operation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">image_file_objects</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;metadata.tags&#39;</span><span class="p">:</span> <span class="n">tag</span> <span class="p">})</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">GridFS</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s">&#39;cms.assets&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">image_file_object</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;metadata.tags&#39;</span><span class="p">:</span> <span class="n">tag</span> <span class="p">}):</span>
+    <span class="n">image_file</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image_file_object</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">])</span>
+    <span class="c"># do something with the image file</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h4>Indexing<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Create an index on the <tt class="docutils literal"><span class="pre">tags</span></tt> field in the <tt class="docutils literal"><span class="pre">cms.assets.files</span></tt>
+collection, to support this query:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;tags&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="generate-a-feed-of-recently-published-blog-articles">
+<h3>Generate a Feed of Recently Published Blog Articles<a class="headerlink" href="#generate-a-feed-of-recently-published-blog-articles" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>Querying<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>Use the following operation to generate a list of recent blog posts
+sorted in descending order by date, for use on the index page of your
+site, or in an <tt class="docutils literal"><span class="pre">.rss</span></tt> or <tt class="docutils literal"><span class="pre">.atom</span></tt> feed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">articles</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">find</span><span class="p">({</span>
+    <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="s">&#39;my-blog&#39;</span>
+    <span class="s">&#39;metadata.published&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="p">}</span> <span class="p">})</span>
+<span class="n">articles</span> <span class="o">=</span> <span class="n">articles</span><span class="o">.</span><span class="n">sort</span><span class="p">({</span><span class="s">&#39;metadata.published&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In many cases you will want to limit the number of nodes returned
+by this query.</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h4>Indexing<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<p>Create a compound index on the
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">metadata.section:</span> <span class="pre">1,</span> <span class="pre">metadata.published:</span> <span class="pre">1</span> <span class="pre">}</span></tt>
+fields to support this query and sort operation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">cms</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span> <span class="p">(</span><span class="s">&#39;metadata.section&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;metadata.published&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For all sort or range queries, ensure that field with the sort or
+range operation is the final field in the index.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="sharding">
+<h2>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h2>
+<p>In a CMS, read performance is more critical than write performance. To
+achieve the best read performance in a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, ensure
+that the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> can route queries to specific <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shards</em></a>.</p>
+<p>Also remember that MongoDB can not enforce unique indexes across
+shards. Using a compound <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> that consists of
+<tt class="docutils literal"><span class="pre">metadata.section</span></tt> and <tt class="docutils literal"><span class="pre">metadata.slug</span></tt>, will provide the same
+semantics as describe above.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Consider the actual use and workload of your cluster before
+configuring sharding for your cluster.</p>
+</div>
+<p>Use the following operation at the Python/PyMongo shell:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;cms.nodes&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">key</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="go">{ &quot;collectionsharded&quot;: &quot;cms.nodes&quot;, &quot;ok&quot;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;cms.assets.files&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">key</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&#39;metadata.section&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;metadata.slug&#39;</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="go">{ &quot;collectionsharded&quot;: &quot;cms.assets.files&quot;, &quot;ok&quot;: 1}</span>
+</pre></div>
+</div>
+<p>To shard the <tt class="docutils literal"><span class="pre">cms.assets.chunks</span></tt> collection, you must use the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field as the <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>. The following operation will
+shard the collection</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;cms.assets.chunks&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="n">key</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&#39;files_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="go">{ &quot;collectionsharded&quot;: &quot;cms.assets.chunks&quot;, &quot;ok&quot;: 1}</span>
+</pre></div>
+</div>
+<p>Sharding on the <tt class="docutils literal"><span class="pre">files_id</span></tt> field ensures routable queries because all
+reads from GridFS must first look up the document in
+<tt class="docutils literal"><span class="pre">cms.assets.files</span></tt> and then look up the chunks separately.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="category-hierarchy.html" title="Previous Section: Category Hierarchy">&lt; &nbsp; Category Hierarchy</a></li>
+<li id="btnvup"><a href="../use-cases.html" title="Parent Section: Use Cases" >&#47;&#92;&nbsp; Use Cases</a></li>
+<li id="btnvnx"><a href="storing-comments.html" title="Next Section: Storing Comments">Storing Comments &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

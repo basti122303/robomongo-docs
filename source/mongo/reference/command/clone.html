@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>clone &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/clone" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="cloneCollection" href="cloneCollection.html" />
+<link rel="prev" title="clean (internal)" href="clean.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="clone">
+<h1>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">clone</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> command clone a database from a
+remote MongoDB instance to the current host. <a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> copies the
+database on the remote instance with the same name as the current
+database. The command takes the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">clone</span><span class="o">:</span> <span class="s2">&quot;db1.example.net:27017&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">db1.example.net:27017</span></tt> above with the resolvable hostname for the
+MongoDB instance you wish to copy from. Note the following
+behaviors:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> can run against a <a class="reference internal" href="../glossary.html#term-slave"><em class="xref std std-term">slave</em></a> or a
+non-<a class="reference internal" href="../glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member of a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>.</li>
+<li><a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> does not snapshot the database. If any clients
+update the database you&#8217;re copying at any point during the clone
+operation, the resulting database may be inconsistent.</li>
+<li>You must run <a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> on the <strong>destination server</strong>.</li>
+<li>The destination server is not locked for the duration of the
+<a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> operation. This means that <a class="reference internal" href="../commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a> will occasionally yield to
+allow other operations to complete.</li>
+</ul>
+<p>See <a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a>  for similar functionality.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command obtains an intermittent write-lock on the
+destination server, that can block other operations until it
+completes.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="clean.html" title="Previous Section: clean (internal)">&lt; &nbsp; clean (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cloneCollection.html" title="Next Section: cloneCollection">cloneCollection &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

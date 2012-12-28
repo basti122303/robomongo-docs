@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongorestore &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongorestore" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="bsondump" href="bsondump.html" />
+<link rel="prev" title="mongodump" href="mongodump.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongorestore">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongorestore</span></tt><a class="headerlink" href="#mongorestore" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> tool imports content from binary database
+dump, created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> into a specific
+database. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> can import content to an existing
+database or create a new one.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, and only performs inserts into the existing
+database, and does not perform updates or <a class="reference internal" href="glossary.html#term-upsert"><em class="xref std std-term">upserts</em></a>. If
+existing data with the same <tt class="docutils literal"><span class="pre">_id</span></tt> already exists on the target
+database, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will <em>not</em> replace it.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will recreate indexes from the dump</p>
+<p>The behavior of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> has the following properties:</p>
+<ul>
+<li><p class="first">all operations are inserts, not updates.</p>
+</li>
+<li><p class="first">all inserts are &#8220;fire and forget,&#8221; <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> does not
+wait for a response from a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to ensure that the
+MongoDB process has received or recorded the operation.</p>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will record any errors to its log that occur
+during a restore operation but <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will not
+receive errors.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of data created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> tool from the
+2.2 distribution or later is different and incompatible with
+earlier versions of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongorestore</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including
+the option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> tool.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to which
+you want to restore the database. By default
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will attempt to connect to a MongoDB
+process running on the localhost port number <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running
+on the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongorestore--host"><em class="xref std std-option">--host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if
+your database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongorestore--password"><em class="xref std std-option">--password</em></a> option to supply a
+password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongorestore--username"><em class="xref std std-option">mongorestore --username</em></a> option to
+supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongorestore--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongorestore--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>
+will prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the directory of the MongoDB data files. If used, the
+<a class="reference internal" href="#cmdoption-mongorestore--dbpath"><em class="xref std std-option">--dbpath</em></a> option enables <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to attach
+directly to local data files and insert the data without the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. To run with <a class="reference internal" href="#cmdoption-mongorestore--dbpath"><em class="xref std std-option">--dbpath</em></a>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> needs to lock access to the data directory:
+as a result, no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can access the same path while the
+process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongorestore--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the
+corresponding option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, which allows
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to import data into MongoDB instances that
+have every database&#8217;s files saved in discrete directories on the
+disk. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongorestore--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> write to the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the data files will remain in a
+consistent state during the write process. This option is only
+relevant when specifying the <a class="reference internal" href="#cmdoption-mongorestore--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--db">
+<tt class="descname">--db</tt><tt class="descclassname"> &lt;db&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"> &lt;db&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongorestore--db"><em class="xref std std-option">--db</em></a> option to specify a database for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to restore data <em>into</em>. If the database
+doesn&#8217;t exist, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will create the specified
+database.  If you do not specify a <tt class="docutils literal"><span class="pre">&lt;db&gt;</span></tt>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> creates new databases that correspond to
+the databases where data originated and data may be
+overwritten. Use this option to restore data into a MongoDB
+instance that already has data.</p>
+<p><a class="reference internal" href="#cmdoption-mongorestore--db"><em class="xref std std-option">--db</em></a> does <em>not</em> control which <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> files
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> restores. You must use the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> <a class="reference internal" href="#mongorestore-path-option"><em>path option</em></a> to limit that restored data.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--collection">
+<tt class="descname">--collection</tt><tt class="descclassname"> &lt;collection&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-c</tt><tt class="descclassname"> &lt;collection&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongorestore--collection"><em class="xref std std-option">--collection</em></a> option to specify a collection for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to restore. If you do not specify a
+<tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> imports all collections
+created. Existing data may be overwritten. Use this option to
+restore data into a MongoDB instance that already has data, or to
+restore only some data in the specified imported data set.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--objcheck">
+<tt class="descname">--objcheck</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--objcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies each object as a valid <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> object before inserting
+it into the target database. If the object is not a valid
+<a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> object, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> will not insert the
+object into the target database and stop processing remaining
+documents for import. This option has some performance impact.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--filter">
+<tt class="descname">--filter</tt><tt class="descclassname"> '&lt;JSON&gt;'</tt><a class="headerlink" href="#cmdoption-mongorestore--filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the documents that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> imports to only
+those documents that match the JSON document specified as
+<tt class="docutils literal"><span class="pre">'&lt;JSON&gt;'</span></tt>. Be sure to include the document in single quotes to
+avoid interaction with your system&#8217;s shell environment.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--drop">
+<tt class="descname">--drop</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--drop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the restoration procedure to drop every collection from
+the target database before restoring the collection from the dumped
+backup.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--oplogReplay">
+<tt class="descname">--oplogReplay</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--oplogReplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replays the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> after restoring the dump to ensure that the current
+state of the database reflects the point-in-time backup captured with
+the &#8220;<a class="reference internal" href="mongodump.html#cmdoption-mongodump--oplog"><em class="xref std std-option">mongodump --oplog</em></a>&#8221; command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--keepIndexVersion">
+<tt class="descname">--keepIndexVersion</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--keepIndexVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> from upgrading the index to the latest
+version during the restoration process.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--w">
+<tt class="descname">--w</tt><tt class="descclassname"> &lt;number of replicas per write&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--w" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Specifies the <a class="reference internal" href="glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a> for each write operation that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> writes to the target database. By default,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> does not wait for a response for
+<a class="reference internal" href="../core/write-operations.html#write-concern-acknowledged"><em>write acknowledgment</em></a>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--noOptionsRestore">
+<tt class="descname">--noOptionsRestore</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--noOptionsRestore" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> from setting the collection
+options, such as those specified by the <a class="reference internal" href="commands.html#collMod" title="collMod"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">collMod</span></tt></a>
+<a class="reference internal" href="glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>, on restored collections.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--noIndexRestore">
+<tt class="descname">--noIndexRestore</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongorestore--noIndexRestore" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> from restoring and building
+indexes as specified in the corresponding <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+output.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongorestore--oplogLimit">
+<tt class="descname">--oplogLimit</tt><tt class="descclassname"> &lt;timestamp&gt;</tt><a class="headerlink" href="#cmdoption-mongorestore--oplogLimit" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> from applying <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries newer
+than the <tt class="docutils literal"><span class="pre">&lt;timestamp&gt;</span></tt>. Specify <tt class="docutils literal"><span class="pre">&lt;timestamp&gt;</span></tt> values in the
+form of <tt class="docutils literal"><span class="pre">&lt;time_t&gt;:&lt;ordinal&gt;</span></tt>, where <tt class="docutils literal"><span class="pre">&lt;time_t&gt;</span></tt> is the seconds
+since the UNIX epoch, and <tt class="docutils literal"><span class="pre">&lt;ordinal&gt;</span></tt> represents a counter of
+operations in the oplog that occurred in the specified second.</p>
+<p>You must use <a class="reference internal" href="#cmdoption-mongorestore--oplogLimit"><em class="xref std std-option">--oplogLimit</em></a> in conjunction with the
+<a class="reference internal" href="#cmdoption-mongorestore--oplogReplay"><em class="xref std std-option">--oplogReplay</em></a> option.</p>
+</dd></dl>
+
+<span class="target" id="mongorestore-path-option"></span><dl class="option">
+<dt>
+<tt class="descname">&lt;path&gt;</tt></dt>
+<dd><p>The final argument of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> command is a
+directory path. This argument specifies the location of the
+database dump from which to restore.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>See the &#8220;<a class="reference internal" href="../administration/backups.html#database-dumps"><em>backup guide section on database dumps</em></a>&#8221; for a larger overview of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>
+usage. Also see the &#8220;<a class="reference internal" href="mongodump.html"><em>mongodump</em></a>&#8221; document for an overview of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, which provides the related inverse
+functionality.</p>
+<p>Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --collection people --db accounts dump/accounts/
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> reads the database dump in the <tt class="docutils literal"><span class="pre">dump/</span></tt>
+sub-directory of the current directory, and restores <em>only</em> the
+documents in the collection named <tt class="docutils literal"><span class="pre">people</span></tt> from the database named
+<tt class="docutils literal"><span class="pre">accounts</span></tt>. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> restores data to the instance
+running on the localhost interface on port <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>In the next example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> restores a backup of the
+database instance located in <tt class="docutils literal"><span class="pre">dump</span></tt> to a database instance stored
+in the <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt> on the local machine. This requires that there
+are no active <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances attached to <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>
+data directory.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --dbpath /srv/mongodb
+</pre></div>
+</div>
+<p>In the final example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> restores a database
+dump located at <tt class="docutils literal"><span class="pre">/opt/backup/mongodump-2011-10-24</span></tt>, from a database
+running on port <tt class="docutils literal"><span class="pre">37017</span></tt> on the host
+<tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt>. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore`</span></tt> authenticates to
+the this MongoDB instance using the username <tt class="docutils literal"><span class="pre">user</span></tt> and the
+password <tt class="docutils literal"><span class="pre">pass</span></tt>, as follows:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --host mongodb1.example.net --port 37017 --username user --password pass /opt/backup/mongodump-2011-10-24
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongodump.html" title="Previous Section: mongodump">&lt; &nbsp; mongodump</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="bsondump.html" title="Next Section: bsondump">bsondump &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

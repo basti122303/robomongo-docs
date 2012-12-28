@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>repairDatabase &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/repairDatabase" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="replSetElect (internal)" href="replSetElect.html" />
+<link rel="prev" title="renameCollection" href="renameCollection.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="repairdatabase">
+<h1>repairDatabase<a class="headerlink" href="#repairdatabase" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="repairDatabase">
+<tt class="descname">repairDatabase</tt><a class="headerlink" href="#repairDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In general, if you have an intact copy of your data, such as
+would exist on a very recent backup or an intact member of a
+<a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>, <strong>do not</strong> use <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>
+or related options like <a class="reference internal" href="../method/db.repairDatabase.html#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell or <a class="reference internal" href="../mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">mongod --repair</em></a>. Restore
+from an intact copy of your data.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When using <a class="reference internal" href="../glossary.html#term-journal"><em class="xref std std-term">journaling</em></a>, there is almost never
+any need to run <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>. In the event of an
+unclean shutdown, the server will be able restore the data files
+to a pristine state automatically.</p>
+</div>
+<p>The <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> command checks and repairs errors and
+inconsistencies with the data storage. The command is analogous to
+a <tt class="docutils literal"><span class="pre">fsck</span></tt> command for file systems.</p>
+<p>If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance is not running with journaling
+the system experiences an unexpected system restart or crash, and
+you have <em>no</em> other intact replica set members with this data, you
+should run the <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> command to ensure that
+there are no errors in the data storage.</p>
+<p>As a side effect, the <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> command will
+compact the database, as the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command, and also
+reduces the total size of the data files on disk. The
+<a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> command will also recreate all indexes
+in the database.</p>
+<p>Use the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">repairDatabase</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Be aware that this command can take a long time to run if your
+database is large. In addition, it requires a quantity of free disk
+space equal to the size of your database. If you lack sufficient
+free space on the same volume, you can mount a separate volume and
+use that for the repair. In this case, you must run the command
+line and use the <a class="reference internal" href="../mongod.html#cmdoption-mongod--repairpath"><em class="xref std std-option">--repairpath</em></a>
+switch to specify the folder in which to store the temporary repair
+files.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command obtains a global write lock and will block other
+operations until it has completed.</p>
+</div>
+<p>This command is accessible via a number of different avenues. You
+may:</p>
+<ul>
+<li><p class="first">Use the shell to run the above command, as above.</p>
+</li>
+<li><p class="first">Use the <a class="reference internal" href="../method/db.repairDatabase.html#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell.</p>
+</li>
+<li><p class="first">Run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> directly from your system&#8217;s shell. Make sure
+that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> isn&#8217;t already running, and that you issue
+this command as a user that has access to MongoDB&#8217;s data
+files. Run as:</p>
+<div class="highlight-python"><pre>$ mongod --repair</pre>
+</div>
+<p>To add a repair path:</p>
+<div class="highlight-python"><pre>$ mongod --repair --repairpath /opt/vol2/data</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command will fail if your database is not a master or
+primary. In most cases, you should recover a corrupt secondary
+using the data from an existing intact node. If you must
+repair a secondary or slave node, first restart the node as a
+standalone mongod by omitting the <a class="reference internal" href="../mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a>
+or <a class="reference internal" href="../mongod.html#cmdoption-mongod--slave"><em class="xref std std-option">--slave</em></a> options, as necessary.</p>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="renameCollection.html" title="Previous Section: renameCollection">&lt; &nbsp; renameCollection</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="replSetElect.html" title="Next Section: replSetElect (internal)">replSetElect (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

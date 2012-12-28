@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Configure Windows netsh Firewall for MongoDB &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/configure-windows-netsh-firewall" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Security" href="../security.html" />
+<link rel="next" title="Control Access to MongoDB Instances with Authentication" href="control-access-to-mongodb-with-authentication.html" />
+<link rel="prev" title="Configure Linux iptables Firewall for MongoDB" href="configure-linux-iptables-firewall.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="configure-windows-netsh-firewall-for-mongodb">
+<h1>Configure Windows <tt class="docutils literal"><span class="pre">netsh</span></tt> Firewall for MongoDB<a class="headerlink" href="#configure-windows-netsh-firewall-for-mongodb" title="Permalink to this headline">¶</a></h1>
+<p>On Windows Server systems, the <tt class="docutils literal"><span class="pre">netsh</span></tt> program provides
+methods for managing the <em class="guilabel">Windows Firewall</em>. These firewall rules make it possible
+for administrators to control what hosts can connect to the system,
+and limit risk exposure by limiting the hosts that can connect to a
+system.</p>
+<p>This document outlines basic <em class="guilabel">Windows Firewall</em> configurations.
+Use these approaches as a starting point for your
+larger networking organization.
+For a detailed over view of security
+practices and risk management for MongoDB, see
+<a class="reference internal" href="../administration/security.html"><em>Security Practices and Management</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://technet.microsoft.com/en-us/network/bb545423.aspx">Windows Firewall</a>
+documentation from Microsoft.</p>
+</div>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><em class="guilabel">Windows Firewall</em> processes rules in an ordered determined
+by rule type, and parsed in the following order:</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">Windows</span> <span class="pre">Service</span> <span class="pre">Hardening</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Connection</span> <span class="pre">security</span> <span class="pre">rules</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Authenticated</span> <span class="pre">Bypass</span> <span class="pre">Rules</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Block</span> <span class="pre">Rules</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Allow</span> <span class="pre">Rules</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Default</span> <span class="pre">Rules</span></tt></li>
+</ol>
+<p>By default, the policy in <em class="guilabel">Windows Firewall</em> allows all outbound connections
+and blocks all incoming connections.</p>
+<p>Given the <a class="reference internal" href="../administration/security.html#security-port-numbers"><em>default ports</em></a> of all MongoDB
+processes, you must configure networking rules that permit <em>only</em>
+required communication between your application and the appropriate
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances.</p>
+<p>The configuration changes outlined in this document will create rules
+which explicitly allow traffic from specific addresses and on specific
+ports, using a default policy that drops all traffic that is not
+explicitly allowed.</p>
+<p>You can configure the <em class="guilabel">Windows Firewall</em> with using the <tt class="docutils literal"><span class="pre">netsh</span></tt> command line
+tool or through a windows application.  On Windows Server 2008 this
+application is <em class="guilabel">Windows Firewall With Advanced Security</em> in <em class="guilabel">Administrative Tools</em>.
+On previous versions of Windows Server, access the
+<em class="guilabel">Windows Firewall</em> application in the <em class="guilabel">System and Security</em> control panel.</p>
+<p>The procedures in this document use the <tt class="docutils literal"><span class="pre">netsh</span></tt> command line tool.</p>
+</div>
+<div class="section" id="patterns">
+<h2>Patterns<a class="headerlink" href="#patterns" title="Permalink to this headline">¶</a></h2>
+<p>This section contains a number of patterns and examples for
+configuring <em class="guilabel">Windows Firewall`</em> for use with MongoDB deployments.
+If you have configured different ports using the <a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a> configuration
+setting, you will need to modify the rules accordingly.</p>
+<div class="section" id="traffic-to-and-from-mongod-exe-instances">
+<span id="wfirewall-basic-rule-set"></span><h3>Traffic to and from <tt class="docutils literal"><span class="pre">mongod.exe</span></tt> Instances<a class="headerlink" href="#traffic-to-and-from-mongod-exe-instances" title="Permalink to this headline">¶</a></h3>
+<p>This pattern is applicable to all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances running
+as standalone instances or as part of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>.
+The goal of this pattern is to explicitly allow traffic to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instance from the application server.</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod port 27017&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP localport<span class="o">=</span><span class="m">27017</span>
+</pre></div>
+</div>
+<p>This rule allows all incoming traffic to port <tt class="docutils literal"><span class="pre">27017</span></tt>, which
+allows the application server to connect to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instance.</p>
+<p><em class="guilabel">Windows Firewall</em> also allows enabling network access for
+an entire application rather than to a specific port, as in the
+following example:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Allowing mongod&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow program<span class="o">=</span><span class="s2">&quot; C:\mongodb\bin\mongod.exe&quot;</span>
+</pre></div>
+</div>
+<p>You can allow all access for a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> server, with the
+following invocation:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Allowing mongos&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow program<span class="o">=</span><span class="s2">&quot; C:\mongodb\bin\mongos.exe&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="traffic-to-and-from-mongos-exe-instances">
+<h3>Traffic to and from <tt class="docutils literal"><span class="pre">mongos.exe</span></tt> Instances<a class="headerlink" href="#traffic-to-and-from-mongos-exe-instances" title="Permalink to this headline">¶</a></h3>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances provide query routing for
+<a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>. Clients connect to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt>
+instances, which behave from the client&#8217;s perspective as
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances. In turn, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt>
+connects to all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances that are components of
+the sharded cluster.</p>
+<p>Use the same <em class="guilabel">Windows Firewall</em> command to allow traffic to
+and from these instances as you would from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt>
+instances that are members of the replica set.</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod shard port 27018&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP localport<span class="o">=</span><span class="m">27018</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="traffic-to-and-from-a-mongodb-config-server">
+<h3>Traffic to and from a MongoDB Config Server<a class="headerlink" href="#traffic-to-and-from-a-mongodb-config-server" title="Permalink to this headline">¶</a></h3>
+<p>Configuration servers, host the <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config database</em></a> that stores metadata
+for sharded clusters. Each production cluster has three configuration
+servers, initiated using the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--configsvr"><em class="xref std std-option">mongod --configsvr</em></a>
+option. <a class="footnote-reference" href="#config-option" id="id1">[1]</a> Configuration servers listen for connections on port
+<tt class="docutils literal"><span class="pre">27019</span></tt>. As a result, add the following <em class="guilabel">Windows Firewall</em> rules to the
+config server to allow incoming and outgoing connection on port
+<tt class="docutils literal"><span class="pre">27019</span></tt>, for connection to the other config servers.</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod config svr port 27019&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP localport<span class="o">=</span><span class="m">27019</span>
+</pre></div>
+</div>
+<p>Additionally, config servers need to allow incoming connections from
+all of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances in the cluster <em>and</em> all
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances in the cluster. Add rules that
+resemble the following:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod config svr inbound&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">27019</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;ip-address&gt;</span></tt> with the addresses of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances and the shard <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt>
+instances.</p>
+<table class="docutils footnote" frame="void" id="config-option" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>You can also run a config server by setting the
+<a class="reference internal" href="../reference/configuration-options.html#configsvr" title="configsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configsvr</span></tt></a> option in a configuration file.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="traffic-to-and-from-a-mongodb-shard-server">
+<h3>Traffic to and from a MongoDB Shard Server<a class="headerlink" href="#traffic-to-and-from-a-mongodb-shard-server" title="Permalink to this headline">¶</a></h3>
+<p>For shard servers, running as <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--shardsvr"><em class="xref std std-option">mongod --shardsvr</em></a>
+<a class="footnote-reference" href="#shard-option" id="id2">[2]</a> Because the default port number when running with
+<a class="reference internal" href="../reference/configuration-options.html#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a> is <tt class="docutils literal"><span class="pre">27018</span></tt>,  you must configure the following
+<em class="guilabel">Windows Firewall</em> rules to allow traffic to and from each shard:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod shardsvr inbound&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">27018</span>
+netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod shardsvr outbound&quot;</span> dir<span class="o">=</span>out action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">27018</span>
+</pre></div>
+</div>
+<p>Replace the <tt class="docutils literal"><span class="pre">&lt;ip-address&gt;</span></tt> specification with the IP address of all
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances. This allows you to permit incoming
+and outgoing traffic between all shards including constituent replica
+set members to:</p>
+<ul class="simple">
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances in the shard&#8217;s replica sets.</li>
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances in other shards. <a class="footnote-reference" href="#migrations" id="id3">[3]</a></li>
+</ul>
+<p>Furthermore, shards need to be able make outgoing connections to:</p>
+<ul class="simple">
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances.</li>
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances in the config servers.</li>
+</ul>
+<p>Create a rule that resembles the following, and replace the
+<tt class="docutils literal"><span class="pre">&lt;ip-address&gt;</span></tt> with the address of the config servers and the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod config svr outbound&quot;</span> dir<span class="o">=</span>out action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">27018</span>
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="shard-option" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>You can also specify the shard server option using
+the <a class="reference internal" href="../reference/configuration-options.html#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a> setting in the configuration file. Shard
+members are also often conventional replica sets using the default
+port.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="migrations" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>All shards in a cluster need to be able to
+communicate with all other shards to facilitate <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> and
+balancing operations.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="provide-access-for-monitoring-systems">
+<h3>Provide Access For Monitoring Systems<a class="headerlink" href="#provide-access-for-monitoring-systems" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> diagnostic tool, when running with the
+<a class="reference internal" href="../reference/mongostat.html#cmdoption-mongostat--discover"><em class="xref std std-option">--discover</em></a> needs to be able to
+reach all components of a cluster, including the config servers,
+the shard servers, and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances.</p>
+</li>
+<li><p class="first">If your monitoring system needs access the HTTP interface, insert
+the following rule to the chain:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod HTTP monitoring inbound&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">28017</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;ip-address&gt;</span></tt> with the address of the instance that
+needs access to the HTTP or REST interface. For <em>all</em> deployments,
+you should restrict access to this port to <em>only</em> the monitoring
+instance.</p>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>For shard server <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances running with
+<a class="reference internal" href="../reference/configuration-options.html#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a>, the rule would resemble the following:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongos HTTP monitoring inbound&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">28018</span>
+</pre></div>
+</div>
+<p>For config server <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> instances running with
+<a class="reference internal" href="../reference/configuration-options.html#configsvr" title="configsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configsvr</span></tt></a>, the rule would resemble the following:</p>
+<div class="last highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall add rule name<span class="o">=</span><span class="s2">&quot;Open mongod configsvr HTTP monitoring inbound&quot;</span> dir<span class="o">=</span>in action<span class="o">=</span>allow protocol<span class="o">=</span>TCP remoteip<span class="o">=</span><span class="p">&lt;</span><span class="n">ip</span>-address<span class="p">&gt;</span> <span class="n">localport</span><span class="o">=</span><span class="m">28019</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="manage-and-maintain-windows-firewall-configurations">
+<h2>Manage and Maintain <em>Windows Firewall</em> Configurations<a class="headerlink" href="#manage-and-maintain-windows-firewall-configurations" title="Permalink to this headline">¶</a></h2>
+<p>This section contains a number of basic operations for managing and
+using <tt class="docutils literal"><span class="pre">netsh</span></tt>. While you can use the GUI front ends to manage the
+<em class="guilabel">Windows Firewall</em>, all core functionality is accessible is
+accessible from <tt class="docutils literal"><span class="pre">netsh</span></tt>.</p>
+<div class="section" id="delete-all-windows-firewall-rules">
+<h3>Delete all <em>Windows Firewall</em> Rules<a class="headerlink" href="#delete-all-windows-firewall-rules" title="Permalink to this headline">¶</a></h3>
+<p>To delete the firewall rule allowing <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> traffic:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall delete rule name<span class="o">=</span><span class="s2">&quot;Open mongod port 27017&quot;</span> protocol<span class="o">=</span>tcp localport<span class="o">=</span><span class="m">27017</span>
+
+netsh advfirewall firewall delete rule name<span class="o">=</span><span class="s2">&quot;Open mongod shard port 27018&quot;</span> protocol<span class="o">=</span>tcp localport<span class="o">=</span><span class="m">27018</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-all-windows-firewall-rules">
+<h3>List All <em>Windows Firewall</em> Rules<a class="headerlink" href="#list-all-windows-firewall-rules" title="Permalink to this headline">¶</a></h3>
+<p>To return a list of all <em class="guilabel">Windows Firewall</em> rules:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall firewall show rule name<span class="o">=</span>all
+</pre></div>
+</div>
+</div>
+<div class="section" id="reset-windows-firewall">
+<h3>Reset <em>Windows Firewall</em><a class="headerlink" href="#reset-windows-firewall" title="Permalink to this headline">¶</a></h3>
+<p>To reset the <em class="guilabel">Windows Firewall</em> rules:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall reset
+</pre></div>
+</div>
+</div>
+<div class="section" id="backup-and-restore-windows-firewall-rules">
+<h3>Backup and Restore <em>Windows Firewall</em> Rules<a class="headerlink" href="#backup-and-restore-windows-firewall-rules" title="Permalink to this headline">¶</a></h3>
+<p>To simplify administration of larger collection of systems, you can export or
+import firewall systems from different servers) rules very easily on Windows:</p>
+<p>Export all firewall rules with the following command:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall export <span class="s2">&quot;C:\temp\MongoDBfw.wfw&quot;</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&quot;C:\temp\MongoDBfw.wfw&quot;</span></tt> with a path of your choosing. You
+can use a command in the following form to import a file created using
+this operation:</p>
+<div class="highlight-bat"><div class="highlight"><pre>netsh advfirewall import <span class="s2">&quot;C:\temp\MongoDBfw.wfw&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="configure-linux-iptables-firewall.html" title="Previous Section: Configure Linux iptables Firewall for MongoDB">&lt; &nbsp; Configure Linux iptables Firewall for MongoDB</a></li>
+<li id="btnvup"><a href="../security.html" title="Parent Section: Security" >&#47;&#92;&nbsp; Security</a></li>
+<li id="btnvnx"><a href="control-access-to-mongodb-with-authentication.html" title="Next Section: Control Access to MongoDB Instances with Authentication">Control Access to MongoDB Instances with Authentication &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

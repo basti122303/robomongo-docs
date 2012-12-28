@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>rs.add() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/rs.add" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="rs.addArb()" href="rs.addArb.html" />
+<link rel="prev" title="resetDbpath()" href="resetDbpath.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="rs-add">
+<h1>rs.add()<a class="headerlink" href="#rs-add" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="rs.add">
+<tt class="descclassname">rs.</tt><tt class="descname">add</tt><big>(</big><em>hostspec</em>, <em>arbiterOnly</em><big>)</big><a class="headerlink" href="#rs.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify one of the following forms:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>string,document</em>) &#8211; Either a string or a document.  If a string, specifies a host
+(and optionally port-number) for a new host member for the
+replica set; MongoDB will add this host with the default
+configuration. If a document, specifies any attributes about a
+member of a replica set.</li>
+<li><strong>arbiterOnly</strong> (<em>Boolean</em>) &#8211; Optional. If <tt class="docutils literal"><span class="pre">true</span></tt>, this host is an arbiter. If the second
+argument evaluates to <tt class="docutils literal"><span class="pre">true</span></tt>, as is the case with some
+<a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">documents</em></a>, then this instance will become an
+arbiter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Provides a simple method to add a member to an existing
+<a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. You can specify new hosts in one of two ways:</p>
+<ol class="arabic simple">
+<li>as a &#8220;hostname&#8221; with an optional port number to use the default
+configuration as in the <a class="reference internal" href="../../tutorial/expand-replica-set.html#replica-set-add-member"><em>Add a Member to an Existing Replica Set</em></a> example.</li>
+<li>as a configuration <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a>, as in the
+<a class="reference internal" href="../../tutorial/expand-replica-set.html#replica-set-add-member-alternate-procedure"><em>Add a Member to an Existing Replica Set (Alternate Procedure)</em></a> example.</li>
+</ol>
+<p>This function will disconnect the shell briefly and forces a
+reconnection as the replica set renegotiates which node
+will be <a class="reference internal" href="../glossary.html#term-primary"><em class="xref std std-term">primary</em></a>. As a result, the shell will display an
+error even if this command succeeds.</p>
+<p><a class="reference internal" href="../replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a> provides a wrapper around some of the
+functionality of the &#8220;<a class="reference internal" href="../replica-commands.html#replSetReconfig" title="replSetReconfig"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetReconfig</span></tt></a>&#8221; <a class="reference internal" href="../glossary.html#term-database-command"><em class="xref std std-term">database
+command</em></a> and the corresponding shell helper
+<a class="reference internal" href="../replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a>. See the <a class="reference internal" href="../replica-configuration.html"><em>Replica Set Configuration</em></a>
+document for full documentation of all replica set configuration
+options.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To add a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> accessible on the default port
+<tt class="docutils literal"><span class="pre">27017</span></tt> running on the host <tt class="docutils literal"><span class="pre">mongodb3.example.net</span></tt>, use the
+following <a class="reference internal" href="../replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a> invocation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;mongodb3.example.net:27017&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">mongodb3.example.net</span></tt> is an arbiter, use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;mongodb3.example.net:27017&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To add <tt class="docutils literal"><span class="pre">mongodb3.example.net</span></tt> as a <a class="reference internal" href="../../administration/replica-sets.html#replica-set-secondary-only-members"><em>secondary-only</em></a> member of set, use the
+following form of <a class="reference internal" href="../replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;host&quot;</span><span class="o">:</span> <span class="s2">&quot;mongodbd3.example.net:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;priority&quot;</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">See the <a class="reference internal" href="../replica-configuration.html"><em>Replica Set Configuration</em></a> and
+<a class="reference internal" href="../../administration/replica-sets.html"><em>Replica Set Administration</em></a> documents for more
+information.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="resetDbpath.html" title="Previous Section: resetDbpath()">&lt; &nbsp; resetDbpath()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="rs.addArb.html" title="Next Section: rs.addArb()">rs.addArb() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

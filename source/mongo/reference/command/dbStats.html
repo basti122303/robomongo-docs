@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>dbStats &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/dbStats" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="diagLogging (internal)" href="diagLogging.html" />
+<link rel="prev" title="dbHash (internal)" href="dbHash.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="dbstats">
+<h1>dbStats<a class="headerlink" href="#dbstats" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="dbStats">
+<tt class="descname">dbStats</tt><a class="headerlink" href="#dbStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#dbStats" title="dbStats"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">dbStats</span></tt></a> command returns storage statistics for a
+given database. The command takes the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">dbStats</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">scale</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The value of the argument (e.g. <tt class="docutils literal"><span class="pre">1</span></tt> above) to <tt class="docutils literal"><span class="pre">dbStats</span></tt> does
+not affect the output of the command. The <tt class="docutils literal"><span class="pre">scale</span></tt> option allows
+you to specify how to scale byte values. For example, a <tt class="docutils literal"><span class="pre">scale</span></tt>
+value of <tt class="docutils literal"><span class="pre">1024</span></tt> will display the results in kilobytes rather
+than in bytes.</p>
+<p>The time required to run the command depends on the total size of the database.
+Because the command has to touch all data files, the command may take several
+seconds to run.</p>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, the <a class="reference internal" href="../method/db.stats.html#db.stats" title="db.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.stats()</span></tt></a> function provides
+a wrapper around this functionality. See the
+&#8220;<a class="reference internal" href="../database-statistics.html"><em>Database Statistics Reference</em></a>&#8221; document for an overview of
+this output.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="dbHash.html" title="Previous Section: dbHash (internal)">&lt; &nbsp; dbHash (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="diagLogging.html" title="Next Section: diagLogging (internal)">diagLogging (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

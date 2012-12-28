@@ -1,0 +1,439 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Security Practices and Management &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/security" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Security" href="../security.html" />
+<link rel="next" title="Vulnerability Notification" href="vulnerability-notification.html" />
+<link rel="prev" title="Security" href="../security.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="security-practices-and-management">
+<h1>Security Practices and Management<a class="headerlink" href="#security-practices-and-management" title="Permalink to this headline">¶</a></h1>
+<p>As with all software running in a networked environment,
+administrators of MongoDB must consider security and risk
+exposures for a MongoDB deployment. There are no magic solutions for risk
+mitigation, and maintaining a secure MongoDB deployment is an ongoing
+process. This document takes a <em>Defense in Depth</em> approach to securing
+MongoDB deployments, and addresses a number of different methods for
+managing risk and reducing risk exposure</p>
+<p>The intent of <em>Defense In Depth</em> approaches are to ensure there are no
+exploitable points of failure in your deployment that could allow an
+intruder or un-trusted party to access the data stored in the MongoDB
+database. The easiest and most effective way to reduce the risk of
+exploitation is to run MongoDB in a trusted environment, limit access,
+follow a system of least privilege, and follow best development and
+deployment practices. See the <a class="reference internal" href="#security-reduce-risk"><em>Strategies for Reducing Risk</em></a> section for
+more information.</p>
+<div class="section" id="strategies-for-reducing-risk">
+<span id="security-reduce-risk"></span><h2>Strategies for Reducing Risk<a class="headerlink" href="#strategies-for-reducing-risk" title="Permalink to this headline">¶</a></h2>
+<p>The most effective way to reduce risk for MongoDB deployments is to
+run your entire MongoDB deployment, including all MongoDB components
+(i.e. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and application instances)
+in a <em>trusted environment</em>. Trusted environments use the following
+strategies to control access:</p>
+<ul class="simple">
+<li>network filter (e.g. firewall) rules that block all connections
+from unknown systems to MongoDB components.</li>
+<li>bind <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances to specific
+IP addresses to limit accessibility.</li>
+<li>limit MongoDB programs to non-public local networks, and virtual
+private networks.</li>
+</ul>
+<p>You may further reduce risk by:</p>
+<ul class="simple">
+<li>requiring authentication for access to MongoDB instances.</li>
+<li>requiring strong, complex, single purpose authentication credentials.
+This should be part of your internal security policy but is not
+currently configurable in MongoDB.</li>
+<li>deploying a model of least privilege, where all users have <em>only</em> the
+amount of access they need to accomplish required tasks, and no
+more.</li>
+<li>following the best application development and deployment practices,
+which includes: validating all inputs, managing sessions, and
+application-level access control.</li>
+</ul>
+<p>Continue reading this document for more information on specific
+strategies and configurations to help reduce the risk exposure of
+your application.</p>
+</div>
+<div class="section" id="vulnerability-notification">
+<h2>Vulnerability Notification<a class="headerlink" href="#vulnerability-notification" title="Permalink to this headline">¶</a></h2>
+<p>10gen takes the security of MongoDB and associated products very
+seriously. If you discover a vulnerability in MongoDB or another
+10gen product, or would like to know more about our vulnerability
+reporting and response process, see the
+<a class="reference internal" href="vulnerability-notification.html"><em>Vulnerability Notification</em></a> document.</p>
+</div>
+<div class="section" id="networking-risk-exposure">
+<h2>Networking Risk Exposure<a class="headerlink" href="#networking-risk-exposure" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="interfaces-and-port-numbers">
+<span id="security-port-numbers"></span><h3>Interfaces and Port Numbers<a class="headerlink" href="#interfaces-and-port-numbers" title="Permalink to this headline">¶</a></h3>
+<p>The following list includes all default ports used by MongoDB:</p>
+<p>By default, listens for connections on the following ports:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">27017</span></tt></dt>
+<dd>This is the default port <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances. You can change this port with <a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a> or
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--port"><em class="xref std std-option">--port</em></a>.</dd>
+<dt><tt class="docutils literal"><span class="pre">27018</span></tt></dt>
+<dd>This is the default port when running with <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--shardsvr"><em class="xref std std-option">--shardsvr</em></a> runtime operation or <a class="reference internal" href="../reference/configuration-options.html#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a>
+setting.</dd>
+<dt><tt class="docutils literal"><span class="pre">27019</span></tt></dt>
+<dd>This is the default port when running with <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--configsvr"><em class="xref std std-option">--configsvr</em></a> runtime operation or <a class="reference internal" href="../reference/configuration-options.html#configsvr" title="configsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configsvr</span></tt></a>
+setting.</dd>
+<dt><tt class="docutils literal"><span class="pre">28017</span></tt></dt>
+<dd>This is the default port for the web status page. This is always
+accessible at a port that is <tt class="docutils literal"><span class="pre">1000</span></tt> greater than the port
+determined by <a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a>.</dd>
+</dl>
+<p>By default MongoDB programs (i.e. <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>) will bind to all available network interfaces
+(i.e. IP addresses) on a system. The next section outlines various
+runtime options that allow you to limit access to MongoDB programs.</p>
+</div>
+<div class="section" id="network-interface-limitation">
+<h3>Network Interface Limitation<a class="headerlink" href="#network-interface-limitation" title="Permalink to this headline">¶</a></h3>
+<p>You can limit the network exposure with the following configuration options:</p>
+<ul>
+<li><p class="first">the <tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nohttpinterface</span></tt> setting for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<p>Disables the &#8220;home&#8221; status page, which would run on port <tt class="docutils literal"><span class="pre">28017</span></tt>
+by default. The status interface is read-only by default. You may
+also specify this option on the command line as
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--nohttpinterface"><em class="xref std std-option">mongod --nohttpinterface</em></a> or <em class="xref std std-option">mongos  --nohttpinterface</em>.
+Authentication does not control or affect access to this interface.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Disable this option for production deployments. If
+<em>do</em> you leave this interface enabled, you should only allow trusted
+clients to access this port.</p>
+</div>
+</li>
+<li><p class="first">the <a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a> setting for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<p>Changes the main port on which the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance listens for connections. Changing the
+port does not menacingly reduce risk or limit exposure.</p>
+<p>You may also specify this option on the command line as
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--port"><em class="xref std std-option">mongod --port</em></a> or <a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--port"><em class="xref std std-option">mongos --port</em></a>.</p>
+<p>Whatever port you attach <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances to, you should only allow trusted clients to connect to
+this port.</p>
+</li>
+<li><p class="first">the <a class="reference internal" href="../reference/configuration-options.html#rest" title="rest"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">rest</span></tt></a> setting for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<p>Enables a fully interactive administrative <a class="reference internal" href="../reference/glossary.html#term-rest"><em class="xref std std-term">REST</em></a> interface,
+which is <em>disabled by default.</em> The status interface, which <em>is</em>
+enabled by default, is read-only. This configuration makes that
+interface fully interactive. The REST interface does not support any
+authentication and you should always restrict access to this
+interface to only allow trusted clients to connect to this port.</p>
+<p>You may also enable this interface on the command line as
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--rest"><em class="xref std std-option">mongod --rest</em></a>.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Disable this option for production deployments. If
+<em>do</em> you leave this interface enabled, you should only allow trusted
+clients to access this port.</p>
+</div>
+</li>
+<li><p class="first">the <a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a> setting for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<p>Limits the network interfaces on which MongoDB programs will listen
+for incoming connections. You can also specify a number of
+interfaces by passing <a class="reference internal" href="../reference/configuration-options.html#bind_ip" title="bind_ip"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">bind_ip</span></tt></a> a comma separated list of
+IP addresses. You can use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--bind_ip"><em class="xref std std-option">mongod --bind_ip</em></a> and
+<a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--bind_ip"><em class="xref std std-option">mongos --bind_ip</em></a> option on the command line at run time to
+limit the network accessibility of a MongoDB program.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Make sure that your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances are only accessible on trusted
+networks. If your system has more than one network interface,
+bind MongoDB programs to the private or internal network
+interface.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="firewalls">
+<span id="security-firewalls"></span><h3>Firewalls<a class="headerlink" href="#firewalls" title="Permalink to this headline">¶</a></h3>
+<p>Firewalls allow administrators to filter and control access to a
+system by providing granular control over what network
+communications. For administrators of MongoDB, the following
+capabilities are important:</p>
+<ul class="simple">
+<li>limiting incoming traffic on a specific port to specific
+systems.</li>
+<li>limiting incoming traffic from untrusted hosts.</li>
+</ul>
+<p>On Linux systems, the <tt class="docutils literal"><span class="pre">iptables</span></tt> interface provides access to the
+underlying <tt class="docutils literal"><span class="pre">netfilter</span></tt> firewall. On Windows systems <tt class="docutils literal"><span class="pre">netsh</span></tt>
+command line interface provides access to the underlying Windows
+Firewall. For additional information about firewall configuration
+consider the following documents:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../tutorial/configure-linux-iptables-firewall.html"><em>Configure Linux iptables Firewall for MongoDB</em></a></li>
+<li><a class="reference internal" href="../tutorial/configure-windows-netsh-firewall.html"><em>Configure Windows netsh Firewall for MongoDB</em></a></li>
+</ul>
+<p>For best results and to minimize overall exposure, ensure that <em>only</em>
+traffic from trusted sources can reach <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances and that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances can only connect to trusted outputs.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">For MongoDB deployments on Amazon&#8217;s web services, see the
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Amazon+EC2">Amazon EC2</a> wiki page, which addresses Amazon&#8217;s
+Security Groups and other EC2-specific security features.</p>
+</div>
+</div>
+<div class="section" id="virtual-private-networks">
+<h3>Virtual Private Networks<a class="headerlink" href="#virtual-private-networks" title="Permalink to this headline">¶</a></h3>
+<p>Virtual private networks, or VPNs, make it possible to link two
+networks over an encrypted and limited-access trusted
+network. Typically MongoDB users who use VPNs use SSL rather than
+IPSEC VPNs for performance issues.</p>
+<p>Depending on configuration and implementation VPNs provide for
+certificate validation and a choice of encryption protocols, which
+requires a rigorous level of authentication and identification of all
+clients. Furthermore, because VPNs provide a secure tunnel, using a
+VPN connection to control access to your MongoDB instance, you can
+prevent tampering and &#8220;man-in-the-middle&#8221; attacks.</p>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>Always run the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process as a
+<em>unique</em> user with the minimum required permissions and access. Never
+run a MongoDB program as a <tt class="docutils literal"><span class="pre">root</span></tt> or administrative users. The
+system users that run the MongoDB processes should have robust
+authentication credentials that prevent unauthorized or casual
+access.</p>
+<p>To further limit the environment, you can run the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process in a <tt class="docutils literal"><span class="pre">chroot</span></tt> environment. Both user-based
+access restrictions and <tt class="docutils literal"><span class="pre">chroot</span></tt> configuration follow recommended
+conventions for administering all daemon processes on Unix-like
+systems.</p>
+<p>You can disable anonymous access to the database by enabling
+authentication using the <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> as detailed in the
+<a class="reference internal" href="#security-authentication"><em>Authentication</em></a> section.</p>
+</div>
+<div class="section" id="authentication">
+<span id="security-authentication"></span><h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB provides basic support for authentication with the
+<a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> setting. For multi-instance deployments
+(i.e. <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>, and <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>) use the <a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a> setting, which implies
+<a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>, and allows intra-deployment authentication and
+operation. Be aware of the following behaviors of MongoDB&#8217;s
+authentication system:</p>
+<ul>
+<li><p class="first">Authentication is <strong>disabled</strong> by default.</p>
+</li>
+<li><p class="first">MongoDB provisions access on a per-database level. Users either have
+<em>read only</em> access to a database or <em>normal</em> access to a database that
+permits full read and write access to the database. <em>Normal</em> access
+conveys the ability to add additional users to the database.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">system.users</span></tt> collection in each database stores all
+credentials. You can query the authorized users with the following
+operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">admin</span></tt> database is unique. Users with <em>normal</em> access to the
+<tt class="docutils literal"><span class="pre">admin</span></tt> database have read and write access to all
+databases. Users with <em>read only</em> access to the <tt class="docutils literal"><span class="pre">admin</span></tt> database
+have read only access to all databases.</p>
+<p>Additionally the <tt class="docutils literal"><span class="pre">admin</span></tt> database exposes several commands and
+functionality, such as <a class="reference internal" href="../reference/commands.html#listDatabases" title="listDatabases"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listDatabases</span></tt></a>.</p>
+</li>
+<li><p class="first">Once authenticated a <em>normal</em> user has full read and write access to
+a database.</p>
+</li>
+<li><p class="first">If you have authenticated to a database as a normal, read and write,
+user; authenticating as a read-only user on the same database will
+invalidate the earlier authentication, leaving the current
+connection with read only access.</p>
+</li>
+<li><p class="first">If you have authenticated to the <tt class="docutils literal"><span class="pre">admin</span></tt> database as normal, read
+and write, user; logging into a <em>different</em> database as a read only
+user will <em>not</em> invalidate the authentication to the <tt class="docutils literal"><span class="pre">admin</span></tt>
+database. In this situation, this client will be able to read and
+write data to this second database.</p>
+</li>
+<li><p class="first">When setting up authentication for the first time you must either:</p>
+<ol class="arabic simple">
+<li>add at least one user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database before starting
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>.</li>
+<li>add the first user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database when connected to
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance from a <tt class="docutils literal"><span class="pre">localhost</span></tt> connection. <a class="footnote-reference" href="#sharded-localhost" id="id1">[1]</a></li>
+</ol>
+</li>
+</ul>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.0: </span>Support for authentication with sharded clusters. Before 2.0
+sharded clusters <em>had</em> to run with trusted applications and a
+trusted networking configuration.</p>
+<p>Consider the
+<a class="reference internal" href="../tutorial/control-access-to-mongodb-with-authentication.html"><em>Control Access to MongoDB Instances with Authentication</em></a>
+document which outlines procedures for configuring and maintaining
+users and access with MongoDB&#8217;s authentication system.</p>
+<table class="docutils footnote" frame="void" id="sharded-localhost" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Because of <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6591">SERVER-6591</a>, you cannot
+add the first user to a sharded cluster using the <tt class="docutils literal"><span class="pre">localhost</span></tt>
+connection in 2.2. If you are running a 2.2 sharded cluster, and
+want to enable authentication, you must deploy the cluster and add
+the first user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database before restarting the
+cluster to run with <a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="interfaces">
+<h2>Interfaces<a class="headerlink" href="#interfaces" title="Permalink to this headline">¶</a></h2>
+<p>Simply limiting access to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is not sufficient for
+totally controlling risk exposure. Consider the recommendations in the
+following section, for limiting exposure other interface-related
+risks.</p>
+<div class="section" id="javascript-and-the-security-of-the-mongo-shell">
+<h3>JavaScript and the Security of the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#javascript-and-the-security-of-the-mongo-shell" title="Permalink to this headline">¶</a></h3>
+<p>Be aware of the following capabilities and behaviors of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<ul>
+<li><p class="first"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will evaluate a <tt class="docutils literal"><span class="pre">.js</span></tt> file passed to the
+<a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--eval"><em class="xref std std-option">mongo --eval</em></a> option. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell does not validate the input of JavaScript input to
+<a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a>.</p>
+</li>
+<li><p class="first"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will evaluate a <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file before
+starting. You can disable this behavior by passing the
+<a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--norc"><em class="xref std std-option">mongo --norc</em></a> option.</p>
+<p>On Linux and Unix systems, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> reads the
+<tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt> file from <tt class="file docutils literal"><em><span class="pre">$HOME</span></em><span class="pre">/.mongorc.js</span></tt>
+(i.e. <tt class="file docutils literal"><span class="pre">~/.mongorc.js</span></tt>), and Windows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> reads the
+<tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt> file from <tt class="file docutils literal"><em><span class="pre">%HOME%</span></em><span class="pre">.mongorc.js</span></tt> or
+<tt class="file docutils literal"><em><span class="pre">%HOMEDRIVE%</span></em><em><span class="pre">%HOMEPATH%</span></em><span class="pre">.mongorc.js</span></tt>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="http-status-interface">
+<h3>HTTP Status Interface<a class="headerlink" href="#http-status-interface" title="Permalink to this headline">¶</a></h3>
+<p>The HTTP status interface provides a web-based interface that includes
+a variety of operational data, logs, and status reports regarding the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. The HTTP interface is
+always available on the port numbered <tt class="docutils literal"><span class="pre">1000</span></tt> greater than the
+primary <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> port. By default this is <tt class="docutils literal"><span class="pre">28017</span></tt>, but is
+indirectly set using the <a class="reference internal" href="../reference/configuration-options.html#port" title="port"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">port</span></tt></a> option which allows you to
+configure the primary <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> port.</p>
+<p>Without the <a class="reference internal" href="../reference/configuration-options.html#rest" title="rest"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">rest</span></tt></a> setting, this interface is entirely
+read-only, and limited in scope; nevertheless, this interface may
+represent an exposure. To disable the HTTP interface, set the
+<a class="reference internal" href="../reference/configuration-options.html#nohttpinterface" title="nohttpinterface"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nohttpinterface</span></tt></a> run time option or the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--nohttpinterface"><em class="xref std std-option">--nohttpinterface</em></a> command line
+option.</p>
+</div>
+<div class="section" id="rest-api">
+<h3>REST API<a class="headerlink" href="#rest-api" title="Permalink to this headline">¶</a></h3>
+<p>The REST API to MongoDB provides additional information and
+write access on top of the HTTP Status interface. The REST interface
+is <em>disabled</em> by default, and is not recommended for production use.</p>
+<p>While the REST API does not provide any support for insert, update, or
+remove operations, it does provide administrative access, and its
+accessibility represents a vulnerability in a secure environment.</p>
+<p>If you must use the REST API, please control and limit access to the
+REST API. The REST API does not include any support for
+authentication, even if when running with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> enabled.</p>
+<p>See the following documents for instructions on restricting access to
+the REST API interface:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../tutorial/configure-linux-iptables-firewall.html"><em>Configure Linux iptables Firewall for MongoDB</em></a></li>
+<li><a class="reference internal" href="../tutorial/configure-windows-netsh-firewall.html"><em>Configure Windows netsh Firewall for MongoDB</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="data-encryption">
+<h2>Data Encryption<a class="headerlink" href="#data-encryption" title="Permalink to this headline">¶</a></h2>
+<p>To support audit requirements, you may need to encrypt data stored in
+MongoDB. For best results you can encrypt this data in the application
+layer, by encrypting the content of fields that hold secure data.</p>
+<p>Additionally, <a class="reference external" href="http://10gen.com">10gen</a> has a <a class="reference external" href="https://www.10gen.com/partners/technology/gazzang">partnership</a> with <a class="reference external" href="http://www.gazzang.com/">Gazzang</a> to encrypt
+and secure sensitive data within MongoDB. The solution encrypts data in
+real time and Gazzang provides advanced key management that ensures
+only authorized processes and can access this data. The Gazzang
+software ensures that the cryptographic keys remain safe and ensures
+compliance with standards including HIPPA, PCI-DSS, and FERPA. For
+more information consider the following resources:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.gazzang.com/images/datasheet-zNcrypt-for-MongoDB.pdf">Datasheet</a></li>
+<li><a class="reference external" href="http://gazzang.com/resources/videos/partner-videos/item/209-gazzang-zncrypt-on-mongodb">Webinar</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../security.html" title="Previous Section: Security">&lt; &nbsp; Security</a></li>
+<li id="btnvup"><a href="../security.html" title="Parent Section: Security" >&#47;&#92;&nbsp; Security</a></li>
+<li id="btnvnx"><a href="vulnerability-notification.html" title="Next Section: Vulnerability Notification">Vulnerability Notification &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

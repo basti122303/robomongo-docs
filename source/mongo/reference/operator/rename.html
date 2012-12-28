@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$rename &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/rename" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$returnKey" href="returnKey.html" />
+<link rel="prev" title="$regex" href="regex.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="rename">
+<h1>$rename<a class="headerlink" href="#rename" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_rename">
+<tt class="descname">$rename</tt><a class="headerlink" href="#_S_rename" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 1.7.2.</span></p>
+<p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{$rename:</span> <span class="pre">{</span> <span class="pre">&lt;old</span> <span class="pre">name1&gt;:</span> <span class="pre">&lt;new</span> <span class="pre">name1&gt;,</span> <span class="pre">&lt;old</span> <span class="pre">name2&gt;:</span> <span class="pre">&lt;new</span> <span class="pre">name2&gt;,</span> <span class="pre">...</span> <span class="pre">}</span> <span class="pre">}</span></tt></p>
+<p>The <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator updates the name of a field. The
+new field name must differ from the existing field name.</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s1">&#39;nickname&#39;</span><span class="o">:</span> <span class="s1">&#39;alias&#39;</span><span class="p">,</span> <span class="s1">&#39;cell&#39;</span><span class="o">:</span> <span class="s1">&#39;mobile&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation renames the field <tt class="docutils literal"><span class="pre">nickname</span></tt> to <tt class="docutils literal"><span class="pre">alias</span></tt>, and the
+field <tt class="docutils literal"><span class="pre">cell</span></tt> to <tt class="docutils literal"><span class="pre">mobile</span></tt>.</p>
+<p>If the document already has a field with the <em>new</em> field name, the
+<a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator removes that field and renames the
+field with the <em>old</em> field name to the <em>new</em> field name.</p>
+<p>The <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator will expand arrays and
+sub-documents to find a match for field names. When renaming a field
+in a sub-document to another sub-document or to a regular field, the
+sub-document itself remains.</p>
+<p>Consider the following examples involving the sub-document of the
+following document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;alias&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;The American Cincinnatus&quot;</span><span class="p">,</span> <span class="s2">&quot;The American Fabius&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;mobile&quot;</span><span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;nmae&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;first&quot;</span> <span class="o">:</span> <span class="s2">&quot;george&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">To rename a sub-document, call the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator
+with the name of the sub-document as you would any other field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;nmae&quot;</span><span class="o">:</span> <span class="s2">&quot;name&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation renames the sub-document <tt class="docutils literal"><span class="pre">nmae</span></tt> to <tt class="docutils literal"><span class="pre">name</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;alias&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;The American Cincinnatus&quot;</span><span class="p">,</span> <span class="s2">&quot;The American Fabius&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;mobile&quot;</span><span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;first&quot;</span> <span class="o">:</span> <span class="s2">&quot;george&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To rename a field within a sub-document, call the
+<a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator using the <a class="reference external" href="http://www.mongodb.org/display/DOCS/Dot+Notation+(Reaching+into+Objects)">dot notation</a> to refer to the field.
+Include the name of the sub-document in the new field name to
+ensure the field remains in the sub-document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;name.first&quot;</span><span class="o">:</span> <span class="s2">&quot;name.fname&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation renames the sub-document field <tt class="docutils literal"><span class="pre">first</span></tt> to <tt class="docutils literal"><span class="pre">fname</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;alias&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;The American Cincinnatus&quot;</span><span class="p">,</span> <span class="s2">&quot;The American Fabius&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;mobile&quot;</span> <span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;fname&quot;</span> <span class="o">:</span> <span class="s2">&quot;george&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To rename a field within a sub-document and move it to another
+sub-document, call the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator using the
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Dot+Notation+(Reaching+into+Objects)">dot notation</a> to
+refer to the field. Include the name of the new sub-document in
+the <tt class="docutils literal"><span class="pre">new</span> <span class="pre">name</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;name.last&quot;</span><span class="o">:</span> <span class="s2">&quot;contact.lname&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation renames the sub-document field <tt class="docutils literal"><span class="pre">last</span></tt> to <tt class="docutils literal"><span class="pre">lname</span></tt> and
+moves it to the sub-document <tt class="docutils literal"><span class="pre">contact</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;alias&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;The American Cincinnatus&quot;</span><span class="p">,</span> <span class="s2">&quot;The American Fabius&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;contact&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;lname&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;mobile&quot;</span> <span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;fname&quot;</span> <span class="o">:</span> <span class="s2">&quot;george&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If the new field name does not include a sub-document name, the
+field moves out of the subdocument and becomes a regular document
+field.</p>
+</li>
+</ul>
+<p>Consider the following behavior when the specified old field name
+does not exist:</p>
+<ul>
+<li><p class="first">When renaming a single field and the existing field name refers to a
+non-existing field, the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator does
+nothing, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s1">&#39;wife&#39;</span><span class="o">:</span> <span class="s1">&#39;spouse&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation does nothing because there is no field named
+<tt class="docutils literal"><span class="pre">wife</span></tt>.</p>
+</li>
+<li><p class="first">When renaming multiple fields and <strong>all</strong> of the old field names
+refer to non-existing fields, the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator
+does nothing, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s1">&#39;wife&#39;</span><span class="o">:</span> <span class="s1">&#39;spouse&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;vice&#39;</span><span class="o">:</span> <span class="s1">&#39;vp&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;office&#39;</span><span class="o">:</span> <span class="s1">&#39;term&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation does nothing because there are no fields named
+<tt class="docutils literal"><span class="pre">wife</span></tt>, <tt class="docutils literal"><span class="pre">vice</span></tt>, and <tt class="docutils literal"><span class="pre">office</span></tt>.</p>
+</li>
+<li><p class="first">When renaming multiple fields and <strong>some</strong> but not all old field
+names refer to non-existing fields, the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a>
+operator performs the following operations:</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2.</span></p>
+<ul class="simple">
+<li>Renames the fields that exist to the specified new field names.</li>
+<li>Ignores the non-existing fields.</li>
+</ul>
+<p>Consider the following query that renames both an existing field
+<tt class="docutils literal"><span class="pre">mobile</span></tt> and a non-existing field <tt class="docutils literal"><span class="pre">wife</span></tt>. The field named
+<tt class="docutils literal"><span class="pre">wife</span></tt> does not exist and <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> sets the field to
+a name that already exists <tt class="docutils literal"><span class="pre">alias</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s1">&#39;wife&#39;</span><span class="o">:</span> <span class="s1">&#39;alias&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;mobile&#39;</span><span class="o">:</span> <span class="s1">&#39;cell&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation renames the <tt class="docutils literal"><span class="pre">mobile</span></tt> field to <tt class="docutils literal"><span class="pre">cell</span></tt>, and has
+no other impact
+action occurs.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;alias&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;The American Cincinnatus&quot;</span><span class="p">,</span> <span class="s2">&quot;The American Fabius&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;cell&quot;</span> <span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;lname&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;places&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;d&quot;</span> <span class="o">:</span> <span class="s2">&quot;Mt Vernon&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span> <span class="o">:</span> <span class="s2">&quot;Colonial Beach&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Before version 2.2, when renaming multiple fields and only some (but
+not all) old field names refer to non-existing fields:</p>
+<ul class="simple">
+<li>For the fields with the old names that do exist, the
+<a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator renames these fields to the
+specified new field names.</li>
+<li>For the fields with the old names that do <strong>not</strong> exist:<ul>
+<li><strong>if</strong> no field exists with the new field name, the
+<a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator does nothing.</li>
+<li><strong>if</strong> fields already exist with the new field names, the
+<a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator drops these fields.</li>
+</ul>
+</li>
+</ul>
+<p>Consider the following operation that renames both the field
+<tt class="docutils literal"><span class="pre">mobile</span></tt>, which exists, and the field <tt class="docutils literal"><span class="pre">wife</span></tt>, which does
+not exist. The operation tries to set the field named <tt class="docutils literal"><span class="pre">wife</span></tt>
+to <tt class="docutils literal"><span class="pre">alias</span></tt>, which is the name of an existing field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$rename</span><span class="o">:</span> <span class="p">{</span> <span class="s1">&#39;wife&#39;</span><span class="o">:</span> <span class="s1">&#39;alias&#39;</span><span class="p">,</span> <span class="s1">&#39;mobile&#39;</span><span class="o">:</span> <span class="s1">&#39;cell&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Before 2.2, the operation renames the field <tt class="docutils literal"><span class="pre">mobile</span></tt> to
+<tt class="docutils literal"><span class="pre">cell</span></tt> <em>and</em> drops the <tt class="docutils literal"><span class="pre">alias</span></tt> field even though the field
+<tt class="docutils literal"><span class="pre">wife</span></tt> does not exist:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;cell&quot;</span> <span class="o">:</span> <span class="s2">&quot;555-555-5555&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;lname&quot;</span> <span class="o">:</span> <span class="s2">&quot;washington&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;places&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;d&quot;</span> <span class="o">:</span> <span class="s2">&quot;Mt Vernon&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span> <span class="o">:</span> <span class="s2">&quot;Colonial Beach&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="regex.html" title="Previous Section: $regex">&lt; &nbsp; $regex</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="returnKey.html" title="Next Section: $returnKey">$returnKey &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

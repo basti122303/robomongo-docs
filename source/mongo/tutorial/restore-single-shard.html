@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Restore a Single Shard &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/restore-single-shard" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Restore Sharded Clusters" href="restore-sharded-cluster.html" />
+<link rel="prev" title="Create Backup of a Sharded Cluster with Database Dumps" href="backup-sharded-cluster-with-database-dumps.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="restore-a-single-shard">
+<h1>Restore a Single Shard<a class="headerlink" href="#restore-a-single-shard" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Restoring a single shard from backup with other unaffected shards
+requires a number of special considerations and practices. This
+document outlines the additional tasks you must perform when restoring
+a single shard.</p>
+<p>Consider the following resources on backups in general as well as
+backup and restoration of sharded clusters specifically:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../administration/backups.html#sharded-cluster-backups"><em>Sharded Cluster Backup Considerations</em></a></li>
+<li><a class="reference internal" href="restore-sharded-cluster.html"><em>Restore Sharded Clusters</em></a></li>
+<li><a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a></li>
+</ul>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>Always restore <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>
+as a whole. When you restore a single shard, keep in mind that the
+<a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> process might have moved <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> to or
+from this shard since the last backup. If that&#8217;s the case, you must
+manually move those chunks, as described in this procedure.</p>
+<ol class="arabic simple">
+<li>Restore the shard as you would any other <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance. See <a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a> for overviews of these
+procedures.</li>
+<li>For all chunks that migrated away from this shard, you do not need
+to do anything at this time.. You do not need to delete these
+documents from the shard because the chunks are automatically
+filtered out from queries by <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>. You can remove
+these documents from the shard if you like, at your leisure.</li>
+<li>For chunks that migrated to this shard since the last backup, you
+must manually recover the chunks using backups of other shards, or
+some other source.  To determine what chunks have moved, view the
+<tt class="docutils literal"><span class="pre">changelog</span></tt> collection in the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>.</li>
+</ol>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="backup-sharded-cluster-with-database-dumps.html" title="Previous Section: Create Backup of a Sharded Cluster with Database Dumps">&lt; &nbsp; Create Backup of a Sharded Cluster with Database Dumps</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="restore-sharded-cluster.html" title="Next Section: Restore Sharded Clusters">Restore Sharded Clusters &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

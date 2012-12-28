@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>touch &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/touch" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="transferMods (internal)" href="transferMods.html" />
+<link rel="prev" title="top" href="top.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="touch">
+<h1>touch<a class="headerlink" href="#touch" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">touch</tt></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>The <a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> command loads data from the data storage
+layer into memory. <a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> can load the data
+(i.e. documents,) indexes or both documents and indexes. Use this
+command to ensure that a collection, and/or its indexes, are in
+memory before another operation. By loading the collection or
+indexes into memory, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will ideally be able to
+perform subsequent operations more efficiently. The
+<a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> command has the following prototypical form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">touch</span><span class="o">:</span> <span class="p">[</span><span class="nx">collection</span><span class="p">],</span> <span class="nx">data</span><span class="o">:</span> <span class="p">[</span><span class="kr">boolean</span><span class="p">],</span> <span class="nx">index</span><span class="o">:</span> <span class="p">[</span><span class="kr">boolean</span><span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>By default, <tt class="docutils literal"><span class="pre">data</span></tt> and <tt class="docutils literal"><span class="pre">index</span></tt> are false, and
+<a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> will perform no operation. For example, to load
+both the data and the index for a collection named <tt class="docutils literal"><span class="pre">records</span></tt>, you
+would use the following command in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">({</span> <span class="nx">touch</span><span class="o">:</span> <span class="s2">&quot;records&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">index</span><span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> will not block read and write operations on a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, and can run on <a class="reference internal" href="../glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of
+replica sets.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Using <a class="reference internal" href="../commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> to control or tweak what a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> stores in memory may displace other records
+data in memory and hinder performance. Use with caution in
+production systems.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="top.html" title="Previous Section: top">&lt; &nbsp; top</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="transferMods.html" title="Next Section: transferMods (internal)">transferMods (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

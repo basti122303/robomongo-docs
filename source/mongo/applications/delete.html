@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Delete &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/delete" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="CRUD" href="../crud.html" />
+<link rel="next" title="Aggregation" href="../aggregation.html" />
+<link rel="prev" title="Update" href="update.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="delete">
+<h1>Delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h1>
+<p>Of the four basic database operations (i.e. CRUD), <em>delete</em> operations
+are those that remove documents from a <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> in MongoDB.</p>
+<p>For general information about write operations and the factors that affect
+their performance, see <a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a>; for documentation
+of other CRUD operations, see the <a class="reference internal" href="../crud.html"><em>CRUD</em></a> page.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#crud-delete-remove"><em>remove()</em></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell provides this operation, as do corresponding methods in the
+<a class="reference internal" href="drivers.html"><em>drivers</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As of these <a class="reference internal" href="../release-notes/drivers-write-concern.html#write-concern-change-releases"><em>driver versions</em></a>, all
+write operations will issue a <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command to
+confirm the result of the write operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">getLastError</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p class="last">Refer to the documentation on <a class="reference internal" href="../core/write-operations.html#write-operations-write-concern"><em>write concern</em></a> in the <a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a>
+document for more information.</p>
+</div>
+</div>
+<div class="section" id="remove">
+<span id="crud-delete-remove"></span><h2>Remove<a class="headerlink" href="#remove" title="Permalink to this headline">¶</a></h2>
+<p>Use the <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method to delete
+documents from a collection; this action does not remove the indexes.
+<a class="footnote-reference" href="#drop" id="id1">[1]</a></p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method has the
+following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">justOne</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-corresponding-operation-in-sql admonition">
+<p class="first admonition-title">Corresponding operation in SQL</p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method is analogous to
+the <tt class="docutils literal"><span class="pre">DELETE</span></tt> statement, and:</p>
+<ul class="last simple">
+<li>the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument corresponds to the <tt class="docutils literal"><span class="pre">WHERE</span></tt> statement, and</li>
+<li>the <tt class="docutils literal"><span class="pre">&lt;justOne&gt;</span></tt> argument has the same affect as <tt class="docutils literal"><span class="pre">LIMIT</span> <span class="pre">1</span></tt>.</li>
+</ul>
+</div>
+<p>Consider the following examples that illustrate the use of the
+<a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a>:</p>
+<ul>
+<li><p class="first">If there is a <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method deletes from the collection all
+documents that match the argument.</p>
+<p>The following operation deletes all documents from the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the subdocument <tt class="docutils literal"><span class="pre">name</span></tt> contains a field <tt class="docutils literal"><span class="pre">first</span></tt>
+whose value starts with <tt class="docutils literal"><span class="pre">G</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="p">{</span> <span class="s1">&#39;name.first&#39;</span> <span class="o">:</span> <span class="sr">/^G/</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If there is a <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument and you specify the <tt class="docutils literal"><span class="pre">&lt;justOne&gt;</span></tt>
+argument as <tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">1</span></tt>, <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> only deletes a single document from the
+collection that matches the query.</p>
+<p>The following operation deletes a single document from the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the <tt class="docutils literal"><span class="pre">turing</span></tt> field equals <tt class="docutils literal"><span class="pre">true</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="p">{</span> <span class="nx">turing</span><span class="o">:</span> <span class="kc">true</span> <span class="p">},</span> <span class="mi">1</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If there is no <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method deletes all documents from a
+collection. The following operation deletes all documents from the
+<tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">remove</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operation is not equivalent to the <a class="reference internal" href="../reference/method/db.collection.drop.html#db.collection.drop" title="db.collection.drop"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">drop()</span></tt></a> method.</p>
+</div>
+</li>
+</ul>
+<table class="docutils footnote" frame="void" id="drop" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>To remove all documents from a collection, it may be faster
+to use the <a class="reference internal" href="../reference/method/db.collection.drop.html#db.collection.drop" title="db.collection.drop"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">drop()</span></tt></a> method to drop the
+entire collection, including the indexes, and then recreate the
+collection and rebuild the indexes.</td></tr>
+</tbody>
+</table>
+<div class="section" id="capped-collection">
+<span id="crud-delete-remove-isolation"></span><h3>Capped Collection<a class="headerlink" href="#capped-collection" title="Permalink to this headline">¶</a></h3>
+<p>You cannot apply the <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method
+to a <a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a>.</p>
+</div>
+<div class="section" id="isolation">
+<h3>Isolation<a class="headerlink" href="#isolation" title="Permalink to this headline">¶</a></h3>
+<p>If the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument to the <a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">remove()</span></tt></a> method matches multiple documents in the
+collection, the delete operation may interleave with other write
+operations to that collection. For an unsharded collection, you have
+the option to override this behavior with the <a class="reference internal" href="../reference/operators.html#_S_atomic" title="$atomic"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$atomic</span></tt></a>
+isolation operator, effectively isolating the delete operation from
+other write operations. To isolate the operation, include <tt class="docutils literal"><span class="pre">$atomic:</span>
+<span class="pre">1</span></tt> in the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> parameter as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span> <span class="p">{</span> <span class="nx">turing</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">$atomic</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="update.html" title="Previous Section: Update">&lt; &nbsp; Update</a></li>
+<li id="btnvup"><a href="../crud.html" title="Parent Section: CRUD" >&#47;&#92;&nbsp; CRUD</a></li>
+<li id="btnvnx"><a href="../aggregation.html" title="Next Section: Aggregation">Aggregation &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

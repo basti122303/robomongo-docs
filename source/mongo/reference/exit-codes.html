@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Exit Codes and Statuses &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/exit-codes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Config Database Contents" href="config-database.html" />
+<link rel="prev" title="Explain Output" href="explain.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="exit-codes-and-statuses">
+<h1>Exit Codes and Statuses<a class="headerlink" href="#exit-codes-and-statuses" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB will return one of the following codes and statuses when
+exiting. Use this guide to interpret logs and when troubleshooting
+issues with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<dl class="error">
+<dt id="0">
+<tt class="descname">0</tt><a class="headerlink" href="#0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by MongoDB applications upon successful exit.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="2">
+<tt class="descname">2</tt><a class="headerlink" href="#2" title="Permalink to this definition">¶</a></dt>
+<dd><p>The specified options are in error or are incompatible
+with other options.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="3">
+<tt class="descname">3</tt><a class="headerlink" href="#3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> if there is a mismatch between hostnames
+specified on the command line and in the <a class="reference internal" href="local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a>
+collection. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> may also return this status if
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> collection in the <tt class="docutils literal"><span class="pre">local</span></tt> database is not readable.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="4">
+<tt class="descname">4</tt><a class="headerlink" href="#4" title="Permalink to this definition">¶</a></dt>
+<dd><p>The version of the database is different from the version supported
+by the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> (or <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt>) instance.  The
+instance exits cleanly.  Restart <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with the
+<a class="reference internal" href="mongod.html#cmdoption-mongod--upgrade"><em class="xref std std-option">--upgrade</em></a> option to upgrade the
+database to the version supported by this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="5">
+<tt class="descname">5</tt><a class="headerlink" href="#5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> if a <a class="reference internal" href="commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> operation
+fails to confirm a commit.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="12">
+<tt class="descname">12</tt><a class="headerlink" href="#12" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> process on Windows when it
+receives a Control-C, Close, Break or Shutdown event.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="14">
+<tt class="descname">14</tt><a class="headerlink" href="#14" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by MongoDB applications which encounter an unrecoverable
+error, an uncaught exception or uncaught signal.  The system exits
+without performing a clean shut down.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="20">
+<tt class="descname">20</tt><a class="headerlink" href="#20" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Message:</em> <tt class="docutils literal"><span class="pre">ERROR:</span> <span class="pre">wsastartup</span> <span class="pre">failed</span> <span class="pre">&lt;reason&gt;</span></tt></p>
+<p>Returned by MongoDB applications on Windows following an error in the
+WSAStartup function.</p>
+<p><em>Message:</em> <tt class="docutils literal"><span class="pre">NT</span> <span class="pre">Service</span> <span class="pre">Error</span></tt></p>
+<p>Returned by MongoDB applications for Windows due to failures installing,
+starting or removing the NT Service for the application.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="45">
+<tt class="descname">45</tt><a class="headerlink" href="#45" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned when a MongoDB application cannot open a file or cannot
+obtain a lock on a file.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="47">
+<tt class="descname">47</tt><a class="headerlink" href="#47" title="Permalink to this definition">¶</a></dt>
+<dd><p>MongoDB applications exit cleanly following a large clock skew (32768
+milliseconds) event.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="48">
+<tt class="descname">48</tt><a class="headerlink" href="#48" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> exits cleanly if the server socket closes. The
+server socket is on port <tt class="docutils literal"><span class="pre">27017</span></tt> by default, or as specified to
+the <a class="reference internal" href="mongod.html#cmdoption-mongod--port"><em class="xref std std-option">--port</em></a> run-time option.</p>
+<blockquote>
+<div></div></blockquote>
+</dd></dl>
+
+<dl class="error">
+<dt id="49">
+<tt class="descname">49</tt><a class="headerlink" href="#49" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> or <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> on Windows
+when either receives a shutdown message from the
+<em class="guilabel">Windows Service Control Manager</em>.</p>
+</dd></dl>
+
+<dl class="error">
+<dt id="100">
+<tt class="descname">100</tt><a class="headerlink" href="#100" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returned by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> when the process throws an uncaught exception.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="explain.html" title="Previous Section: Explain Output">&lt; &nbsp; Explain Output</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="config-database.html" title="Next Section: Config Database Contents">Config Database Contents &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

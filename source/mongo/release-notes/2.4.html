@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Release Notes for MongoDB 2.4 (2.3 Development Series) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/2.4" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Default Write Concern Change" href="drivers-write-concern.html" />
+<link rel="prev" title="Release Notes for MongoDB 1.8" href="1.8.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="release-notes-for-mongodb-2-4-2-3-development-series">
+<h1>Release Notes for MongoDB 2.4 (2.3 Development Series)<a class="headerlink" href="#release-notes-for-mongodb-2-4-2-3-development-series" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB 2.4 is currently in development, as part of the 2.3
+development release series. While 2.3-series releases are currently
+available, these versions of MongoDB are for <strong>testing</strong> <em>only</em>, and
+are <em>not for production use</em> under any circumstances.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last"><em>All</em> interfaces <em>and</em> functionality described in this
+document are subject to change before the 2.4.0 release.</p>
+</div>
+<p>This document will eventually contain the full release notes for
+MongoDB 2.4; during the development cycle this document will contain
+documentation of new features and functionality only available in the
+2.3 releases.</p>
+<div class="contents local topic" id="see-the-full-index-of-this-page-for-a-complete-list-of-changes-included-in-2-4">
+<p class="topic-title first">See the <a class="reference internal" href="2.4-changes.html"><em>full index of this page</em></a> for
+           a complete list of changes included in 2.4.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#downloading" id="id3">Downloading</a></li>
+<li><a class="reference internal" href="#changes" id="id4">Changes</a><ul>
+<li><a class="reference internal" href="#additional-authentication-features" id="id5">Additional Authentication Features</a></li>
+<li><a class="reference internal" href="#default-java-script-engine-switched-to-v8-from-spidermonkey" id="id6">Default Java Script Engine Switched to v8 from SpiderMonkey</a></li>
+<li><a class="reference internal" href="#new-geospatial-indexes-with-geojson-and-improved-spherical-geometry" id="id7">New Geospatial Indexes with GeoJSON and Improved Spherical Geometry</a></li>
+<li><a class="reference internal" href="#mongod-automatically-continues-in-progress-index-builds-following-restart" id="id8"><tt class="docutils literal"><span class="pre">mongod</span></tt> Automatically Continues in Progress Index Builds Following Restart</a></li>
+<li><a class="reference internal" href="#new-hashed-index-and-sharding-with-a-hashed-shard-key" id="id9">New Hashed Index and Sharding with a Hashed Shard Key</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="downloading">
+<h2>Downloading<a class="headerlink" href="#downloading" title="Permalink to this headline">¶</a></h2>
+<p>You can download the 2.3 release on the <a class="reference external" href="http://www.mongodb.org/downloads">downloads page</a> in the
+<em class="guilabel">Development Release (Unstable)</em> section. There are no
+distribution packages for development releases, but you can use the
+binaries provided for testing purposes. See
+<a class="reference internal" href="../tutorial/install-mongodb-on-linux.html"><em>Install MongoDB on Linux</em></a>,
+<a class="reference internal" href="../tutorial/install-mongodb-on-windows.html"><em>Install MongoDB on Windows</em></a>, or
+<a class="reference internal" href="../tutorial/install-mongodb-on-os-x.html"><em>Install MongoDB on OS X</em></a> for the basic installation
+process.</p>
+</div>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="additional-authentication-features">
+<h3>Additional Authentication Features<a class="headerlink" href="#additional-authentication-features" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>These features are only present in the <a class="reference external" href="https://www.10gen.com/mongodb-subscriber-edition-download">MongoDB Subscriber Edition</a>. To
+download 2.3 development releases of the Subscriber Edition, use
+the following resources:</p>
+<ul class="last simple">
+<li><a class="reference external" href="http://s3.amazonaws.com/downloads.10gen.com/linux/mongodb-linux-x86_64-subscription-amzn64-2.3.1.tgz">Amazon Linux 6.4</a></li>
+<li><a class="reference external" href="http://s3.amazonaws.com/downloads.10gen.com/linux/mongodb-linux-x86_64-subscription-rhel62-2.3.1.tgz">Red Hat Enterprise Linux 6.2</a></li>
+<li><a class="reference external" href="http://s3.amazonaws.com/downloads.10gen.com/linux/mongodb-linux-x86_64-subscription-ubuntu1104-2.3.1.tgz">Ubuntu 11.04</a></li>
+<li><a class="reference external" href="http://s3.amazonaws.com/downloads.10gen.com/linux/mongodb-linux-x86_64-subscription-suse11-2.3.1.tgz">SUSE 11</a></li>
+</ul>
+</div>
+<p>An improved authentication system is a core focus of the entire 2.3
+cycle, as of 2.3.1, the following components of the new authentication
+system are available for use in MongoDB:</p>
+<ul class="simple">
+<li>SASL Support in <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and C++ client library
+(driver.)</li>
+<li>New <a class="reference internal" href="#acquirePrivilege" title="acquirePrivilege"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">acquirePrivilege</span></tt></a>, <a class="reference internal" href="#saslBegin" title="saslBegin"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">saslBegin</span></tt></a>, and <a class="reference internal" href="#saslContinue" title="saslContinue"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">saslContinue</span></tt></a>
+database commands.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As of 2.3.1 support for SASL/Kerberos in <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is
+forthcoming. Test Kerberos with standalone <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances and <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>.</p>
+</div>
+<div class="section" id="initial-sasl-kerberos-support">
+<h4>Initial SASL/Kerberos  Support<a class="headerlink" href="#initial-sasl-kerberos-support" title="Permalink to this headline">¶</a></h4>
+<p>Development work on this functionality is ongoing, and additional
+related functionality is forthcoming. To use Kerberos with MongoDB as
+of the current 2.3-series release, consider the following requirements:</p>
+<ul class="simple">
+<li>add users to MongoDB as with the existing authentication
+mechanism:<ul>
+<li>Usernames <em>must</em> correspond to the Kerberos
+principal (e.g. <tt class="docutils literal"><span class="pre">&lt;username&gt;&#64;&lt;REALM&gt;</span></tt> as in
+<tt class="docutils literal"><span class="pre">mongodbuser&#64;EXAMPLE.COM</span></tt>),</li>
+<li>You <em>must</em> have a user document in the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.users" title="&lt;database&gt;.system.users"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.users</span></tt></a> collection with the Kerberos principal
+for any database that you want to grant access.</li>
+</ul>
+</li>
+<li>every <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using Kerberos must have a fully resolvable
+fully qualified domain name. This includes all members of replica
+sets.</li>
+<li>every <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using Kerberos must have a Kerberos service
+principal, in the form of: <tt class="docutils literal"><span class="pre">mongodb/&lt;fqdn&gt;&#64;&lt;REALM&gt;</span></tt>.</li>
+<li>each system running a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with Kerberos must have a
+key tab file that holds key data granting access to it&#8217;s principal
+that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can read.</li>
+</ul>
+<p>To start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with support for Kerberos, use the
+following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>env <span class="nv">KRB5_KTNAME</span><span class="o">=</span>&lt;path to keytab file&gt; &lt;mongod invocation&gt;
+</pre></div>
+</div>
+<p>You must start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> or
+<tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyfile</span></tt>, <a class="footnote-reference" href="#keyfile-auth" id="id1">[1]</a> so that an actual command would
+resemble:</p>
+<div class="highlight-sh"><div class="highlight"><pre>env <span class="nv">KRB5_KTNAME</span><span class="o">=</span>/opt/etc/mongodb.keytab <span class="se">\</span>
+    /opt/bin/mongod --auth --dbpath /opt/data/db --logpath /opt/log/mongod.log --fork
+</pre></div>
+</div>
+<p>Replace the paths as needed for your test deployment.</p>
+<p>To use Kerberos with the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, begin by initializing
+a Kerberos session with <tt class="docutils literal"><span class="pre">kinit</span></tt>. Then start a 2.3.1 or greater
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell instance, and run the following operations to
+associate the current connection with the Kerberos session:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">getMongo</span><span class="p">().</span><span class="nx">saslAuthenticate</span><span class="p">(</span> <span class="p">{</span> <span class="nx">mechanism</span><span class="o">:</span> <span class="s2">&quot;GSSAPI&quot;</span><span class="p">,</span>
+                                  <span class="nx">principal</span><span class="o">:</span> <span class="s2">&quot;&lt;username&gt;@&lt;REALM&gt;&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The value of the <tt class="docutils literal"><span class="pre">principal</span></tt> field <em>must</em> be the same principal that
+you initialized with <tt class="docutils literal"><span class="pre">kinit</span></tt>. Continue to gain privileges using the
+<a class="reference internal" href="#acquirePrivilege" title="acquirePrivilege"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">acquirePrivilege</span></tt></a> in an operation that resembles the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">acquirePrivilege</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="nx">resource</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">dbname</span><span class="o">&gt;</span><span class="p">,</span>
+                   <span class="nx">principal</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">principalName</span><span class="o">&gt;</span><span class="p">,</span>
+                   <span class="nx">actions</span><span class="o">:</span> <span class="p">[</span> <span class="o">&lt;</span><span class="nx">actionString</span><span class="o">&gt;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace the <tt class="docutils literal"><span class="pre">&lt;dbname&gt;</span></tt> with the name of the database you want
+privileges, replace <tt class="docutils literal"><span class="pre">&lt;principalName&gt;</span></tt> with the Kerberos principal
+you initialized with <tt class="docutils literal"><span class="pre">kinit</span></tt>. The <tt class="docutils literal"><span class="pre">&lt;actionString&gt;</span></tt> list, contains
+the privileges you are acquiring, currently this value must be either:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">oldRead</span></tt>, or</li>
+<li><tt class="docutils literal"><span class="pre">oldWrite</span></tt>.</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">oldRead</span></tt> action string corresponds to the &#8220;<em>read only</em>&#8221;
+privileges in the existing authentication system, while <tt class="docutils literal"><span class="pre">oldWrite</span></tt>
+corresponds to the existing &#8220;<em>read/write</em>&#8221; privileges.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last"><a class="reference internal" href="../security.html"><em>Security</em></a></p>
+</div>
+<table class="docutils footnote" frame="void" id="keyfile-auth" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyfile</span></tt> implies <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>, and you
+<em>must</em> use <tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyfile</span></tt> for replica sets.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="new-authentication-control-database-commands">
+<h4>New Authentication Control Database Commands<a class="headerlink" href="#new-authentication-control-database-commands" title="Permalink to this headline">¶</a></h4>
+<p>In the 2.3 series, MongoDB adds the following database commands:</p>
+<dl class="dbcommand">
+<dt id="acquirePrivilege">
+<tt class="descname">acquirePrivilege</tt><a class="headerlink" href="#acquirePrivilege" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="dbcommand">
+<dt id="saslBegin">
+<tt class="descname">saslBegin</tt><a class="headerlink" href="#saslBegin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="dbcommand">
+<dt id="saslContinue">
+<tt class="descname">saslContinue</tt><a class="headerlink" href="#saslContinue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="default-java-script-engine-switched-to-v8-from-spidermonkey">
+<h3>Default Java Script Engine Switched to v8 from SpiderMonkey<a class="headerlink" href="#default-java-script-engine-switched-to-v8-from-spidermonkey" title="Permalink to this headline">¶</a></h3>
+<p>The default JavaScript engine used throughout MongoDB, for the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a>, <a class="reference internal" href="../reference/operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a>,
+and <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> is now v8.</p>
+<dl class="data">
+<dt id="serverBuildInfo.interpreterVersion">
+<tt class="descclassname">serverBuildInfo.</tt><tt class="descname">interpreterVersion</tt><a class="headerlink" href="#serverBuildInfo.interpreterVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#interpreterVersion" title="interpreterVersion"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">interpreterVersion</span></tt></a> field of the document output by
+<tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.serverBuildInfo()</span></tt> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+reports which JavaScript interpreter the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+is running.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="interpreterVersion">
+<tt class="descname">interpreterVersion</tt><big>(</big><big>)</big><a class="headerlink" href="#interpreterVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#interpreterVersion" title="interpreterVersion"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">interpreterVersion()</span></tt></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+reports which JavaScript interpreter this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+uses.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="new-geospatial-indexes-with-geojson-and-improved-spherical-geometry">
+<h3>New Geospatial Indexes with GeoJSON and Improved Spherical Geometry<a class="headerlink" href="#new-geospatial-indexes-with-geojson-and-improved-spherical-geometry" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In 2.3.2, the index type for Spherical Geospatial Indexes will
+become <tt class="docutils literal"><span class="pre">2dsphere</span></tt></p>
+</div>
+<p>The 2.3 series adds a new type of geospatial index that supports
+improved spherical queries and GeoJSON. Create the index by specifying
+<tt class="docutils literal"><span class="pre">s2d</span></tt> as the value of the field in the index specification, as
+any of the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geo</span><span class="o">:</span> <span class="s2">&quot;s2d&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">geo</span><span class="o">:</span> <span class="s2">&quot;s2d&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geo</span><span class="o">:</span> <span class="s2">&quot;s2d&quot;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the first example you create a spherical geospatial index on the
+field named <tt class="docutils literal"><span class="pre">geo</span></tt>, in the second example, you create a compound
+index where the first field is a normal index, and the index of the
+second field is a spherical geospatial index. Unlike <tt class="docutils literal"><span class="pre">2d</span></tt> indexes,
+fields indexed using the <tt class="docutils literal"><span class="pre">s2d</span></tt> type can do not have to be the first
+field in a compound index.</p>
+<p>You must store data in the fields indexed using the <tt class="docutils literal"><span class="pre">s2d</span></tt> index
+using the <a class="reference external" href="http://geojson.org/geojson-spec.html">GeoJSON</a> specification, at the moment. Support for storing
+points, in the form used by the existing <tt class="docutils literal"><span class="pre">2d</span></tt> (i.e. geospatial)
+indexes is forthcoming. Currently, <tt class="docutils literal"><span class="pre">s2d</span></tt> indexes only support
+the following GeoJSON shapes:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Point</span></tt>, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">LineString</span></tt>, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;LineString&quot;</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">6</span> <span class="p">]</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Polygon</span></tt>, as in the following:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;Polygon&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;coordinates&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">6</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">6</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">5</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span> <span class="p">]</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<p>To query <tt class="docutils literal"><span class="pre">s2d</span></tt> indexes, all current geospatial <a class="reference internal" href="../reference/operators.html#query-selectors-geospatial"><em>query operators</em></a> with an additional
+<a class="reference internal" href="#_S_intersect" title="$intersect"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$intersect</span></tt></a> operator. Currently, all queries using the
+<tt class="docutils literal"><span class="pre">s2d</span></tt> index must pass the query selector (e.g. <a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a>,
+<a class="reference internal" href="#_S_intersect" title="$intersect"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$intersect</span></tt></a>) a GeoJSON document. With the exception of the
+GeoJSON requirement, the operation of <a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> is the same
+for <tt class="docutils literal"><span class="pre">s2d</span></tt> indexes as <tt class="docutils literal"><span class="pre">2d</span></tt> indexes.</p>
+<dl class="operator">
+<dt id="_S_intersect">
+<tt class="descname">$intersect</tt><a class="headerlink" href="#_S_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#_S_intersect" title="$intersect"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$intersect</span></tt></a> selects all indexed points that
+intersect with provided geometry. (i.e. <tt class="docutils literal"><span class="pre">Point</span></tt>, <tt class="docutils literal"><span class="pre">LineString</span></tt>,
+and <tt class="docutils literal"><span class="pre">Polygon</span></tt>.) You must pass <a class="reference internal" href="#_S_intersect" title="$intersect"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$intersect</span></tt></a> a document
+in GeoJSON format.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$intersect</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;coordinates&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">5</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all indexed objects that intersect with the
+<tt class="docutils literal"><span class="pre">Point</span></tt> with the coordinates <tt class="docutils literal"><span class="pre">[</span> <span class="pre">40,</span> <span class="pre">5</span> <span class="pre">]</span></tt>. MongoDB will return
+documents as intersecting if they have a shared edge.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mongod-automatically-continues-in-progress-index-builds-following-restart">
+<h3><tt class="docutils literal"><span class="pre">mongod</span></tt> Automatically Continues in Progress Index Builds Following Restart<a class="headerlink" href="#mongod-automatically-continues-in-progress-index-builds-following-restart" title="Permalink to this headline">¶</a></h3>
+<p>If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance was building an index when it
+shutdown or terminated, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will now continue building
+the index when the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> restarts. Previously, the index
+build <em>had</em> to finish building before <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> shutdown.</p>
+<p>To disable this behavior the 2.3 series adds a new run time option,
+<a class="reference internal" href="#noIndexBuildRetry" title="noIndexBuildRetry"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">noIndexBuildRetry</span></tt></a> (or via,q <tt class="docutils literal"><span class="pre">--noIndexBuildRetry</span></tt> on the
+command line,) for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. <a class="reference internal" href="#noIndexBuildRetry" title="noIndexBuildRetry"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">noIndexBuildRetry</span></tt></a>
+prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> from continuing rebuilding indexes that did
+were not finished building when the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> last shut down.</p>
+<dl class="setting">
+<dt id="noIndexBuildRetry">
+<tt class="descname">noIndexBuildRetry</tt><a class="headerlink" href="#noIndexBuildRetry" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will attempt to rebuild indexes upon
+start-up <em>if</em> <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> shuts down or stops in the middle
+of an index build. When enabled, run time option prevents this
+behavior.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="new-hashed-index-and-sharding-with-a-hashed-shard-key">
+<h3>New Hashed Index and Sharding with a Hashed Shard Key<a class="headerlink" href="#new-hashed-index-and-sharding-with-a-hashed-shard-key" title="Permalink to this headline">¶</a></h3>
+<p>To support an easy to configure and evenly distributed shard key, version 2.3 adds a
+new &#8220;<tt class="docutils literal"><span class="pre">hashed</span></tt>&#8221; index type that indexes based on hashed values. This
+section introduces and documents both the new index type and its use
+in sharding:</p>
+<div class="section" id="hashed-index">
+<h4>Hashed Index<a class="headerlink" href="#hashed-index" title="Permalink to this headline">¶</a></h4>
+<p>The new <tt class="docutils literal"><span class="pre">hashed</span></tt> index exists primarily to support automatically
+hashed shard keys. Consider the following properties of hashed
+indexes:</p>
+<ul>
+<li><p class="first">Hashed indexes must only have a single field, and cannot be compound
+indexes.</p>
+</li>
+<li><p class="first">Fields indexed with hashed indexes must <em>not</em> hold arrays. Hashed
+indexes cannot be multikey indexes.</p>
+</li>
+<li><p class="first">Hashed indexes cannot have a <tt class="docutils literal"><span class="pre">unique</span></tt> constraint.</p>
+<p>You <em>may</em> create hashed indexes with the <tt class="docutils literal"><span class="pre">sparse</span></tt> property.</p>
+</li>
+<li><p class="first">MongoDB can use the hashed index to support equality queries, but
+cannot use these indexes for range queries.</p>
+</li>
+<li><p class="first">Hashed indexes offer no performance advantage over normal indexes.
+<em>However</em>, hashed indexes may be smaller than a normal index when
+the values of the indexed field are larger than 64 bits. <a class="footnote-reference" href="#hash-size" id="id2">[2]</a></p>
+</li>
+<li><p class="first">it&#8217;s possible to have a hashed and non-hased index on the same
+field: MongoDB will use the non-hashed for range queries.</p>
+</li>
+</ul>
+<div class="admonition warning" id="hashed-index-warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Hashed indexes round floating point numbers to 64-bit integers
+before hashing. For example, a hashed index would store the same
+value for a field that held a value of <tt class="docutils literal"><span class="pre">2.3</span></tt> and <tt class="docutils literal"><span class="pre">2.2</span></tt>. To
+prevent collisions do not use a hashed index for floating point
+numbers that cannot be consistently converted to 64-bit integers (and
+then back to floating point.) Hashed indexes do not support
+floating point values larger than 2<sup>53</sup>.</p>
+</div>
+<p>Create a hashed index using an operation that resembles the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="s2">&quot;hashed&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation creates a hashed index for the <tt class="docutils literal"><span class="pre">records</span></tt> collection
+on the <tt class="docutils literal"><span class="pre">a</span></tt> field.</p>
+<table class="docutils footnote" frame="void" id="hash-size" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>The hash stored in the hashed index is 64 bits long.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="hashed-sharding">
+<h4>Hashed Sharding<a class="headerlink" href="#hashed-sharding" title="Permalink to this headline">¶</a></h4>
+<p>To shard a collection using a hashed shard key, issue an operation in
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell that resembles the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span> <span class="s2">&quot;records.active&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="s2">&quot;hashed&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation shards the <tt class="docutils literal"><span class="pre">active</span></tt> collection in the <tt class="docutils literal"><span class="pre">records</span></tt>
+database, using a hash of the <tt class="docutils literal"><span class="pre">a</span></tt> field as the shard
+key. Consider the following properties when using a hashed shard key:</p>
+<ul>
+<li><p class="first">As with other kinds of shard key indexes, if your collection has
+data, you must create the hashed index before sharding. If your
+collection does not have data, sharding the collection will create
+the appropriate index.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will route all equality queries to a specific
+shard or set of shards; however, the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> must route
+range queries to all shards.</p>
+</li>
+<li><p class="first">When using a hashed shard key on a new collection, MongoDB
+automatically pre-splits the range of 64-bit hash values into
+chunks. By default, the initial number of chunks is equal to twice
+the number of shards at creation time. You can change the number of
+chunks created, using the <tt class="docutils literal"><span class="pre">numInitialChunks</span></tt> option, as in the
+following invocation of <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span><span class="o">:</span> <span class="s2">&quot;test.collection&quot;</span><span class="p">,</span>
+                   <span class="nx">key</span><span class="o">:</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="s2">&quot;hashed&quot;</span><span class="p">},</span>
+                   <span class="nx">numInitialChunks</span><span class="o">:</span> <span class="mi">2001</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB will only pre-split chunks in a collection when sharding
+empty collections. MongoDB will not create chunk splits in a
+collection sharding collections that have data.</p>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Avoid using hashed shard keys when the hashed field has non-integral floating
+point values, see <a class="reference internal" href="#hashed-index-warning"><em>hashed indexes</em></a> for
+more information.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="1.8.html" title="Previous Section: Release Notes for MongoDB 1.8">&lt; &nbsp; Release Notes for MongoDB 1.8</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="drivers-write-concern.html" title="Next Section: Default Write Concern Change">Default Write Concern Change &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Aggregation Framework &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/aggregation" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Aggregation" href="../aggregation.html" />
+<link rel="next" title="Aggregation Framework Examples" href="../tutorial/aggregation-examples.html" />
+<link rel="prev" title="Aggregation" href="../aggregation.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="aggregation-framework">
+<h1>Aggregation Framework<a class="headerlink" href="#aggregation-framework" title="Permalink to this headline">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1.</span></p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The MongoDB aggregation framework provides a means to calculate
+aggregated values without having to use <a class="reference internal" href="../reference/glossary.html#term-map-reduce"><em class="xref std std-term">map-reduce</em></a>. While
+map-reduce is powerful, it is often more difficult than
+necessary for many simple aggregation tasks, such as totaling or
+averaging field values.</p>
+<p>If you&#8217;re familiar with <a class="reference internal" href="../reference/glossary.html#term-sql"><em class="xref std std-term">SQL</em></a>, the aggregation framework
+provides similar functionality to <tt class="docutils literal"><span class="pre">GROUP</span> <span class="pre">BY</span></tt> and related SQL
+operators as well as simple forms of &#8220;self joins.&#8221; Additionally, the
+aggregation framework provides projection capabilities to reshape the
+returned data. Using the projections in the aggregation framework, you
+can add computed fields, create new virtual sub-objects, and extract
+sub-fields into the top-level of results.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>A presentation from MongoSV 2011: <a class="reference external" href="http://www.10gen.com/presentations/mongosv-2011/mongodbs-new-aggregation-framework">MongoDB&#8217;s New
+Aggregation Framework</a>.</p>
+<p class="last">Additionally, consider <a class="reference internal" href="../tutorial/aggregation-examples.html"><em>Aggregation Framework Examples</em></a> and
+<a class="reference internal" href="../reference/aggregation.html"><em>Aggregation Framework Reference</em></a> for additional documentation.</p>
+</div>
+</div>
+<div class="section" id="framework-components">
+<h2>Framework Components<a class="headerlink" href="#framework-components" title="Permalink to this headline">¶</a></h2>
+<p>This section provides an introduction to the two concepts that
+underpin the aggregation framework: <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipelines</em></a> and
+<a class="reference internal" href="../reference/glossary.html#term-expression"><em class="xref std std-term">expressions</em></a>.</p>
+<div class="section" id="pipelines">
+<span id="aggregation-pipelines"></span><h3>Pipelines<a class="headerlink" href="#pipelines" title="Permalink to this headline">¶</a></h3>
+<p>Conceptually, documents from a collection pass through an
+aggregation pipeline, which transforms these objects as they pass through.
+For those familiar with UNIX-like shells (e.g. bash,) the concept is
+analogous to the pipe (i.e. <tt class="docutils literal"><span class="pre">|</span></tt>) used to string text filters together.</p>
+<p>In a shell environment the pipe redirects a stream of characters from
+the output of one process to the input of the next. The MongoDB
+aggregation pipeline streams MongoDB documents from one <a class="reference internal" href="../reference/aggregation.html#aggregation-pipeline-operator-reference"><em>pipeline
+operator</em></a> to the next to process the
+documents. Pipeline operators can be repeated in the pipe.</p>
+<p>All pipeline operators process a stream of documents and the
+pipeline behaves as if the operation scans a <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> and
+passes all matching documents into the &#8220;top&#8221; of the pipeline.
+Each operator in the pipeline transforms each document as it passes
+through the pipeline.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Pipeline operators need not produce one output document for every
+input document: operators may also generate new documents or filter
+out documents.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The pipeline cannot operate on values of the following types:
+<tt class="docutils literal"><span class="pre">Binary</span></tt>, <tt class="docutils literal"><span class="pre">Symbol</span></tt>, <tt class="docutils literal"><span class="pre">MinKey</span></tt>, <tt class="docutils literal"><span class="pre">MaxKey</span></tt>, <tt class="docutils literal"><span class="pre">DBRef</span></tt>,
+<tt class="docutils literal"><span class="pre">Code</span></tt>, and <tt class="docutils literal"><span class="pre">CodeWScope</span></tt>.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The &#8220;<a class="reference internal" href="../reference/aggregation.html"><em>Aggregation Framework Reference</em></a>&#8221; includes
+documentation of the following pipeline operators:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../reference/aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="expressions">
+<span id="aggregation-expressions"></span><h3>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../reference/aggregation.html#aggregation-expression-operators"><em>Expressions</em></a> produce output
+documents based on calculations performed on input documents. The
+aggregation framework defines expressions using a document format
+using prefixes.</p>
+<p>Expressions are stateless and are only evaluated when seen by the
+aggregation process. All aggregation expressions can only operate on
+the current document in the pipeline, and cannot integrate data from
+other documents.</p>
+<p>The <a class="reference internal" href="../reference/glossary.html#term-accumulator"><em class="xref std std-term">accumulator</em></a> expressions used in the <a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>
+operator maintain that state (e.g.  totals, maximums, minimums, and
+related data) as documents progress through the <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/aggregation.html#aggregation-expression-operators"><em>Aggregation expressions</em></a> for additional examples of the
+expressions provided by the aggregation framework.</p>
+</div>
+</div>
+</div>
+<div class="section" id="use">
+<h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="invocation">
+<h3>Invocation<a class="headerlink" href="#invocation" title="Permalink to this headline">¶</a></h3>
+<p>Invoke an <a class="reference internal" href="../reference/glossary.html#term-aggregation"><em class="xref std std-term">aggregation</em></a> operation with the <a class="reference internal" href="../reference/method/db.collection.aggregate.html#db.collection.aggregate" title="db.collection.aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a>
+wrapper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell or the <a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a>
+<a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>. Always call <a class="reference internal" href="../reference/method/db.collection.aggregate.html#db.collection.aggregate" title="db.collection.aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> on a
+collection object that determines the input documents of the aggregation <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>.
+The arguments to the <a class="reference internal" href="../reference/method/db.collection.aggregate.html#db.collection.aggregate" title="db.collection.aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> method specify a sequence of <a class="reference internal" href="../reference/aggregation.html#aggregation-pipeline-operator-reference"><em>pipeline
+operators</em></a>, where each
+operator may have a number of operands.</p>
+<p>First, consider a <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> of documents named <tt class="docutils literal"><span class="pre">articles</span></tt>
+using the following format:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+ <span class="nx">title</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span> <span class="p">,</span>
+ <span class="nx">author</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span> <span class="p">,</span>
+ <span class="nx">posted</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span> <span class="p">()</span> <span class="p">,</span>
+ <span class="nx">pageViews</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">,</span>
+ <span class="nx">tags</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;fun&quot;</span> <span class="p">,</span> <span class="s2">&quot;good&quot;</span> <span class="p">,</span> <span class="s2">&quot;fun&quot;</span> <span class="p">]</span> <span class="p">,</span>
+ <span class="nx">comments</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span> <span class="nx">author</span> <span class="o">:</span><span class="s2">&quot;joe&quot;</span> <span class="p">,</span> <span class="nx">text</span> <span class="o">:</span> <span class="s2">&quot;this is cool&quot;</span> <span class="p">}</span> <span class="p">,</span>
+             <span class="p">{</span> <span class="nx">author</span> <span class="o">:</span><span class="s2">&quot;sam&quot;</span> <span class="p">,</span> <span class="nx">text</span> <span class="o">:</span> <span class="s2">&quot;this is bad&quot;</span> <span class="p">}</span>
+ <span class="p">],</span>
+ <span class="nx">other</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">foo</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The following example aggregation operation pivots data to
+create a set of author names grouped by tags applied to an
+article. Call the aggregation framework by issuing the following
+command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">articles</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+  <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+     <span class="nx">tags</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$unwind</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$group</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">_id</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">tags</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">},</span>
+     <span class="nx">authors</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$addToSet</span> <span class="o">:</span> <span class="s2">&quot;$author&quot;</span> <span class="p">}</span>
+  <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The aggregation pipeline begins with the <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a>
+<tt class="docutils literal"><span class="pre">articles</span></tt> and selects the <tt class="docutils literal"><span class="pre">author</span></tt> and <tt class="docutils literal"><span class="pre">tags</span></tt> fields using the
+<a class="reference internal" href="../reference/aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> aggregation operator. The
+<a class="reference internal" href="../reference/aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-expression docutils literal"><span class="pre">$unwind</span></tt></a> operator produces one output document per
+tag. Finally, the <a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-expression docutils literal"><span class="pre">$group</span></tt></a> operator pivots these fields.</p>
+</div>
+<div class="section" id="result">
+<h3>Result<a class="headerlink" href="#result" title="Permalink to this headline">¶</a></h3>
+<p>The aggregation operation in the previous section returns a
+<a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a> with two fields:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">result</span></tt> which holds an array of documents returned by the <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a></li>
+<li><tt class="docutils literal"><span class="pre">ok</span></tt> which holds the value <tt class="docutils literal"><span class="pre">1</span></tt>, indicating success, or another value
+if there was an error</li>
+</ul>
+<p>As a document, the result is subject to the <a class="reference internal" href="../reference/limits.html#limit-bson-document-size"><em>BSON
+Document size</em></a> limit, which is currently 16 megabytes.</p>
+</div>
+</div>
+<div class="section" id="optimizing-performance">
+<span id="aggregation-optimize-performance"></span><h2>Optimizing Performance<a class="headerlink" href="#optimizing-performance" title="Permalink to this headline">¶</a></h2>
+<p>Because you will always call <a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate</span></tt></a> on a
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> object, which logically inserts the <em>entire</em> collection into
+the aggregation pipeline, you may want to optimize the operation
+by avoiding scanning the entire collection whenever possible.</p>
+<div class="section" id="pipeline-operators-and-indexes">
+<span id="aggregation-pipeline-operators-and-performance"></span><h3>Pipeline Operators and Indexes<a class="headerlink" href="#pipeline-operators-and-indexes" title="Permalink to this headline">¶</a></h3>
+<p>Depending on the order in which they appear in the pipeline,
+aggregation operators can take advantage of indexes.</p>
+<p>The following pipeline operators take advantage of an index when they
+occur at the beginning of the pipeline:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/limit.html#_S_limit" title="$limit"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$limit</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a>.</li>
+</ul>
+<p>The above operators can also use an index when placed <strong>before</strong> the
+following aggregation operators:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/aggregation/project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a></li>
+<li><a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>.</li>
+</ul>
+</div>
+<div class="section" id="early-filtering">
+<h3>Early Filtering<a class="headerlink" href="#early-filtering" title="Permalink to this headline">¶</a></h3>
+<p>If your aggregation operation requires only a subset of the data in a
+collection, use the <a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> operator to restrict which items go
+in to the top of the pipeline, as in a query. When placed early in a
+pipeline, these <a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> operations use suitable indexes
+to scan only the matching documents in a collection.</p>
+<p>Placing a <a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> pipeline stage followed by a
+<a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> stage at the
+start of the pipeline is logically equivalent to a single query
+with a sort, and can use an index.</p>
+<p>In future versions there may be an optimization phase in the
+pipeline that reorders the operations to increase performance without
+affecting the result. However, at this time place
+<a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> operators at the beginning of the pipeline when
+possible.</p>
+</div>
+<div class="section" id="memory-for-cumulative-operators">
+<h3>Memory for Cumulative Operators<a class="headerlink" href="#memory-for-cumulative-operators" title="Permalink to this headline">¶</a></h3>
+<p>Certain pipeline operators require access to the entire input set
+before they can produce any output. For example, <a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a>
+must receive all of the input from the preceding <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>
+operator before it can produce its first output document. The current
+implementation of <a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> does not go to disk in these
+cases: in order to sort the contents of the pipeline, the entire input
+must fit in memory.</p>
+<p><a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> has similar characteristics: Before any
+<a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> passes its output along the pipeline, it must
+receive the entirety of its input. For the <a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>
+operator, this frequently does not require as much memory as
+<a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a>, because it only needs to retain one record for
+each unique key in the grouping specification.</p>
+<p>The current implementation of the aggregation framework logs a warning
+if a cumulative operator consumes 5% or more of the physical memory on
+the host. Cumulative operators produce an error if they consume 10% or
+more of the physical memory on the host.</p>
+</div>
+</div>
+<div class="section" id="sharded-operation">
+<h2>Sharded Operation<a class="headerlink" href="#sharded-operation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.1.</span></p>
+<p class="last">Some aggregation operations using <a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> will
+cause <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances to require more CPU resources
+than in previous versions. This modified performance profile may
+dictate alternate architectural decisions if you use the
+<a class="reference internal" href="../reference/glossary.html#term-aggregation-framework"><em class="xref std std-term">aggregation framework</em></a> extensively in a sharded environment.</p>
+</div>
+<p>The aggregation framework is compatible with sharded collections.</p>
+<p>When operating on a sharded collection, the aggregation pipeline
+is split into two parts. The aggregation framework pushes
+all of the operators up to the first
+<a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> or <a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operation to each shard.
+<a class="footnote-reference" href="#match-sharding" id="id1">[1]</a> Then, a second pipeline on the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+runs. This pipeline consists of the first <a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> or
+<a class="reference internal" href="../reference/aggregation/sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> and any remaining pipeline operators, and runs
+on the results received from the shards.</p>
+<p>The <a class="reference internal" href="../reference/aggregation/group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> operator brings in any &#8220;sub-totals&#8221; from
+the shards and combines them: in some cases these may be
+structures. For example, the <a class="reference internal" href="../reference/aggregation/group.html#_S_avg" title="$avg"><tt class="xref agg agg-expression docutils literal"><span class="pre">$avg</span></tt></a> expression
+maintains a total and count for each shard; <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> combines
+these values and then divides.</p>
+<table class="docutils footnote" frame="void" id="match-sharding" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If an early <a class="reference internal" href="../reference/aggregation/match.html#_S_match" title="$match"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$match</span></tt></a> can exclude
+shards through the use of the shard key in the predicate, then
+these operators are only pushed to the relevant shards.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<p>Aggregation operations with the <a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> command have
+the following limitations:</p>
+<ul class="simple">
+<li>The pipeline cannot operate on values of the following types:
+<tt class="docutils literal"><span class="pre">Binary</span></tt>, <tt class="docutils literal"><span class="pre">Symbol</span></tt>, <tt class="docutils literal"><span class="pre">MinKey</span></tt>, <tt class="docutils literal"><span class="pre">MaxKey</span></tt>, <tt class="docutils literal"><span class="pre">DBRef</span></tt>, <tt class="docutils literal"><span class="pre">Code</span></tt>,
+<tt class="docutils literal"><span class="pre">CodeWScope</span></tt>.</li>
+<li>Output from the <a class="reference internal" href="../reference/glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> can only contain 16 megabytes. If
+your result set exceeds this limit, the <a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a>
+command produces an error.</li>
+<li>If any single aggregation operation consumes more than 10 percent of
+system RAM the operation will produce an error.</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../aggregation.html" title="Previous Section: Aggregation">&lt; &nbsp; Aggregation</a></li>
+<li id="btnvup"><a href="../aggregation.html" title="Parent Section: Aggregation" >&#47;&#92;&nbsp; Aggregation</a></li>
+<li id="btnvnx"><a href="../tutorial/aggregation-examples.html" title="Next Section: Aggregation Framework Examples">Aggregation Framework Examples &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

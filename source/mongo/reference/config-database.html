@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Config Database Contents &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/config-database" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="The local Database" href="local-database.html" />
+<link rel="prev" title="Exit Codes and Statuses" href="exit-codes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <span class="target" id="index-0"></span><div class="section" id="config-database-contents">
+<span id="config-database"></span><span id="index-1"></span><h1>Config Database Contents<a class="headerlink" href="#config-database-contents" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">config</span></tt> database supports <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>
+operation. See the <a class="reference internal" href="../sharding.html"><em>Sharding</em></a> section of this manual for full
+documentation of sharded clusters.</p>
+<p>To access a the <tt class="docutils literal"><span class="pre">config</span></tt> database, connect to a <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance in a sharded cluster, and issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+</pre></div>
+</div>
+<p>You can return a list of the databases, by issuing the following
+command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">collections</span>
+</pre></div>
+</div>
+<div class="section" id="collections">
+<h2>Collections<a class="headerlink" href="#collections" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="changelog">
+<tt class="descname">changelog</tt><a class="headerlink" href="#changelog" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#changelog" title="changelog"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">changelog</span></tt></a> collection stores a document for each change to
+the metadata of a sharded collection.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following example displays a single record of a chunk split
+from a <tt class="xref mongodb mongodb-data docutils literal"><span class="pre">config.changelog</span> <span class="pre">&lt;changelog&gt;`</span></tt> collection:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+ <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;hostname&gt;-&lt;timestamp&gt;-&lt;increment&gt;&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;server&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;clientAddr&quot;</span> <span class="o">:</span> <span class="s2">&quot;127.0.0.1:63381&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;time&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-11T14:09:21.039Z&quot;</span><span class="p">),</span>
+ <span class="s2">&quot;what&quot;</span> <span class="o">:</span> <span class="s2">&quot;split&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;details&quot;</span> <span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;before&quot;</span> <span class="o">:</span> <span class="p">{</span>
+       <span class="s2">&quot;min&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$minKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;max&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$maxKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;lastmod&quot;</span> <span class="o">:</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+       <span class="s2">&quot;lastmodEpoch&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;000000000000000000000000&quot;</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;left&quot;</span> <span class="o">:</span> <span class="p">{</span>
+       <span class="s2">&quot;min&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$minKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;max&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;value&gt;&quot;</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;lastmod&quot;</span> <span class="o">:</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+       <span class="s2">&quot;lastmodEpoch&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;right&quot;</span> <span class="o">:</span> <span class="p">{</span>
+       <span class="s2">&quot;min&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;value&gt;&quot;</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;max&quot;</span> <span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$maxKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+       <span class="p">},</span>
+       <span class="s2">&quot;lastmod&quot;</span> <span class="o">:</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+       <span class="s2">&quot;lastmodEpoch&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;&lt;...&gt;&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Each document in the <a class="reference internal" href="#changelog" title="changelog"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">changelog</span></tt></a> collection contains the
+following fields:</p>
+<dl class="data">
+<dt id="changelog._id">
+<tt class="descclassname">changelog.</tt><tt class="descname">_id</tt><a class="headerlink" href="#changelog._id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <tt class="docutils literal"><span class="pre">changelog._id</span></tt> is:
+<tt class="docutils literal"><span class="pre">&lt;hostname&gt;-&lt;timestamp&gt;-&lt;increment&gt;</span></tt>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.server">
+<tt class="descclassname">changelog.</tt><tt class="descname">server</tt><a class="headerlink" href="#changelog.server" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hostname of the server that holds this data.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.clientAddr">
+<tt class="descclassname">changelog.</tt><tt class="descname">clientAddr</tt><a class="headerlink" href="#changelog.clientAddr" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string that holds the address of the client, a
+<a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance that initiates this change.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.time">
+<tt class="descclassname">changelog.</tt><tt class="descname">time</tt><a class="headerlink" href="#changelog.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a> timestamp that reflects when the change
+occurred.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.what">
+<tt class="descclassname">changelog.</tt><tt class="descname">what</tt><a class="headerlink" href="#changelog.what" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reflects the type of change recorded. Possible values are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">dropCollection</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">dropCollection.start</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">dropDatabase</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">dropDatabase.start</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">moveChunk.start</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">moveChunk.commit</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">split</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">multi-split</span></tt></li>
+</ul>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.ns">
+<tt class="descclassname">changelog.</tt><tt class="descname">ns</tt><a class="headerlink" href="#changelog.ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Namespace where the change occured.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="changelog.details">
+<tt class="descclassname">changelog.</tt><tt class="descname">details</tt><a class="headerlink" href="#changelog.details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> that contains  additional details regarding
+the change. The structure of the <a class="reference internal" href="#changelog.details" title="changelog.details"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">details</span></tt></a>
+document depends on the type of change.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="chunks">
+<tt class="descname">chunks</tt><a class="headerlink" href="#chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#chunks" title="chunks"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">chunks</span></tt></a> collection stores a document for each chunk in
+the cluster.  Consider the following example of a document for a
+chunk named <tt class="docutils literal"><span class="pre">records.pets-animal_\&quot;cat\&quot;</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;mydb.foo-a_\&quot;cat\&quot;&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;lastmod&quot;</span> <span class="o">:</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+   <span class="s2">&quot;lastmodEpoch&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;5078407bd58b175c5c225fdc&quot;</span><span class="p">),</span>
+   <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;mydb.foo&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;min&quot;</span> <span class="o">:</span> <span class="p">{</span>
+         <span class="s2">&quot;animal&quot;</span> <span class="o">:</span> <span class="s2">&quot;cat&quot;</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;max&quot;</span> <span class="o">:</span> <span class="p">{</span>
+         <span class="s2">&quot;animal&quot;</span> <span class="o">:</span> <span class="s2">&quot;dog&quot;</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;shard&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0004&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>These documents store the range of values for the shard key that
+describe the chunk in the <tt class="docutils literal"><span class="pre">min</span></tt> and <tt class="docutils literal"><span class="pre">max</span></tt> fields. Additionally
+the <tt class="docutils literal"><span class="pre">shard</span></tt> field identifies the shard in the cluster that &#8220;owns&#8221;
+the chunk.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descname">collections</tt></dt>
+<dd><p>The <a class="reference internal" href="database-statistics.html#collections" title="collections"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">collections</span></tt></a> collection stores a document for each sharded collection
+in the cluster. Given a collection named <tt class="docutils literal"><span class="pre">pets</span></tt>
+in the <tt class="docutils literal"><span class="pre">records</span></tt> database, a document in the <a class="reference internal" href="database-statistics.html#collections" title="collections"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">collections</span></tt></a>
+collection would resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;records.pets&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;lastmod&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1970-01-16T15:00:58.107Z&quot;</span><span class="p">),</span>
+   <span class="s2">&quot;dropped&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+   <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span>
+         <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;unique&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+   <span class="s2">&quot;lastmodEpoch&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;5078407bd58b175c5c225fdc&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="databases">
+<tt class="descname">databases</tt><a class="headerlink" href="#databases" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#databases" title="databases"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">databases</span></tt></a> collection stores a document for each
+database in the cluster, and tracks if the database has sharding
+enabled. <a class="reference internal" href="#databases" title="databases"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">databases</span></tt></a> represents each database in a
+distinct document. When a databases have sharding enabled, the
+<tt class="docutils literal"><span class="pre">primary</span></tt> field holds the name of the <a class="reference internal" href="glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;config&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;mydb&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0000&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="lockpings">
+<tt class="descname">lockpings</tt><a class="headerlink" href="#lockpings" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#lockpings" title="lockpings"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">lockpings</span></tt></a> collection keeps track of the active components
+in the sharded cluster. Given a cluster with a <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+running on <tt class="docutils literal"><span class="pre">example.com:30000</span></tt>, the document in the
+<a class="reference internal" href="#lockpings" title="lockpings"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">lockpings</span></tt></a> collection would resemble:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;example.com:30000:1350047994:16807&quot;</span><span class="p">,</span> <span class="s2">&quot;ping&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-10-12T18:32:54.892Z&quot;</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="locks">
+<tt class="descname">locks</tt><a class="headerlink" href="#locks" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks</span></tt></a> collection stores a distributed lock. This
+ensures that only one <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance can perform
+administrative tasks on the cluster at once. The <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+acting as <a class="reference internal" href="glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> takes a lock by inserting a document
+resembling the following into the <tt class="docutils literal"><span class="pre">locks</span></tt> collection.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;process&quot;</span> <span class="o">:</span> <span class="s2">&quot;example.net:40000:1350402818:16807&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;state&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;ts&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507daeedf40e1879df62e5f3&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;when&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-10-16T19:01:01.593Z&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;who&quot;</span> <span class="o">:</span> <span class="s2">&quot;example.net:40000:1350402818:16807:Balancer:282475249&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;why&quot;</span> <span class="o">:</span> <span class="s2">&quot;doing balance round&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If a <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> holds the balancer lock, the <tt class="docutils literal"><span class="pre">state</span></tt> field
+has a value of <tt class="docutils literal"><span class="pre">2</span></tt>, which means that balancer is active. The <tt class="docutils literal"><span class="pre">when</span></tt> field
+indicates when the balancer began the current operation.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0: </span>The value of the <tt class="docutils literal"><span class="pre">state</span></tt> field was <tt class="docutils literal"><span class="pre">1</span></tt> before MongoDB 2.0.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="mongos">
+<tt class="descname">mongos</tt><a class="headerlink" href="#mongos" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">mongos</span></tt></a> collection stores a document for each
+<a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance affiliated with the
+cluster. <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances send pings to all members of
+the cluster every 30 seconds so the cluster can verify that the
+<a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is active. The <tt class="docutils literal"><span class="pre">ping</span></tt> field shows the time of
+the last ping. The cluster maintains this collection for reporting
+purposes.</p>
+<p>The following document shows the status of the <a class="reference internal" href="#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+running on <tt class="docutils literal"><span class="pre">example.com:30000</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;example.com:30000&quot;</span><span class="p">,</span> <span class="s2">&quot;ping&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-10-12T17:08:13.538Z&quot;</span><span class="p">),</span> <span class="s2">&quot;up&quot;</span> <span class="o">:</span> <span class="mi">13699</span><span class="p">,</span> <span class="s2">&quot;waiting&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="settings">
+<tt class="descname">settings</tt><a class="headerlink" href="#settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="replica-configuration.html#settings" title="settings"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">settings</span></tt></a> collection holds the following sharding configuration settings:</p>
+<ul class="simple">
+<li>Chunk size. To change chunk size, see <a class="reference internal" href="../administration/sharding.html#sharding-balancing-modify-chunk-size"><em>Modify Chunk Size</em></a>.</li>
+<li>Balancer status. To change status, see <a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the Balancer</em></a>.</li>
+</ul>
+<p>The following is an example <tt class="docutils literal"><span class="pre">settings</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;chunksize&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mi">64</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span><span class="p">,</span> <span class="s2">&quot;stopped&quot;</span> <span class="o">:</span> <span class="kc">false</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="shards">
+<tt class="descname">shards</tt><a class="headerlink" href="#shards" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="explain.html#shards" title="shards"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">shards</span></tt></a> collection represents each shard in the cluster
+in a separate document. If the shard is a replica set, the
+<tt class="docutils literal"><span class="pre">host</span></tt> field displays the name of the replica set, then a slash, then
+the hostname, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0000&quot;</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard1/localhost:30000&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="version">
+<tt class="descname">version</tt><a class="headerlink" href="#version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="server-status.html#version" title="version"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">version</span></tt></a> collection holds the current metadata version number. This
+collection contains only one document:</p>
+<p>To access the <a class="reference internal" href="server-status.html#version" title="version"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">version</span></tt></a> collection you must use the
+<a class="reference internal" href="method/db.getCollection.html#db.getCollection" title="db.getCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getCollection()</span></tt></a> method. For example, to display the
+collection&#8217;s document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongos</span><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">).</span><span class="nx">find</span><span class="p">()</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Like all databases in MongoDB, the <tt class="docutils literal"><span class="pre">config</span></tt> database contains a
+<tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.indexes</span></tt> collection contains metadata for all indexes
+in the database for information on indexes, see <a class="reference internal" href="../indexes.html"><em>Indexes</em></a>.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="exit-codes.html" title="Previous Section: Exit Codes and Statuses">&lt; &nbsp; Exit Codes and Statuses</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="local-database.html" title="Next Section: The local Database">The local Database &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

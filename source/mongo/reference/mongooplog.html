@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongooplog &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongooplog" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongoimport" href="mongoimport.html" />
+<link rel="prev" title="bsondump" href="bsondump.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongooplog">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongooplog</span></tt><a class="headerlink" href="#mongooplog" title="Permalink to this headline">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1.1.</span></p>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> is a simple tool that polls operations from
+the <a class="reference internal" href="glossary.html#term-replication"><em class="xref std std-term">replication</em></a> <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> of a remote server, and applies
+them to the local server. This capability supports certain classes of
+real-time migrations that require that the source server remain online
+and in operation throughout the migration process.</p>
+<p>Typically this command will take the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --host mongodb1.example.net
+</pre></div>
+</div>
+<p>This command copies oplog entries from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+running on the host <tt class="docutils literal"><span class="pre">mongodb0.example.net</span></tt> and duplicates
+operations to the host <tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt>. If you do not need
+to keep the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">--from</em></a> host running during
+the migration, consider using <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> or another <a class="reference internal" href="../administration/backups.html"><em>backup</em></a> operation, which may be better suited to
+your operation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance specified by the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">--from</em></a>
+argument is running with <a class="reference internal" href="configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">authentication</span></tt></a>, then
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will not be able to copy oplog entries.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>,
+&#8220;<a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a>,&#8221; &#8220;<a class="reference internal" href="../core/replication-internals.html#replica-set-oplog"><em>Oplog Internals Overview</em></a>, and &#8220;<a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>Replica Set Oplog Sizing</em></a>&#8221;.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongooplog</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including the
+option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> utility.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+to which <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will apply <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> operations
+retrieved from the serve specified by the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">--from</em></a>
+option.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> assumes that all target  <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances are accessible by way of port <tt class="docutils literal"><span class="pre">27017</span></tt>. You may,
+optionally, declare an alternate port number as part of the
+hostname argument.</p>
+<p>You can always connect directly to a single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance by specifying the host and port number directly.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--port">
+<tt class="descname">--port</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance where
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will apply <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries. Only
+specify this option if the MongoDB instance that you wish to
+connect to is not running on the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>)
+You may also specify a port number using the <a class="reference internal" href="#cmdoption-mongooplog--host"><em class="xref std std-option">--host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if
+your database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongooplog--password"><em class="xref std std-option">--password</em></a> option to supply a
+password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-p</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongooplog--username"><em class="xref std std-option">--username</em></a>
+option to supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongooplog--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongooplog--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will
+prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a directory, containing MongoDB data files, to which
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will apply operations from the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>
+of the database specified with the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">--from</em></a>
+option.  When used, the <a class="reference internal" href="#cmdoption-mongooplog--dbpath"><em class="xref std std-option">--dbpath</em></a> option enables
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> to attach directly to local data files and write
+data without a running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. To run with
+<a class="reference internal" href="#cmdoption-mongooplog--dbpath"><em class="xref std std-option">--dbpath</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> needs to restrict access
+to the data directory: as a result, no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can be
+access the same path while the process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongooplog--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the
+corresponding option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. This option allows
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> to write to data files organized with each
+database located in a distinct directory. This option is only
+relevant when specifying the <a class="reference internal" href="#cmdoption-mongooplog--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongooplog--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> operations to use the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the data files will
+remain in a consistent state during the writing process. This
+option is only relevant when specifying the <a class="reference internal" href="#cmdoption-mongooplog--dbpath"><em class="xref std std-option">--dbpath</em></a>
+option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--fields">
+<tt class="descname">--fields</tt><tt class="descclassname"> [field1[,field2]]</tt><tt class="descclassname">, </tt><tt class="descname">-f</tt><tt class="descclassname"> [field1[,field2]]</tt><a class="headerlink" href="#cmdoption-mongooplog--fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a field or number fields to constrain which data
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will migrate. All other fields will be
+<em>excluded</em> from the migration. Comma separate a list of fields to
+limit the applied fields.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--fieldFile">
+<tt class="descname">--fieldFile</tt><tt class="descclassname"> &lt;file&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--fieldFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>As an alternative to &#8220;<a class="reference internal" href="#cmdoption-mongooplog--fields"><em class="xref std std-option">--fields</em></a>&#8221; the
+<a class="reference internal" href="#cmdoption-mongooplog--fieldFile"><em class="xref std std-option">--fieldFile</em></a> option allows you to specify a file
+(e.g. <tt class="docutils literal"><span class="pre">&lt;file&gt;</span></tt>) that holds a list of field names to <em>include</em> in
+the migration. All other fields will be <em>excluded</em> from the
+migration. Place one field per line.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--seconds">
+<tt class="descname">--seconds</tt><tt class="descclassname"> &lt;number&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-s</tt><tt class="descclassname"> &lt;number&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a number of seconds of operations for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt>
+to pull from the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">remote host</em></a>. Unless
+specified the default value is <tt class="docutils literal"><span class="pre">86400</span></tt> seconds, or 24 hours.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--from">
+<tt class="descname">--from</tt><tt class="descclassname"> &lt;host[:port]&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the host for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> to retrieve <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>
+operations from. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> <em>requires</em> this
+option.</p>
+<p>Unless you specify the <a class="reference internal" href="#cmdoption-mongooplog--host"><em class="xref std std-option">--host</em></a> option,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will apply the operations collected with this
+option to the oplog of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on
+the localhost interface connected to port <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongooplog--oplogns">
+<tt class="descname">--oplogns</tt><tt class="descclassname"> &lt;namespace&gt;</tt><a class="headerlink" href="#cmdoption-mongooplog--oplogns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a namespace in the <a class="reference internal" href="#cmdoption-mongooplog--from"><em class="xref std std-option">--from</em></a>
+host where the oplog resides. The default value is
+<tt class="docutils literal"><span class="pre">local.oplog.rs</span></tt>, which is the where <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members
+store their operation log. However, if you&#8217;ve copied <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>
+entries into another database or collection, use this option to
+copy oplog entries stored in another location.</p>
+<p><a class="reference internal" href="glossary.html#term-namespace"><em class="xref std std-term">Namespaces</em></a> take the form of
+<tt class="docutils literal"><span class="pre">[database].[collection]</span></tt>.</p>
+</dd></dl>
+
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>Consider the following prototype <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --host mongodb1.example.net
+</pre></div>
+</div>
+<p>Here, entries from the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running
+on port <tt class="docutils literal"><span class="pre">27017</span></tt>. This only pull entries from the last 24 hours.</p>
+<p>In the next command, the parameters limit this operation to only apply
+operations to the database <tt class="docutils literal"><span class="pre">people</span></tt> in the collection <tt class="docutils literal"><span class="pre">usage</span></tt> on
+the target host (i.e. <tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt>):</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --host mongodb1.example.net --database people --collection usage
+</pre></div>
+</div>
+<p>This operation only applies oplog entries from the last 24 hours. Use
+the <a class="reference internal" href="#cmdoption-mongooplog--seconds"><em class="xref std std-option">--seconds</em></a> argument to capture a
+greater or smaller amount of time. Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --seconds 172800
+</pre></div>
+</div>
+<p>In this operation, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> captures 2 full days of
+operations. To migrate 12 hours of <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries, use the
+following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --seconds 43200
+</pre></div>
+</div>
+<p>For the previous two examples, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> migrates entries
+to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process running on the localhost interface
+connected to the <tt class="docutils literal"><span class="pre">27017</span></tt> port. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> can also
+operate directly on MongoDB&#8217;s data files if no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is
+running on the <em>target</em> host. Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongooplog  --from mongodb0.example.net --dbpath /srv/mongodb --journal
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> imports <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> operations from the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> host connected to port <tt class="docutils literal"><span class="pre">27017</span></tt>. This migrates
+operations to the MongoDB data files stored in the <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>
+directory. Additionally <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> will use the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the data files remain in a consistent
+state.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="bsondump.html" title="Previous Section: bsondump">&lt; &nbsp; bsondump</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongoimport.html" title="Next Section: mongoimport">mongoimport &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

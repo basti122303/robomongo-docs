@@ -1,0 +1,370 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Collection Validation Data &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/collection-validation" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Connection Pool Statistics Reference" href="connection-pool-stats.html" />
+<link rel="prev" title="Collection Statistics Reference" href="collection-statistics.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="collection-validation-data">
+<h1>Collection Validation Data<a class="headerlink" href="#collection-validation-data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The collection validation command checks all of the structures within
+a name space for correctness and returns a <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> containing
+information regarding the on-disk representation of the collection.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a> process may consume significant system
+resources and impede application performance because it must scan
+all data in the collection.</p>
+</div>
+<p>Run the validation command in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell using the
+following form to validate a collection named <tt class="docutils literal"><span class="pre">people</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">validate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Alternatively you can use the command prototype and the
+<a class="reference internal" href="method/db.runCommand.html#db.runCommand" title="db.runCommand"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.runCommand()</span></tt></a> shell helper in the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">validate</span><span class="o">:</span> <span class="s2">&quot;people&quot;</span><span class="p">,</span> <span class="nx">full</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">validate</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a>&#8221; and &#8220;<a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">validate()</span></tt></a>.&#8221;</p>
+</div>
+</div>
+<div class="section" id="values">
+<h2>Values<a class="headerlink" href="#values" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="ns">
+<tt class="descname">ns</tt><a class="headerlink" href="#ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full namespace name of the collection. Namespaces include the
+database name and the collection name in the form
+<tt class="docutils literal"><span class="pre">database.collection</span></tt>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtent">
+<tt class="descname">firstExtent</tt><a class="headerlink" href="#firstExtent" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the first extent in the collection. The value
+of this field also includes the namespace.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="lastExtent">
+<tt class="descname">lastExtent</tt><a class="headerlink" href="#lastExtent" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the last extent in the collection. The value
+of this field also includes the namespace.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extentCount">
+<tt class="descname">extentCount</tt><a class="headerlink" href="#extentCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of extents in the collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents">
+<tt class="descname">extents</tt><a class="headerlink" href="#extents" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a> returns one instance of this document for
+every extent in the collection. This sub-document is only returned
+when you specify the <tt class="docutils literal"><span class="pre">full</span></tt> option to the command.</p>
+<dl class="data">
+<dt id="extents.loc">
+<tt class="descclassname">extents.</tt><tt class="descname">loc</tt><a class="headerlink" href="#extents.loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the beginning of this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.xnext">
+<tt class="descclassname">extents.</tt><tt class="descname">xnext</tt><a class="headerlink" href="#extents.xnext" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the extent following this one. &#8220;null&#8221; if
+this is the end of the linked list of extents.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.xprev">
+<tt class="descclassname">extents.</tt><tt class="descname">xprev</tt><a class="headerlink" href="#extents.xprev" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the extent preceding this one. &#8220;null&#8221; if
+this is the head of the linked list of extents.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.nsdiag">
+<tt class="descclassname">extents.</tt><tt class="descname">nsdiag</tt><a class="headerlink" href="#extents.nsdiag" title="Permalink to this definition">¶</a></dt>
+<dd><p>The namespace this extent belongs to (should be the same as the
+namespace shown at the beginning of the validate listing).</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.size">
+<tt class="descclassname">extents.</tt><tt class="descname">size</tt><a class="headerlink" href="#extents.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bytes in this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.firstRecord">
+<tt class="descclassname">extents.</tt><tt class="descname">firstRecord</tt><a class="headerlink" href="#extents.firstRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the first record in this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="extents.lastRecord">
+<tt class="descclassname">extents.</tt><tt class="descname">lastRecord</tt><a class="headerlink" href="#extents.lastRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the last record in this extent.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="datasize">
+<tt class="descname">datasize</tt><a class="headerlink" href="#datasize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bytes in all data records.  This value does not
+include deleted records, nor does it include extent headers, nor
+record headers, nor space in a file unallocated to any
+extent. <a class="reference internal" href="#datasize" title="datasize"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">datasize</span></tt></a> includes record <a class="reference internal" href="glossary.html#term-padding"><em class="xref std std-term">padding</em></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nrecords">
+<tt class="descname">nrecords</tt><a class="headerlink" href="#nrecords" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">documents</em></a> in the collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="lastExtentSize">
+<tt class="descname">lastExtentSize</tt><a class="headerlink" href="#lastExtentSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the last new extent created in this collection. This
+value determines the size of the <em>next</em> extent created.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="padding">
+<tt class="descname">padding</tt><a class="headerlink" href="#padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>A floating point value between 1 and 2.</p>
+<p>When MongoDB creates a new record it uses the <a class="reference internal" href="glossary.html#term-padding-factor"><em class="xref std std-term">padding
+factor</em></a> to determine how much additional space to add to the
+record. The padding factor is automatically adjusted by mongo when
+it notices that update operations are triggering record moves.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails">
+<tt class="descname">firstExtentDetails</tt><a class="headerlink" href="#firstExtentDetails" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the first extent created in this collection. This data
+is similar to the data provided by the <a class="reference internal" href="#extents" title="extents"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">extents</span></tt></a>
+sub-document; however, the data reflects only the first extent in
+the collection and is always returned.</p>
+<dl class="data">
+<dt id="firstExtentDetails.loc">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">loc</tt><a class="headerlink" href="#firstExtentDetails.loc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the beginning of this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.xnext">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">xnext</tt><a class="headerlink" href="#firstExtentDetails.xnext" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the extent following this one. &#8220;null&#8221; if
+this is the end of the linked list of extents, which should only
+be the case if there is only one extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.xprev">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">xprev</tt><a class="headerlink" href="#firstExtentDetails.xprev" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location for the extent preceding this one. This should
+always be &#8220;null.&#8221;</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.nsdiag">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">nsdiag</tt><a class="headerlink" href="#firstExtentDetails.nsdiag" title="Permalink to this definition">¶</a></dt>
+<dd><p>The namespace this extent belongs to (should be the same as the
+namespace shown at the beginning of the validate listing).</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.size">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">size</tt><a class="headerlink" href="#firstExtentDetails.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bytes in this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.firstRecord">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">firstRecord</tt><a class="headerlink" href="#firstExtentDetails.firstRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the first record in this extent.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="firstExtentDetails.lastRecord">
+<tt class="descclassname">firstExtentDetails.</tt><tt class="descname">lastRecord</tt><a class="headerlink" href="#firstExtentDetails.lastRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>The disk location of the last record in this extent.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="objectsFound">
+<tt class="descname">objectsFound</tt><a class="headerlink" href="#objectsFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of records actually encountered in a scan of the
+collection. This field should have the same value as the
+<a class="reference internal" href="#nrecords" title="nrecords"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nrecords</span></tt></a> field.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="invalidObjects">
+<tt class="descname">invalidObjects</tt><a class="headerlink" href="#invalidObjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of records containing BSON documents that do not pass a
+validation check.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This field is only included in the validation output when you
+specify the <tt class="docutils literal"><span class="pre">full</span></tt> option.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="bytesWithHeaders">
+<tt class="descname">bytesWithHeaders</tt><a class="headerlink" href="#bytesWithHeaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is similar to datasize, except that <a class="reference internal" href="#bytesWithHeaders" title="bytesWithHeaders"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">bytesWithHeaders</span></tt></a>
+includes the record headers. In version 2.0, record headers are 16
+bytes per document.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This field is only included in the validation output when you
+specify the <tt class="docutils literal"><span class="pre">full</span></tt> option.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="bytesWithoutHeaders">
+<tt class="descname">bytesWithoutHeaders</tt><a class="headerlink" href="#bytesWithoutHeaders" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#bytesWithoutHeaders" title="bytesWithoutHeaders"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">bytesWithoutHeaders</span></tt></a> returns data collected from a scan of
+all records. The value should be the same as <a class="reference internal" href="#datasize" title="datasize"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">datasize</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This field is only included in the validation output when you
+specify the <tt class="docutils literal"><span class="pre">full</span></tt> option.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="deletedCount">
+<tt class="descname">deletedCount</tt><a class="headerlink" href="#deletedCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of deleted or &#8220;free&#8221; records in the collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="deletedSize">
+<tt class="descname">deletedSize</tt><a class="headerlink" href="#deletedSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of all deleted or &#8220;free&#8221; records in the collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nIndexes">
+<tt class="descname">nIndexes</tt><a class="headerlink" href="#nIndexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of indexes on the data in the collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="keysPerIndex">
+<tt class="descname">keysPerIndex</tt><a class="headerlink" href="#keysPerIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>A document containing a field for each index, named after the
+index&#8217;s name, that contains the number of keys, or documents
+referenced, included in the index.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="valid">
+<tt class="descname">valid</tt><a class="headerlink" href="#valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean. <tt class="docutils literal"><span class="pre">true</span></tt>, unless <a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a> determines that an
+aspect of the collection is not valid. When <tt class="docutils literal"><span class="pre">false</span></tt>, see the
+<a class="reference internal" href="#errors" title="errors"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">errors</span></tt></a> field for more information.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="errors">
+<tt class="descname">errors</tt><a class="headerlink" href="#errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Typically empty; however, if the collection is not valid (i.e
+<a class="reference internal" href="#valid" title="valid"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">valid</span></tt></a> is false,) this field will contain a message
+describing the validation error.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ok">
+<tt class="descname">ok</tt><a class="headerlink" href="#ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set to <tt class="docutils literal"><span class="pre">1</span></tt> when the command succeeds. If the command fails
+the <a class="reference internal" href="#ok" title="ok"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">ok</span></tt></a> field has a value of <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="collection-statistics.html" title="Previous Section: Collection Statistics Reference">&lt; &nbsp; Collection Statistics Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="connection-pool-stats.html" title="Next Section: Connection Pool Statistics Reference">Connection Pool Statistics Reference &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

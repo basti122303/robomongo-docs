@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>ObjectId &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/core/object-id" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Capped Collections" href="capped-collections.html" />
+<link rel="prev" title="GridFS" href="../applications/gridfs.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="objectid">
+<h1>ObjectId<a class="headerlink" href="#objectid" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectId</em></a> is a 12-byte <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> type,
+constructed using:</p>
+<ul class="simple">
+<li>a 4-byte timestamp,</li>
+<li>a 3-byte machine identifier,</li>
+<li>a 2-byte process id, and</li>
+<li>a 3-byte counter.</li>
+</ul>
+<p>In MongoDB, documents stored in a collection require a unique
+<a class="reference internal" href="../reference/glossary.html#term-id"><em class="xref std std-term">_id</em></a> field that acts as a <a class="reference internal" href="../reference/glossary.html#term-primary-key"><em class="xref std std-term">primary key</em></a>. Because
+ObjectIds are small, most likely unique, and fast to generate, MongoDB
+uses ObjectIds as the default value for the <tt class="docutils literal"><span class="pre">_id</span></tt> field if the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field is not specified; i.e., the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> adds the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field and generates a unique ObjectId to assign as its value.</p>
+<p>Using ObjectIds for the <tt class="docutils literal"><span class="pre">_id</span></tt> field, provides the following
+additional benefits:</p>
+<ul class="simple">
+<li>you can access the timestamp of the ObjectId&#8217;s creation, using the
+<a class="reference internal" href="../reference/method/ObjectId.getTimestamp.html#ObjectId.getTimestamp" title="ObjectId.getTimestamp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">getTimestamp()</span></tt></a> method.</li>
+<li>Sorting on an <tt class="docutils literal"><span class="pre">_id</span></tt> field that stores ObjectId values is equivalent
+to sorting by creation time.</li>
+</ul>
+<p>Also consider the <a class="reference internal" href="document.html"><em>BSON Documents</em></a> section for related
+information on MongoDB&#8217;s document orientation.</p>
+</div>
+<div class="section" id="core-object-id-class">
+<span id="id1"></span><h2>ObjectId()<a class="headerlink" href="#core-object-id-class" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> wrapper class to
+generate a new ObjectId, and to provide the following helper attribute
+and methods:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">str</span></tt></p>
+<blockquote>
+<div><p>The hexadecimal string value of the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/method/ObjectId.getTimestamp.html#ObjectId.getTimestamp" title="ObjectId.getTimestamp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">getTimestamp()</span></tt></a></p>
+<blockquote>
+<div><p>Returns the timestamp portion of the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object as a Date.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/method/ObjectId.toString.html#ObjectId.toString" title="ObjectId.toString"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">toString()</span></tt></a></p>
+<blockquote>
+<div><p>Returns the string representation of the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object. The
+returned string literal has the format &#8220;<tt class="docutils literal"><span class="pre">ObjectId(...)</span></tt>&#8221;.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>In previous versions <a class="reference internal" href="../reference/method/ObjectId.toString.html#ObjectId.toString" title="ObjectId.toString"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ObjectId.toString()</span></tt></a> returns the
+value of the ObjectId as a hexadecimal string.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/method/ObjectId.valueOf.html#ObjectId.valueOf" title="ObjectId.valueOf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">valueOf()</span></tt></a></p>
+<blockquote>
+<div><p>Returns the value of the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object as a hexadecimal string.
+The returned string is the <tt class="docutils literal"><span class="pre">str</span></tt> attribute.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>In previous versions <a class="reference internal" href="../reference/method/ObjectId.valueOf.html#ObjectId.valueOf" title="ObjectId.valueOf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ObjectId.valueOf()</span></tt></a> returns the
+<tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object.</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following uses <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> class in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<ul>
+<li><p class="first">To generate a new ObjectId, use the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> constructor with
+no argument:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">x</span> <span class="o">=</span> <span class="nx">ObjectId</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In this example, the value of <tt class="docutils literal"><span class="pre">x</span></tt> would be:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f1f77bcf86cd799439011&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To generate a new ObjectId using the <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> constructor with
+a unique hexadecimal string:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">y</span> <span class="o">=</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, the value of <tt class="docutils literal"><span class="pre">y</span></tt> would be:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To return the timestamp of an <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object, use the
+<a class="reference internal" href="../reference/method/ObjectId.getTimestamp.html#ObjectId.getTimestamp" title="ObjectId.getTimestamp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">getTimestamp()</span></tt></a> method as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">).</span><span class="nx">getTimestamp</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation will return the following Date object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-10-17T20:46:22Z&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Access the <tt class="docutils literal"><span class="pre">str</span></tt> attribute of an <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object, as
+follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">).</span><span class="nx">str</span>
+</pre></div>
+</div>
+<p>This operation will return the following hexadecimal string:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="mi">507</span><span class="nx">f191e810c19729de860ea</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To return the string representation of an <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object, use
+the <a class="reference internal" href="../reference/method/ObjectId.toString.html#ObjectId.toString" title="ObjectId.toString"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">toString()</span></tt></a> method as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation will return the following output:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To return the value of an <tt class="docutils literal"><span class="pre">ObjectId()</span></tt> object as a hexadecimal
+string, use the <a class="reference internal" href="../reference/method/ObjectId.valueOf.html#ObjectId.valueOf" title="ObjectId.valueOf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">valueOf()</span></tt></a> method as
+follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507f191e810c19729de860ea&quot;</span><span class="p">).</span><span class="nx">valueOf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation returns the following output:</p>
+<div class="highlight-none"><div class="highlight"><pre>507f191e810c19729de860ea
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../applications/gridfs.html" title="Previous Section: GridFS">&lt; &nbsp; GridFS</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="capped-collections.html" title="Next Section: Capped Collections">Capped Collections &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Convert a Secondary to an Arbiter &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/convert-secondary-into-arbiter" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Reconfigure a Replica Set with Unavailable Members" href="reconfigure-replica-set-with-unavailable-members.html" />
+<link rel="prev" title="Change Hostnames in a Replica Set" href="change-hostnames-in-a-replica-set.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="convert-a-secondary-to-an-arbiter">
+<h1>Convert a Secondary to an Arbiter<a class="headerlink" href="#convert-a-secondary-to-an-arbiter" title="Permalink to this headline">¶</a></h1>
+<p>If you have a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> in a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> that no
+longer needs to hold a copy of the data <em>but</em> that you want to retain
+in the set to ensure that the replica set will be able to <a class="reference internal" href="../core/replication.html#replica-set-elections"><em>elect
+a primary</em></a>, you can convert the secondary into
+an <a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>arbiter</em></a>. This document provides two
+equivalent procedures for this process.</p>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>Both of the following procedures are operationally equivalent. Choose
+whichever procedure you are most comfortable with:</p>
+<ol class="arabic">
+<li><p class="first">You may operate the arbiter on the same port as the former secondary.
+In this procedure, you must shut down the secondary and remove its data
+before restarting and reconfiguring it as an arbiter.</p>
+<p>For this procedure, see <a class="reference internal" href="#replica-set-convert-secondary-to-arbiter-same-port"><em>Convert a Secondary to an Arbiter and Reuse the Port Number</em></a>.</p>
+</li>
+<li><p class="first">Run the arbiter on a new port. In this procedure, you can
+reconfigure the server as an arbiter before shutting down the
+instance running as a secondary.</p>
+<p>For this procedure, see <a class="reference internal" href="#replica-set-convert-secondary-to-arbiter"><em>Convert a Secondary to an Arbiter Running on a New Port Number</em></a>.</p>
+</li>
+</ol>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>Arbiters</em></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.addArb" title="rs.addArb"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.addArb()</span></tt></a></li>
+<li><a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="procedures">
+<h2>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="convert-a-secondary-to-an-arbiter-and-reuse-the-port-number">
+<span id="replica-set-convert-secondary-to-arbiter-same-port"></span><h3>Convert a Secondary to an Arbiter and Reuse the Port Number<a class="headerlink" href="#convert-a-secondary-to-an-arbiter-and-reuse-the-port-number" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">If your application is connecting directly to the secondary,
+modify the application so that MongoDB queries don&#8217;t reach
+the secondary.</p>
+</li>
+<li><p class="first">Shut down the secondary.</p>
+</li>
+<li><p class="first">Remove the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> from the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> by calling
+the <a class="reference internal" href="../reference/replica-commands.html#rs.remove" title="rs.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.remove()</span></tt></a> method. Perform this operation while connected to the current
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify that the replica set no longer includes the secondary by
+calling the <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Move the secondary&#8217;s data directory to an archive folder. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mv /data/db /data/db-old
+</pre></div>
+</div>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p class="last">You may remove the data instead.</p>
+</div>
+</li>
+<li><p class="first">Create a new, empty data directory to point to when restarting the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. You can reuse the previous name. For
+example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir /data/db
+</pre></div>
+</div>
+</li>
+<li><p class="first">Restart the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance for the secondary, specifying
+the port number, the empty data directory, and the replica set. You
+can use the same port number you used before. Issue a command similar
+to the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 27021 --dbpath /data/db --replSet rs
+</pre></div>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell convert the secondary to an arbiter
+using the <a class="reference internal" href="../reference/replica-commands.html#rs.addArb" title="rs.addArb"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.addArb()</span></tt></a> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">addArb</span><span class="p">(</span><span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the arbiter belongs to the replica set by calling the
+<a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The arbiter member should include the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;arbiterOnly&quot;</span> <span class="o">:</span> <span class="kc">true</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="convert-a-secondary-to-an-arbiter-running-on-a-new-port-number">
+<span id="replica-set-convert-secondary-to-arbiter"></span><h3>Convert a Secondary to an Arbiter Running on a New Port Number<a class="headerlink" href="#convert-a-secondary-to-an-arbiter-running-on-a-new-port-number" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">If your application is connecting directly to the secondary
+or has a connection string referencing the secondary,
+modify the application so that MongoDB queries don&#8217;t reach
+the secondary.</p>
+</li>
+<li><p class="first">Create a new, empty data directory to be used with the new port
+number. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir /data/db-temp
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start a new <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance on the new port number,
+specifying the new data directory and the existing replica
+set. Issue a command similar to the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 27021 --dbpath /data/db-temp --replSet rs
+</pre></div>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the current primary,
+convert the new <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance to an arbiter using the <a class="reference internal" href="../reference/replica-commands.html#rs.addArb" title="rs.addArb"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.addArb()</span></tt></a>
+method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">addArb</span><span class="p">(</span><span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the arbiter has been added to the replica set by calling the
+<a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The arbiter member should include the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;arbiterOnly&quot;</span> <span class="o">:</span> <span class="kc">true</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Shut down the secondary.</p>
+</li>
+<li><p class="first">Remove the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> from the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> by calling
+the <a class="reference internal" href="../reference/replica-commands.html#rs.remove" title="rs.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.remove()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify that the replica set no longer includes the old secondary by
+calling the <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Move the secondary&#8217;s data directory to an archive folder. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mv /data/db /data/db-old
+</pre></div>
+</div>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p class="last">You may remove the data instead.</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="change-hostnames-in-a-replica-set.html" title="Previous Section: Change Hostnames in a Replica Set">&lt; &nbsp; Change Hostnames in a Replica Set</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="reconfigure-replica-set-with-unavailable-members.html" title="Next Section: Reconfigure a Replica Set with Unavailable Members">Reconfigure a Replica Set with Unavailable Members &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

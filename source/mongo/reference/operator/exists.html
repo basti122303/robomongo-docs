@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$exists &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/exists" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$explain" href="explain.html" />
+<link rel="prev" title="$elemMatch (query)" href="elemMatch.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="exists">
+<h1>$exists<a class="headerlink" href="#exists" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_exists">
+<tt class="descname">$exists</tt><a class="headerlink" href="#_S_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">field:</span> <span class="pre">{</span> <span class="pre">$exists:</span> <span class="pre">&lt;boolean&gt;</span> <span class="pre">}</span> <span class="pre">}</span></tt></p>
+<p><a class="reference internal" href="../operators.html#_S_exists" title="$exists"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$exists</span></tt></a> selects the documents that contain the field if
+<tt class="docutils literal"><span class="pre">&lt;boolean&gt;</span></tt> is <tt class="docutils literal"><span class="pre">true</span></tt>. If <tt class="docutils literal"><span class="pre">&lt;boolean&gt;</span></tt> is <tt class="docutils literal"><span class="pre">false</span></tt>, the query
+only returns the documents that do not contain the field. Documents
+that contain the field but has the value <tt class="docutils literal"><span class="pre">null</span></tt> are <em>not</em> returned.</p>
+<p>MongoDB <cite>$exists</cite> does <strong>not</strong> correspond to SQL operator
+<tt class="docutils literal"><span class="pre">exists</span></tt>. For SQL <tt class="docutils literal"><span class="pre">exists</span></tt>, refer to the <a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a>
+operator.</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$exists</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">$nin</span><span class="o">:</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection
+where the <tt class="docutils literal"><span class="pre">qty</span></tt> field exists <em>and</em> its value does not equal either
+<tt class="docutils literal"><span class="pre">5</span></tt> nor <tt class="docutils literal"><span class="pre">15</span></tt>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a></li>
+<li><a class="reference internal" href="../operators.html#_S_nin" title="$nin"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$nin</span></tt></a></li>
+<li><a class="reference internal" href="../operators.html#_S_and" title="$and"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$and</span></tt></a></li>
+<li><a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a></li>
+<li><a class="reference internal" href="../../faq/developers.html#faq-developers-query-for-nulls"><em>How do I query for fields that have null values?</em></a></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="elemMatch.html" title="Previous Section: $elemMatch (query)">&lt; &nbsp; $elemMatch (query)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="explain.html" title="Next Section: $explain">$explain &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

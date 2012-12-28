@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>fsync &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/fsync" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="geoNear" href="geoNear.html" />
+<link rel="prev" title="forceerror (internal)" href="forceerror.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="fsync">
+<h1>fsync<a class="headerlink" href="#fsync" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">fsync</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> command forces the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process
+to flush all pending writes to the storage layer. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+is always writing data to the storage layer as applications write
+more data to the database. MongoDB guarantees that it will write
+all data to disk within the <a class="reference internal" href="../configuration-options.html#syncdelay" title="syncdelay"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">syncdelay</span></tt></a> interval, which is
+60 seconds by default.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">fsync</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> operation is synchronous by default, to run
+<a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> asynchronously, use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">fsync</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">async</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The connection will return immediately. You can check the output of
+<a class="reference internal" href="../method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> for the status of the <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a>
+operation.</p>
+<p>The primary use of <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> is to lock the database
+during backup operations. This will flush all data to the data
+storage layer and block all write operations until you unlock the
+database. Consider the following command form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">fsync</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">lock</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You may continue to perform read operations on a database that
+has a <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> lock. However, following the first
+write operation all subsequent read operations wait until
+you unlock the database.</p>
+</div>
+<p>To check on the current state of the fsync lock, use
+<a class="reference internal" href="../method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a>. Use the following JavaScript function in
+the shell to test if the database is currently locked:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">serverIsLocked</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                     <span class="kd">var</span> <span class="nx">co</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">currentOp</span><span class="p">();</span>
+                     <span class="k">if</span> <span class="p">(</span><span class="nx">co</span> <span class="o">&amp;&amp;</span> <span class="nx">co</span><span class="p">.</span><span class="nx">fsyncLock</span><span class="p">)</span> <span class="p">{</span>
+                         <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+                     <span class="p">}</span>
+                     <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+                 <span class="p">}</span>
+</pre></div>
+</div>
+<p>After loading this function into your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+session you can call it as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">serverIsLocked</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This function will return <tt class="docutils literal"><span class="pre">true</span></tt> if the database is currently
+locked and <tt class="docutils literal"><span class="pre">false</span></tt> if the database is not locked. To unlock the
+database, make a request for an unlock using the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">getSiblingDB</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">).</span><span class="nx">$cmd</span><span class="p">.</span><span class="nx">sys</span><span class="p">.</span><span class="nx">unlock</span><span class="p">.</span><span class="nx">findOne</span><span class="p">();</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.9.0: </span>The <a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> and <a class="reference internal" href="../method/db.fsyncUnlock.html#db.fsyncUnlock" title="db.fsyncUnlock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncUnlock()</span></tt></a>
+helpers in the shell.</p>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you may use the
+<a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> and <a class="reference internal" href="../method/db.fsyncUnlock.html#db.fsyncUnlock" title="db.fsyncUnlock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncUnlock()</span></tt></a> wrappers for
+the <a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> lock and unlock process:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">fsyncLock</span><span class="p">();</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">fsyncUnlock</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="../commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> lock is only possible on individual shards of
+a sharded cluster, not on the entire sharded cluster. To backup an
+entire sharded cluster, please read <a class="reference internal" href="../../administration/backups.html#backups-with-sharding-and-replication"><em>considerations for
+backing up sharded clusters</em></a>.</p>
+<p class="last">If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> has <a class="reference internal" href="../glossary.html#term-journal"><em class="xref std std-term">journaling</em></a>
+enabled, consider using <a class="reference internal" href="../../administration/backups.html#backup-with-journaling"><em>another method</em></a> to back up your database.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The database cannot be locked with <a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> while profiling is enabled.
+You must disable profiling before locking the database with <a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>.
+Disable profiling using <a class="reference internal" href="../method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a> as follows in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="forceerror.html" title="Previous Section: forceerror (internal)">&lt; &nbsp; forceerror (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="geoNear.html" title="Next Section: geoNear">geoNear &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

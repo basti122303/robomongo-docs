@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$set &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/set" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$showDiskLoc" href="showDiskLoc.html" />
+<link rel="prev" title="$returnKey" href="returnKey.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="set">
+<h1>$set<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_set">
+<tt class="descname">$set</tt><a class="headerlink" href="#_S_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a> operator to set a particular value. The
+<a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a> operator requires the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="nx">value2</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>This statement updates in the document in <tt class="docutils literal"><span class="pre">collection</span></tt> where
+<tt class="docutils literal"><span class="pre">field</span></tt> matches <tt class="docutils literal"><span class="pre">value1</span></tt> by replacing the value of the field
+<tt class="docutils literal"><span class="pre">field1</span></tt> with <tt class="docutils literal"><span class="pre">value2</span></tt>. This operator will add the specified
+field or fields if they do not exist in this document <em>or</em> replace
+the existing value of the specified field(s) if they already exist.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="returnKey.html" title="Previous Section: $returnKey">&lt; &nbsp; $returnKey</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="showDiskLoc.html" title="Next Section: $showDiskLoc">$showDiskLoc &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

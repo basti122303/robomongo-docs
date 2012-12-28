@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Query, Update, Projection, and Aggregation Operators &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="$addToSet" href="operator/addToSet.html" />
+<link rel="prev" title="Reference" href="../reference.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="query-update-projection-and-aggregation-operators">
+<h1>Query, Update, Projection, and Aggregation Operators<a class="headerlink" href="#query-update-projection-and-aggregation-operators" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first">Query and update operators:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="operator/addToSet.html">$addToSet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/all.html">$all</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/and.html">$and</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/atomic.html">$atomic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/bit.html">$bit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/box.html">$box</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/center.html">$center</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/centerSphere.html">$centerSphere</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/comment.html">$comment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/each.html">$each</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/elemMatch.html">$elemMatch (query)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/exists.html">$exists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/explain.html">$explain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/gt.html">$gt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/gte.html">$gte</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/hint.html">$hint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/in.html">$in</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/inc.html">$inc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/lt.html">$lt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/lte.html">$lte</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/max.html">$max</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/maxDistance.html">$maxDistance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/maxScan.html">$maxScan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/min.html">$min</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/mod.html">$mod</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/natural.html">$natural</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/ne.html">$ne</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/near.html">$near</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/nearSphere.html">$nearSphere</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/nin.html">$nin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/nor.html">$nor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/not.html">$not</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/or.html">$or</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/orderby.html">$orderby</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/polygon.html">$polygon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/pop.html">$pop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/positional.html">$</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/pull.html">$pull</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/pullAll.html">$pullAll</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/push.html">$push</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/pushAll.html">$pushAll</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/query.html">$query</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/regex.html">$regex</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/rename.html">$rename</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/returnKey.html">$returnKey</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/set.html">$set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/showDiskLoc.html">$showDiskLoc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/size.html">$size</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/snapshot.html">$snapshot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/type.html">$type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/uniqueDocs.html">$uniqueDocs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/unset.html">$unset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/where.html">$where</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operator/within.html">$within</a></li>
+</ul>
+</div>
+</li>
+<li><p class="first">Projection operators:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="projection/elemMatch.html">$elemMatch (projection)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projection/slice.html">$slice (projection)</a></li>
+</ul>
+</div>
+</li>
+<li><p class="first">Aggregation operators:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/add.html">$add (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/addToSet.html">$addToSet (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/and.html">$and (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/avg.html">$avg (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/cmp.html">$cmp (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/cond.html">$cond (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/dayOfMonth.html">$dayOfMonth (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/dayOfWeek.html">$dayOfWeek (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/dayOfYear.html">$dayOfYear (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/divide.html">$divide (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/eq.html">$eq (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/first.html">$first (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/group.html">$group (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/gt.html">$gt (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/gte.html">$gte (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/hour.html">$hour (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/ifNull.html">$ifNull (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/last.html">$last (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/limit.html">$limit (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/lt.html">$lt (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/lte.html">$lte (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/match.html">$match (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/max.html">$max (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/min.html">$min (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/minute.html">$minute (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/mod.html">$mod (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/month.html">$month (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/multiply.html">$multiply (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/ne.html">$ne (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/not.html">$not (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/or.html">$or (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/project.html">$project (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/push.html">$push (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/second.html">$second (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/skip.html">$skip (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/sort.html">$sort (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/strcasecmp.html">$strcasecmp (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/substr.html">$substr (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/subtract.html">$subtract (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/sum.html">$sum (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/toLower.html">$toLower (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/toUpper.html">$toUpper (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/unwind.html">$unwind (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/week.html">$week (aggregation)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aggregation/year.html">$year (aggregation)</a></li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../reference.html" title="Previous Section: Reference">&lt; &nbsp; Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="operator/addToSet.html" title="Next Section: $addToSet">$addToSet &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

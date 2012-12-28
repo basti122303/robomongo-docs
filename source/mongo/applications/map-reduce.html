@@ -1,0 +1,767 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Map-Reduce &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/map-reduce" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Aggregation" href="../aggregation.html" />
+<link rel="next" title="Simple Aggregation Methods and Commands" href="../reference/simple-aggregation.html" />
+<link rel="prev" title="Aggregation Framework Reference" href="../reference/aggregation.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="map-reduce">
+<h1>Map-Reduce<a class="headerlink" href="#map-reduce" title="Permalink to this headline">¶</a></h1>
+<p>Map-reduce operations can handle complex aggregation tasks. To perform
+map-reduce operations, MongoDB provides the <a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a>
+command and, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, the
+<a class="reference internal" href="../reference/method/db.collection.mapReduce.html#db.collection.mapReduce" title="db.collection.mapReduce"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.mapReduce()</span></tt></a> wrapper method.</p>
+<p>For many simple aggregation tasks, see the <a class="reference internal" href="aggregation.html"><em>aggregation framework</em></a>.</p>
+<div class="section" id="map-reduce-examples">
+<span id="id1"></span><h2>Map-Reduce Examples<a class="headerlink" href="#map-reduce-examples" title="Permalink to this headline">¶</a></h2>
+<p>This section provides some map-reduce examples in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell using the <a class="reference internal" href="../reference/method/db.collection.mapReduce.html#db.collection.mapReduce" title="db.collection.mapReduce"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.mapReduce()</span></tt></a> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">mapReduce</span><span class="p">(</span>
+                         <span class="o">&lt;</span><span class="nx">mapfunction</span><span class="o">&gt;</span><span class="p">,</span>
+                         <span class="o">&lt;</span><span class="nx">reducefunction</span><span class="o">&gt;</span><span class="p">,</span>
+                         <span class="p">{</span>
+                           <span class="nx">out</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">query</span><span class="o">:</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">sort</span><span class="o">:</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">limit</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">finalize</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">scope</span><span class="o">:</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">jsMode</span><span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+                           <span class="nx">verbose</span><span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span>
+                         <span class="p">}</span>
+                       <span class="p">)</span>
+</pre></div>
+</div>
+<p>For more information on the parameters, see the
+<a class="reference internal" href="../reference/method/db.collection.mapReduce.html#db.collection.mapReduce" title="db.collection.mapReduce"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.mapReduce()</span></tt></a> reference page .</p>
+<p>Consider the following map-reduce operations on a collection <tt class="docutils literal"><span class="pre">orders</span></tt>
+that contains documents of the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;50a8240b927d5d8b5891743c&quot;</span><span class="p">),</span>
+     <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
+     <span class="nx">ord_date</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s2">&quot;Oct 04, 2012&quot;</span><span class="p">),</span>
+     <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+     <span class="nx">price</span><span class="o">:</span> <span class="mi">250</span><span class="p">,</span>
+     <span class="nx">items</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;mmm&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">2.5</span> <span class="p">},</span>
+              <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;nnn&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">2.5</span> <span class="p">}</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="return-the-total-price-per-customer-id">
+<h3>Return the Total Price Per Customer Id<a class="headerlink" href="#return-the-total-price-per-customer-id" title="Permalink to this headline">¶</a></h3>
+<p>Perform map-reduce operation on the <tt class="docutils literal"><span class="pre">orders</span></tt> collection to group by
+the <tt class="docutils literal"><span class="pre">cust_id</span></tt>, and for each <tt class="docutils literal"><span class="pre">cust_id</span></tt>, calculate the sum of the
+<tt class="docutils literal"><span class="pre">price</span></tt> for each <tt class="docutils literal"><span class="pre">cust_id</span></tt>:</p>
+<blockquote>
+<div></div></blockquote>
+<ol class="arabic">
+<li><p class="first">Define the map function to process each input document:</p>
+<ul class="simple">
+<li>In the function, <tt class="docutils literal"><span class="pre">this</span></tt> refers to the document that the
+map-reduce operation is processing.</li>
+<li>The function maps the <tt class="docutils literal"><span class="pre">price</span></tt> to the <tt class="docutils literal"><span class="pre">cust_id</span></tt> for each
+document and emits the <tt class="docutils literal"><span class="pre">cust_id</span></tt> and <tt class="docutils literal"><span class="pre">price</span></tt> pair.</li>
+</ul>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">mapFunction1</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                       <span class="nx">emit</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">cust_id</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">price</span><span class="p">);</span>
+                   <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define the corresponding reduce function with two arguments
+<tt class="docutils literal"><span class="pre">keyCustId</span></tt> and <tt class="docutils literal"><span class="pre">valuesPrices</span></tt>:</p>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">valuesPrices</span></tt> is an array whose elements are the <tt class="docutils literal"><span class="pre">price</span></tt>
+values emitted by the map function and grouped by <tt class="docutils literal"><span class="pre">keyCustId</span></tt>.</li>
+<li>The function reduces the <tt class="docutils literal"><span class="pre">valuesPrice</span></tt> array to the
+sum of its elements.</li>
+</ul>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction1</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keyCustId</span><span class="p">,</span> <span class="nx">valuesPrices</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="k">return</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="nx">valuesPrices</span><span class="p">);</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Perform the map-reduce on all documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection
+using the <tt class="docutils literal"><span class="pre">mapFunction1</span></tt> map function and the <tt class="docutils literal"><span class="pre">reduceFunction1</span></tt>
+reduce function.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">mapReduce</span><span class="p">(</span>
+                     <span class="nx">mapFunction1</span><span class="p">,</span>
+                     <span class="nx">reduceFunction1</span><span class="p">,</span>
+                     <span class="p">{</span> <span class="nx">out</span><span class="o">:</span> <span class="s2">&quot;map_reduce_example&quot;</span> <span class="p">}</span>
+                   <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation outputs the results to a collection named
+<tt class="docutils literal"><span class="pre">map_reduce_example</span></tt>. If the <tt class="docutils literal"><span class="pre">map_reduce_example</span></tt> collection
+already exists, the operation will replace the contents with the
+results of this map-reduce operation:</p>
+</li>
+</ol>
+</div>
+<div class="section" id="calculate-the-number-of-orders-total-quantity-and-average-quantity-per-item">
+<h3>Calculate the Number of Orders, Total Quantity, and Average Quantity Per Item<a class="headerlink" href="#calculate-the-number-of-orders-total-quantity-and-average-quantity-per-item" title="Permalink to this headline">¶</a></h3>
+<p>In this example you will perform a map-reduce operation on the <tt class="docutils literal"><span class="pre">orders</span></tt> collection, for
+all documents that have an <tt class="docutils literal"><span class="pre">ord_date</span></tt> value
+greater than <tt class="docutils literal"><span class="pre">01/01/2012</span></tt>. The operation groups by
+the <tt class="docutils literal"><span class="pre">item.sku</span></tt> field, and for each <tt class="docutils literal"><span class="pre">sku</span></tt> calculates the number of orders and the
+total quantity ordered. The operation concludes by calculating the average quantity per
+order for each <tt class="docutils literal"><span class="pre">sku</span></tt> value:</p>
+<ol class="arabic">
+<li><p class="first">Define the map function to process each input document:</p>
+<ul class="simple">
+<li>In the function, <tt class="docutils literal"><span class="pre">this</span></tt> refers to the document that the
+map-reduce operation is processing.</li>
+<li>For each item, the function associates the <tt class="docutils literal"><span class="pre">sku</span></tt> with a new
+object <tt class="docutils literal"><span class="pre">value</span></tt> that contains the <tt class="docutils literal"><span class="pre">count</span></tt> of <tt class="docutils literal"><span class="pre">1</span></tt> and the
+item <tt class="docutils literal"><span class="pre">qty</span></tt> for the order and emits the <tt class="docutils literal"><span class="pre">sku</span></tt> and <tt class="docutils literal"><span class="pre">value</span></tt> pair.</li>
+</ul>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">mapFunction2</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                       <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                           <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">sku</span><span class="p">;</span>
+                           <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="p">{</span>
+                                         <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                                         <span class="nx">qty</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">qty</span>
+                                       <span class="p">};</span>
+                           <span class="nx">emit</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+                       <span class="p">}</span>
+                    <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define the corresponding reduce function with two arguments
+<tt class="docutils literal"><span class="pre">keySKU</span></tt> and <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt>:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt> is an array whose elements are the objects
+mapped to the grouped <tt class="docutils literal"><span class="pre">keySKU</span></tt> values passed by map
+function to the reducer function.</li>
+<li>The function reduces the <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt> array to a single
+object <tt class="docutils literal"><span class="pre">reducedValue</span></tt> that also contains the <tt class="docutils literal"><span class="pre">count</span></tt> and the
+<tt class="docutils literal"><span class="pre">qty</span></tt> fields.</li>
+<li>In <tt class="docutils literal"><span class="pre">reducedValue</span></tt>, the <tt class="docutils literal"><span class="pre">count</span></tt> field contains the sum of the
+<tt class="docutils literal"><span class="pre">count</span></tt> fields from the individual array elements, and the
+<tt class="docutils literal"><span class="pre">qty</span></tt> field contains the sum of the <tt class="docutils literal"><span class="pre">qty</span></tt> fields from the
+individual array elements.</li>
+</ul>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction2</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keySKU</span><span class="p">,</span> <span class="nx">valuesCountObjects</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="nx">reducedValue</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+                          <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">valuesCountObjects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">qty</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">qty</span><span class="p">;</span>
+                          <span class="p">}</span>
+
+                          <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a finalize function with two arguments <tt class="docutils literal"><span class="pre">key</span></tt> and
+<tt class="docutils literal"><span class="pre">reducedValue</span></tt>. The function modifies the <tt class="docutils literal"><span class="pre">reducedValue</span></tt> object
+to add a computed field named <tt class="docutils literal"><span class="pre">average</span></tt> and returns the modified
+object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">finalizeFunction2</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">reducedValue</span><span class="p">)</span> <span class="p">{</span>
+
+                            <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">average</span> <span class="o">=</span> <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">qty</span><span class="o">/</span><span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+
+                            <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                        <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Perform the map-reduce operation on the <tt class="docutils literal"><span class="pre">orders</span></tt> collection using
+the <tt class="docutils literal"><span class="pre">mapFunction2</span></tt>, <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt>, and
+<tt class="docutils literal"><span class="pre">finalizeFunction2</span></tt> functions.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">mapReduce</span><span class="p">(</span> <span class="nx">mapFunction2</span><span class="p">,</span>
+                     <span class="nx">reduceFunction2</span><span class="p">,</span>
+                     <span class="p">{</span>
+                       <span class="nx">out</span><span class="o">:</span> <span class="p">{</span> <span class="nx">merge</span><span class="o">:</span> <span class="s2">&quot;map_reduce_example&quot;</span> <span class="p">},</span>
+                       <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_date</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/2012&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                       <span class="nx">finalize</span><span class="o">:</span> <span class="nx">finalizeFunction2</span>
+                     <span class="p">}</span>
+                   <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation uses the <tt class="docutils literal"><span class="pre">query</span></tt> field to select only those
+documents with <tt class="docutils literal"><span class="pre">ord_date</span></tt> greater than <tt class="docutils literal"><span class="pre">new</span>
+<span class="pre">Date(01/01/2012)</span></tt>. Then it output the results to a collection
+<tt class="docutils literal"><span class="pre">map_reduce_example</span></tt>. If the <tt class="docutils literal"><span class="pre">map_reduce_example</span></tt> collection
+already exists, the operation will merge the existing contents with
+the results of this map-reduce operation:</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="incremental-map-reduce">
+<span id="map-reduce-incremental"></span><h2>Incremental Map-Reduce<a class="headerlink" href="#incremental-map-reduce" title="Permalink to this headline">¶</a></h2>
+<p>If the map-reduce dataset is constantly growing, then rather than
+performing the map-reduce operation over the entire dataset each time
+you want to run map-reduce, you may want to perform an incremental
+map-reduce.</p>
+<p>To perform incremental map-reduce:</p>
+<ol class="arabic simple">
+<li>Run a map-reduce job over the current collection and output the
+result to a separate collection.</li>
+<li>When you have more data to process, run subsequent map-reduce job
+with:<ul>
+<li>the <tt class="docutils literal"><span class="pre">query</span></tt> parameter that specifies conditions that match
+<em>only</em> the new documents.</li>
+<li>the <tt class="docutils literal"><span class="pre">out</span></tt> parameter that specifies the <tt class="docutils literal"><span class="pre">reduce</span></tt> action to
+merge the new results into the existing output collection.</li>
+</ul>
+</li>
+</ol>
+<p>Consider the following example where you schedule a map-reduce
+operation on a <tt class="docutils literal"><span class="pre">sessions</span></tt> collection to run at the end of each day.</p>
+<div class="section" id="data-setup">
+<h3>Data Setup<a class="headerlink" href="#data-setup" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">sessions</span></tt> collection contains documents that log users&#8217; session
+each day, for example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-03 14:17:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">95</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-03 14:23:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">110</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-03 15:02:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">120</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-03 16:45:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">45</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-04 11:05:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">105</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-04 13:14:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">120</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-04 17:00:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">130</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-04 15:37:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">65</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initial-map-reduce-of-current-collection">
+<h3>Initial Map-Reduce of Current Collection<a class="headerlink" href="#initial-map-reduce-of-current-collection" title="Permalink to this headline">¶</a></h3>
+<p>Run the first map-reduce operation as follows:</p>
+<ol class="arabic">
+<li><p class="first">Define the <tt class="docutils literal"><span class="pre">map</span></tt> function that maps the <tt class="docutils literal"><span class="pre">userid</span></tt> to an
+object that contains the fields <tt class="docutils literal"><span class="pre">userid</span></tt>, <tt class="docutils literal"><span class="pre">total_time</span></tt>, <tt class="docutils literal"><span class="pre">count</span></tt>,
+and <tt class="docutils literal"><span class="pre">avg_time</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">mapFunction</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                      <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">userid</span><span class="p">;</span>
+                      <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="p">{</span>
+                                    <span class="nx">userid</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">userid</span><span class="p">,</span>
+                                    <span class="nx">total_time</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+                                    <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                                    <span class="nx">avg_time</span><span class="o">:</span> <span class="mi">0</span>
+                                   <span class="p">};</span>
+
+                      <span class="nx">emit</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">value</span> <span class="p">);</span>
+                  <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define the corresponding <tt class="docutils literal"><span class="pre">reduce</span></tt> function with two arguments
+<tt class="docutils literal"><span class="pre">key</span></tt> and <tt class="docutils literal"><span class="pre">values</span></tt> to calculate the total time and the count.
+The <tt class="docutils literal"><span class="pre">key</span></tt> corresponds to the <tt class="docutils literal"><span class="pre">userid</span></tt>, and the <tt class="docutils literal"><span class="pre">values</span></tt> is an
+array whose elements corresponds to the individual objects mapped to the
+<tt class="docutils literal"><span class="pre">userid</span></tt> in the <tt class="docutils literal"><span class="pre">mapFunction</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">values</span><span class="p">)</span> <span class="p">{</span>
+
+                        <span class="kd">var</span> <span class="nx">reducedObject</span> <span class="o">=</span> <span class="p">{</span>
+                                              <span class="nx">userid</span><span class="o">:</span> <span class="nx">key</span><span class="p">,</span>
+                                              <span class="nx">total_time</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                                              <span class="nx">count</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span>
+                                              <span class="nx">avg_time</span><span class="o">:</span><span class="mi">0</span>
+                                            <span class="p">};</span>
+
+                        <span class="nx">values</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+                                              <span class="nx">reducedObject</span><span class="p">.</span><span class="nx">total_time</span> <span class="o">+=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">total_time</span><span class="p">;</span>
+                                              <span class="nx">reducedObject</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+                                        <span class="p">}</span>
+                                      <span class="p">);</span>
+                        <span class="k">return</span> <span class="nx">reducedObject</span><span class="p">;</span>
+                     <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define <tt class="docutils literal"><span class="pre">finalize</span></tt> function with two arguments <tt class="docutils literal"><span class="pre">key</span></tt> and
+<tt class="docutils literal"><span class="pre">reducedValue</span></tt>. The function modifies the <tt class="docutils literal"><span class="pre">reducedValue</span></tt> document
+to add another field <tt class="docutils literal"><span class="pre">average</span></tt> and returns the modified document.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">finalizeFunction</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">reducedValue</span><span class="p">)</span> <span class="p">{</span>
+
+                          <span class="k">if</span> <span class="p">(</span><span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">avg_time</span> <span class="o">=</span> <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">total_time</span> <span class="o">/</span> <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+
+                          <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                       <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Perform map-reduce on the <tt class="docutils literal"><span class="pre">session</span></tt> collection using the
+<tt class="docutils literal"><span class="pre">mapFunction</span></tt>, the <tt class="docutils literal"><span class="pre">reduceFunction</span></tt>, and the
+<tt class="docutils literal"><span class="pre">finalizeFunction</span></tt> functions. Output the results to a collection
+<tt class="docutils literal"><span class="pre">session_stat</span></tt>. If the <tt class="docutils literal"><span class="pre">session_stat</span></tt> collection already exists,
+the operation will replace the contents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">mapReduce</span><span class="p">(</span> <span class="nx">mapFunction</span><span class="p">,</span>
+                       <span class="nx">reduceFunction</span><span class="p">,</span>
+                       <span class="p">{</span>
+                         <span class="nx">out</span><span class="o">:</span> <span class="p">{</span> <span class="nx">reduce</span><span class="o">:</span> <span class="s2">&quot;session_stat&quot;</span> <span class="p">},</span>
+                         <span class="nx">finalize</span><span class="o">:</span> <span class="nx">finalizeFunction</span>
+                       <span class="p">}</span>
+                     <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="subsequent-incremental-map-reduce">
+<h3>Subsequent Incremental Map-Reduce<a class="headerlink" href="#subsequent-incremental-map-reduce" title="Permalink to this headline">¶</a></h3>
+<p>Later as the <tt class="docutils literal"><span class="pre">sessions</span></tt> collection grows, you can run additional
+map-reduce operations. For example, add new documents to the
+<tt class="docutils literal"><span class="pre">sessions</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-05 14:17:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">100</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-05 14:23:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">115</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-05 15:02:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">125</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">userid</span><span class="o">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-05 16:45:00&#39;</span><span class="p">),</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">55</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>At the end of the day, perform incremental map-reduce on the
+<tt class="docutils literal"><span class="pre">sessions</span></tt> collection but use the <tt class="docutils literal"><span class="pre">query</span></tt> field to select only the
+new documents. Output the results to the collection <tt class="docutils literal"><span class="pre">session_stat</span></tt>,
+but <tt class="docutils literal"><span class="pre">reduce</span></tt> the contents with the results of the incremental
+map-reduce:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">sessions</span><span class="p">.</span><span class="nx">mapReduce</span><span class="p">(</span> <span class="nx">mapFunction</span><span class="p">,</span>
+                       <span class="nx">reduceFunction</span><span class="p">,</span>
+                       <span class="p">{</span>
+                         <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ts</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2011-11-05 00:00:00&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                         <span class="nx">out</span><span class="o">:</span> <span class="p">{</span> <span class="nx">reduce</span><span class="o">:</span> <span class="s2">&quot;session_stat&quot;</span> <span class="p">},</span>
+                         <span class="nx">finalize</span><span class="o">:</span> <span class="nx">finalizeFunction</span>
+                       <span class="p">}</span>
+                     <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="temporary-collection">
+<span id="map-reduce-temporay-collection"></span><h2>Temporary Collection<a class="headerlink" href="#temporary-collection" title="Permalink to this headline">¶</a></h2>
+<p>The map-reduce operation uses a temporary collection during processing.
+At completion, the map-reduce operation renames the temporary
+collection. As a result, you  can perform a map-reduce operation
+periodically with the same target collection name without affecting
+the intermediate states. Use this mode when
+generating statistical output collections on a regular basis.</p>
+</div>
+<div class="section" id="concurrency">
+<span id="map-reduce-concurrency"></span><h2>Concurrency<a class="headerlink" href="#concurrency" title="Permalink to this headline">¶</a></h2>
+<p>The map-reduce operation is composed of many tasks, including:</p>
+<ul class="simple">
+<li>reads from the input collection,</li>
+<li>executions of the <tt class="docutils literal"><span class="pre">map</span></tt> function,</li>
+<li>executions of the <tt class="docutils literal"><span class="pre">reduce</span></tt> function,</li>
+<li>writes to the output collection.</li>
+</ul>
+<p>These various tasks take the following locks:</p>
+<ul>
+<li><p class="first">The read phase takes a read lock.  It yields every 100 documents.</p>
+</li>
+<li><p class="first">The JavaScript code (i.e. <tt class="docutils literal"><span class="pre">map</span></tt>, <tt class="docutils literal"><span class="pre">reduce</span></tt>, <tt class="docutils literal"><span class="pre">finalize</span></tt>
+functions) is executed in a single thread, taking a JavaScript lock;
+however, most JavaScript tasks in map-reduce are very short and
+yield the lock frequently.</p>
+</li>
+<li><p class="first">The insert into the temporary collection takes a write lock for a
+single write.</p>
+<p>If the output collection does not exist, the creation of the output
+collection takes a write lock.</p>
+<p>If the output collection exists, then the output actions (i.e.
+<tt class="docutils literal"><span class="pre">merge</span></tt>, <tt class="docutils literal"><span class="pre">replace</span></tt>, <tt class="docutils literal"><span class="pre">reduce</span></tt>) take a write lock.</p>
+</li>
+</ul>
+<p>Although single-threaded, the map-reduce tasks interleave and appear to
+run in parallel.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The final write lock during post-processing makes the results appear
+atomically. However, output actions <tt class="docutils literal"><span class="pre">merge</span></tt> and <tt class="docutils literal"><span class="pre">reduce</span></tt> may
+take minutes to process. For the <tt class="docutils literal"><span class="pre">merge</span></tt> and <tt class="docutils literal"><span class="pre">reduce</span></tt>, the
+<tt class="docutils literal"><span class="pre">nonAtomic</span></tt> flag is available. See the
+<a class="reference internal" href="../reference/method/db.collection.mapReduce.html#db.collection.mapReduce" title="db.collection.mapReduce"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.mapReduce()</span></tt></a> reference for more information.</p>
+</div>
+</div>
+<div class="section" id="sharded-cluster">
+<span id="map-reduce-sharded-cluster"></span><h2>Sharded Cluster<a class="headerlink" href="#sharded-cluster" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="sharded-input">
+<h3>Sharded Input<a class="headerlink" href="#sharded-input" title="Permalink to this headline">¶</a></h3>
+<p>When using sharded collection as the input for a map-reduce operation,
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will automatically dispatch the map-reduce job to
+each shard in parallel. There is no special option
+required. <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will wait for jobs on all shards to
+finish.</p>
+</div>
+<div class="section" id="sharded-output">
+<h3>Sharded Output<a class="headerlink" href="#sharded-output" title="Permalink to this headline">¶</a></h3>
+<p>By default the output collection is not sharded. The process is:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> dispatches a map-reduce finish job to the shard
+that will store the target collection.</p>
+</li>
+<li><p class="first">The target shard pulls results from all other shards, and runs a
+final reduce/finalize operation, and write to the output.</p>
+</li>
+<li><p class="first">If using the <tt class="docutils literal"><span class="pre">sharded</span></tt> option to the <tt class="docutils literal"><span class="pre">out</span></tt> parameter, MongoDB
+shards the output using <tt class="docutils literal"><span class="pre">_id</span></tt> field as the shard key.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2.</span></p>
+</li>
+<li><p class="first">If the output collection does not exist, MongoDB creates and shards
+the collection on the <tt class="docutils literal"><span class="pre">_id</span></tt> field. If the collection is empty,
+MongoDB creates <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> using the result of the first
+stage of the map-reduce operation.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> dispatches, in parallel, a map-reduce finish job
+to every shard that owns a chunk.</p>
+</li>
+<li><p class="first">Each shard will pull the results it owns from all other shards, run a
+final reduce/finalize, and write to the output collection.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>During later map-reduce jobs, MongoDB splits chunks as needed.</li>
+<li>Balancing of chunks for the output collection is automatically
+prevented during post-processing to avoid concurrency issues.</li>
+</ul>
+</div>
+<p>In MongoDB 2.0:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> retrieves the results from each shard, and
+performs merge sort to order the results, and performs a reduce/finalize as
+needed. <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> then writes the result to the output
+collection in sharded mode.</li>
+<li>This model requires only a small amount of memory, even for large datasets.</li>
+<li>Shard chunks are not automatically split during insertion. This
+requires manual intervention until the chunks are granular and
+balanced.</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">For best results, only use the sharded output options for
+<a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> in version 2.2 or later.</p>
+</div>
+</div>
+</div>
+<div class="section" id="troubleshooting-map-reduce-operations">
+<span id="map-reduce-troubleshooting"></span><h2>Troubleshooting Map-Reduce Operations<a class="headerlink" href="#troubleshooting-map-reduce-operations" title="Permalink to this headline">¶</a></h2>
+<p>You can troubleshoot the <tt class="docutils literal"><span class="pre">map</span></tt> function and the <tt class="docutils literal"><span class="pre">reduce</span></tt> function
+in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<div class="section" id="troubleshoot-the-map-function">
+<span id="troubleshoot-map-function"></span><h3>Troubleshoot the Map Function<a class="headerlink" href="#troubleshoot-the-map-function" title="Permalink to this headline">¶</a></h3>
+<p>You can verify the <tt class="docutils literal"><span class="pre">key</span></tt> and <tt class="docutils literal"><span class="pre">value</span></tt> pairs emitted by the <tt class="docutils literal"><span class="pre">map</span></tt>
+function by writing your own <tt class="docutils literal"><span class="pre">emit</span></tt> function.</p>
+<p>Consider a collection <tt class="docutils literal"><span class="pre">orders</span></tt> that contains documents of the
+following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;50a8240b927d5d8b5891743c&quot;</span><span class="p">),</span>
+     <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
+     <span class="nx">ord_date</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s2">&quot;Oct 04, 2012&quot;</span><span class="p">),</span>
+     <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+     <span class="nx">price</span><span class="o">:</span> <span class="mi">250</span><span class="p">,</span>
+     <span class="nx">items</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;mmm&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">2.5</span> <span class="p">},</span>
+              <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;nnn&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">2.5</span> <span class="p">}</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p class="first">Define the <tt class="docutils literal"><span class="pre">map</span></tt> function that maps the <tt class="docutils literal"><span class="pre">price</span></tt> to the
+<tt class="docutils literal"><span class="pre">cust_id</span></tt> for each document and emits the <tt class="docutils literal"><span class="pre">cust_id</span></tt> and <tt class="docutils literal"><span class="pre">price</span></tt>
+pair:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">map</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">emit</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">cust_id</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">price</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define the <tt class="docutils literal"><span class="pre">emit</span></tt> function to print the key and value:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">emit</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;emit&quot;</span><span class="p">);</span>
+    <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;key: &quot;</span> <span class="o">+</span> <span class="nx">key</span> <span class="o">+</span> <span class="s2">&quot;  value: &quot;</span> <span class="o">+</span> <span class="nx">tojson</span><span class="p">(</span><span class="nx">value</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">map</span></tt> function with a single document from the <tt class="docutils literal"><span class="pre">orders</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myDoc</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;50a8240b927d5d8b5891743c&quot;</span><span class="p">)</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">myDoc</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the key and value pair is as you expected.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">emit</span>
+<span class="nx">key</span><span class="o">:</span> <span class="nx">abc123</span> <span class="nx">value</span><span class="o">:</span><span class="mi">250</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">map</span></tt> function with multiple documents from the <tt class="docutils literal"><span class="pre">orders</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myCursor</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">cust_id</span><span class="o">:</span> <span class="s2">&quot;abc123&quot;</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="nx">myCursor</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">myCursor</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+    <span class="nx">print</span> <span class="p">(</span><span class="s2">&quot;document _id= &quot;</span> <span class="o">+</span> <span class="nx">tojson</span><span class="p">(</span><span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span><span class="p">));</span>
+    <span class="nx">map</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">doc</span><span class="p">);</span>
+    <span class="nx">print</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the key and value pairs are as you expected.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="troubleshoot-the-reduce-function">
+<span id="troubleshoot-reduce-function"></span><h3>Troubleshoot the Reduce Function<a class="headerlink" href="#troubleshoot-the-reduce-function" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="confirm-output-type">
+<h4>Confirm Output Type<a class="headerlink" href="#confirm-output-type" title="Permalink to this headline">¶</a></h4>
+<p>You can test that the <tt class="docutils literal"><span class="pre">reduce</span></tt> function returns a value that is the
+same type as the value emitted from the <tt class="docutils literal"><span class="pre">map</span></tt> function.</p>
+<ol class="arabic">
+<li><p class="first">Define a <tt class="docutils literal"><span class="pre">reduceFunction1</span></tt> function that takes the arguments
+<tt class="docutils literal"><span class="pre">keyCustId</span></tt> and <tt class="docutils literal"><span class="pre">valuesPrices</span></tt>. <tt class="docutils literal"><span class="pre">valuesPrices</span></tt> is an array of
+integers:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction1</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keyCustId</span><span class="p">,</span> <span class="nx">valuesPrices</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="k">return</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">sum</span><span class="p">(</span><span class="nx">valuesPrices</span><span class="p">);</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a sample array of integers:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myTestValues</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span> <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">reduceFunction1</span></tt> with <tt class="docutils literal"><span class="pre">myTestValues</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">reduceFunction1</span><span class="p">(</span><span class="s1">&#39;myKey&#39;</span><span class="p">,</span> <span class="nx">myTestValues</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the <tt class="docutils literal"><span class="pre">reduceFunction1</span></tt> returned an integer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="mi">20</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> function that takes the arguments
+<tt class="docutils literal"><span class="pre">keySKU</span></tt> and <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt>. <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt> is an array of
+documents that contain two fields <tt class="docutils literal"><span class="pre">count</span></tt> and <tt class="docutils literal"><span class="pre">qty</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction2</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keySKU</span><span class="p">,</span> <span class="nx">valuesCountObjects</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="nx">reducedValue</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+                          <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">valuesCountObjects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">qty</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">qty</span><span class="p">;</span>
+                          <span class="p">}</span>
+
+                          <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a sample array of documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myTestObjects</span> <span class="o">=</span> <span class="p">[</span>
+                      <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                      <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+                      <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+                    <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> with <tt class="docutils literal"><span class="pre">myTestObjects</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">reduceFunction2</span><span class="p">(</span><span class="s1">&#39;myKey&#39;</span><span class="p">,</span> <span class="nx">myTestObjects</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> returned a document with exactly the
+<tt class="docutils literal"><span class="pre">count</span></tt> and the <tt class="docutils literal"><span class="pre">qty</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;qty&quot;</span> <span class="o">:</span> <span class="mi">30</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="ensure-insensitivity-to-the-order-of-mapped-values">
+<h4>Ensure Insensitivity to the Order of Mapped Values<a class="headerlink" href="#ensure-insensitivity-to-the-order-of-mapped-values" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="docutils literal"><span class="pre">reduce</span></tt> function takes a <tt class="docutils literal"><span class="pre">key</span></tt> and a <tt class="docutils literal"><span class="pre">values</span></tt> array as its
+argument. You can test that the result of the <tt class="docutils literal"><span class="pre">reduce</span></tt> function does
+not depend on the order of the elements in the <tt class="docutils literal"><span class="pre">values</span></tt> array.</p>
+<ol class="arabic">
+<li><p class="first">Define a sample <tt class="docutils literal"><span class="pre">values1</span></tt> array and a sample <tt class="docutils literal"><span class="pre">values2</span></tt> array
+that only differ in the order of the array elements:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">values1</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+              <span class="p">];</span>
+
+<span class="kd">var</span> <span class="nx">values2</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">15</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+              <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> function that takes the arguments
+<tt class="docutils literal"><span class="pre">keySKU</span></tt> and <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt>. <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt> is an array of
+documents that contain two fields <tt class="docutils literal"><span class="pre">count</span></tt> and <tt class="docutils literal"><span class="pre">qty</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction2</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keySKU</span><span class="p">,</span> <span class="nx">valuesCountObjects</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="nx">reducedValue</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+                          <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">valuesCountObjects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">qty</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">qty</span><span class="p">;</span>
+                          <span class="p">}</span>
+
+                          <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> first with <tt class="docutils literal"><span class="pre">values1</span></tt> and then with
+<tt class="docutils literal"><span class="pre">values2</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">reduceFunction2</span><span class="p">(</span><span class="s1">&#39;myKey&#39;</span><span class="p">,</span> <span class="nx">values1</span><span class="p">);</span>
+<span class="nx">reduceFunction2</span><span class="p">(</span><span class="s1">&#39;myKey&#39;</span><span class="p">,</span> <span class="nx">values2</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> returned the same result:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;qty&quot;</span> <span class="o">:</span> <span class="mi">30</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="ensure-reduce-function-idempotentcy">
+<h4>Ensure Reduce Function Idempotentcy<a class="headerlink" href="#ensure-reduce-function-idempotentcy" title="Permalink to this headline">¶</a></h4>
+<p>Because the map-reduce operation may call a <tt class="docutils literal"><span class="pre">reduce</span></tt> multiple times
+for the same key, the <tt class="docutils literal"><span class="pre">reduce</span></tt> function must return a value of the
+same type as the value emitted from the <tt class="docutils literal"><span class="pre">map</span></tt> function. You can test
+that the <tt class="docutils literal"><span class="pre">reduce</span></tt> function process &#8220;reduced&#8221; values without
+affecting the <em>final</em> value.</p>
+<ol class="arabic">
+<li><p class="first">Define a <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> function that takes the arguments
+<tt class="docutils literal"><span class="pre">keySKU</span></tt> and <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt>. <tt class="docutils literal"><span class="pre">valuesCountObjects</span></tt> is an array of
+documents that contain two fields <tt class="docutils literal"><span class="pre">count</span></tt> and <tt class="docutils literal"><span class="pre">qty</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">reduceFunction2</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">keySKU</span><span class="p">,</span> <span class="nx">valuesCountObjects</span><span class="p">)</span> <span class="p">{</span>
+                          <span class="nx">reducedValue</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+                          <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">valuesCountObjects</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span>
+                              <span class="nx">reducedValue</span><span class="p">.</span><span class="nx">qty</span> <span class="o">+=</span> <span class="nx">valuesCountObjects</span><span class="p">[</span><span class="nx">idx</span><span class="p">].</span><span class="nx">qty</span><span class="p">;</span>
+                          <span class="p">}</span>
+
+                          <span class="k">return</span> <span class="nx">reducedValue</span><span class="p">;</span>
+                      <span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a sample key:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myKey</span> <span class="o">=</span> <span class="s1">&#39;myKey&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a sample <tt class="docutils literal"><span class="pre">valuesIdempotent</span></tt> array that contains an element that is a
+call to the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> function:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">valuesIdempotent</span> <span class="o">=</span> <span class="p">[</span>
+                         <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                         <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+                         <span class="nx">reduceFunction2</span><span class="p">(</span><span class="nx">myKey</span><span class="p">,</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span><span class="mi">3</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span> <span class="p">]</span> <span class="p">)</span>
+                       <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Define a sample <tt class="docutils literal"><span class="pre">values1</span></tt> array that combines the values passed to
+<tt class="docutils literal"><span class="pre">reduceFunction2</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">values1</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+              <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Invoke the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> first with <tt class="docutils literal"><span class="pre">myKey</span></tt> and
+<tt class="docutils literal"><span class="pre">valuesIdempotent</span></tt> and then with <tt class="docutils literal"><span class="pre">myKey</span></tt> and <tt class="docutils literal"><span class="pre">values1</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">reduceFunction2</span><span class="p">(</span><span class="nx">myKey</span><span class="p">,</span> <span class="nx">valuesIdempotent</span><span class="p">);</span>
+<span class="nx">reduceFunction2</span><span class="p">(</span><span class="nx">myKey</span><span class="p">,</span> <span class="nx">values1</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify the <tt class="docutils literal"><span class="pre">reduceFunction2</span></tt> returned the same result:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;qty&quot;</span> <span class="o">:</span> <span class="mi">30</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../reference/aggregation.html" title="Previous Section: Aggregation Framework Reference">&lt; &nbsp; Aggregation Framework Reference</a></li>
+<li id="btnvup"><a href="../aggregation.html" title="Parent Section: Aggregation" >&#47;&#92;&nbsp; Aggregation</a></li>
+<li id="btnvnx"><a href="../reference/simple-aggregation.html" title="Next Section: Simple Aggregation Methods and Commands">Simple Aggregation Methods and Commands &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

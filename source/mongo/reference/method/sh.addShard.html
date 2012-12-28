@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>sh.addShard() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/sh.addShard" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="sh.addShardTag()" href="sh.addShardTag.html" />
+<link rel="prev" title="runProgram()" href="runProgram.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sh-addshard">
+<h1>sh.addShard()<a class="headerlink" href="#sh-addshard" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="sh.addShard">
+<tt class="descclassname">sh.</tt><tt class="descname">addShard</tt><big>(</big><em>host</em><big>)</big><a class="headerlink" href="#sh.addShard" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>string</em>) &#8211; Specify the hostname of a database instance or a
+replica set configuration.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Use this method to add a database instance or replica set to a
+<a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.
+This method must be run on a <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.
+The <tt class="docutils literal"><span class="pre">host</span></tt> parameter can be in any of the following forms:</p>
+<div class="highlight-python"><pre>[hostname]
+[hostname]:[port]
+[set]/[hostname]
+[set]/[hostname],[hostname]:port</pre>
+</div>
+<p>You can specify shards using the hostname, or a hostname and port
+combination if the shard is running on a non-standard port.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not use <tt class="docutils literal"><span class="pre">localhost</span></tt> for the hostname unless your
+<a class="reference internal" href="../glossary.html#term-config-database"><em class="xref std std-term">configuration server</em></a>
+is also running on <tt class="docutils literal"><span class="pre">localhost</span></tt>.</p>
+</div>
+<p>The optimal configuration is to deploy shards across
+<a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>.
+To add a shard on a replica set you must specify the name of the
+replica set and the hostname of at least one member of the replica
+set. You must specify at least one member of the set, but can
+specify all members in the set or another subset if
+desired. <a class="reference internal" href="#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> takes the following form:</p>
+<p>If you specify additional hostnames, all must be members of the
+same replica set.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span><span class="s2">&quot;set-name/seed-hostname&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span><span class="s2">&quot;repl0/mongodb3.example.net:27327&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference internal" href="#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> method is a helper for the
+<a class="reference internal" href="../commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command.
+The <a class="reference internal" href="../commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command has additional options which are
+not available with this helper.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a></li>
+<li><a class="reference internal" href="../../administration/sharding.html"><em>Sharded Cluster Administration</em></a></li>
+<li><a class="reference internal" href="../../tutorial/add-shards-to-shard-cluster.html"><em>Add Shards to an Existing Cluster</em></a></li>
+<li><a class="reference internal" href="../../tutorial/remove-shards-from-cluster.html"><em>Remove Shards from an Existing Sharded Cluster</em></a></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="runProgram.html" title="Previous Section: runProgram()">&lt; &nbsp; runProgram()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="sh.addShardTag.html" title="Next Section: sh.addShardTag()">sh.addShardTag() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

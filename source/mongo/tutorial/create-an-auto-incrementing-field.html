@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Create an Auto-Incrementing Sequence Field &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/create-an-auto-incrementing-field" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Expire Data from Collections by Setting TTL" href="expire-data.html" />
+<link rel="prev" title="Isolate Sequence of Operations" href="isolate-sequence-of-operations.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="create-an-auto-incrementing-sequence-field">
+<h1>Create an Auto-Incrementing Sequence Field<a class="headerlink" href="#create-an-auto-incrementing-sequence-field" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB reserves the <tt class="docutils literal"><span class="pre">_id</span></tt> field in the top level of all documents
+as a primary key. <tt class="docutils literal"><span class="pre">_id</span></tt> must be unique, and always has an index with
+a <a class="reference internal" href="../core/indexes.html#index-type-unique"><em>unique constraint</em></a>. However, except for
+the unique constraint you can use any value for the <tt class="docutils literal"><span class="pre">_id</span></tt> field in
+your collections. This tutorial describes two methods for creating an
+incrementing sequence number for the <tt class="docutils literal"><span class="pre">_id</span></tt> field using the
+following:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#auto-increment-counters-collection"><em>A Counters Collection</em></a></li>
+<li><a class="reference internal" href="#auto-increment-optimistic-loop"><em>Optimistic Loop</em></a></li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Generally in MongoDB, you would not use an auto-increment pattern
+for the <tt class="docutils literal"><span class="pre">_id</span></tt> field, or any field, because it does not scale for
+databases with larger numbers of documents. Typically the default
+value <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectId</em></a> is more ideal for the <tt class="docutils literal"><span class="pre">_id</span></tt>.</p>
+</div>
+<div class="section" id="a-counters-collection">
+<span id="auto-increment-counters-collection"></span><h3>A Counters Collection<a class="headerlink" href="#a-counters-collection" title="Permalink to this headline">¶</a></h3>
+<p>Use a separate <tt class="docutils literal"><span class="pre">counters</span></tt> collection tracks the <em>last</em> number sequence
+used. The <tt class="docutils literal"><span class="pre">_id</span></tt> field contains the sequence name and the <tt class="docutils literal"><span class="pre">seq</span></tt>
+contains the last value of the sequence.</p>
+<ol class="arabic">
+<li><p class="first">Insert into the <tt class="docutils literal"><span class="pre">counters</span></tt> collection, the initial value for the <tt class="docutils literal"><span class="pre">userid</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">counters</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">{</span>
+      <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;userid&quot;</span><span class="p">,</span>
+      <span class="nx">seq</span><span class="o">:</span> <span class="mi">0</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a <tt class="docutils literal"><span class="pre">getNextSequence</span></tt> function that accepts a <tt class="docutils literal"><span class="pre">name</span></tt> of the
+sequence. The function uses the <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findAndModify()</span>
+<span class="pre">&lt;db.collection.findAndModify()</span></tt> method to atomically increment the
+<tt class="docutils literal"><span class="pre">seq</span></tt> value and return this new value:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">getNextSequence</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">counters</span><span class="p">.</span><span class="nx">findAndModify</span><span class="p">(</span>
+          <span class="p">{</span>
+            <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">name</span> <span class="p">},</span>
+            <span class="nx">update</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$inc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">seq</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">},</span>
+            <span class="k">new</span><span class="o">:</span> <span class="kc">true</span>
+          <span class="p">}</span>
+   <span class="p">);</span>
+
+   <span class="k">return</span> <span class="nx">ret</span><span class="p">.</span><span class="nx">seq</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use this <tt class="docutils literal"><span class="pre">getNextSequence()</span></tt> function during
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="nx">getNextSequence</span><span class="p">(</span><span class="s2">&quot;userid&quot;</span><span class="p">),</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Sarah C.&quot;</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="nx">getNextSequence</span><span class="p">(</span><span class="s2">&quot;userid&quot;</span><span class="p">),</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Bob D.&quot;</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can verify the results with <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">_id</span></tt> fields contain incrementing sequence values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">_id</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;Sarah C.&quot;</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nx">_id</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;Bob D.&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="optimistic-loop">
+<span id="auto-increment-optimistic-loop"></span><h3>Optimistic Loop<a class="headerlink" href="#optimistic-loop" title="Permalink to this headline">¶</a></h3>
+<p>In this pattern, an <em>Optimistic Loop</em> calculates the incremented
+<tt class="docutils literal"><span class="pre">_id</span></tt> value and attempts to insert a document with the calculated
+<tt class="docutils literal"><span class="pre">_id</span></tt> value. If the insert is successful, the loop ends. Otherwise,
+the loop will iterate through possible <tt class="docutils literal"><span class="pre">_id</span></tt> values until the insert
+is successful.</p>
+<ol class="arabic">
+<li><p class="first">Create a function named <tt class="docutils literal"><span class="pre">insertDocument</span></tt> that performs the
+&#8220;insert if not present&#8221; loop. The function wraps the
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method and takes a
+<tt class="docutils literal"><span class="pre">doc</span></tt> and a <tt class="docutils literal"><span class="pre">targetCollection</span></tt> arguments.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">insertDocument</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">targetCollection</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="kd">var</span> <span class="nx">cursor</span> <span class="o">=</span> <span class="nx">targetCollection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+        <span class="kd">var</span> <span class="nx">seq</span> <span class="o">=</span> <span class="nx">cursor</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">()</span> <span class="o">?</span> <span class="nx">cursor</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">_id</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">:</span> <span class="mi">1</span><span class="p">;</span>
+
+        <span class="nx">doc</span><span class="p">.</span><span class="nx">_id</span> <span class="o">=</span> <span class="nx">seq</span><span class="p">;</span>
+
+        <span class="nx">targetCollection</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">doc</span><span class="p">);</span>
+
+        <span class="kd">var</span> <span class="nx">err</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">getLastErrorObj</span><span class="p">();</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nx">err</span> <span class="o">&amp;&amp;</span> <span class="nx">err</span><span class="p">.</span><span class="nx">code</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nx">err</span><span class="p">.</span><span class="nx">code</span> <span class="o">==</span> <span class="mi">11000</span> <span class="cm">/* dup key */</span> <span class="p">)</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="nx">print</span><span class="p">(</span> <span class="s2">&quot;unexpected error inserting data: &quot;</span> <span class="o">+</span> <span class="nx">tojson</span><span class="p">(</span> <span class="nx">err</span> <span class="p">)</span> <span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">while</span> <span class="pre">(1)</span></tt> loop performs the following actions:</p>
+<ul class="simple">
+<li>Queries the <tt class="docutils literal"><span class="pre">targetCollection</span></tt> for the document with the
+maximum <tt class="docutils literal"><span class="pre">_id</span></tt> value.</li>
+<li>Determines the next sequence value for <tt class="docutils literal"><span class="pre">_id</span></tt> by:<ul>
+<li>adding <tt class="docutils literal"><span class="pre">1</span></tt> to the returned <tt class="docutils literal"><span class="pre">_id</span></tt> value if the returned
+cursor points to a document.</li>
+<li>otherwise: it sets the next sequence value to <tt class="docutils literal"><span class="pre">1</span></tt> if the
+returned cursor points to no document.</li>
+</ul>
+</li>
+<li>For the <tt class="docutils literal"><span class="pre">doc</span></tt> to insert, set its <tt class="docutils literal"><span class="pre">_id</span></tt> field to the
+calculated sequence value <tt class="docutils literal"><span class="pre">seq</span></tt>.</li>
+<li>Insert the <tt class="docutils literal"><span class="pre">doc</span></tt> into the <tt class="docutils literal"><span class="pre">targetCollection</span></tt>.</li>
+<li>If the insert operation errors with duplicate key, repeat the
+loop.  Otherwise, if the insert operation encounters some
+other error or if the operation succeeds, break out of the loop.</li>
+</ul>
+</li>
+<li><p class="first">Use the <tt class="docutils literal"><span class="pre">insertDocument()</span></tt> function to perform an insert:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myCollection</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">users2</span><span class="p">;</span>
+
+<span class="nx">insertDocument</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Grace H.&quot;</span>
+   <span class="p">},</span>
+   <span class="nx">myCollection</span>
+<span class="p">);</span>
+
+<span class="nx">insertDocument</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Ted R.&quot;</span>
+   <span class="p">},</span>
+   <span class="nx">myCollection</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can verify the results with <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users2</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">_id</span></tt> fields contain incrementing sequence values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Grace H.&quot;</span>
+<span class="p">}</span>
+<span class="p">{</span>
+  <span class="nx">_id</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;Ted R.&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>The <tt class="docutils literal"><span class="pre">while</span></tt> loop may iterate many times in collections with larger
+insert volumes.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="isolate-sequence-of-operations.html" title="Previous Section: Isolate Sequence of Operations">&lt; &nbsp; Isolate Sequence of Operations</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="expire-data.html" title="Next Section: Expire Data from Collections by Setting TTL">Expire Data from Collections by Setting TTL &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

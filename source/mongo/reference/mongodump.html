@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongodump &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongodump" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongorestore" href="mongorestore.html" />
+<link rel="prev" title="mongos.exe" href="mongos.exe.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodump">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongodump</span></tt><a class="headerlink" href="#mongodump" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> is a utility for creating a binary export of the
+contents of a database. Consider using this utility as part an
+effective <a class="reference internal" href="../administration/backups.html"><em>backup strategy</em></a>. Use in
+conjunction with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to provide restore
+functionality.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of data created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> tool from the
+2.2 distribution or later is different and incompatible with
+earlier versions of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>&#8221; and &#8220;<a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a>&#8221;.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongodump</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including the
+option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> utility and exits.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> that you wish to
+use to create the database dump. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> will
+attempt to connect to a MongoDB process ruining on the localhost
+port number <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, use the <a class="reference internal" href="#cmdoption-mongodump--host"><em class="xref std std-option">--host</em></a>
+argument with a setname, followed by a slash and a comma-separated
+list of host names and port numbers. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+utility will, given the seed of at least one connected set member,
+connect to the primary member of that set. This option would resemble:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongodump</span> <span class="o">--</span><span class="nx">host</span> <span class="nx">repl0</span><span class="o">/</span><span class="nx">mongo0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span><span class="nx">mongo0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="o">:</span><span class="mi">27018</span><span class="p">,</span><span class="nx">mongo1</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span><span class="nx">mongo2</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span>
+</pre></div>
+</div>
+<p>You can always connect directly to a single MongoDB instance by
+specifying the host and port number directly.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running
+on the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongodump--host"><em class="xref std std-option">--host</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to connect to
+the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, disable IPv6 support
+by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if
+your database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongodump--password"><em class="xref std std-option">--password</em></a> option to supply a
+password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongodump--username"><em class="xref std std-option">--username</em></a>
+option to supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongodump--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongodump--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> will
+prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the directory of the MongoDB data files. If used, the
+<a class="reference internal" href="#cmdoption-mongodump--dbpath"><em class="xref std std-option">--dbpath</em></a> option enables <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to attach
+directly to local data files and copy the data without the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. To run with <a class="reference internal" href="#cmdoption-mongodump--dbpath"><em class="xref std std-option">--dbpath</em></a>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> needs to restrict access to the data
+directory: as a result, no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can access the same
+path while the process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongodump--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the
+corresponding option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. This option allows
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to read data files organized with each
+database located in a distinct directory. This option is only
+relevant when specifying the <a class="reference internal" href="#cmdoption-mongodump--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> operations to use the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the export is in a
+consistent state. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongodump--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--db">
+<tt class="descname">--db</tt><tt class="descclassname"> &lt;db&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"> &lt;db&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongodump--db"><em class="xref std std-option">--db</em></a> option to specify a database for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to backup. If you do not specify a DB,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> copies all databases in this instance into the
+dump files. Use this option to backup or copy a smaller subset of
+your data.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--collection">
+<tt class="descname">--collection</tt><tt class="descclassname"> &lt;collection&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-c</tt><tt class="descclassname"> &lt;collection&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongodump--collection"><em class="xref std std-option">--collection</em></a> option to specify a collection for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to backup. If you do not specify a collection,
+this option copies all collections in the specified database or
+instance to the dump files. Use this option to backup or copy a
+smaller subset of your data.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--out">
+<tt class="descname">--out</tt><tt class="descclassname"> &lt;path&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-o</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a path where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> and store the output
+the database dump. To output the database dump to standard output,
+specify a <tt class="docutils literal"><span class="pre">-</span></tt> rather than a path.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--query">
+<tt class="descname">--query</tt><tt class="descclassname"> &lt;json&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-q</tt><tt class="descclassname"> &lt;json&gt;</tt><a class="headerlink" href="#cmdoption-mongodump--query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a query to limit (optionally) the documents included in
+the output of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--oplog">
+<tt class="descname">--oplog</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--oplog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this option to ensure that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> creates a dump
+of the database that includes an <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>, to create a
+point-in-time snapshot of the state of a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. To
+restore to a specific point-in-time backup, use the output created
+with this option in conjunction with <a class="reference internal" href="mongorestore.html#cmdoption-mongorestore--oplogReplay"><em class="xref std std-option">mongorestore --oplogReplay</em></a>.</p>
+<p>Without <a class="reference internal" href="#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a>, if there are write operations during the
+dump operation, the dump will not reflect a single moment in
+time. Changes made to the database during the update process can
+affect the output of the backup.</p>
+<p><a class="reference internal" href="#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> has no effect when running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+against a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance to dump the entire contents of
+a sharded cluster. However, you can use <a class="reference internal" href="#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> to dump
+individual shards.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> only works against nodes that maintain a
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. This includes all members of a replica set, as
+well as <a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a> nodes in master/slave replication
+deployments.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--repair">
+<tt class="descname">--repair</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--repair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this option to run a repair option in addition to dumping the
+database. The repair option attempts to repair a database that may
+be in an inconsistent state as a result of an improper shutdown or
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> crash.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongodump--forceTableScan">
+<tt class="descname">--forceTableScan</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongodump--forceTableScan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forces <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to scan the data store directly:
+typically, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> saves entries as they appear in the
+index of the <tt class="docutils literal"><span class="pre">_id</span></tt> field. Use <a class="reference internal" href="#cmdoption-mongodump--forceTableScan"><em class="xref std std-option">--forceTableScan</em></a> to skip
+the index and scan the data directly. Typically there are two cases
+where this behavior is preferable to the default:</p>
+<ol class="arabic simple">
+<li>If you have key sizes over 800 bytes that would not be present
+in the <tt class="docutils literal"><span class="pre">_id</span></tt> index.</li>
+<li>Your database uses a custom <tt class="docutils literal"><span class="pre">_id</span></tt> field.</li>
+</ol>
+<p>When you run with <a class="reference internal" href="#cmdoption-mongodump--forceTableScan"><em class="xref std std-option">--forceTableScan</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+does not use <a class="reference internal" href="operator/snapshot.html#_S_snapshot" title="$snapshot"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$snapshot</span></tt></a>. As a result, the dump produced
+by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> can reflect the state of the database at
+many different points in time.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Use <a class="reference internal" href="#cmdoption-mongodump--forceTableScan"><em class="xref std std-option">--forceTableScan</em></a> with extreme caution
+and consideration.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>When used in combination with <a class="reference internal" href="commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> or
+<a class="reference internal" href="method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> may block some
+reads, including those from <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, when
+queued write operation waits behind the <a class="reference internal" href="commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a>
+lock.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="behavior">
+<span id="mongodump-behavior"></span><h2>Behavior<a class="headerlink" href="#behavior" title="Permalink to this headline">¶</a></h2>
+<p>When running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> against a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance
+where the <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> consists of <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>, the <a class="reference internal" href="glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a> of the operation will prefer reads
+from <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of the set.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>See the &#8220;<a class="reference internal" href="../administration/backups.html#database-dumps"><em>backup guide section on database dumps</em></a>&#8221;
+for a larger overview of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> usage. Also see the
+&#8220;<a class="reference internal" href="mongorestore.html"><em>mongorestore</em></a>&#8221; document for an overview of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, which provides the related inverse
+functionality.</p>
+<p>The following command, creates a dump file that contains only the
+collection named <tt class="docutils literal"><span class="pre">collection</span></tt> in the database named <tt class="docutils literal"><span class="pre">test</span></tt>. In
+this case the database is running on the local interface on port
+<tt class="docutils literal"><span class="pre">27017</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --collection collection --db <span class="nb">test</span>
+</pre></div>
+</div>
+<p>In the next example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> creates a backup of the
+database instance stored in the <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt> directory on the
+local machine. This requires that no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance is
+using the <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt> directory.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --dbpath /srv/mongodb
+</pre></div>
+</div>
+<p>In the final example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> creates a database dump
+located at <tt class="docutils literal"><span class="pre">/opt/backup/mongodump-2011-10-24</span></tt>, from a database
+running on port <tt class="docutils literal"><span class="pre">37017</span></tt> on the host <tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt> and
+authenticating using the username <tt class="docutils literal"><span class="pre">user</span></tt> and the password
+<tt class="docutils literal"><span class="pre">pass</span></tt>, as follows:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --host mongodb1.example.net --port 37017 --username user --password pass /opt/backup/mongodump-2011-10-24
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongos.exe.html" title="Previous Section: mongos.exe">&lt; &nbsp; mongos.exe</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongorestore.html" title="Next Section: mongorestore">mongorestore &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

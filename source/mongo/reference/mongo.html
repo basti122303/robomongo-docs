@@ -1,0 +1,518 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongo &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongo" />
+
+    <meta content="The mongo command man page." name="description" />
+<meta content="mongo, mongodb, man page, mongo process, mongo shell" name="keywords" />
+
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongod.exe" href="mongod.exe.html" />
+<link rel="prev" title="mongos" href="mongos.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongo">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongo</span></tt><a class="headerlink" href="#mongo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongo</tt></dt>
+<dd></dd></dl>
+
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> is an interactive JavaScript shell interface to
+MongoDB, which provides a powerful interface for systems
+administrators as well as a way for developers to test queries and
+operations directly with the database. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> also provides
+a fully functional JavaScript environment for use with a MongoDB. This
+document addresses the basic invocation of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+and an overview of its usage.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">In additional to this page, also consider the documentation in
+the <a class="reference internal" href="../mongo.html"><em>Using the mongo Shell</em></a> section of the manual.</p>
+</div>
+</div>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<dl class="describe">
+<dt>
+<tt class="descname">mongo [--shell] [--nodb] [--norc] [--quiet] [--port &lt;port&gt;] [--host &lt;host&gt;] [--eval &lt;JavaScript&gt;] [-u &lt;username&gt;] [--username &lt;username&gt;] [-p &lt;password&gt;] [--password &lt;password&gt;] [--help] [-h] [--version] [--verbose] [--ipv6] [database] [file.js]</tt></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="interface">
+<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="options">
+<span id="mongo-shell-options"></span><h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<dl class="option">
+<dt id="cmdoption-mongo--shell">
+<tt class="descname">--shell</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--shell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables the shell interface after evaluating a <a class="reference internal" href="glossary.html#term-javascript"><em class="xref std std-term">JavaScript</em></a> file.
+If you invoke the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> command and specify a JavaScript
+file as an argument, or use <a class="reference internal" href="#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a> to specify
+JavaScript on the command line, the <a class="reference internal" href="#cmdoption-mongo--shell"><em class="xref std std-option">--shell</em></a> option
+provides the user with a shell prompt after the file finishes
+executing.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--nodb">
+<tt class="descname">--nodb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--nodb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the shell from connecting to any database instances. Later,
+to connect to a database within the shell, see
+<a class="reference internal" href="../tutorial/write-scripts-for-the-mongo-shell.html#mongo-shell-new-connections"><em>Opening New Connections</em></a>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--norc">
+<tt class="descname">--norc</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--norc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents the shell from sourcing and evaluating
+<tt class="file docutils literal"><span class="pre">~/.mongorc.js</span></tt> on start up.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--quiet">
+<tt class="descname">--quiet</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--quiet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Silences output from the shell during the connection process.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongo--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port where the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance is listening. Unless specified <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> connects
+to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances on port <tt class="docutils literal"><span class="pre">27017</span></tt>, which is the default
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> port.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;</tt><a class="headerlink" href="#cmdoption-mongo--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>specifies the host where the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is running to
+connect to as <tt class="docutils literal"><span class="pre">&lt;hostname&gt;</span></tt>. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will attempt
+to connect to a MongoDB process running on the localhost.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--eval">
+<tt class="descname">--eval</tt><tt class="descclassname"> &lt;javascript&gt;</tt><a class="headerlink" href="#cmdoption-mongo--eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates a JavaScript expression specified as an argument to this
+option. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> does not load its own environment when evaluating
+code: as a result many options of the shell environment are not
+available.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongo--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance.
+Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongo--password"><em class="xref std std-option">--password</em></a> option to supply a password.
+If you specify a username and password but the default database
+or the specified database do not require authentication,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will exit with an exception.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-p</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongo--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance.
+Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongo--username"><em class="xref std std-option">--username</em></a> option to supply a username. If you
+specify a <a class="reference internal" href="#cmdoption-mongo--username"><em class="xref std std-option">--username</em></a> without the
+<a class="reference internal" href="#cmdoption-mongo--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will prompt for a
+password interactively, if the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> requires authentication.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the shell.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the verbosity of the output of the shell during the
+connection process.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongo--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongo--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">&lt;db address&gt;</tt></dt>
+<dd><p>Specifies the &#8220;database address&#8221; of the database to connect to. For
+example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo admin
+</pre></div>
+</div>
+<p>The above command will connect the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> on the local machine. You may specify a
+remote database instance, with the resolvable hostname or IP
+address. Separate the database name from the hostname using a
+<tt class="docutils literal"><span class="pre">/</span></tt> character. See the following examples:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo mongodb1.example.net
+mongo mongodb1/admin
+mongo 10.8.8.10/test
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="mongo-shell-file"></span><dl class="option">
+<dt>
+<tt class="descname">&lt;file.js&gt;</tt></dt>
+<dd><p>Specifies a JavaScript file to run and then exit.
+Must be the last option specified.
+Use the
+<a class="reference internal" href="#cmdoption-mongo--shell"><em class="xref std std-option">--shell</em></a> option to return to a shell after the file
+finishes running.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="files">
+<h3>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h3>
+<p id="mongo-dbshell-file"><tt class="file docutils literal"><span class="pre">~/.dbshell</span></tt></p>
+<blockquote>
+<div><p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> maintains a history of commands in the <tt class="file docutils literal"><span class="pre">.dbshell</span></tt>
+file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> does not recorded interaction related to
+authentication in the history file, including
+<a class="reference internal" href="commands.html#authenticate" title="authenticate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">authenticate</span></tt></a> and <a class="reference internal" href="method/db.addUser.html#db.addUser" title="db.addUser"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.addUser()</span></tt></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Versions of Windows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> earlier than 2.2.0 will
+save the <cite>.dbshell</cite> file in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> working
+directory.</p>
+</div>
+</div></blockquote>
+<p id="mongo-mongorc-file"><tt class="file docutils literal"><span class="pre">~/.mongorc.js</span></tt></p>
+<blockquote>
+<div><p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will read the <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file from the home
+directory of the user invoking <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>. In the file, users
+can define variables, customize the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell prompt,
+or update information that they would like updated every time they
+launch a shell. If you use the shell to evaluate a JavaScript file
+or expression either on the command line with <a class="reference internal" href="#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a> or
+by specifying <a class="reference internal" href="#mongo-shell-file"><em>a .js file to mongo</em></a>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will read the <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file <em>after</em> the
+JavaScript has finished processing.</p>
+<p>Specify the <a class="reference internal" href="#cmdoption-mongo--norc"><em class="xref std std-option">--norc</em></a> option to disable
+reading <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt>.</p>
+</div></blockquote>
+<p><tt class="file docutils literal"><span class="pre">/tmp/mongo_edit</span><em><span class="pre">&lt;time_t&gt;</span></em><span class="pre">.js</span></tt></p>
+<blockquote>
+<div>Created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> when editing a file.  If the file
+exists <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will append an integer from <tt class="docutils literal"><span class="pre">1</span></tt> to <tt class="docutils literal"><span class="pre">10</span></tt> to the
+time value to attempt to create a unique file.</div></blockquote>
+<p><tt class="file docutils literal"><span class="pre">%TEMP%mongo_edit</span><em><span class="pre">&lt;time_t&gt;</span></em><span class="pre">.js</span></tt></p>
+<blockquote>
+<div>Created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo.exe</span></tt> on Windows when editing a file.
+If the file
+exists <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will append an integer from <tt class="docutils literal"><span class="pre">1</span></tt> to <tt class="docutils literal"><span class="pre">10</span></tt> to
+the time value to attempt to create a unique file.</div></blockquote>
+</div>
+<div class="section" id="environment">
+<h3>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h3>
+<dl class="envvar">
+<dt id="envvar-EDITOR">
+<tt class="descname">EDITOR</tt><a class="headerlink" href="#envvar-EDITOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the path to an editor to use with the <tt class="docutils literal"><span class="pre">edit</span></tt> shell
+command.  A JavaScript variable <tt class="docutils literal"><span class="pre">EDITOR</span></tt> will override the value of
+<span class="target" id="index-0"></span><a class="reference internal" href="#envvar-EDITOR"><tt class="xref std std-envvar docutils literal"><span class="pre">EDITOR</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-HOME">
+<tt class="descname">HOME</tt><a class="headerlink" href="#envvar-HOME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the path to the home directory where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will
+read the <tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt> file and write the <tt class="file docutils literal"><span class="pre">.dbshell</span></tt>
+file.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-HOMEDRIVE">
+<tt class="descname">HOMEDRIVE</tt><a class="headerlink" href="#envvar-HOMEDRIVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>On Windows systems, <span class="target" id="index-1"></span><a class="reference internal" href="#envvar-HOMEDRIVE"><tt class="xref std std-envvar docutils literal"><span class="pre">HOMEDRIVE</span></tt></a> specifies the path the
+directory where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will read the <tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt>
+file and write the <tt class="file docutils literal"><span class="pre">.dbshell</span></tt> file.</p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-HOMEPATH">
+<tt class="descname">HOMEPATH</tt><a class="headerlink" href="#envvar-HOMEPATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the Windows path to the home directory where
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will read the <tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt> file and write
+the <tt class="file docutils literal"><span class="pre">.dbshell</span></tt> file.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="keyboard-shortcuts">
+<span id="mongo-keyboard-shortcuts"></span><h2>Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell supports the following keyboard shortcuts:
+<a class="footnote-reference" href="#multiple-bindings" id="id2">[1]</a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Keybinding</strong></th>
+<th class="head"><strong>Function</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Up arrow</td>
+<td>Retrieve previous command from history</td>
+</tr>
+<tr class="row-odd"><td>Down-arrow</td>
+<td>Retrieve next command from history</td>
+</tr>
+<tr class="row-even"><td>Home</td>
+<td>Go to beginning of the line</td>
+</tr>
+<tr class="row-odd"><td>End</td>
+<td>Go to end of the line</td>
+</tr>
+<tr class="row-even"><td>Tab</td>
+<td>Autocomplete method/command</td>
+</tr>
+<tr class="row-odd"><td>Left-arrow</td>
+<td>Go backward one character</td>
+</tr>
+<tr class="row-even"><td>Right-arrow</td>
+<td>Go forward one character</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-left-arrow</td>
+<td>Go backward one word</td>
+</tr>
+<tr class="row-even"><td>Ctrl-right-arrow</td>
+<td>Go forward one word</td>
+</tr>
+<tr class="row-odd"><td>Meta-left-arrow</td>
+<td>Go backward one word</td>
+</tr>
+<tr class="row-even"><td>Meta-right-arrow</td>
+<td>Go forward one word</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-A</td>
+<td>Go to the beginning of the line</td>
+</tr>
+<tr class="row-even"><td>Ctrl-B</td>
+<td>Go backward one character</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-C</td>
+<td>Exit the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell</td>
+</tr>
+<tr class="row-even"><td>Ctrl-D</td>
+<td>Delete a char (or exit the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell)</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-E</td>
+<td>Go to the end of the line</td>
+</tr>
+<tr class="row-even"><td>Ctrl-F</td>
+<td>Go forward one character</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-G</td>
+<td>Abort</td>
+</tr>
+<tr class="row-even"><td>Ctrl-J</td>
+<td>Accept/evaluate the line</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-K</td>
+<td>Kill/erase the line</td>
+</tr>
+<tr class="row-even"><td>Ctrl-L or type <tt class="docutils literal"><span class="pre">cls</span></tt></td>
+<td>Clear the screen</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-M</td>
+<td>Accept/evaluate the line</td>
+</tr>
+<tr class="row-even"><td>Ctrl-N</td>
+<td>Retrieve next command from history</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-P</td>
+<td>Retrieve previous command from history</td>
+</tr>
+<tr class="row-even"><td>Ctrl-R</td>
+<td>Reverse-search command history</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-S</td>
+<td>Forward-search command history</td>
+</tr>
+<tr class="row-even"><td>Ctrl-T</td>
+<td>Transpose characters</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-U</td>
+<td>Perform Unix line-discard</td>
+</tr>
+<tr class="row-even"><td>Ctrl-W</td>
+<td>Perform Unix word-rubout</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-Y</td>
+<td>Yank</td>
+</tr>
+<tr class="row-even"><td>Ctrl-Z</td>
+<td>Suspend (job control works in linux)</td>
+</tr>
+<tr class="row-odd"><td>Ctrl-H</td>
+<td>Backward-delete a character</td>
+</tr>
+<tr class="row-even"><td>Ctrl-I</td>
+<td>Complete, same as Tab</td>
+</tr>
+<tr class="row-odd"><td>Meta-B</td>
+<td>Go backward one word</td>
+</tr>
+<tr class="row-even"><td>Meta-C</td>
+<td>Capitalize word</td>
+</tr>
+<tr class="row-odd"><td>Meta-D</td>
+<td>Kill word</td>
+</tr>
+<tr class="row-even"><td>Meta-F</td>
+<td>Go forward one word</td>
+</tr>
+<tr class="row-odd"><td>Meta-L</td>
+<td>Change word to lowercase</td>
+</tr>
+<tr class="row-even"><td>Meta-U</td>
+<td>Change word to uppercase</td>
+</tr>
+<tr class="row-odd"><td>Meta-Y</td>
+<td>Yank-pop</td>
+</tr>
+<tr class="row-even"><td>Meta-Backspace</td>
+<td>Backward-kill word</td>
+</tr>
+<tr class="row-odd"><td>Meta-&lt;</td>
+<td>Retrieve the first command in command history</td>
+</tr>
+<tr class="row-even"><td>Meta-&gt;</td>
+<td>Retrieve the last command in command history</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="multiple-bindings" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>MongoDB accommodates multiple keybinding,
+Since 2.0, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> includes support for basic emacs
+keybindings.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="use">
+<span id="mongo-usage-examples"></span><h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<p>Typically users invoke the shell with the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> command at
+the system prompt. Consider the following examples for other
+scenarios.</p>
+<p>To connect to a database on a remote host using authentication and a
+non-standard port, use the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --username &lt;user&gt; --password &lt;pass&gt; --hostname &lt;host&gt; --port 28015
+</pre></div>
+</div>
+<p>Alternatively, consider the following short form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo -u &lt;user&gt; -p &lt;pass&gt; --host &lt;host&gt; --port 28015
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;user&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;pass&gt;</span></tt>, and <tt class="docutils literal"><span class="pre">&lt;host&gt;</span></tt> with the appropriate
+values for your situation and substitute or omit the <a class="reference internal" href="#cmdoption-mongo--port"><em class="xref std std-option">--port</em></a>
+as needed.</p>
+<p>To execute a JavaScript file without evaluating the <tt class="file docutils literal"><span class="pre">~/.mongorc.js</span></tt>
+file before starting a shell session, use the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --shell --norc alternate-environment.js
+</pre></div>
+</div>
+<p>To print return a query as <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a>, from the system prompt using
+the <a class="reference internal" href="#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a> option, use the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --eval <span class="s1">&#39;db.collection.find().forEach(printjson)&#39;</span>
+</pre></div>
+</div>
+<p>Use single quotes (e.g. <tt class="docutils literal"><span class="pre">'</span></tt>) to enclose the JavaScript, as well as
+the additional JavaScript required to generate this output.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongos.html" title="Previous Section: mongos">&lt; &nbsp; mongos</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongod.exe.html" title="Next Section: mongod.exe">mongod.exe &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$sort (aggregation) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/aggregation/sort" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$strcasecmp (aggregation)" href="strcasecmp.html" />
+<link rel="prev" title="$skip (aggregation)" href="skip.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sort-aggregation">
+<h1>$sort (aggregation)<a class="headerlink" href="#sort-aggregation" title="Permalink to this headline">¶</a></h1>
+<dl class="pipeline">
+<dt id="_S_sort">
+<tt class="descname">$sort</tt><a class="headerlink" href="#_S_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> <a class="reference internal" href="../glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a> operator sorts all input
+documents and returns them to the pipeline in sorted
+order. Consider the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="o">&lt;</span><span class="nx">collection</span><span class="o">-</span><span class="nx">name</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$sort</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">sort</span><span class="o">-</span><span class="nx">key</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This sorts the documents in the collection named
+<tt class="docutils literal"><span class="pre">&lt;collection-name&gt;</span></tt>, according to the key and specification in
+the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&lt;sort-key&gt;</span> <span class="pre">}</span></tt> document.</p>
+<p>Specify the sort in a document with a field or fields that you want
+to sort by and a value of <tt class="docutils literal"><span class="pre">1</span></tt> or <tt class="docutils literal"><span class="pre">-1</span></tt> to specify an ascending
+or descending sort respectively, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$sort</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">age</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nx">posts</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation sorts the documents in the <tt class="docutils literal"><span class="pre">users</span></tt> collection,
+in descending order according by the <tt class="docutils literal"><span class="pre">age</span></tt> field and then in
+ascending order according to the value in the <tt class="docutils literal"><span class="pre">posts</span></tt> field.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <a class="reference internal" href="#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> cannot begin sorting documents until
+previous operators in the pipeline have returned all output.</p>
+<ul class="last simple">
+<li><a class="reference internal" href="skip.html#_S_skip" title="$skip"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$skip</span></tt></a></li>
+</ul>
+</div>
+<p><a class="reference internal" href="#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operator can take advantage of an index when
+placed at the <strong>beginning</strong> of the pipeline or placed <strong>before</strong>
+the following aggregation operators:</p>
+<ul class="simple">
+<li><a class="reference internal" href="project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a></li>
+<li><a class="reference internal" href="unwind.html#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a></li>
+<li><a class="reference internal" href="group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>.</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unless the <a class="reference internal" href="#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operator can use an index,
+in the current release, the sort must fit within memory. This
+may cause problems when sorting large numbers of documents.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="skip.html" title="Previous Section: $skip (aggregation)">&lt; &nbsp; $skip (aggregation)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="strcasecmp.html" title="Next Section: $strcasecmp (aggregation)">$strcasecmp (aggregation) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

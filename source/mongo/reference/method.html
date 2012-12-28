@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>JavaScript Methods &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Date()" href="method/Date.html" />
+<link rel="prev" title="writeBacksQueued (internal)" href="command/writeBacksQueued.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="javascript-methods">
+<h1>JavaScript Methods<a class="headerlink" href="#javascript-methods" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="method/Date.html">Date()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/ObjectId.getTimestamp.html">ObjectId.getTimestamp()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/ObjectId.toString.html">ObjectId.toString()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/ObjectId.valueOf.html">ObjectId.valueOf()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cat.html">cat()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cd.html">cd()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/clearRawMongoProgramOutput.html">clearRawMongoProgramOutput()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/copyDbpath.html">copyDbpath()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.batchSize.html">cursor.batchSize()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.count.html">cursor.count()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.explain.html">cursor.explain()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.forEach.html">cursor.forEach()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.hasNext.html">cursor.hasNext()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.hint.html">cursor.hint()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.limit.html">cursor.limit()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.map.html">cursor.map()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.max.html">cursor.max()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.min.html">cursor.min()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.next.html">cursor.next()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.readPref.html">cursor.readPref()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.showDiskLoc.html">cursor.showDiskLoc()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.size.html">cursor.size()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.skip.html">cursor.skip()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.snapshot.html">cursor.snapshot()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/cursor.sort.html">cursor.sort()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.addUser.html">db.addUser()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.auth.html">db.auth()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.cloneDatabase.html">db.cloneDatabase()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.aggregate.html">db.collection.aggregate()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.count.html">db.collection.count()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.createIndex.html">db.collection.createIndex()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.dataSize.html">db.collection.dataSize()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.distinct.html">db.collection.distinct()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.drop.html">db.collection.drop()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.dropIndex.html">db.collection.dropIndex()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.dropIndexes.html">db.collection.dropIndexes()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.ensureIndex.html">db.collection.ensureIndex()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.find.html">db.collection.find()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.findAndModify.html">db.collection.findAndModify()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.findOne.html">db.collection.findOne()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.getIndexes.html">db.collection.getIndexes()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.group.html">db.collection.group()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.insert.html">db.collection.insert()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.isCapped.html">db.collection.isCapped()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.mapReduce.html">db.collection.mapReduce()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.reIndex.html">db.collection.reIndex()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.remove.html">db.collection.remove()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.renameCollection.html">db.collection.renameCollection()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.save.html">db.collection.save()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.stats.html">db.collection.stats()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.storageSize.html">db.collection.storageSize()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.totalIndexSize.html">db.collection.totalIndexSize()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.update.html">db.collection.update()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.collection.validate.html">db.collection.validate()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.commandHelp.html">db.commandHelp()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.copyDatabase.html">db.copyDatabase()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.createCollection.html">db.createCollection()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.currentOp.html">db.currentOp()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.dropDatabase.html">db.dropDatabase()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.eval.html">db.eval()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.fsyncLock.html">db.fsyncLock()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.fsyncUnlock.html">db.fsyncUnlock()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getCollection.html">db.getCollection()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getCollectionNames.html">db.getCollectionNames()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getLastError.html">db.getLastError()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getLastErrorObj.html">db.getLastErrorObj()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getMongo.html">db.getMongo()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getName.html">db.getName()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getPrevError.html">db.getPrevError()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getProfilingLevel.html">db.getProfilingLevel()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getProfilingStatus.html">db.getProfilingStatus()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getReplicationInfo.html">db.getReplicationInfo()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.getSiblingDB.html">db.getSiblingDB()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.isMaster.html">db.isMaster()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.killOp.html">db.killOp()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.listCommands.html">db.listCommands()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.loadServerScripts.html">db.loadServerScripts()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.logout.html">db.logout()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.printCollectionStats.html">db.printCollectionStats()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.printReplicationInfo.html">db.printReplicationInfo()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.printShardingStatus.html">db.printShardingStatus()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.printSlaveReplicationInfo.html">db.printSlaveReplicationInfo()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.removeUser.html">db.removeUser()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.repairDatabase.html">db.repairDatabase()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.resetError.html">db.resetError()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.runCommand.html">db.runCommand()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.serverStatus.html">db.serverStatus()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.setProfilingLevel.html">db.setProfilingLevel()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.shutdownServer.html">db.shutdownServer()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.stats.html">db.stats()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/db.version.html">db.version()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/fuzzFile.html">fuzzFile()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/getDB.html">db.getDB()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/getHostName.html">getHostName()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/getMemInfo.html">getMemInfo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/getShardDistribution.html">getShardDistribution()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/getShardVersion.html">getShardVersion()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/hostname.html">hostname()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/isWindows.html">isWindows()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/listFiles.html">listFiles()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/load.html">load()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/ls.html">ls()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/md5sumFile.html">md5sumFile()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/mkdir.html">mkdir()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/mongo.setSlaveOk.html">mongo.setSlaveOk()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/pwd.html">pwd()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/quit.html">quit()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rand.html">rand()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rawMongoProgramOutput.html">rawMongoProgramOutput()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/removeFile.html">removeFile()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/resetDbpath.html">resetDbpath()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.add.html">rs.add()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.addArb.html">rs.addArb()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.conf.html">rs.conf()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.freeze.html">rs.freeze()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.help.html">rs.help()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.initiate.html">rs.initiate()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.reconfig.html">rs.reconfig()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.remove.html">rs.remove()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.slaveOk.html">rs.slaveOk()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.status.html">rs.status()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.stepDown.html">rs.stepDown()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/rs.syncFrom.html">rs.syncFrom()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/run.html">run()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/runMongoProgram.html">runMongoProgram()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/runProgram.html">runProgram()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.addShard.html">sh.addShard()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.addShardTag.html">sh.addShardTag()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.addTagRange.html">sh.addTagRange()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.enableSharding.html">sh.enableSharding()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.getBalancerState.html">sh.getBalancerState()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.help.html">sh.help()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.isBalancerRunning.html">sh.isBalancerRunning()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.moveChunk.html">sh.moveChunk()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.removeShardTag.html">sh.removeShardTag()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.setBalancerState.html">sh.setBalancerState()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.shardCollection.html">sh.shardCollection()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.splitAt.html">sh.splitAt()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.splitFind.html">sh.splitFind()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/sh.status.html">sh.status()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/srand.html">srand()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/startMongoProgram.html">startMongoProgram()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/stopMongoProgram.html">stopMongoProgram()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/stopMongoProgramByPid.html">stopMongoProgramByPid()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/stopMongod.html">stopMongod()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/waitMongoProgramOnPort.html">waitMongoProgramOnPort()</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method/waitProgram.html">waitProgram()</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="command/writeBacksQueued.html" title="Previous Section: writeBacksQueued (internal)">&lt; &nbsp; writeBacksQueued (internal)</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="method/Date.html" title="Next Section: Date()">Date() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

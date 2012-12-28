@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.skip() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.skip" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.snapshot()" href="cursor.snapshot.html" />
+<link rel="prev" title="cursor.size()" href="cursor.size.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-skip">
+<h1>cursor.skip()<a class="headerlink" href="#cursor-skip" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.skip">
+<tt class="descclassname">cursor.</tt><tt class="descname">skip</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.skip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the <a class="reference internal" href="#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> method on a cursor to control where MongoDB
+begins returning results. This approach may be useful in
+implementing &#8220;paged&#8221; results.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must apply <a class="reference internal" href="#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> to the cursor before
+retrieving any documents from the database.</p>
+</div>
+<p>Consider the following JavaScript function as an example of the
+sort function:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">printStudents</span><span class="p">(</span><span class="nx">pageNumber</span><span class="p">,</span> <span class="nx">nPerPage</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;Page: &quot;</span> <span class="o">+</span> <span class="nx">pageNumber</span><span class="p">);</span>
+   <span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">skip</span><span class="p">((</span><span class="nx">pageNumber</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nx">nPerPage</span><span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="nx">nPerPage</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">student</span><span class="p">)</span> <span class="p">{</span> <span class="nx">print</span><span class="p">(</span><span class="nx">student</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">&quot;&lt;p&gt;&quot;</span><span class="p">);</span> <span class="p">}</span> <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> method is often expensive because it requires
+the server to walk from the beginning of the collection or index to
+get the offset or skip position before beginning to return
+result. As offset (e.g. <tt class="docutils literal"><span class="pre">pageNumber</span></tt> above) increases,
+<a class="reference internal" href="#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> will become slower and more CPU intensive. With
+larger collections, <a class="reference internal" href="#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> may become IO bound.</p>
+<p>Consider using range-based pagination for these kinds of
+tasks. That is, query for a range of objects, using logic within
+the application to determine the pagination rather than the
+database itself. This approach features better index utilization,
+if you do not need to easily jump to a specific page.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.size.html" title="Previous Section: cursor.size()">&lt; &nbsp; cursor.size()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.snapshot.html" title="Next Section: cursor.snapshot()">cursor.snapshot() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

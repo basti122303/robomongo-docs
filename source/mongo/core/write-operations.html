@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Write Operations &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/core/write-operations" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="CRUD" href="../crud.html" />
+<link rel="next" title="BSON Documents" href="document.html" />
+<link rel="prev" title="Read Operations" href="read-operations.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="write-operations">
+<h1>Write Operations<a class="headerlink" href="#write-operations" title="Permalink to this headline">¶</a></h1>
+<p>All operations that create or modify data in the MongoDB instance are
+write operations. MongoDB represents data as <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">BSON documents</em></a> stored in <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collections</em></a>. Write
+operations target one collection and are atomic on the level of a
+single document: no single write operation can atomically affect more
+than one document or more than one collection.</p>
+<p>This document introduces the write operators available in MongoDB as
+well as presents strategies to increase the efficiency of writes in
+applications.</p>
+<div class="section" id="write-operators">
+<span id="write-operations-operators"></span><span id="index-0"></span><h2>Write Operators<a class="headerlink" href="#write-operators" title="Permalink to this headline">¶</a></h2>
+<p>For information on write operators and how to write data to a MongoDB
+database, see the following pages:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../applications/create.html"><em>Create</em></a></li>
+<li><a class="reference internal" href="../applications/update.html"><em>Update</em></a></li>
+<li><a class="reference internal" href="../applications/delete.html"><em>Delete</em></a></li>
+</ul>
+<p>For information on specific methods used to perform write operations in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, see the following:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.insert()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.update()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.save()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/db.collection.findAndModify.html#db.collection.findAndModify" title="db.collection.findAndModify"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.findAndModify()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.remove()</span></tt></a></li>
+</ul>
+<p>For information on how to perform write operations from within an
+application, see the <a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a> documentation or the
+documentation for your client library.</p>
+</div>
+<div class="section" id="write-concern">
+<span id="write-operations-write-concern"></span><span id="index-1"></span><span id="id1"></span><h2>Write Concern<a class="headerlink" href="#write-concern" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="../release-notes/drivers-write-concern.html"><em>driver write concern</em></a>
+change created a new connection class in all of the MongoDB
+drivers, called <tt class="docutils literal"><span class="pre">MongoClient</span></tt> with a different default write
+concern. See the <a class="reference internal" href="../release-notes/drivers-write-concern.html"><em>release notes</em></a>
+for this change, and the release notes for the driver you&#8217;re using
+for more information about your driver&#8217;s release.</p>
+</div>
+<div class="section" id="operational-considerations-and-write-concern">
+<span id="write-concern-considerations"></span><h3>Operational Considerations and Write Concern<a class="headerlink" href="#operational-considerations-and-write-concern" title="Permalink to this headline">¶</a></h3>
+<p>Clients issue write operations with some level of <a class="reference internal" href="../reference/glossary.html#term-write-concern"><em class="xref std std-term">write
+concern</em></a>, which describes the level of concern or
+guarantee the server will provide in its response to a write operation.
+Consider the following levels of conceptual write concern:</p>
+<ul id="write-concern-errors-ignored">
+<li><p class="first"><em>errors ignored</em>: Write operations are not acknowledged by MongoDB, and may
+not succeed in the case of connection errors that the client is not yet aware of, or
+if the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> produces an exception (e.g. a duplicate key
+exception for <a class="reference internal" href="indexes.html#index-type-unique"><em>unique indexes</em></a>.) While this
+operation is efficient because it does not require the database to
+respond to every write operation, it also incurs a significant risk
+with regards to the persistence and durability of the data.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not use this option in normal operation.</p>
+</div>
+</li>
+</ul>
+<ul id="write-concern-unacknowledged">
+<li><p class="first"><em>unacknowledged</em>: MongoDB does not acknowledge the receipt of write
+operation as with a write concern level of <em>ignore</em>; however, the
+driver will receive and handle network errors, as possible given
+system networking configuration.</p>
+<p>Before the releases outlined in <a class="reference internal" href="../release-notes/drivers-write-concern.html#driver-write-concern-change"><em>Default Write Concern Change</em></a>,
+this was the default write concern.</p>
+</li>
+</ul>
+<ul class="simple" id="write-concern-acknowledged">
+<li>receipt <em>acknowledged</em>: The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will confirm the
+receipt of the write operation, allowing the client to catch
+network, duplicate key, and other exceptions. After the releases
+outlined in <a class="reference internal" href="../release-notes/drivers-write-concern.html#driver-write-concern-change"><em>Default Write Concern Change</em></a>, this is the default
+write concern. <a class="footnote-reference" href="#default-write-concern" id="id2">[1]</a></li>
+</ul>
+<ul id="write-concern-replica-journaled">
+<li><p class="first"><em>journaled</em>: The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will confirm the write
+operation only after it has written the operation to the
+<a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journal</em></a>. This confirms that the write operation can survive a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> shutdown and ensures that the write operation is
+durable.</p>
+<p>While receipt <em>acknowledged</em> without <em>journaled</em> provides the
+fundamental basis for write concern, there is an up-to 100
+millisecond window between journal commits where the write operation
+is not fully durable. Require <em>journaled</em> as part of the write
+concern to provide this durability guarantee.</p>
+</li>
+</ul>
+<p id="write-concern-replica-acknowledged"><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica sets</em></a> present an additional layer of
+consideration for write concern. Basic write concern level affect the
+write operation on only one <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. The <tt class="docutils literal"><span class="pre">w</span></tt>
+argument to <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> provides a <em>replica
+acknowledged</em> level of write concern. With <em>replica acknowledged</em> you
+can guarantee that the write operation has propagated to the members
+of a replica set. See the <a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>Write Concern for Replica Sets</em></a> for more information.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Requiring <em>journaled</em> write concern in a replica set only requires
+a journal commit of the write operation to the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> of the
+set regardless of the level of <em>replica acknowledged</em> write
+concern.</p>
+</div>
+<table class="docutils footnote" frame="void" id="default-write-concern" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>The default write concern is to call
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> with no arguments. For replica sets, you
+can define the default write concern settings in the
+<a class="reference internal" href="../reference/replica-configuration.html#settings.getLastErrorDefaults" title="settings.getLastErrorDefaults"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">getLastErrorDefaults</span></tt></a>. If
+<a class="reference internal" href="../reference/replica-configuration.html#settings.getLastErrorDefaults" title="settings.getLastErrorDefaults"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">getLastErrorDefaults</span></tt></a> does
+not define a default write concern setting,
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> defaults to basic receipt acknowledgment.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="internal-operation-of-write-concern">
+<span id="write-concern-internals"></span><span id="write-concern-operation"></span><h3>Internal Operation of Write Concern<a class="headerlink" href="#internal-operation-of-write-concern" title="Permalink to this headline">¶</a></h3>
+<p>To provide write concern, <a class="reference internal" href="../applications/drivers.html"><em>drivers</em></a> issue
+the <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command after a write operation and
+receive a document with information about the last operation. This
+document&#8217;s <tt class="docutils literal"><span class="pre">err</span></tt> field contains either:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">null</span></tt>, which indicates the write operations have completed
+successfully, or</li>
+<li>a description of the last error encountered.</li>
+</ul>
+<p>The definition of a &#8220;successful write&#8221; depends on the arguments
+specified to <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a>, or in replica sets, the
+configuration of <a class="reference internal" href="../reference/replica-configuration.html#settings.getLastErrorDefaults" title="settings.getLastErrorDefaults"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">getLastErrorDefaults</span></tt></a>. When deciding the level of write
+concern for your application, become familiar with the
+<a class="reference internal" href="#write-concern-considerations"><em>Operational Considerations and Write Concern</em></a>.</p>
+<p>The <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command has the following options to configure write
+concern requirements:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">j</span></tt> or &#8220;journal&#8221; option</p>
+<p>This option confirms that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance has written
+the data to the on-disk journal and ensures data is not lost if the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance shuts down unexpectedly. Set to <tt class="docutils literal"><span class="pre">true</span></tt> to
+enable, as shown in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">getLastError</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">j</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>If you set <a class="reference internal" href="../reference/connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">journal</span></tt></a> to true, and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> does
+not have journaling enabled, as with <a class="reference internal" href="../reference/configuration-options.html#nojournal" title="nojournal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nojournal</span></tt></a>, then
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> will provide basic receipt acknowledgment,
+and will include a <tt class="docutils literal"><span class="pre">jnote</span></tt> field in its return document.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">w</span></tt> option</p>
+<p>This option provides the ability to disable write concern entirely <em>as
+well as</em> specifies the write concern operations for <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>. See <a class="reference internal" href="#write-concern-considerations"><em>Operational Considerations and Write Concern</em></a> for an
+introduction to the fundamental concepts of write concern. By
+default, the <tt class="docutils literal"><span class="pre">w</span></tt> option is set to <tt class="docutils literal"><span class="pre">1</span></tt>, which provides basic
+receipt acknowledgment on a single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance or on the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> in a replica set.</p>
+<p>The <tt class="docutils literal"><span class="pre">w</span></tt> option takes the following values:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">-1</span></tt>:</p>
+<p>Disables all acknowledgment of write operations, and suppresses
+all including network and socket errors.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">0</span></tt>:</p>
+<p>Disables basic acknowledgment of write operations, but returns
+information about socket excepts and networking errors to the
+application.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you disable basic write operation acknowledgment but require
+journal commit acknowledgment, the journal commit prevails, and
+the driver will require that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>  will
+acknowladge the replica set.</p>
+</div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<p>Provides acknowledgment of write operations on a standalone
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> in a replica set.</p>
+</li>
+<li><p class="first"><em>A number greater than 1</em>:</p>
+<p>Guarantees that write operations have propagated successfully to
+the specified number of replica set members including the primary.
+If you set <tt class="docutils literal"><span class="pre">w</span></tt> to a number that is greater than the number of set
+members that hold data, MongoDB waits for the non-existent members
+to become available, which means MongoDB blocks indefinitely.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">majority</span></tt>:</p>
+<p>Confirms that write operations have propagated to the majority of
+configured replica set: nodes must acknowledge the write operation
+before it succeeds. This ensures that write operation will <em>never</em>
+be subject to a rollback in the course of normal operation, and
+furthermore allows you to prevent hard coding assumptions about the
+size of your replica set into your application.</p>
+</li>
+<li><p class="first"><em>A tag set</em>:</p>
+<p>By specifying a <a class="reference internal" href="../reference/replica-configuration.html#replica-set-configuration-tag-sets"><em>tag set</em></a>
+you can have fine-grained control over which replica
+set members must acknowledge a write operation to satisfy the required
+level of write concern.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> also supports a <tt class="docutils literal"><span class="pre">wtimeout</span></tt> setting which
+allows clients to specify a timeout for the write concern: if you
+don&#8217;t specify <tt class="docutils literal"><span class="pre">wtimeout</span></tt> and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> cannot fulfill
+the write concern the <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> will block,
+potentially forever.</p>
+<p>For more information on write concern and replica sets, see <a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>Write
+Concern for Replica Sets</em></a> for more information..</p>
+<p>In sharded clusters, <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances will pass write
+concern on to the shard <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances.</p>
+</div>
+</div>
+<div class="section" id="bulk-inserts">
+<span id="write-operations-bulk-insert"></span><h2>Bulk Inserts<a class="headerlink" href="#bulk-inserts" title="Permalink to this headline">¶</a></h2>
+<p>In some situations you may need to insert or ingest a large amount of
+data into a MongoDB database. These <em>bulk inserts</em> have some
+special considerations that are different from other write
+operations.</p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method, when passed an
+array of documents, will perform a bulk insert, and inserts each
+document atomically. <a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a>
+provide their own interface for this kind of operation.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.2: </span><a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell gained support for bulk inserts in version 2.2.</p>
+<p>Bulk insert can significantly increase performance by amortizing
+<a class="reference internal" href="#write-operations-write-concern"><em>write concern</em></a> costs. In the
+drivers, you can configure write concern for batches rather than on a
+per-document level.</p>
+<p>Drivers also have a <tt class="docutils literal"><span class="pre">ContinueOnError</span></tt> option in their insert
+operation, so that the bulk operation will continue to insert
+remaining documents in a batch even if an insert fails.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last versionadded">
+<span class="versionmodified">New in version 2.0: </span>Support for <tt class="docutils literal"><span class="pre">ContinueOnError</span></tt> depends on version 2.0 of the
+core <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> components.</p>
+</div>
+<p>If the bulk insert process generates more than one error in a batch
+job, the client will only receive the most recent error. All bulk
+operations to a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded collection</em></a> run with
+<tt class="docutils literal"><span class="pre">ContinueOnError</span></tt>, which applications cannot disable. See
+<a class="reference internal" href="../administration/sharding.html#sharding-bulk-inserts"><em>Strategies for Bulk Inserts in Sharded Clusters</em></a> section for more information on
+consideration for bulk inserts in sharded clusters.</p>
+<p>For more information see your <a class="reference internal" href="../applications/drivers.html"><em>driver documentation</em></a> for details on performing bulk inserts in
+your application. Also consider the following resources:
+<a class="reference internal" href="#write-operations-sharded-clusters"><em>Sharded Clusters</em></a>,
+<a class="reference internal" href="../administration/sharding.html#sharding-bulk-inserts"><em>Strategies for Bulk Inserts in Sharded Clusters</em></a>, and
+<a class="reference internal" href="../administration/import-export.html"><em>Importing and Exporting MongoDB Data</em></a>.</p>
+</div>
+<div class="section" id="indexing">
+<span id="write-operations-indexing"></span><h2>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h2>
+<p>After every insert, update, or delete operation, MongoDB must update
+<em>every</em> index associated with the collection in addition to the data
+itself. Therefore, every index on a collection adds some amount of
+overhead for the performance of write operations. <a class="footnote-reference" href="#exceptions" id="id3">[2]</a></p>
+<p>In general, the performance gains that indexes provide for <em>read
+operations</em> are worth the insertion penalty; however, when optimizing
+write performance, be careful when creating new indexes and always
+evaluate the indexes on the collection and ensure that your queries are
+actually using these indexes.</p>
+<p>For more information on indexes in MongoDB consider <a class="reference internal" href="../indexes.html"><em>Indexes</em></a>
+and <a class="reference internal" href="../applications/indexes.html"><em>Indexing Strategies</em></a>.</p>
+<table class="docutils footnote" frame="void" id="exceptions" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>The overhead for <a class="reference internal" href="indexes.html#index-type-sparse"><em>sparse indexes</em></a> inserts and updates to un-indexed fields
+is less than for non-sparse indexes. Also for non-sparse indexes,
+updates that don&#8217;t change the record size have less indexing
+overhead.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="isolation">
+<span id="write-operations-isolation"></span><h2>Isolation<a class="headerlink" href="#isolation" title="Permalink to this headline">¶</a></h2>
+<p>When a single write operation modifies multiple documents, the
+operation as a whole is not atomic, and other operations may
+interleave. The modification of a single document, or record, is always
+atomic, even if the write operation modifies multiple sub-document
+<em>within</em> the single record.</p>
+<p>No other operations are atomic; however, you can attempt to isolate a
+write operation that affects multiple documents using the
+<a class="reference internal" href="../reference/operator/atomic.html"><em>isolation operator</em></a>.</p>
+<p>To isolate a sequence of write operations from other read and write
+operations, see <a class="reference internal" href="../tutorial/perform-two-phase-commits.html"><em>Perform Two Phase Commits</em></a>.</p>
+</div>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="replica-sets">
+<span id="write-operations-replica-sets"></span><h3>Replica Sets<a class="headerlink" href="#replica-sets" title="Permalink to this headline">¶</a></h3>
+<p>In <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>, all write operations go to the
+set&#8217;s <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, which applies the write operation then records
+the operations on the primary&#8217;s operation log or <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. The
+oplog is a reproducible sequence of operations to the data
+set. <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">Secondary</em></a> members of the set are continuously replicating the
+oplog and applying the operations to themselves in an asynchronous
+process.</p>
+<p>Large volumes of write operations, particularly bulk operations, may
+create situations where the secondary members have difficulty applying
+the replicating operations from the primary at a sufficient rate: this
+can cause the secondary&#8217;s state to fall behind that of the primary. Secondaries
+that are significantly behind the primary present problems for normal
+operation of the replica set, particularly <a class="reference internal" href="../administration/replica-sets.html#replica-set-failover-administration"><em>failover</em></a> in the form of <a class="reference internal" href="replication.html#replica-set-rollback"><em>rollbacks</em></a> as well as general <a class="reference internal" href="replication.html#replica-set-consistency"><em>re2ad consistency</em></a>.</p>
+<p>To help avoid this issue, you can customize the <a class="reference internal" href="#write-operations-write-concern"><em>write concern</em></a> to return confirmation of the write
+operation to another member <a class="footnote-reference" href="#write-concern-throttling" id="id4">[3]</a> of the replica
+set every 100 or 1,000 operations. This provides an opportunity for
+secondaries to catch up with the primary. Write concern can slow the
+overall progress of write operations but ensure that the secondaries
+can maintain a largely current state with respect to the primary.</p>
+<p>For more information on replica sets and write operations, see
+<a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>Write Concern</em></a>, <a class="reference internal" href="replication.html#replica-set-oplog-sizing"><em>Oplog</em></a>,
+<a class="reference internal" href="replication-internals.html#replica-set-oplog"><em>Oplog Internals</em></a>, and <a class="reference internal" href="../administration/replica-sets.html#replica-set-procedure-change-oplog-size"><em>Changing Oplog Size</em></a>.</p>
+<table class="docutils footnote" frame="void" id="write-concern-throttling" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td>Calling <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a>
+intermittently with a <tt class="docutils literal"><span class="pre">w</span></tt> value of <tt class="docutils literal"><span class="pre">2</span></tt> or <tt class="docutils literal"><span class="pre">majority</span></tt> will
+slow the throughput of write traffic; however, this practice will
+allow the secondaries to remain current with the state of the
+primary.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="sharded-clusters">
+<span id="write-operations-sharded-clusters"></span><h3>Sharded Clusters<a class="headerlink" href="#sharded-clusters" title="Permalink to this headline">¶</a></h3>
+<p>In a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, MongoDB directs a given write operation to
+a <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> and then performs the write on a particular
+<a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> on that shard. Shards and chunks are range-based.
+<a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">Shard keys</em></a> affect how MongoDB distributes documents
+among shards. Choosing the correct shard key can have a great impact on
+the performance, capability, and functioning of your database and
+cluster.</p>
+<p>For more information, see <a class="reference internal" href="../administration/sharding.html"><em>Sharded Cluster Administration</em></a> and
+<a class="reference internal" href="#write-operations-bulk-insert"><em>Bulk Inserts</em></a>.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="read-operations.html" title="Previous Section: Read Operations">&lt; &nbsp; Read Operations</a></li>
+<li id="btnvup"><a href="../crud.html" title="Parent Section: CRUD" >&#47;&#92;&nbsp; CRUD</a></li>
+<li id="btnvnx"><a href="document.html" title="Next Section: BSON Documents">BSON Documents &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

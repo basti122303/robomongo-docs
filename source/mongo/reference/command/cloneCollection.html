@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cloneCollection &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/cloneCollection" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="cloneCollectionAsCapped" href="cloneCollectionAsCapped.html" />
+<link rel="prev" title="clone" href="clone.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="clonecollection">
+<h1>cloneCollection<a class="headerlink" href="#clonecollection" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="cloneCollection">
+<tt class="descname">cloneCollection</tt><a class="headerlink" href="#cloneCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#cloneCollection" title="cloneCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollection</span></tt></a> command copies a collection from a
+remote server to the server where you run the command.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>from</strong> &#8211; Specify a resolvable hostname, and optional port number
+of the remote server where the specified collection resides.</li>
+<li><strong>query</strong> &#8211; Optional. A query document, in the form of a
+<a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a>, that filters the documents
+in the remote collection that
+<a class="reference internal" href="../commands.html#cloneCollection" title="cloneCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollection</span></tt></a> will copy to the
+current database. See <a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a>.</li>
+<li><strong>copyIndexes</strong> (<em>Boolean</em>) &#8211; Optional. <tt class="docutils literal"><span class="pre">true</span></tt> by default. When set
+to <tt class="docutils literal"><span class="pre">false</span></tt> the indexes on the
+originating server are <em>not</em> copied with
+the documents in the collection.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">cloneCollection</span><span class="o">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span> <span class="nx">from</span><span class="o">:</span> <span class="s2">&quot;db.example.net:27017&quot;</span><span class="p">,</span> <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">active</span><span class="o">:</span> <span class="kc">true</span> <span class="p">},</span> <span class="nx">copyIndexes</span><span class="o">:</span> <span class="kc">false</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>This operation copies the &#8220;users&#8221; collection from the current
+database on the server at <tt class="docutils literal"><span class="pre">db.example.net</span></tt>. The operation only
+copies documents that satisfy the query <tt class="docutils literal"><span class="pre">{</span> <span class="pre">active:</span> <span class="pre">true</span> <span class="pre">}</span></tt> and
+does not copy indexes. <a class="reference internal" href="../commands.html#cloneCollection" title="cloneCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollection</span></tt></a> copies indexes
+by default, but you can disable this behavior by setting <tt class="docutils literal"><span class="pre">{</span>
+<span class="pre">copyIndexes:</span> <span class="pre">false</span> <span class="pre">}</span></tt>. The <tt class="docutils literal"><span class="pre">query</span></tt> and <tt class="docutils literal"><span class="pre">copyIndexes</span></tt>
+arguments are optional.</p>
+<p><a class="reference internal" href="../commands.html#cloneCollection" title="cloneCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollection</span></tt></a> creates a collection on the current
+database with the same name as the origin collection. If, in the
+above example, the <tt class="docutils literal"><span class="pre">users</span></tt> collection already exists, then
+MongoDB appends documents in the remote collection to the
+destination collection.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="clone.html" title="Previous Section: clone">&lt; &nbsp; clone</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cloneCollectionAsCapped.html" title="Next Section: cloneCollectionAsCapped">cloneCollectionAsCapped &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

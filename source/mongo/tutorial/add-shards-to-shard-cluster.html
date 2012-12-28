@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Add Shards to an Existing Cluster &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/add-shards-to-shard-cluster" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Remove Shards from an Existing Sharded Cluster" href="remove-shards-from-cluster.html" />
+<link rel="prev" title="Deploy a Sharded Cluster" href="deploy-shard-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="add-shards-to-an-existing-cluster">
+<h1>Add Shards to an Existing Cluster<a class="headerlink" href="#add-shards-to-an-existing-cluster" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This document describes how to add a <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> to an
+existing <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. As your
+data set grows you must add additional shards to a cluster to provide
+additional capacity. For additional sharding
+procedures, see <a class="reference internal" href="../administration/sharding.html"><em>Sharded Cluster Administration</em></a>.</p>
+</div>
+<div class="section" id="concerns">
+<h2>Concerns<a class="headerlink" href="#concerns" title="Permalink to this headline">¶</a></h2>
+<p>Distributing <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> among your cluster requires some
+capacity to support the migration process. When adding a shard to your
+cluster, you should always ensure that your cluster has enough
+capacity to support the migration without affecting legitimate
+production traffic.</p>
+<p>In production environments, all shards should be <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>. Furthermore, <em>all</em> interaction with your sharded
+cluster should pass through a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. This
+tutorial assumes that you already have a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+connection to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+</div>
+<div class="section" id="process">
+<h2>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h2>
+<p>Tell the cluster where to find the individual
+shards. You can do this using the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">addShard</span><span class="o">:</span> <span class="nx">mongodb0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Or you can use the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> helper in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;[hostname]:[port]&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">[hostname]</span></tt> and <tt class="docutils literal"><span class="pre">[port]</span></tt> with the hostname and TCP
+port number of where the shard is accessible.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not use <tt class="docutils literal"><span class="pre">localhost</span></tt> for the hostname unless your
+<a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">configuration server</em></a>
+is also running on <tt class="docutils literal"><span class="pre">localhost</span></tt>.</p>
+</div>
+<p>For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;mongodb0.example.net:27027&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">mongodb0.example.net:27027</span></tt> is a member of a replica
+set, call the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> method with an argument that
+resembles the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;&lt;setName&gt;/mongodb0.example.net:27027&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace, <tt class="docutils literal"><span class="pre">&lt;setName&gt;</span></tt> with the name of the replica set, and
+MongoDB will discover all other members of the replica set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In production deployments, all shards should be replica sets.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.3.</span></p>
+<p>Before version 2.0.3, you must specify the shard in the following
+form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>replicaSetName/&lt;seed1&gt;,&lt;seed2&gt;,&lt;seed3&gt;
+</pre></div>
+</div>
+<p>For example, if the name of the replica set is <tt class="docutils literal"><span class="pre">repl0</span></tt>, then
+your <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard</span></tt></a> command would be:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;repl0/mongodb0.example.net:27027,mongodb1.example.net:27017,mongodb2.example.net:27017&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Repeat this step for each shard in your cluster.</p>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>You may specify a &#8220;name&#8221; as an argument to the
+<a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a>, follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">addShard</span><span class="o">:</span> <span class="nx">mongodb0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">You cannot specify a name for a shard using the
+<a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. If
+you use the helper or do not specify a shard name, then MongoDB
+will assign a name upon creation.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>It may take some time for <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> to migrate to the new
+shard because the system must copy data from one <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance to another while maintaining data consistency.</p>
+<p>For an overview of the balancing operation,
+see the <a class="reference internal" href="../core/sharding.html#sharding-balancing"><em>Balancing and Distribution</em></a>
+section.</p>
+<p class="last">For additional information on balancing, see the
+<a class="reference internal" href="../core/sharding-internals.html#sharding-balancing-internals"><em>Balancing Internals</em></a> section.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="deploy-shard-cluster.html" title="Previous Section: Deploy a Sharded Cluster">&lt; &nbsp; Deploy a Sharded Cluster</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="remove-shards-from-cluster.html" title="Next Section: Remove Shards from an Existing Sharded Cluster">Remove Shards from an Existing Sharded Cluster &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

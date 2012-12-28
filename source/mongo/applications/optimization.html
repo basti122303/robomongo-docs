@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Optimization Strategies for MongoDB Applications &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/optimization" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Database References" href="database-references.html" />
+<link rel="prev" title="Data Modeling Considerations for MongoDB Applications" href="../core/data-modeling.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="optimization-strategies-for-mongodb-applications">
+<h1>Optimization Strategies for MongoDB Applications<a class="headerlink" href="#optimization-strategies-for-mongodb-applications" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>There are many factors that can affect performance of operations in
+MongoDB, including index use, query structure, data modeling,
+application design and architecture, as well as operational factors
+including architecture and system configuration. This document
+addresses key application optimization strategies, and includes
+examples and links to relevant reference material.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="aggregation.html#aggregation-optimize-performance"><em>Optimizing Performance</em></a>,
+<a class="reference internal" href="../faq/fundamentals.html"><em>FAQ: MongoDB Fundamentals</em></a>, and <a class="reference internal" href="../faq/developers.html"><em>FAQ: MongoDB for Application Developers</em></a>.</p>
+</div>
+</div>
+<div class="section" id="strategies">
+<h2>Strategies<a class="headerlink" href="#strategies" title="Permalink to this headline">¶</a></h2>
+<p>This section describes techniques for optimizing database performance
+with MongoDB with particular attention to query performance and basic
+client operations.</p>
+<div class="section" id="use-indexes">
+<h3>Use Indexes<a class="headerlink" href="#use-indexes" title="Permalink to this headline">¶</a></h3>
+<p>For commonly issued queries, create <a class="reference internal" href="../indexes.html"><em>indexes</em></a>. If a
+query searches multiple fields, create a <a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound index</em></a>. Scanning an index is much faster than scanning a
+collection. The indexes structures are smaller than the documents
+reference, and store references in order.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>If you have a <tt class="docutils literal"><span class="pre">posts</span></tt> collection containing blog posts,
+and if you regularly issue a query that sorts on the <tt class="docutils literal"><span class="pre">author_name</span></tt>
+field, then you can optimize the query by creating an index on the
+<tt class="docutils literal"><span class="pre">author_name</span></tt> field:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">author_name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Indexes also improve efficiency on queries that routinely sort on a
+given field.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>If you regularly issue a query that sorts on the
+<tt class="docutils literal"><span class="pre">timestamp</span></tt> field, then you can optimize the query by creating an
+index on the <tt class="docutils literal"><span class="pre">timestamp</span></tt> field:</p>
+<p>Creating this index:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Optimizes this query:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Because MongoDB can read indexes in both ascending and descending
+order, the direction of a single-key index does not matter.</p>
+<p>Indexes support queries, update operations, and some phases of the
+<a class="reference internal" href="aggregation.html#aggregation-pipeline-operators-and-performance"><em>aggregation pipeline</em></a> for more
+information.</p>
+</div>
+<div class="section" id="limit-results">
+<h3>Limit Results<a class="headerlink" href="#limit-results" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB <a class="reference internal" href="../reference/glossary.html#term-cursor"><em class="xref std std-term">cursors</em></a> return results in groups of multiple
+documents. If you know the number of results you want, you can reduce
+the demand on network resources by issuing the <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a>
+method.</p>
+<p>This is typically used in conjunction with sort operations. For example,
+if you need only 10 results from your query to the <tt class="docutils literal"><span class="pre">posts</span></tt>
+collection, you would issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more information on limiting results, see <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a></p>
+</div>
+<div class="section" id="use-projections-to-return-only-necessary-data">
+<h3>Use Projections to Return Only Necessary Data<a class="headerlink" href="#use-projections-to-return-only-necessary-data" title="Permalink to this headline">¶</a></h3>
+<p>When you need only a subset of fields from documents, you can achieve better
+performance by returning only the fields you need:</p>
+<p>For example, if in your query to the <tt class="docutils literal"><span class="pre">posts</span></tt> collection, you need only
+the <tt class="docutils literal"><span class="pre">timestamp</span></tt>, <tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">author</span></tt>, and <tt class="docutils literal"><span class="pre">abstract</span></tt> fields, you
+would issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">posts</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{},</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span> <span class="kr">abstract</span> <span class="o">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">timestamp</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For more information on using projections, see
+<a class="reference internal" href="../core/read-operations.html#read-operations-projection"><em>Result Projections</em></a>.</p>
+</div>
+<div class="section" id="use-the-database-profiler-to-evaluate-performance">
+<h3>Use the Database Profiler to Evaluate Performance<a class="headerlink" href="#use-the-database-profiler-to-evaluate-performance" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB provides a database profiler that shows performance
+characteristics of each operation against the database. Use the profiler
+to locate any queries or write operations that are running slow. You can
+use this information, for example, to determine what indexes to create.</p>
+<p>For more information, see <a class="reference internal" href="../administration/monitoring.html#database-profiling"><em>Database Profiling</em></a>.</p>
+</div>
+<div class="section" id="use-db-currentop-to-evaluate-performance">
+<h3>Use <tt class="docutils literal"><span class="pre">db.currentOp()</span></tt> to Evaluate Performance<a class="headerlink" href="#use-db-currentop-to-evaluate-performance" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> method reports on current operations
+running on a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. For documentation of the
+output of <a class="reference internal" href="../reference/method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> see <a class="reference internal" href="../reference/current-op.html"><em>Current Operation Reporting</em></a>.</p>
+</div>
+<div class="section" id="use-explain-to-evaluate-performance">
+<h3>Use <tt class="docutils literal"><span class="pre">$explain</span></tt> to Evaluate Performance<a class="headerlink" href="#use-explain-to-evaluate-performance" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> method returns statistics
+on a query, and reports the index MongoDB selected to fulfill the
+query, as well as information about the internal operation of the
+query.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To use <a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> on a query
+for documents matching the expression <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">1</span> <span class="pre">}</span></tt>, in the
+collection <tt class="docutils literal"><span class="pre">records</span></tt>, use an operation that resembles the
+following in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">explain</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="use-hint-to-select-a-particular-index">
+<h3>Use <tt class="docutils literal"><span class="pre">$hint</span></tt> to Select a Particular Index<a class="headerlink" href="#use-hint-to-select-a-particular-index" title="Permalink to this headline">¶</a></h3>
+<p>In most cases the <a class="reference internal" href="../core/read-operations.html#read-operations-query-optimization"><em>query optimizer</em></a> selects the optimal index for a
+specific operation; however, you can force MongoDB to use a specific
+index using the <a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> method. Use
+<a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> to support performance testing, or on
+some queries where you must select a field or field included in
+several indexes.</p>
+</div>
+<div class="section" id="use-the-increment-operator-to-perform-operations-server-side">
+<h3>Use the Increment Operator to Perform Operations Server-Side<a class="headerlink" href="#use-the-increment-operator-to-perform-operations-server-side" title="Permalink to this headline">¶</a></h3>
+<p>Use MongoDB&#8217;s <a class="reference internal" href="../reference/operators.html#_S_inc" title="$inc"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$inc</span></tt></a> operator to increment or decrement
+values in documents. The operator increments the value of the field on
+the server side, as an alternative to selecting a document, making
+simple modifications in the client and then writing the entire
+document to the server.  The <a class="reference internal" href="../reference/operators.html#_S_inc" title="$inc"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$inc</span></tt></a> operator can also help
+avoid race conditions, which would result when two application
+instances queried for a document, manually incremented a field, and
+saved the entire document back at the same time.</p>
+</div>
+<div class="section" id="perform-server-side-code-execution">
+<h3>Perform Server-Side Code Execution<a class="headerlink" href="#perform-server-side-code-execution" title="Permalink to this headline">¶</a></h3>
+<p>For some kinds of operations, you can perform operations on the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> server itself rather than writing a client
+application to perform a simple task. This can eliminate network
+overhead for client operations for some basic administrative
+operations. Consider the following example:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last">For example, if you want to remove a field from all
+documents in a collection, performing the operation directly on the
+server is more efficient than transmitting the collection to your
+client and back again.</p>
+</div>
+<p>For more information, see the <a class="reference external" href="http://www.mongodb.org/display/DOCS/Server-side+Code+Execution">Server-side Code Execution</a> wiki page.</p>
+</div>
+<div class="section" id="use-capped-collections">
+<h3>Use Capped Collections<a class="headerlink" href="#use-capped-collections" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../core/capped-collections.html"><em>Capped Collections</em></a> are circular, fixed-size collections
+that keep documents well-ordered, even without the use of an
+index. This means that capped collections can receive very high-speed
+writes and sequential reads.</p>
+<p>These collections are particularly useful for keeping log files but are
+not limited to that purpose. Use capped collections where appropriate.</p>
+</div>
+<div class="section" id="use-natural-order">
+<h3>Use Natural Order<a class="headerlink" href="#use-natural-order" title="Permalink to this headline">¶</a></h3>
+<p>To return documents in the order they exist on disk, return sorted
+operations using the <a class="reference internal" href="../reference/operator/natural.html#_S_natural" title="$natural"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$natural</span></tt></a> operator. <a class="reference internal" href="../reference/glossary.html#term-natural-order"><em class="xref std std-term">Natural
+order</em></a> does not use indexes but can be fast for
+operations when you want to select the first or last items on
+disk. This is particularly useful for capped collections.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> and <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/data-modeling.html" title="Previous Section: Data Modeling Considerations for MongoDB Applications">&lt; &nbsp; Data Modeling Considerations for MongoDB Applications</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="database-references.html" title="Next Section: Database References">Database References &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

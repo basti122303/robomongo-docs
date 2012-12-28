@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.sort() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.sort" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.addUser()" href="db.addUser.html" />
+<link rel="prev" title="cursor.snapshot()" href="cursor.snapshot.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-sort">
+<h1>cursor.sort()<a class="headerlink" href="#cursor-sort" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.sort">
+<tt class="descclassname">cursor.</tt><tt class="descname">sort</tt><big>(</big><em>sort</em><big>)</big><a class="headerlink" href="#cursor.sort" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sort</strong> &#8211; A document whose fields specify the attributes on
+which to sort the result set.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Append the <a class="reference internal" href="#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> method to a cursor to
+control the order that the query returns matching documents.  For
+each field in the sort document, if the field&#8217;s corresponding value
+is positive, then <a class="reference internal" href="#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> returns query
+results in ascending order for that attribute: if the field&#8217;s
+corresponding value is negative, then <a class="reference internal" href="#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> returns query results in descending order.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must apply <a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> to the cursor before
+retrieving any documents from the database.</p>
+</div>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, the query returns all documents in <tt class="docutils literal"><span class="pre">collection</span></tt> sorted by
+the <tt class="docutils literal"><span class="pre">age</span></tt> field in descending order. Specify a value of negative
+one (e.g. <tt class="docutils literal"><span class="pre">-1</span></tt>), as above, to sort in descending order or a
+positive value (e.g. <tt class="docutils literal"><span class="pre">1</span></tt>) to sort in ascending order.</p>
+<p>Unless you have a index for the specified key pattern, use
+<a class="reference internal" href="#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.sort()</span></tt></a> in conjunction with <a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> to avoid
+requiring MongoDB to perform a large, in-memory
+sort. <a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> increases the speed and reduces the amount
+of memory required to return this query by way of an optimized
+algorithm.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The sort function requires that the entire sort be able to
+complete within 32 megabytes. When the sort option consumes more
+than 32 megabytes, MongoDB will return an error. Use
+<a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a>, or create an index on the field that you&#8217;re
+sorting to avoid this error.</p>
+</div>
+<p>The <a class="reference internal" href="../operator/natural.html#_S_natural" title="$natural"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$natural</span></tt></a> parameter returns items according to their
+order on disk. Consider the following query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$natural</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This will return documents in the reverse of the order on
+disk. Typically, the order of documents on disks reflects insertion
+order, <em>except</em> when documents move internal because of document
+growth due to update operations.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.snapshot.html" title="Previous Section: cursor.snapshot()">&lt; &nbsp; cursor.snapshot()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.addUser.html" title="Next Section: db.addUser()">db.addUser() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

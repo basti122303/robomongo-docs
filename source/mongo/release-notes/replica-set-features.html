@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replica Set Features and Version Compatibility &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/replica-set-features" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Replica Set Commands" href="../reference/replica-commands.html" />
+<link rel="prev" title="Replication Internals" href="../core/replication-internals.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replica-set-features-and-version-compatibility">
+<h1>Replica Set Features and Version Compatibility<a class="headerlink" href="#replica-set-features-and-version-compatibility" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This table is for archival purposes and does not list all
+features of <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>. Always use the latest stable
+release of MongoDB in production deployments.</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="80%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Features</strong></th>
+<th class="head"><strong>Version</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Slave Delay</td>
+<td>1.6.3</td>
+</tr>
+<tr class="row-odd"><td>Hidden</td>
+<td>1.7</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../reference/replica-commands.html#replSetFreeze" title="replSetFreeze"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetFreeze</span></tt></a> and <a class="reference internal" href="../reference/command/replSetStepDown.html#replSetStepDown" title="replSetStepDown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetStepDown</span></tt></a></td>
+<td>1.7.3</td>
+</tr>
+<tr class="row-odd"><td>Replicated ops in <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt></td>
+<td>1.7.3</td>
+</tr>
+<tr class="row-even"><td>Syncing from Secondaries</td>
+<td>1.8.0</td>
+</tr>
+<tr class="row-odd"><td>Authentication</td>
+<td>1.8.0</td>
+</tr>
+<tr class="row-even"><td>Replication from Nearest Server (by ping Time)</td>
+<td>2.0</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../reference/replica-commands.html#replSetSyncFrom" title="replSetSyncFrom"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetSyncFrom</span></tt></a> support for syncing from specific
+members.</td>
+<td>2.2</td>
+</tr>
+</tbody>
+</table>
+<p>Additionally:</p>
+<ul class="simple">
+<li>1.8-series secondaries can replicate from 1.6-series primaries.</li>
+<li>1.6-series secondaries cannot replicate from 1.8-series primaries.</li>
+</ul>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/replication-internals.html" title="Previous Section: Replication Internals">&lt; &nbsp; Replication Internals</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="../reference/replica-commands.html" title="Next Section: Replica Set Commands">Replica Set Commands &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Category Hierarchy &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/use-cases/category-hierarchy" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Use Cases" href="../use-cases.html" />
+<link rel="next" title="Metadata and Asset Management" href="metadata-and-asset-management.html" />
+<link rel="prev" title="Inventory Management" href="inventory-management.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="category-hierarchy">
+<h1>Category Hierarchy<a class="headerlink" href="#category-hierarchy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This document provides the basic design for modeling a product
+hierarchy stored in MongoDB as well as a collection of common
+operations for interacting with this data that will help you begin to
+write an E-commerce product category hierarchy.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="product-catalog.html"><em>Product Catalog</em></a>&#8220;</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>To model a product category hierarchy, this solution keeps each
+category in its own document that also has a list of its ancestors or
+&#8220;parents.&#8221; This document uses music genres as the basis of its
+examples:</p>
+<div class="figure align-center">
+<img alt="Initial category hierarchy" src="../_images/category1.png" />
+<p class="caption">Initial category hierarchy</p>
+</div>
+<p>Because these kinds of categories change infrequently, this model
+focuses on the operations needed to keep the hierarchy up-to-date
+rather than the performance profile of update operations.</p>
+</div>
+<div class="section" id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<p>This schema has the following properties:</p>
+<ul class="simple">
+<li>A single document represents each category in the hierarchy.</li>
+<li>An <tt class="docutils literal"><span class="pre">ObjectId</span></tt> identifies each category document for internal
+cross-referencing.</li>
+<li>Each category document has a human-readable name and a
+URL compatible <tt class="docutils literal"><span class="pre">slug</span></tt> field.</li>
+<li>The schema stores a list of ancestors for each category to
+facilitate displaying a query and its ancestors using only a single
+query.</li>
+</ul>
+<p>Consider the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4f5ec858eb03303a11000002&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;Modal Jazz&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;parent&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4f5ec858eb03303a11000001&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;slug&quot;</span> <span class="o">:</span> <span class="s2">&quot;modal-jazz&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;ancestors&quot;</span> <span class="o">:</span> <span class="p">[</span>
+         <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4f5ec858eb03303a11000001&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;slug&quot;</span> <span class="o">:</span> <span class="s2">&quot;bop&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;Bop&quot;</span> <span class="p">},</span>
+         <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4f5ec858eb03303a11000000&quot;</span><span class="p">),</span>
+           <span class="s2">&quot;slug&quot;</span> <span class="o">:</span> <span class="s2">&quot;ragtime&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;Ragtime&quot;</span> <span class="p">}</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines the category hierarchy manipulations that you
+may need in an E-Commerce site.  All examples in this document use the
+Python programming language and the <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a>
+<a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> for MongoDB, but you can implement this system using
+any language you choose.</p>
+<div class="section" id="read-and-display-a-category">
+<h3>Read and Display a Category<a class="headerlink" href="#read-and-display-a-category" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="querying">
+<h4>Querying<a class="headerlink" href="#querying" title="Permalink to this headline">¶</a></h4>
+<p>Use the following option to read and display a category
+hierarchy. This query will use the <tt class="docutils literal"><span class="pre">slug</span></tt> field to return the
+category information and a &#8220;bread crumb&#8221; trail from the current
+category to the top level category.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">category</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;slug&#39;</span><span class="p">:</span><span class="n">slug</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;ancestors.slug&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;ancestors.name&#39;</span><span class="p">:</span><span class="mi">1</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indexing">
+<h4>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h4>
+<p>Create a unique index on the <tt class="docutils literal"><span class="pre">slug</span></tt> field with the following
+operation on the Python/PyMongo console:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;slug&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="add-a-category-to-the-hierarchy">
+<h3>Add a Category to the Hierarchy<a class="headerlink" href="#add-a-category-to-the-hierarchy" title="Permalink to this headline">¶</a></h3>
+<p>To add a category you must first determine its ancestors. Take adding
+a new category &#8220;Swing&#8221; as a child of &#8220;Ragtime&#8221;, as below:</p>
+<div class="figure align-center">
+<img alt="Adding a category" src="../_images/category2.png" />
+<p class="caption">Adding a category</p>
+</div>
+<p>The insert operation would be trivial except for the ancestors. To
+define this array, consider the following helper function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">build_ancestors</span><span class="p">(</span><span class="n">_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">parent_id</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;ancestors&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+    <span class="n">parent_ancestors</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;ancestors&#39;</span><span class="p">)</span>
+    <span class="n">ancestors</span> <span class="o">=</span> <span class="p">[</span> <span class="n">parent</span> <span class="p">]</span> <span class="o">+</span> <span class="n">parent_ancestors</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">_id</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;ancestors&#39;</span><span class="p">:</span> <span class="n">ancestors</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>You only need to travel &#8220;up&#8221; one level in the hierarchy to get the
+ancestor list for &#8220;Ragtime&#8221; that you can use to build the ancestor
+list for &#8220;Swing.&#8221; Then create a document with the following set of
+operations:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">doc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Swing&#39;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="s">&#39;swing&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">ragtime_id</span><span class="p">)</span>
+<span class="n">swing_id</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+<span class="n">build_ancestors</span><span class="p">(</span><span class="n">swing_id</span><span class="p">,</span> <span class="n">ragtime_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Since these queries and updates all selected based on <tt class="docutils literal"><span class="pre">_id</span></tt>, you
+only need the default MongoDB-supplied index on <tt class="docutils literal"><span class="pre">_id</span></tt> to support
+this operation efficiently.</p>
+</div>
+</div>
+<div class="section" id="change-the-ancestry-of-a-category">
+<h3>Change the Ancestry of a Category<a class="headerlink" href="#change-the-ancestry-of-a-category" title="Permalink to this headline">¶</a></h3>
+<p>This section address the process for reorganizing the hierarchy by
+moving &#8220;bop&#8221; under &#8220;swing&#8221; as follows:</p>
+<div class="figure align-center">
+<img alt="Change the parent of a category" src="../_images/category3.png" />
+<p class="caption">Change the parent of a category</p>
+</div>
+<div class="section" id="procedure">
+<h4>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h4>
+<p>Update the <tt class="docutils literal"><span class="pre">bop</span></tt> document to reflect the change in ancestry with the
+following operation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="n">bop_id</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;parent&#39;</span><span class="p">:</span> <span class="n">swing_id</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following helper function, rebuilds the ancestor fields to ensure
+correctness. <a class="footnote-reference" href="#update-correctness" id="id1">[1]</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">build_ancestors_full</span><span class="p">(</span><span class="n">_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
+    <span class="n">ancestors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">parent_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">parent_id</span><span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;parent&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;slug&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;ancestors&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+        <span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;parent&#39;</span><span class="p">)</span>
+        <span class="n">ancestors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">_id</span><span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;ancestors&#39;</span><span class="p">:</span> <span class="n">ancestors</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>You can use the following loop to reconstruct all the descendants of
+the &#8220;bop&#8221; category:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;ancestors._id&#39;</span><span class="p">:</span> <span class="n">bop_id</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#39;parent_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}):</span>
+    <span class="n">build_ancestors_full</span><span class="p">(</span><span class="n">cat</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">],</span> <span class="n">cat</span><span class="p">[</span><span class="s">&#39;parent_id&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<table class="docutils footnote" frame="void" id="update-correctness" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Your application cannot guarantee that the
+ancestor list of a parent category is correct, because MongoDB may
+process the categories out-of-order.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id2">
+<h4>Indexing<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>Create an index on the <tt class="docutils literal"><span class="pre">ancestors._id</span></tt> field to support the update
+operation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;ancestors._id&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="rename-a-category">
+<h3>Rename a Category<a class="headerlink" href="#rename-a-category" title="Permalink to this headline">¶</a></h3>
+<p>To a rename a category you need to both update the category itself and
+also update all the descendants. Consider renaming &#8220;Bop&#8221; to
+&#8220;BeBop&#8221; as in the following figure:</p>
+<div class="figure align-center">
+<img alt="Rename a category" src="../_images/category4.png" />
+<p class="caption">Rename a category</p>
+</div>
+<p>First, you need to update the category name with the following operation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="n">bop_id</span><span class="p">},</span> <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;BeBop&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, you need to update each descendant&#8217;s ancestors list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="p">{</span><span class="s">&#39;ancestors._id&#39;</span><span class="p">:</span> <span class="n">bop_id</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;ancestors.$.name&#39;</span><span class="p">:</span> <span class="s">&#39;BeBop&#39;</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation uses:</p>
+<ul class="simple">
+<li>the positional operation <tt class="docutils literal"><span class="pre">$</span></tt> to match the exact &#8220;ancestor&#8221; entry
+that matches the query, and</li>
+<li>the <tt class="docutils literal"><span class="pre">multi</span></tt> option to update all documents that match this query.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In this case, the index you have already defined on
+<tt class="docutils literal"><span class="pre">ancestors._id</span></tt> is sufficient to ensure good performance.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sharding">
+<h2>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h2>
+<p>For most deployments, <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">sharding</em></a> this collection has
+limited value because the collection will be very small. If you do
+need to shard, because most updates query the <tt class="docutils literal"><span class="pre">_id</span></tt> field, this
+field is a suitable <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>. Shard the collection with the
+following operation in the Python/PyMongo console.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;categories&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">})</span>
+<span class="go">{ &quot;collectionsharded&quot; : &quot;categories&quot;, &quot;ok&quot; : 1 }</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="inventory-management.html" title="Previous Section: Inventory Management">&lt; &nbsp; Inventory Management</a></li>
+<li id="btnvup"><a href="../use-cases.html" title="Parent Section: Use Cases" >&#47;&#92;&nbsp; Use Cases</a></li>
+<li id="btnvnx"><a href="metadata-and-asset-management.html" title="Next Section: Metadata and Asset Management">Metadata and Asset Management &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Change the Size of the Oplog &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/change-oplog-size" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Force a Member to Become Primary" href="force-member-to-be-primary.html" />
+<link rel="prev" title="Deploy a Geographically Distributed Replica Set" href="deploy-geographically-distributed-replica-set.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="change-the-size-of-the-oplog">
+<h1>Change the Size of the Oplog<a class="headerlink" href="#change-the-size-of-the-oplog" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> exists internally as a <a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a>, so
+you cannot modify its size in the course of normal operations. In most
+cases the <a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>default oplog size</em></a> is an
+acceptable size; however, in some situations you may need a larger or
+smaller oplog. For example, you might need to change the oplog size
+if your applications perform large numbers of multi-updates or
+deletes in short periods of time.</p>
+<p>This tutorial describes how to resize the oplog. For a detailed
+explanation of oplog sizing, see the <a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>Oplog</em></a>
+topic in the <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> document. For details on the how
+oplog size affects <a class="reference internal" href="../reference/glossary.html#term-delayed-member"><em class="xref std std-term">delayed members</em></a> and affects
+<a class="reference internal" href="../reference/glossary.html#term-replication-lag"><em class="xref std std-term">replication lag</em></a>, see the <a class="reference internal" href="../administration/replica-sets.html#replica-set-delayed-members"><em>Delayed Members</em></a>
+topic and the <a class="reference internal" href="../administration/replica-sets.html#replica-set-replication-lag"><em>Check the Replication Lag</em></a> topic in
+<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a>.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The following is an overview of the procedure for changing the size of
+the oplog:</p>
+<ol class="arabic simple">
+<li>Shut down the current <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> instance in the
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> and then restart it on a different port
+and in &#8220;standalone&#8221; mode.</li>
+<li>Create a backup of the old (current) oplog. This is optional.</li>
+<li>Save the last entry from the old oplog.</li>
+<li>Drop the old oplog.</li>
+<li>Create a new oplog of a different size.</li>
+<li>Insert the previously saved last entry from the old oplog into the
+new oplog.</li>
+<li>Restart the server as a member of the replica set on its usual
+port.</li>
+<li>Apply this procedure to any other member of the replica set that
+<em>could become</em> primary.</li>
+</ol>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>The examples in this procedure use the following configuration:</p>
+<ul class="simple">
+<li>The active <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> is <tt class="docutils literal"><span class="pre">rs0</span></tt>.</li>
+<li>The replica set is running on port is <tt class="docutils literal"><span class="pre">27017</span></tt>.</li>
+<li>The replica set is running with a <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">data</span> <span class="pre">directory</span></tt></a>
+of <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>.</li>
+</ul>
+<p>To change the size of the oplog for a replica set, use the following
+procedure for every member of the set that may become primary.</p>
+<ol class="arabic">
+<li><p class="first">Shut down the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance and restart it in
+&#8220;standalone&#8221; mode running on a different port.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Shutting down the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member of the set will trigger
+a failover situation and another member in the replica set will
+become primary. In most cases, it is least disruptive to modify
+the oplogs of all the secondaries before modifying the primary.</p>
+</div>
+<p>To shut down the current primary instance, use a command that
+resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /srv/mongodb --shutdown
+</pre></div>
+</div>
+<p>To restart the instance on a different port and in &#8220;standalone&#8221; mode
+(i.e. without
+<tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt> or
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a>),
+use a command that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 37017 --dbpath /srv/mongodb
+</pre></div>
+</div>
+</li>
+<li><p class="first">Backup the existing oplog on the standalone instance. Use the
+following sequence of commands:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --db <span class="nb">local</span> --collection <span class="s1">&#39;oplog.rs&#39;</span> --port 37017
+</pre></div>
+</div>
+<p>Connect to the instance using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --port 37017
+</pre></div>
+</div>
+</li>
+<li><p class="first">Save the last entry from the old (current) oplog.</p>
+<ol class="loweralpha">
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, enter the following command to use the
+<tt class="docutils literal"><span class="pre">local</span></tt> database to interact with the oplog:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">local</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use the <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.save()</span></tt></a> operation to save the last
+entry in the oplog to a temporary collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">temp</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="nx">db</span><span class="p">.</span><span class="nx">oplog</span><span class="p">.</span><span class="nx">rs</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">ts</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">h</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span><span class="nx">$natural</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">next</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can see this oplog entry in the <tt class="docutils literal"><span class="pre">temp</span></tt> collection by issuing
+the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">temp</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li><p class="first">Drop the old <tt class="docutils literal"><span class="pre">oplog.rs</span></tt> collection in the <tt class="docutils literal"><span class="pre">local</span></tt> database. Use
+the following command:</p>
+<div class="highlight-javascript"><pre>db.oplog.rs.drop()
+
+This will return ``true`` on the shell.</pre>
+</div>
+</li>
+<li><p class="first">Use the <a class="reference internal" href="../reference/commands.html#create" title="create"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">create</span></tt></a> command to create a new oplog of a
+different size. Specify the <tt class="docutils literal"><span class="pre">size</span></tt> argument in bytes. A value of
+<tt class="docutils literal"><span class="pre">2147483648</span></tt> will create a new oplog that&#8217;s 2 gigabytes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">create</span> <span class="o">:</span> <span class="s2">&quot;oplog.rs&quot;</span><span class="p">,</span> <span class="nx">capped</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">size</span> <span class="o">:</span> <span class="mi">2147483648</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Upon success, this command returns the following status:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Insert the previously saved last entry from the old oplog into the
+new oplog:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">oplog</span><span class="p">.</span><span class="nx">rs</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="nx">db</span><span class="p">.</span><span class="nx">temp</span><span class="p">.</span><span class="nx">findOne</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>To confirm the entry is in the new oplog, issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">oplog</span><span class="p">.</span><span class="nx">rs</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Restart the server as a member of the replica set on its usual
+port:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">srv</span><span class="o">/</span><span class="nx">mongodb</span> <span class="o">--</span><span class="nx">shutdown</span>
+<span class="nx">mongod</span> <span class="o">--</span><span class="nx">replSet</span> <span class="nx">rs0</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">srv</span><span class="o">/</span><span class="nx">mongodb</span>
+</pre></div>
+</div>
+<p>The replica member will recover and &#8220;catch up&#8221; and then will be
+eligible for election to <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>. To step down the
+&#8220;temporary&#8221; primary that took over when you initially shut down the
+server, use the <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> method. This will force an
+election for primary. If the server&#8217;s <a class="reference internal" href="../core/replication.html#replica-set-node-priority"><em>priority</em></a> is higher than all other members in the
+set <em>and</em> if it has successfully &#8220;caught up,&#8221; then it will likely
+become primary.</p>
+</li>
+<li><p class="first">Repeat this procedure for all other members of the replica set that
+are or could become primary.</p>
+</li>
+</ol>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="deploy-geographically-distributed-replica-set.html" title="Previous Section: Deploy a Geographically Distributed Replica Set">&lt; &nbsp; Deploy a Geographically Distributed Replica Set</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="force-member-to-be-primary.html" title="Next Section: Force a Member to Become Primary">Force a Member to Become Primary &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

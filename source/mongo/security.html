@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Security &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/security" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Security Practices and Management" href="administration/security.html" />
+<link rel="prev" title="Build Old Style Indexes" href="tutorial/roll-back-to-v1.8-index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="security">
+<h1>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h1>
+<p>The documents outline basic security practices and risk management
+strategies. Additionally, this section includes <a class="reference internal" href="tutorial.html#tutorials"><em>MongoDB Tutorials</em></a> that
+outline basic network filter and firewall rules to configure trusted
+environments for MongoDB.</p>
+<div class="section" id="strategies-and-practices">
+<h2>Strategies and Practices<a class="headerlink" href="#strategies-and-practices" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="administration/security.html">Security Practices and Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#strategies-for-reducing-risk">Strategies for Reducing Risk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#vulnerability-notification">Vulnerability Notification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#networking-risk-exposure">Networking Risk Exposure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#authentication">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#interfaces">Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/security.html#data-encryption">Data Encryption</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/vulnerability-notification.html">Vulnerability Notification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/vulnerability-notification.html#notification">Notification</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="tutorials">
+<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html">Configure Linux <tt class="docutils literal"><span class="pre">iptables</span></tt> Firewall for MongoDB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html#patterns">Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html#change-default-policy-to-drop">Change Default Policy to <tt class="docutils literal"><span class="pre">DROP</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html#manage-and-maintain-iptables-configuration">Manage and Maintain <tt class="docutils literal"><span class="pre">iptables</span></tt> Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/configure-windows-netsh-firewall.html">Configure Windows <tt class="docutils literal"><span class="pre">netsh</span></tt> Firewall for MongoDB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-windows-netsh-firewall.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-windows-netsh-firewall.html#patterns">Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/configure-windows-netsh-firewall.html#manage-and-maintain-windows-firewall-configurations">Manage and Maintain <em>Windows Firewall</em> Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html">Control Access to MongoDB Instances with Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#adding-users">Adding Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#administrative-access-in-mongodb">Administrative Access in MongoDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#authentication-on-localhost">Authentication on Localhost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#password-hashing-insecurity">Password Hashing Insecurity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#configuration-considerations-for-authentication">Configuration Considerations for Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html#generate-a-key-file">Generate a Key File</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/roll-back-to-v1.8-index.html" title="Previous Section: Build Old Style Indexes">&lt; &nbsp; Build Old Style Indexes</a></li>
+<li id="btnvnx"><a href="administration/security.html" title="Next Section: Security Practices and Management">Security Practices and Management &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Master Slave Replication &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/master-slave" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Deploy a Replica Set" href="../tutorial/deploy-replica-set.html" />
+<link rel="prev" title="Replica Set Commands" href="../reference/replica-commands.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="master-slave-replication">
+<h1>Master Slave Replication<a class="headerlink" href="#master-slave-replication" title="Permalink to this headline">¶</a></h1>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 1.6: </span><a class="reference internal" href="../core/replication.html"><em>Replica sets</em></a> replace
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>-<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> replication. Use replica sets rather
+than master-slave replication for all new production deployments.</p>
+<p>Replica sets provide functional super-set of master-slave and are more
+robust for production use. Master-slave replication preceded replica
+and makes it possible have a large number of non-master (i.e. slave)
+and to <em>only</em> replicate operations for a single database; however,
+master-slave replication provides less redundancy, and does not
+automate failover. See <a class="reference internal" href="#replica-set-equivalent"><em>Deploy Master-Slave Equivalent using Replica Sets</em></a> for a replica set
+configuration that is equivalent to master-slave replication.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This documentation remains to support legacy deployments
+and for archival purposes, <em>only</em>.</p>
+</div>
+<div class="section" id="fundamental-operations">
+<h2>Fundamental Operations<a class="headerlink" href="#fundamental-operations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="initial-deployment">
+<h3>Initial Deployment<a class="headerlink" href="#initial-deployment" title="Permalink to this headline">¶</a></h3>
+<p>To configure a <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>-<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> deployment, start two
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances: one in <a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a> mode, and the
+other in <a class="reference internal" href="../reference/configuration-options.html#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> mode.</p>
+<p>To start a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance in <a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a> mode,
+invoke <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">master</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">data</span><span class="o">/</span><span class="nx">masterdb</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>With the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--master"><em class="xref std std-option">--master</em></a> option, the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will create a <a class="reference internal" href="../reference/local-database.html#local.oplog._S_main" title="local.oplog.$main"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.oplog.$main</span></tt></a> collection,
+which the &#8220;operation log&#8221; that queues operations that the slaves will
+apply to replicate operations from the master. The
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a> is optional.</p>
+<p>To start a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance in <a class="reference internal" href="../reference/configuration-options.html#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> mode,
+invoke <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">slave</span> <span class="o">--</span><span class="nx">source</span> <span class="o">&lt;</span><span class="nx">masterhostname</span><span class="o">&gt;&lt;:&lt;</span><span class="nx">port</span><span class="o">&gt;&gt;</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">data</span><span class="o">/</span><span class="nx">slavedb</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>Specify the hostname and port of the master instance to the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--source"><em class="xref std std-option">--source</em></a> argument. The
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a> is optional.</p>
+<p>For <a class="reference internal" href="../reference/configuration-options.html#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> instances, MongoDB stores data about the source
+server in the <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a> collection.</p>
+</div>
+<div class="section" id="configuration-options-for-master-slave-deployments">
+<h3>Configuration Options for Master-Slave Deployments<a class="headerlink" href="#configuration-options-for-master-slave-deployments" title="Permalink to this headline">¶</a></h3>
+<p>As an alternative to specifying the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--source"><em class="xref std std-option">--source</em></a>
+run-time option, can add a document to <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a>
+specifying the <a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a> instance, as in the following
+operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">local</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sources</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">sources</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">host</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">masterhostname</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="p">,</span><span class="nx">only</span><span class="o">:</span> <span class="nx">databasename</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In line 1, you switch context to the <tt class="docutils literal"><span class="pre">local</span></tt> database. In line 2,
+the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> operation should return no
+documents, to ensure that there are no documents in the <tt class="docutils literal"><span class="pre">sources</span></tt>
+collection. Finally, line 3 uses <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.insert()</span></tt></a> to
+insert the source document into the <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a>
+collection. The model of the <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a> document is as
+follows:</p>
+<dl class="describe">
+<dt>
+<tt class="descname">host</tt></dt>
+<dd><p>The host field specifies the <a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance, and holds a resolvable hostname, i.e. IP address, or
+a name from a <tt class="docutils literal"><span class="pre">host</span></tt> file, or preferably a fully qualified domain
+name.</p>
+<p>You can append <tt class="docutils literal"><span class="pre">&lt;:port&gt;</span></tt> to the host name if the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is not running on the default <tt class="docutils literal"><span class="pre">27017</span></tt> port.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">only</tt></dt>
+<dd><p>Optional. Specify a name of a database. When specified, MongoDB
+will only replicate the indicated database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="operational-considerations-for-replication-with-master-slave-deployments">
+<h3>Operational Considerations for Replication with Master Slave Deployments<a class="headerlink" href="#operational-considerations-for-replication-with-master-slave-deployments" title="Permalink to this headline">¶</a></h3>
+<p>Master instances store operations in an <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> which is a
+<a class="reference internal" href="../core/capped-collections.html"><em>capped collection</em></a>. As a result, if a
+slave falls too far behind the state of the master, it cannot
+&#8220;catchup&#8221; and must re-sync from scratch. Slave may become out of sync
+with a master if:</p>
+<ul class="simple">
+<li>The slave falls far behind the data updates available from that
+master.</li>
+<li>The slave stops (i.e. shuts down) and restarts later after the
+master has overwritten the relevant operations from the master.</li>
+</ul>
+<p>When slaves, are out of sync, replication stops. Administrators must
+intervene manually to restart replication. Use the <a class="reference internal" href="../reference/replica-commands.html#resync" title="resync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">resync</span></tt></a>
+command. Alternatively, the <em class="xref std std-option">--autoresync</em> allows a slave to restart replication automatically,
+after ten second pause, when the slave falls out of sync with the
+master. With <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--autoresync"><em class="xref std std-option">--autoresync</em></a> specified,
+the slave will only attempt to re-sync once in a ten minute period.</p>
+<p>To prevent these situations you should specify the a larger oplog when
+you start the <a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a> instance, by adding the
+<em class="xref std std-option">--oplogSize</em> option when starting
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. If you do not specify
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--oplogSize"><em class="xref std std-option">--oplogSize</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will
+allocate 5% of available disk space on start up to the oplog, with a
+minimum of 1GB for 64bit machines and 50MB for 32bit machines.</p>
+</div>
+</div>
+<div class="section" id="run-time-master-slave-configuration">
+<h2>Run time Master-Slave Configuration<a class="headerlink" href="#run-time-master-slave-configuration" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB provides a number of run time configuration options for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances in <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>-<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a>
+deployments. You can specify these options in <a class="reference internal" href="configuration.html"><em>configuration
+files</em></a> or on the command-line. See
+documentation of the following:</p>
+<ul class="simple">
+<li>For <em>master</em> nodes:<ul>
+<li><a class="reference internal" href="../reference/configuration-options.html#master" title="master"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">master</span></tt></a></li>
+<li><a class="reference internal" href="../reference/configuration-options.html#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a></li>
+</ul>
+</li>
+<li>For <em>slave</em> nodes:<ul>
+<li><a class="reference internal" href="../reference/configuration-options.html#source" title="source"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">source</span></tt></a></li>
+<li><a class="reference internal" href="../reference/configuration-options.html#only" title="only"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">only</span></tt></a></li>
+<li><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slaveDelay</span></tt></li>
+</ul>
+</li>
+</ul>
+<p>Also consider the <a class="reference internal" href="../reference/mongod.html#cli-mongod-master-slave"><em>Master-Slave Replication Command Line Options</em></a> for related options.</p>
+<div class="section" id="diagnostics">
+<h3>Diagnostics<a class="headerlink" href="#diagnostics" title="Permalink to this headline">¶</a></h3>
+<p>On a <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> instance, issue the following operation in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to return replication status from the
+perspective of the master:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">printReplicationInfo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>On a <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> instance, use the following operation in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to return the replication status from the
+perspective of the slave:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">printSlaveReplicationInfo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Use the <a class="reference internal" href="../reference/commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> as in the following operation, to
+return status of the replication:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">serverStatus</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../reference/server-status.html#server-status-repl"><em>server status repl fields</em></a> for
+documentation of the relevant section of output.</p>
+</div>
+</div>
+<div class="section" id="security">
+<h2>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h2>
+<p>When running with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> enabled, in
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>-<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> deployments, you must create a user
+account for the local database on both <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances. Log in, and authenticate to the <tt class="docutils literal"><span class="pre">admin</span></tt> database on the
+<em>slave</em> instance, and then create the <tt class="docutils literal"><span class="pre">repl</span></tt> user on the <tt class="docutils literal"><span class="pre">local</span></tt>
+database, with the following operation:</p>
+<blockquote>
+<div>use local
+db.addUser(&#8216;repl&#8217;, &lt;replpassword&gt;)</div></blockquote>
+<p>Once created, repeat the operation on the <em>master</em> instance.</p>
+<p>The slave instance first looks for a user named <tt class="docutils literal"><span class="pre">repl</span></tt> in the
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.users" title="&lt;database&gt;.system.users"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.system.users</span></tt></a> collection. If
+present, the slave uses this user account to authenticate to the
+<tt class="docutils literal"><span class="pre">local</span></tt> database in the <tt class="docutils literal"><span class="pre">master</span></tt> instance. If the <tt class="docutils literal"><span class="pre">repl</span></tt> user
+does not exist, the slave instance attempts to authenticate using the
+first user document in the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.users" title="&lt;database&gt;.system.users"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.system.users</span></tt></a> collection.</p>
+<p>The <tt class="docutils literal"><span class="pre">local</span></tt> database works like the <tt class="docutils literal"><span class="pre">admin</span></tt> database: an account for
+local has access to the entire server.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../security.html"><em>Security</em></a> for more information about security in mongodb</p>
+</div>
+</div>
+<div class="section" id="ongoing-administration-and-operation-of-master-slave-deployments">
+<h2>Ongoing Administration and Operation of Master-Slave Deployments<a class="headerlink" href="#ongoing-administration-and-operation-of-master-slave-deployments" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="deploy-master-slave-equivalent-using-replica-sets">
+<span id="replica-set-equivalent"></span><h3>Deploy Master-Slave Equivalent using Replica Sets<a class="headerlink" href="#deploy-master-slave-equivalent-using-replica-sets" title="Permalink to this headline">¶</a></h3>
+<p>If you want a replication configuration that resembles
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>-<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> replication, using <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> replica sets, consider the following replica
+configuration document. In this deployment hosts <tt class="docutils literal"><span class="pre">&lt;master&gt;</span></tt> and
+<tt class="docutils literal"><span class="pre">&lt;slave&gt;</span></tt> <a class="footnote-reference" href="#host-are-hostnames" id="id1">[1]</a> provide replication that is roughly
+equivalent to a two-instance master-slave deployment:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">_id</span> <span class="o">:</span> <span class="s1">&#39;setName&#39;</span><span class="p">,</span>
+  <span class="nx">members</span> <span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">host</span> <span class="o">:</span> <span class="s2">&quot;&lt;master&gt;&quot;</span><span class="p">,</span> <span class="nx">priority</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">host</span> <span class="o">:</span> <span class="s2">&quot;&lt;slave&gt;&quot;</span><span class="p">,</span> <span class="nx">priority</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">votes</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../reference/replica-configuration.html"><em>Replica Set Configuration</em></a> for more information about
+replica set configurations.</p>
+<table class="docutils footnote" frame="void" id="host-are-hostnames" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>In replica set configurations, the
+<a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">host</span></tt></a> field must hold a resolvable
+hostname.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="failing-over-to-a-slave-promotion">
+<h3>Failing over to a Slave (Promotion)<a class="headerlink" href="#failing-over-to-a-slave-promotion" title="Permalink to this headline">¶</a></h3>
+<p>To permanently failover from a unavailable or damaged <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>
+(<tt class="docutils literal"><span class="pre">A</span></tt> in the following example) to a <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> (<tt class="docutils literal"><span class="pre">B</span></tt>):</p>
+<ol class="arabic">
+<li><p class="first">Shut down <tt class="docutils literal"><span class="pre">A</span></tt>.</p>
+</li>
+<li><p class="first">Stop <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on <tt class="docutils literal"><span class="pre">B</span></tt>.</p>
+</li>
+<li><p class="first">Back up and move all data files that begin with <tt class="docutils literal"><span class="pre">local</span></tt> on <tt class="docutils literal"><span class="pre">B</span></tt>
+from the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Removing <tt class="docutils literal"><span class="pre">local.*</span></tt> is irrevocable and cannot be
+undone. Perform this step with extreme caution.</p>
+</div>
+</li>
+<li><p class="first">Restart <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on <tt class="docutils literal"><span class="pre">B</span></tt> with the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--master"><em class="xref std std-option">--master</em></a> option.</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is a one time operation, and is not reversible. <tt class="docutils literal"><span class="pre">A</span></tt>
+cannot become a slave of <tt class="docutils literal"><span class="pre">B</span></tt> until it completes a full resync.</p>
+</div>
+</div>
+<div class="section" id="inverting-master-and-slave">
+<h3>Inverting Master and Slave<a class="headerlink" href="#inverting-master-and-slave" title="Permalink to this headline">¶</a></h3>
+<p>If you have a <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> (<tt class="docutils literal"><span class="pre">A</span></tt>) and a <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> (<tt class="docutils literal"><span class="pre">B</span></tt>) and
+you would like to reverse their roles, follow this procedure. The
+procedure assumes <tt class="docutils literal"><span class="pre">A</span></tt> is healthy, up-to-date and available.</p>
+<p>If <tt class="docutils literal"><span class="pre">A</span></tt> is not healthy but the hardware is okay (power outage, server
+crash, etc.), skip steps 1 and 2 and in step 8 replace all of <tt class="docutils literal"><span class="pre">A</span></tt>&#8216;s
+files with <tt class="docutils literal"><span class="pre">B</span></tt>&#8216;s files in step 8.</p>
+<p>If <tt class="docutils literal"><span class="pre">A</span></tt> is not healthy and the hardware is not okay, replace <tt class="docutils literal"><span class="pre">A</span></tt> with
+a new machine. Also follow the instructions in the previous paragraph.</p>
+<p>To invert the master and slave in a deployment:</p>
+<ol class="arabic">
+<li><p class="first">Halt writes on <tt class="docutils literal"><span class="pre">A</span></tt> using the <a class="reference internal" href="../reference/glossary.html#term-fsync"><em class="xref std std-term">fsync</em></a> command.</p>
+</li>
+<li><p class="first">Make sure <tt class="docutils literal"><span class="pre">B</span></tt> is up to date with the state of <tt class="docutils literal"><span class="pre">A</span></tt>.</p>
+</li>
+<li><p class="first">Shut down <tt class="docutils literal"><span class="pre">B</span></tt>.</p>
+</li>
+<li><p class="first">Back up and move all data files that begin with <tt class="docutils literal"><span class="pre">local</span></tt> on <tt class="docutils literal"><span class="pre">B</span></tt>
+from the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> to remove the existing
+<tt class="docutils literal"><span class="pre">local.sources</span></tt> data.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Removing <tt class="docutils literal"><span class="pre">local.*</span></tt> is irrevocable and cannot be
+undone. Perform this step with extreme caution.</p>
+</div>
+</li>
+<li><p class="first">Start <tt class="docutils literal"><span class="pre">B</span></tt> with the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--master"><em class="xref std std-option">--master</em></a> option.</p>
+</li>
+<li><p class="first">Do a write on <tt class="docutils literal"><span class="pre">B</span></tt>, which primes the <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> to provide a new
+sync start point.</p>
+</li>
+<li><p class="first">Shut down <tt class="docutils literal"><span class="pre">B</span></tt>. <tt class="docutils literal"><span class="pre">B</span></tt> will now have a new set of data files that
+start with <tt class="docutils literal"><span class="pre">local</span></tt>.</p>
+</li>
+<li><p class="first">Shut down <tt class="docutils literal"><span class="pre">A</span></tt> and replace all files in the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> of
+<tt class="docutils literal"><span class="pre">A</span></tt> that start with <tt class="docutils literal"><span class="pre">local</span></tt> with a copy of the files in the
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> of <tt class="docutils literal"><span class="pre">B</span></tt> that begin with <tt class="docutils literal"><span class="pre">local</span></tt>.</p>
+<p>Considering compressing the <tt class="docutils literal"><span class="pre">local</span></tt> files from <tt class="docutils literal"><span class="pre">B</span></tt> while you
+copy them, as they may be quite large.</p>
+</li>
+<li><p class="first">Start <tt class="docutils literal"><span class="pre">B</span></tt> with the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--master"><em class="xref std std-option">--master</em></a> option.</p>
+</li>
+<li><p class="first">Start <tt class="docutils literal"><span class="pre">A</span></tt> with all the usual slave options, but include
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--fastsync"><em class="xref std std-option">fastsync</em></a>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="creating-a-slave-from-an-existing-master-s-disk-image">
+<h3>Creating a Slave from an Existing Master&#8217;s Disk Image<a class="headerlink" href="#creating-a-slave-from-an-existing-master-s-disk-image" title="Permalink to this headline">¶</a></h3>
+<p>If you can stop write operations to the <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> for an indefinite
+period, you can copy the data files from the master to the new
+<a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> and then start the slave with <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--fastsync"><em class="xref std std-option">--fastsync</em></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Be careful with <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--fastsync"><em class="xref std std-option">--fastsync</em></a>.  If the
+data on both instances is identical, a discrepancy will exist
+forever.</p>
+</div>
+<p><a class="reference internal" href="../reference/configuration-options.html#fastsync" title="fastsync"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">fastsync</span></tt></a> is a way to start a slave by starting with an
+existing master disk image/backup. This option declares that the
+administrator guarantees the image is correct and completely up-to-date
+with that of the master. If you have a full and complete copy of data
+from a master you can use this option to avoid a full synchronization
+upon starting the slave.</p>
+</div>
+<div class="section" id="creating-a-slave-from-an-existing-slave-s-disk-image">
+<h3>Creating a Slave from an Existing Slave&#8217;s Disk Image<a class="headerlink" href="#creating-a-slave-from-an-existing-slave-s-disk-image" title="Permalink to this headline">¶</a></h3>
+<p>You can just copy the other <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave&#8217;s</em></a> data file snapshot
+without any special options. Only take data snapshots when a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process is down or locked using
+<a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>.</p>
+</div>
+<div class="section" id="resyncing-a-slave-that-is-too-stale-to-recover">
+<h3>Resyncing a Slave that is too Stale to Recover<a class="headerlink" href="#resyncing-a-slave-that-is-too-stale-to-recover" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">Slaves</em></a> asynchronously apply write operations from the
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> that the slaves poll from the master&#8217;s
+<a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. The oplog is finite in length, and if a slave is too
+far behind, a full resync will be necessary. To resync the slave,
+connect to a slave using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> and issue the
+<a class="reference internal" href="../reference/replica-commands.html#resync" title="resync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">resync</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">resync</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This forces a full resync of all data (which will be very slow on a
+large database). You can achieve the same effect by stopping
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on the slave, deleting the entire content of the
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> on the slave, and restarting the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+</div>
+<div class="section" id="slave-chaining">
+<h3>Slave Chaining<a class="headerlink" href="#slave-chaining" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">Slaves</em></a> cannot be &#8220;chained.&#8221; They must all connect to the
+<a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> directly.</p>
+<p>If a slave attempts &#8220;slave from&#8221; another slave you will see the
+following line in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> long of the shell:</p>
+<div class="highlight-none"><div class="highlight"><pre>assertion 13051 tailable cursor requested on non capped collection ns:local.oplog.$main
+</pre></div>
+</div>
+</div>
+<div class="section" id="correcting-a-slave-s-source">
+<h3>Correcting a Slave&#8217;s Source<a class="headerlink" href="#correcting-a-slave-s-source" title="Permalink to this headline">¶</a></h3>
+<p>To change a <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave&#8217;s</em></a> source, manually modify the
+slave&#8217;s <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a> collection.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Consider the following: If you accidentally set an incorrect hostname
+for the slave&#8217;s <a class="reference internal" href="../reference/configuration-options.html#source" title="source"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">source</span></tt></a>, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">slave</span> <span class="o">--</span><span class="nx">source</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">mississippi</span>
+</pre></div>
+</div>
+<p>You can correct this, by restarting the slave without the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--slave"><em class="xref std std-option">--slave</em></a> and
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--source"><em class="xref std std-option">--source</em></a> arguments:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span>
+</pre></div>
+</div>
+<p>Connect to this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and update the <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a>
+collection, with the following operation sequence:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">local</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">sources</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">host</span> <span class="o">:</span> <span class="s2">&quot;prod.mississippi&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">host</span> <span class="o">:</span> <span class="s2">&quot;prod.mississippi.example.net&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Restart the slave with the correct command line arguments or with no
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--source"><em class="xref std std-option">--source</em></a> option.
+After configuring <a class="reference internal" href="../reference/local-database.html#local.sources" title="local.sources"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.sources</span></tt></a> the
+first time, the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--source"><em class="xref std std-option">--source</em></a> will have no
+subsequent effect. Therefore, both of the following invocations are
+correct:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">slave</span> <span class="o">--</span><span class="nx">source</span> <span class="nx">prod</span><span class="p">.</span><span class="nx">mississippi</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">slave</span>
+</pre></div>
+</div>
+<p class="last">The slave now polls data from the correct <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../reference/replica-commands.html" title="Previous Section: Replica Set Commands">&lt; &nbsp; Replica Set Commands</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="../tutorial/deploy-replica-set.html" title="Next Section: Deploy a Replica Set">Deploy a Replica Set &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

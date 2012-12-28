@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>FAQ: Replica Sets and Replication in MongoDB &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/faq/replica-sets" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Frequently Asked Questions" href="../faq.html" />
+<link rel="next" title="FAQ: MongoDB Storage" href="storage.html" />
+<link rel="prev" title="FAQ: Sharding with MongoDB" href="sharding.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="faq-replica-sets-and-replication-in-mongodb">
+<h1>FAQ: Replica Sets and Replication in MongoDB<a class="headerlink" href="#faq-replica-sets-and-replication-in-mongodb" title="Permalink to this headline">¶</a></h1>
+<p>This document answers common questions about database replication
+in MongoDB.</p>
+<p>If you don&#8217;t find the answer you&#8217;re looking for, check
+the <a class="reference internal" href="../faq.html"><em>complete list of FAQs</em></a> or post your question to the
+<a class="reference external" href="https://groups.google.com/forum/?fromgroups#!forum/mongodb-user">MongoDB User Mailing List</a>.</p>
+<div class="contents local topic" id="frequently-asked-questions">
+<p class="topic-title first">Frequently Asked Questions:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#what-kinds-of-replication-does-mongodb-support" id="id1">What kinds of replication does MongoDB support?</a></li>
+<li><a class="reference internal" href="#what-do-the-terms-primary-and-master-mean" id="id2">What do the terms &#8220;primary&#8221; and &#8220;master&#8221; mean?</a></li>
+<li><a class="reference internal" href="#what-do-the-terms-secondary-and-slave-mean" id="id3">What do the terms &#8220;secondary&#8221; and &#8220;slave&#8221; mean?</a></li>
+<li><a class="reference internal" href="#how-long-does-replica-set-failover-take" id="id4">How long does replica set failover take?</a></li>
+<li><a class="reference internal" href="#does-replication-work-over-the-internet-and-wan-connections" id="id5">Does replication work over the Internet and WAN connections?</a></li>
+<li><a class="reference internal" href="#can-mongodb-replicate-over-a-noisy-connection" id="id6">Can MongoDB replicate over a &#8220;noisy&#8221; connection?</a></li>
+<li><a class="reference internal" href="#what-is-the-preferred-replication-method-master-slave-or-replica-sets" id="id7">What is the preferred replication method: master/slave or replica sets?</a></li>
+<li><a class="reference internal" href="#what-is-the-preferred-replication-method-replica-sets-or-replica-pairs" id="id8">What is the preferred replication method: replica sets or replica pairs?</a></li>
+<li><a class="reference internal" href="#why-use-journaling-if-replication-already-provides-data-redundancy" id="id9">Why use journaling if replication already provides data redundancy?</a></li>
+<li><a class="reference internal" href="#are-write-operations-durable-if-write-concern-does-not-acknowledge-writes" id="id10">Are write operations durable if write concern does not acknowledge writes?</a></li>
+<li><a class="reference internal" href="#how-many-arbiters-do-replica-sets-need" id="id11">How many arbiters do replica sets need?</a></li>
+<li><a class="reference internal" href="#what-information-do-arbiters-exchange-with-the-rest-of-the-replica-set" id="id12">What information do arbiters exchange with the rest of the replica set?</a></li>
+<li><a class="reference internal" href="#which-members-of-a-replica-set-vote-in-elections" id="id13">Which members of a replica set vote in elections?</a></li>
+<li><a class="reference internal" href="#do-hidden-members-vote-in-replica-set-elections" id="id14">Do hidden members vote in replica set elections?</a></li>
+<li><a class="reference internal" href="#is-it-normal-for-replica-set-members-to-use-different-amounts-of-disk-space" id="id15">Is it normal for replica set members to use different amounts of disk space?</a></li>
+</ul>
+</div>
+<div class="section" id="what-kinds-of-replication-does-mongodb-support">
+<h2>What kinds of replication does MongoDB support?<a class="headerlink" href="#what-kinds-of-replication-does-mongodb-support" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB supports master-slave replication and a variation
+on master-slave replication known as replica sets. Replica
+sets are the recommended replication topology.</p>
+</div>
+<div class="section" id="what-do-the-terms-primary-and-master-mean">
+<h2>What do the terms &#8220;primary&#8221; and &#8220;master&#8221; mean?<a class="headerlink" href="#what-do-the-terms-primary-and-master-mean" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">Primary</em></a> and <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a> nodes are the nodes
+that can accept writes. MongoDB&#8217;s replication is
+&#8220;single-master:&#8221; only one node can accept write operations at a time.</p>
+<p>In a replica set, if a the current &#8220;primary&#8221; node fails or becomes
+inaccessible, the other members can autonomously <a class="reference internal" href="../reference/glossary.html#term-election"><em class="xref std std-term">elect</em></a> one of the other members of the set to be the new &#8220;primary&#8221;.</p>
+<p>By default, clients send all reads to the primary;
+however, <a class="reference internal" href="../reference/glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a> is configurable at the
+client level on a per-connection basis, which makes it possible to
+send reads to secondary nodes instead.</p>
+</div>
+<div class="section" id="what-do-the-terms-secondary-and-slave-mean">
+<h2>What do the terms &#8220;secondary&#8221; and &#8220;slave&#8221; mean?<a class="headerlink" href="#what-do-the-terms-secondary-and-slave-mean" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">Secondary</em></a> and <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> nodes are read-only nodes
+that replicate from the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>.</p>
+<p>Replication operates by way of an <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>, from which secondary/slave
+members apply new operations to themselves. This replication process
+is asynchronous, so secondary/slave nodes may not always reflect the
+latest writes to the primary. But usually, the gap between the primary and
+secondary nodes is just few milliseconds on a local network connection.</p>
+</div>
+<div class="section" id="how-long-does-replica-set-failover-take">
+<h2>How long does replica set failover take?<a class="headerlink" href="#how-long-does-replica-set-failover-take" title="Permalink to this headline">¶</a></h2>
+<p>It varies, but a replica set will select a new primary within a minute.</p>
+<p>It may take 10-30 seconds for the members of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica
+set</em></a> to declare a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> inaccessible. This
+triggers an <a class="reference internal" href="../reference/glossary.html#term-election"><em class="xref std std-term">election</em></a>. During the election, the cluster
+is unavailable for writes.</p>
+<p>The election itself may take another 10-30 seconds.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../reference/glossary.html#term-eventual-consistency"><em class="xref std std-term">Eventually consistent</em></a> reads, like the ones that will return
+from a replica set are only possible with a <a class="reference internal" href="../reference/glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a>
+that permits reads from <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members.</p>
+</div>
+</div>
+<div class="section" id="does-replication-work-over-the-internet-and-wan-connections">
+<h2>Does replication work over the Internet and WAN connections?<a class="headerlink" href="#does-replication-work-over-the-internet-and-wan-connections" title="Permalink to this headline">¶</a></h2>
+<p>Yes.</p>
+<p>For example, a deployment may maintain a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>
+in an East-coast data center along with a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> member for disaster
+recovery in a West-coast data center.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../tutorial/deploy-geographically-distributed-replica-set.html"><em>Deploy a Geographically Distributed Replica Set</em></a></p>
+</div>
+</div>
+<div class="section" id="can-mongodb-replicate-over-a-noisy-connection">
+<h2>Can MongoDB replicate over a &#8220;noisy&#8221; connection?<a class="headerlink" href="#can-mongodb-replicate-over-a-noisy-connection" title="Permalink to this headline">¶</a></h2>
+<p>Yes, but not without connection failures and the obvious latency.</p>
+<p>Members of the set will attempt to reconnect to the other members of
+the set in response to networking flaps. This does not require
+administrator intervention. However, if the network connections
+between the nodes in the replica set are very slow, it might not be
+possible for the members of the node to keep up with the replication.</p>
+<p>If the TCP connection between the secondaries and the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>
+instance breaks, a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> the set will automatically
+elect one of the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of the set as primary.</p>
+</div>
+<div class="section" id="what-is-the-preferred-replication-method-master-slave-or-replica-sets">
+<h2>What is the preferred replication method: master/slave or replica sets?<a class="headerlink" href="#what-is-the-preferred-replication-method-master-slave-or-replica-sets" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.</span></p>
+<p><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica sets</em></a> are the preferred
+<a class="reference internal" href="../reference/glossary.html#term-replication"><em class="xref std std-term">replication</em></a> mechanism in MongoDB. However, if your deployment
+requires more than 12 nodes, you must use master/slave replication.</p>
+</div>
+<div class="section" id="what-is-the-preferred-replication-method-replica-sets-or-replica-pairs">
+<h2>What is the preferred replication method: replica sets or replica pairs?<a class="headerlink" href="#what-is-the-preferred-replication-method-replica-sets-or-replica-pairs" title="Permalink to this headline">¶</a></h2>
+<p class="deprecated">
+<span class="versionmodified">Deprecated since version 1.6.</span></p>
+<p><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica sets</em></a> replaced <a class="reference internal" href="../reference/glossary.html#term-replica-pairs"><em class="xref std std-term">replica pairs</em></a> in
+version 1.6. <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica sets</em></a> are the preferred
+<a class="reference internal" href="../reference/glossary.html#term-replication"><em class="xref std std-term">replication</em></a> mechanism in MongoDB.</p>
+</div>
+<div class="section" id="why-use-journaling-if-replication-already-provides-data-redundancy">
+<h2>Why use journaling if replication already provides data redundancy?<a class="headerlink" href="#why-use-journaling-if-replication-already-provides-data-redundancy" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">Journaling</em></a> facilitates faster crash recovery.
+Prior to journaling, crashes often required <a class="reference internal" href="../reference/commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">database</span> <span class="pre">repairs</span></tt></a>
+or full data resync. Both were slow, and the first was unreliable.</p>
+<p>Journaling is particularly useful for protection
+against power failures, especially if your replica set resides in a single data
+center or power circuit.</p>
+<p>When a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> runs with journaling, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances can safely restart without any administrator intervention.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Journaling requires some resource overhead for write
+operations. Journaling has no effect on read performance, however.</p>
+<p class="last">Journaling is enabled by default on all 64-bit
+builds of MongoDB v2.0 and greater.</p>
+</div>
+</div>
+<div class="section" id="are-write-operations-durable-if-write-concern-does-not-acknowledge-writes">
+<h2>Are write operations durable if write concern does not acknowledge writes?<a class="headerlink" href="#are-write-operations-durable-if-write-concern-does-not-acknowledge-writes" title="Permalink to this headline">¶</a></h2>
+<p>Yes.</p>
+<p>However, if you want confirmation that a given write has arrived at
+the server, use <a class="reference internal" href="../core/write-operations.html#write-concern"><em>write concern</em></a>. The
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command provides the facility for write
+concern. However, after the <a class="reference internal" href="../release-notes/drivers-write-concern.html#driver-write-concern-change"><em>default write concern change</em></a>, the default write concern acknowledges
+all write operations, and unacknowledged writes must be explicitly
+configured. See the <a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a> documentation for
+your driver for more information.</p>
+</div>
+<div class="section" id="how-many-arbiters-do-replica-sets-need">
+<h2>How many arbiters do replica sets need?<a class="headerlink" href="#how-many-arbiters-do-replica-sets-need" title="Permalink to this headline">¶</a></h2>
+<p>Some configurations do not require any <a class="reference internal" href="../reference/glossary.html#term-arbiter"><em class="xref std std-term">arbiter</em></a>
+instances. Arbiters vote in <a class="reference internal" href="../reference/glossary.html#term-election"><em class="xref std std-term">elections</em></a>
+for <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> but do not replicate the data like
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members.</p>
+<p><a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">Replica sets</em></a> require a majority of the
+original nodes present to elect a primary. Arbiters allow you
+to construct this majority without the overhead of adding replicating
+nodes to the system.</p>
+<p>There are many possible replica set <a class="reference internal" href="../administration/replication-architectures.html"><em>architectures</em></a>.</p>
+<p>If you have a three node replica set, you don&#8217;t need an arbiter.</p>
+<p>But a common configuration consists of two replicating nodes, one of which is
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and the other is <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>, as well as an
+arbiter for the third node. This configuration makes it possible for
+the set to elect a primary in the event of a failure without requiring
+three replicating nodes.</p>
+<p>You may also consider adding an arbiter to a set if it has an equal
+number of nodes in two facilities and network partitions between the
+facilities are possible. In these cases, the arbiter will break
+the tie between the two facilities and allow the set to elect a new
+primary.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../administration/replication-architectures.html"><em>Replication Architectures</em></a></p>
+</div>
+</div>
+<div class="section" id="what-information-do-arbiters-exchange-with-the-rest-of-the-replica-set">
+<h2>What information do arbiters exchange with the rest of the replica set?<a class="headerlink" href="#what-information-do-arbiters-exchange-with-the-rest-of-the-replica-set" title="Permalink to this headline">¶</a></h2>
+<p>Arbiters never receive the contents of a collection but do exchange the
+following data with the rest of the replica set:</p>
+<ul class="simple">
+<li>Credentials used to authenticate the arbiter with the replica set. All
+MongoDB processes within a replica set use keyfiles. These exchanges
+are encrypted.</li>
+<li>Replica set configuration data and voting data. This information is
+not encrypted. Only credential exchanges are encrypted.</li>
+</ul>
+<p>If your MongoDB deployment uses SSL, then all communications between
+arbiters and the other members of the replica set are secure. See the
+documentation for <a class="reference internal" href="../administration/ssl.html"><em>Using MongoDB with SSL Connections</em></a> for more information. Run
+all arbiters on secure networks, as with all MongoDB components.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last">The overview of <a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>Arbiter Members of Replica Sets</em></a>.</p>
+</div>
+</div>
+<div class="section" id="which-members-of-a-replica-set-vote-in-elections">
+<h2>Which members of a replica set vote in elections?<a class="headerlink" href="#which-members-of-a-replica-set-vote-in-elections" title="Permalink to this headline">¶</a></h2>
+<p>All members of a replica set, unless the value of <a class="reference internal" href="../reference/replica-configuration.html#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">votes</span></tt></a> is equal to <tt class="docutils literal"><span class="pre">0</span></tt>, vote in elections. This includes
+all <a class="reference internal" href="../administration/replica-sets.html#replica-set-delayed-members"><em>delayed</em></a>, <a class="reference internal" href="../administration/replica-sets.html#replica-set-hidden-members"><em>hidden</em></a> and <a class="reference internal" href="../administration/replica-sets.html#replica-set-secondary-only-members"><em>secondary-only</em></a> members, as well as the
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-arbiters"><em>arbiters</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../core/replication.html#replica-set-elections"><em>Elections</em></a></p>
+</div>
+</div>
+<div class="section" id="do-hidden-members-vote-in-replica-set-elections">
+<h2>Do hidden members vote in replica set elections?<a class="headerlink" href="#do-hidden-members-vote-in-replica-set-elections" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../administration/replica-sets.html#replica-set-hidden-members"><em>Hidden members</em></a> of term:<cite>replica
+:sets</cite> <em>do</em> vote in elections. To exclude a member from voting in an
+:election, change the value of the member&#8217;s <a class="reference internal" href="../reference/replica-configuration.html#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">votes</span>
+<span class="pre">:</span></tt></a> configuration to <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../core/replication.html#replica-set-elections"><em>Elections</em></a></p>
+</div>
+</div>
+<div class="section" id="is-it-normal-for-replica-set-members-to-use-different-amounts-of-disk-space">
+<h2>Is it normal for replica set members to use different amounts of disk space?<a class="headerlink" href="#is-it-normal-for-replica-set-members-to-use-different-amounts-of-disk-space" title="Permalink to this headline">¶</a></h2>
+<p>Yes.</p>
+<p>Factors including: different oplog sizes, different levels of storage
+fragmentation, and MongoDB&#8217;s data file pre-allocation can lead to some
+variation in storage utilization between nodes. Storage use
+disparities will be most pronounced when you add members at different
+times.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sharding.html" title="Previous Section: FAQ: Sharding with MongoDB">&lt; &nbsp; FAQ: Sharding with MongoDB</a></li>
+<li id="btnvup"><a href="../faq.html" title="Parent Section: Frequently Asked Questions" >&#47;&#92;&nbsp; Frequently Asked Questions</a></li>
+<li id="btnvnx"><a href="storage.html" title="Next Section: FAQ: MongoDB Storage">FAQ: MongoDB Storage &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

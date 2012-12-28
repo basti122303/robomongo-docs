@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Add Members to a Replica Set &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/expand-replica-set" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Deploy a Geographically Distributed Replica Set" href="deploy-geographically-distributed-replica-set.html" />
+<link rel="prev" title="Convert a Standalone to a Replica Set" href="convert-standalone-to-replica-set.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="add-members-to-a-replica-set">
+<h1>Add Members to a Replica Set<a class="headerlink" href="#add-members-to-a-replica-set" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial explains how to add an additional member to an
+existing replica set.</p>
+<p>Before adding a new member, see the
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-admin-procedure-add-member"><em>Adding Members</em></a>
+topic in the <a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a> document.</p>
+<p>For background on replication deployment patterns, see the
+<a class="reference internal" href="../administration/replication-architectures.html"><em>Replication Architectures</em></a> document.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>An active replica set.</li>
+<li>A new MongoDB system capable of supporting your dataset, accessible by
+the active replica set through the network.</li>
+</ol>
+<p>If neither of these conditions are satisfied, please use the MongoDB
+<a class="reference internal" href="../installation.html#tutorials-installation"><em>installation tutorial</em></a> and the
+<a class="reference internal" href="deploy-replica-set.html"><em>Deploy a Replica Set</em></a> tutorial instead.</p>
+</div>
+<div class="section" id="procedures">
+<h2>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h2>
+<p id="procedure-assumption-add-member-rs">The examples in this procedure use the following
+configuration:</p>
+<ul class="simple">
+<li>The active replica set is <tt class="docutils literal"><span class="pre">rs0</span></tt>.</li>
+<li>The new member to be added is <tt class="docutils literal"><span class="pre">mongodb3.example.net</span></tt>.</li>
+<li>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance default port is <tt class="docutils literal"><span class="pre">27017</span></tt>.</li>
+<li>The <tt class="docutils literal"><span class="pre">mongodb.conf</span></tt> configuration file exists in the <tt class="docutils literal"><span class="pre">/etc</span></tt>
+directory and contains the following replica set information:</li>
+</ul>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="na">port</span> <span class="o">=</span> <span class="s">27017</span>
+
+<span class="na">bind_ip</span> <span class="o">=</span> <span class="s">10.8.0.10</span>
+
+<span class="na">dbpath</span> <span class="o">=</span> <span class="s">/srv/mongodb/</span>
+
+<span class="na">logpath</span> <span class="o">=</span> <span class="s">/var/log/mongodb.log</span>
+
+<span class="na">fork</span> <span class="o">=</span> <span class="s">true</span>
+
+<span class="na">replSet</span> <span class="o">=</span> <span class="s">rs0</span>
+</pre></div>
+</div>
+<p>For more information on configuration options, see
+<a class="reference internal" href="../reference/configuration-options.html"><em>Configuration File Options</em></a>.</p>
+<div class="section" id="add-a-member-to-an-existing-replica-set">
+<span id="replica-set-add-member"></span><h3>Add a Member to an Existing Replica Set<a class="headerlink" href="#add-a-member-to-an-existing-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>This procedure uses the above <a class="reference internal" href="#procedure-assumption-add-member-rs"><em>example configuration</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">Deploy a new <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance, specifying the name of the
+replica set. You can do this one of two ways:</p>
+<ul>
+<li><p class="first">Using the <tt class="docutils literal"><span class="pre">mongodb.conf</span></tt> file. On the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, issue a
+command that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --config /etc/mongodb.conf
+</pre></div>
+</div>
+</li>
+<li><p class="first">Using command line arguments. On the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, issue command
+that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --replSet rs0
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Take note of the host name and port information for the new
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the replica set&#8217;s primary:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The primary is the only member that can add or remove members from
+the replica set. If you do not know which member is the primary,
+log into any member of the replica set using <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> and
+issue the <a class="reference internal" href="../reference/replica-commands.html#db.isMaster" title="db.isMaster"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.isMaster()</span></tt></a> command to determine which
+member is in the <a class="reference internal" href="../reference/replica-commands.html#isMaster.primary" title="isMaster.primary"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">isMaster.primary</span></tt></a> field. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongo</span> <span class="nx">mongodb0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">isMaster</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="last">If you are not connected to the primary, disconnect from the
+current client and reconnect to the primary.</p>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, issue the following command to add the new member to the
+replica set.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;mongodb3.example.net&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can also include the port number, depending on your setup:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;mongodb3.example.net:27017&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first">Verify that the member is now part of the replica set by
+calling the <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method,
+which displays the <a class="reference internal" href="../reference/replica-configuration.html"><em>replica set configuration</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You can use the <a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> function to provide an
+overview of <a class="reference internal" href="../reference/replica-status.html"><em>replica set status</em></a>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="add-a-member-to-an-existing-replica-set-alternate-procedure">
+<span id="replica-set-add-member-alternate-procedure"></span><h3>Add a Member to an Existing Replica Set (Alternate Procedure)<a class="headerlink" href="#add-a-member-to-an-existing-replica-set-alternate-procedure" title="Permalink to this headline">¶</a></h3>
+<p>Alternately, you can add a member to a replica set by specifying an
+entire configuration document with some or all of the fields in a
+<a class="reference internal" href="../reference/replica-configuration.html#rs.conf.members" title="rs.conf.members"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members</span></tt></a> document. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">host</span><span class="o">:</span> <span class="s2">&quot;mongodb3.example.net:27017&quot;</span><span class="p">,</span> <span class="nx">priority</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">hidden</span><span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This configures a <a class="reference internal" href="../reference/glossary.html#term-hidden-member"><em class="xref std std-term">hidden member</em></a> that is accessible at
+<tt class="docutils literal"><span class="pre">mongodb3.example.net:27017</span></tt>. See <a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">host</span></tt></a>,
+<a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">priority</span></tt></a>, and <a class="reference internal" href="../reference/replica-configuration.html#members[n].hidden" title="members[n].hidden"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">hidden</span></tt></a> for more information about these settings. When you
+specify a full configuration object with <a class="reference internal" href="../reference/replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a>, you must
+declare the <tt class="docutils literal"><span class="pre">_id</span></tt> field, which is not automatically populated in this
+case.</p>
+</div>
+</div>
+<div class="section" id="production-notes">
+<h2>Production Notes<a class="headerlink" href="#production-notes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>In production deployments you likely want to use and configure a
+<a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control script</em></a> to manage this process based on this command.</li>
+<li>A member can be removed from a set and re-added later. If the
+removed member&#8217;s data is still relatively fresh, it can recover and
+catch up from its old data set. See the <a class="reference internal" href="../reference/replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a> and
+<a class="reference internal" href="../reference/replica-commands.html#rs.remove" title="rs.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.remove()</span></tt></a> helpers.</li>
+<li>If you have a backup or snapshot of an existing member, you can move
+the data files (i.e. <tt class="docutils literal"><span class="pre">/data/db</span></tt> or <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>) to a new
+system and use them to quickly initiate a new member. These files
+must be:<ul>
+<li>clean: the existing dataset must be from a consistent copy of the
+database from a member of the same replica set. See the
+<a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a> document for more information.</li>
+<li>recent: the copy must more recent than the oldest operation in the
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member&#8217;s <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. The new secondary must be
+able to become current using operations from the primary&#8217;s oplog.</li>
+</ul>
+</li>
+<li>There is a maximum of seven <a class="reference internal" href="../core/replication-internals.html#replica-set-election-internals"><em>voting members</em></a> in any replica set. When adding
+more members to a replica set that already has seven votes, you must
+either:<ul>
+<li>add the new member as a <a class="reference internal" href="../administration/replica-sets.html#replica-set-non-voting-members"><em>non-voting members</em></a> or,</li>
+<li>remove votes from an <a class="reference internal" href="../reference/replica-configuration.html#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">existing</span> <span class="pre">member</span></tt></a>.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="convert-standalone-to-replica-set.html" title="Previous Section: Convert a Standalone to a Replica Set">&lt; &nbsp; Convert a Standalone to a Replica Set</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="deploy-geographically-distributed-replica-set.html" title="Next Section: Deploy a Geographically Distributed Replica Set">Deploy a Geographically Distributed Replica Set &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

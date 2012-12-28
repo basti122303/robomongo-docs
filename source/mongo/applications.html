@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Application Development &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Drivers" href="applications/drivers.html" />
+<link rel="prev" title="2d Geospatial Indexes" href="core/geospatial-indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="application-development">
+<h1>Application Development<a class="headerlink" href="#application-development" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB provides language-specific client libraries called
+<a class="reference internal" href="reference/glossary.html#term-driver"><em class="xref std std-term">drivers</em></a> that let you develop applications to interact
+with your databases.</p>
+<p>This page lists the documents, tutorials, and reference pages that
+describe application development. For API-level documentation, see
+<a class="reference internal" href="applications/drivers.html"><em>Drivers</em></a>.</p>
+<p>For an overview of topics with which every
+MongoDB application developer will want familiarity,
+see the <a class="reference internal" href="aggregation.html"><em>aggregation</em></a> and <a class="reference internal" href="indexes.html"><em>indexes</em></a> documents.
+For an introduction too basic
+MongoDB use, see the <a class="reference internal" href="administration.html#administration-tutorials"><em>administration tutorials</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://www.mongodb.org/display/DOCS/Developer+Zone">Developer Zone</a> wiki pages and
+the <a class="reference internal" href="faq/developers.html"><em>FAQ: MongoDB for Application Developers</em></a> document. Developers also should be
+familiar with <a class="reference internal" href="mongo.html"><em>Using the mongo Shell</em></a> and the MongoDB <a class="reference internal" href="reference/operators.html"><em>query
+and update operators</em></a>.</p>
+</div>
+<div class="section" id="development-considerations">
+<h2>Development Considerations<a class="headerlink" href="#development-considerations" title="Permalink to this headline">¶</a></h2>
+<p>The following documents outline basic application development topics:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="applications/drivers.html">Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/data-modeling.html">Data Modeling Considerations for MongoDB Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/data-modeling.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/data-modeling.html#data-modeling-decisions">Data Modeling Decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/data-modeling.html#operational-considerations">Operational Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/data-modeling.html#data-modeling-patterns-and-examples">Data Modeling Patterns and Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/optimization.html">Optimization Strategies for MongoDB Applications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/optimization.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/optimization.html#strategies">Strategies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/database-references.html">Database References</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/database-references.html#manual-references">Manual References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/database-references.html#dbrefs">DBRefs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/server-side-javascript.html">Server-side JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#map-reduce">Map-Reduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#eval-command"><tt class="docutils literal"><span class="pre">eval</span></tt> Command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#running-js-files-via-a-mongo-shell-instance-on-the-server">Running <tt class="docutils literal"><span class="pre">.js</span></tt> files via a <tt class="docutils literal"><span class="pre">mongo</span></tt> shell Instance on the Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#where-operator"><tt class="docutils literal"><span class="pre">$where</span></tt> Operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#storing-functions-server-side">Storing Functions Server-side</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/server-side-javascript.html#concurrency">Concurrency</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/gridfs.html">GridFS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/gridfs.html#implement-gridfs">Implement GridFS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/gridfs.html#gridfs-collections">GridFS Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/gridfs.html#gridfs-index">GridFS Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/gridfs.html#example-interface">Example Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/object-id.html">ObjectId</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/object-id.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/object-id.html#core-object-id-class">ObjectId()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/object-id.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/capped-collections.html">Capped Collections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/capped-collections.html#recommendations-and-restrictions">Recommendations and Restrictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/capped-collections.html#procedures">Procedures</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="applications/replication.html"><em>Application Development with Replica Sets</em></a></li>
+<li><a class="reference internal" href="applications/indexes.html"><em>Indexing Strategies</em></a></li>
+<li><a class="reference internal" href="applications/aggregation.html"><em>Aggregation Framework</em></a></li>
+<li><a class="reference internal" href="reference/connection-string.html"><em>Connection String URI Format</em></a></li>
+<li><a class="reference internal" href="applications/map-reduce.html"><em>Map-Reduce</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="application-patterns">
+<span id="id1"></span><h2>Application Patterns<a class="headerlink" href="#application-patterns" title="Permalink to this headline">¶</a></h2>
+<p>The following documents provide patterns for developing application features:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/perform-two-phase-commits.html">Perform Two Phase Commits</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/perform-two-phase-commits.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/perform-two-phase-commits.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/perform-two-phase-commits.html#pattern">Pattern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/perform-two-phase-commits.html#using-two-phase-commits-in-production-applications">Using Two-Phase Commits in Production Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/create-tailable-cursor.html">Create Tailable Cursor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/create-tailable-cursor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/create-tailable-cursor.html#c-example">C++ Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/isolate-sequence-of-operations.html">Isolate Sequence of Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/isolate-sequence-of-operations.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/isolate-sequence-of-operations.html#update-if-current">Update if Current</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/create-an-auto-incrementing-field.html">Create an Auto-Incrementing Sequence Field</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/create-an-auto-incrementing-field.html#synopsis">Synopsis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/expire-data.html">Expire Data from Collections by Setting TTL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/expire-data.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/expire-data.html#constraints">Constraints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/expire-data.html#enabling-a-ttl-for-a-collection">Enabling a TTL for a Collection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/expire-data.html#replication">Replication</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="data-modeling-patterns">
+<h2>Data Modeling Patterns<a class="headerlink" href="#data-modeling-patterns" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-embedded-one-to-one-relationships-between-documents.html">Model Embedded One-to-One Relationships Between Documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-embedded-one-to-many-relationships-between-documents.html">Model Embedded One-to-Many Relationships Between Documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-referenced-one-to-many-relationships-between-documents.html">Model Referenced One-to-Many Relationships Between Documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-data-for-atomic-operations.html">Model Data for Atomic Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-tree-structures-with-parent-references.html">Model Tree Structures with Parent References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-tree-structures-with-child-references.html">Model Tree Structures with Child References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-tree-structures-with-ancestors-array.html">Model Tree Structures with an Array of Ancestors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-tree-structures-with-materialized-paths.html">Model Tree Structures with Materialized Paths</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-tree-structures-with-nested-sets.html">Model Tree Structures with Nested Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/model-data-for-keyword-search.html">Model Data to Support Keyword Search</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="core/geospatial-indexes.html" title="Previous Section: 2d Geospatial Indexes">&lt; &nbsp; 2d Geospatial Indexes</a></li>
+<li id="btnvnx"><a href="applications/drivers.html" title="Next Section: Drivers">Drivers &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

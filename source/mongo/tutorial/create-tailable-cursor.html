@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Create Tailable Cursor &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/create-tailable-cursor" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Isolate Sequence of Operations" href="isolate-sequence-of-operations.html" />
+<link rel="prev" title="Perform Two Phase Commits" href="perform-two-phase-commits.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="create-tailable-cursor">
+<h1>Create Tailable Cursor<a class="headerlink" href="#create-tailable-cursor" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>By default, MongoDB will automatically close a cursor when the client
+has exhausted all results in the cursor. However, for <a class="reference internal" href="../core/capped-collections.html"><em>capped
+collections</em></a> you may use a <em>Tailable
+Cursor</em> that remains open after the client exhausts the results in the
+initial causer. Taliable cursors are conceptually equivelent to the
+<tt class="docutils literal"><span class="pre">tail</span></tt> Unix command with the <tt class="docutils literal"><span class="pre">-f</span></tt> option (i.e. with &#8220;follow&#8221;
+mode.) After clients insert new additional documents into a capped
+collection, the tailable cursor will to continue to retrieve
+documents.</p>
+<p>Use tailable cursors on capped collections with high numbers of write
+operations for which an index would be too expensive. For instance,
+MongoDB <a class="reference internal" href="../core/replication.html"><em>replication</em></a> uses tailable cursors to
+tail the primary&#8217;s <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If your query is on an indexed field, do not use tailable cursors,
+but instead, use a regular cursor. Keep track of the last value of
+the indexed field returned by the query. To retrieve the newly
+added documents, query the collection again using the last value of
+the indexed field in the query criteria, as in the following
+example:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">indexedField</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">lastvalue</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Consider the following behaviors related to tailable cursors:</p>
+<ul>
+<li><p class="first">Tailable cursors do not use indexes and return documents in
+<a class="reference internal" href="../reference/glossary.html#term-natural-order"><em class="xref std std-term">natural order</em></a>.</p>
+</li>
+<li><p class="first">Because tailable cursors do not use indexes, the initial scan for the
+query may be expensive; but, after initially exhausting the cursor,
+subsequent retrievals of the newly added documents are inexpensive.</p>
+</li>
+<li><p class="first">Tailable cursors may become <em>dead</em>, or invalid, if either:</p>
+<ul class="simple">
+<li>the query returns no match.</li>
+<li>the cursor returns the document at the &#8220;end&#8221; of the collection and
+then the application deletes those document.</li>
+</ul>
+<p>A <em>dead</em> cursor has an id of <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</li>
+</ul>
+<p>See your <a class="reference internal" href="../applications/drivers.html"><em>driver documentation</em></a> for the
+driver-specific method to specify the tailable cursor.  For more
+information on the details of specifying a tailable cursor, see
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Mongo Wire Protocol">Mongo wire protocol</a> documentation.</p>
+</div>
+<div class="section" id="c-example">
+<h2>C++ Example<a class="headerlink" href="#c-example" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">tail</span></tt> function uses a tailable cursor to output the results from
+a query to a capped collection:</p>
+<ul class="simple">
+<li>The function handles the case of the dead cursor by having the query
+be inside a loop.</li>
+<li>To periodically check for new data, the <tt class="docutils literal"><span class="pre">cursor-&gt;more()</span></tt> statement
+is also inside a loop.</li>
+</ul>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="cp">#include &quot;client/dbclient.h&quot;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">mongo</span><span class="p">;</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Example of a tailable cursor.</span>
+<span class="cm"> * The function &quot;tails&quot; the capped collection (ns) and output elements as they are added.</span>
+<span class="cm"> * The function also handles the possibility of a dead cursor by tracking the field &#39;insertDate&#39;.</span>
+<span class="cm"> * New documents are added with increasing values of &#39;insertDate&#39;.</span>
+<span class="cm"> */</span>
+
+<span class="kt">void</span> <span class="n">tail</span><span class="p">(</span><span class="n">DBClientBase</span><span class="o">&amp;</span> <span class="n">conn</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">ns</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">BSONElement</span> <span class="n">lastValue</span> <span class="o">=</span> <span class="n">minKey</span><span class="p">.</span><span class="n">firstElement</span><span class="p">();</span>
+
+    <span class="n">Query</span> <span class="n">query</span> <span class="o">=</span> <span class="n">Query</span><span class="p">().</span><span class="n">hint</span><span class="p">(</span> <span class="n">BSON</span><span class="p">(</span> <span class="s">&quot;$natural&quot;</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">);</span>
+
+    <span class="k">while</span> <span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">DBClientCursor</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span>
+            <span class="n">conn</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                       <span class="n">QueryOption_CursorTailable</span> <span class="o">|</span> <span class="n">QueryOption_AwaitData</span> <span class="p">);</span>
+
+        <span class="k">while</span> <span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">more</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+
+                <span class="k">if</span> <span class="p">(</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">isDead</span><span class="p">()</span> <span class="p">)</span> <span class="p">{</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">BSONObj</span> <span class="n">o</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">();</span>
+            <span class="n">lastValue</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s">&quot;insertDate&quot;</span><span class="p">];</span>
+            <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">o</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">QUERY</span><span class="p">(</span> <span class="s">&quot;insertDate&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">GT</span> <span class="o">&lt;&lt;</span> <span class="n">lastValue</span> <span class="p">).</span><span class="n">hint</span><span class="p">(</span> <span class="n">BSON</span><span class="p">(</span> <span class="s">&quot;$natural&quot;</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">tail</span></tt> function performs the following actions:</p>
+<ul>
+<li><p class="first">Initialize the <tt class="docutils literal"><span class="pre">lastValue</span></tt> variable, which tracks the last
+accessed value. The function will use the <tt class="docutils literal"><span class="pre">lastValue</span></tt> if the
+cursor becomes <em>invalid</em> and <tt class="docutils literal"><span class="pre">tail</span></tt> needs to restart the
+query. Use <a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> to ensure that the query uses
+the <a class="reference internal" href="../reference/operator/natural.html#_S_natural" title="$natural"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$natural</span></tt></a> order.</p>
+</li>
+<li><p class="first">In an outer <tt class="docutils literal"><span class="pre">while(1)</span></tt> loop,</p>
+<ul>
+<li><p class="first">Query the capped collection and return a tailable cursor that
+blocks for several seconds waiting for new documents</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">auto_ptr</span><span class="o">&lt;</span><span class="n">DBClientCursor</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span>
+     <span class="n">conn</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="n">QueryOption_CursorTailable</span> <span class="o">|</span> <span class="n">QueryOption_AwaitData</span> <span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Specify the capped collection using <tt class="docutils literal"><span class="pre">ns</span></tt> as an argument
+to the function.</li>
+<li>Set the <tt class="docutils literal"><span class="pre">QueryOption_CursorTailable</span></tt> option to create a
+tailable cursor.</li>
+<li>Set the <tt class="docutils literal"><span class="pre">QueryOption_AwaitData</span></tt> option so that the returned
+cursor blocks for a few seconds to wait for data.</li>
+</ul>
+</li>
+<li><p class="first">In an inner <tt class="docutils literal"><span class="pre">while</span> <span class="pre">(1)</span></tt> loop, read the documents from the cursor:</p>
+<ul class="simple">
+<li>If the cursor has no more documents and is not invalid, loop the
+inner <tt class="docutils literal"><span class="pre">while</span></tt> loop to recheck for more documents.</li>
+<li>If the cursor has no more documents and is dead, break the inner
+<tt class="docutils literal"><span class="pre">while</span></tt> loop.</li>
+<li>If the cursor has documents:<ul>
+<li>output the document,</li>
+<li>update the <tt class="docutils literal"><span class="pre">lastValue</span></tt> value,</li>
+<li>and loop the inner <tt class="docutils literal"><span class="pre">while</span> <span class="pre">(1)</span></tt> loop to recheck for more
+documents.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first">If the logic breaks out of the inner <tt class="docutils literal"><span class="pre">while</span> <span class="pre">(1)</span></tt> loop and the
+cursor is invalid:</p>
+<ul>
+<li><p class="first">Use the <tt class="docutils literal"><span class="pre">lastValue</span></tt> value to create a new query condition that
+matches documents added after the <tt class="docutils literal"><span class="pre">lastValue</span></tt>. Explicitly
+ensure <tt class="docutils literal"><span class="pre">$natural</span></tt> order with the <tt class="docutils literal"><span class="pre">hint()</span></tt> method:</p>
+<div class="highlight-cpp"><div class="highlight"><pre><span class="n">query</span> <span class="o">=</span> <span class="n">QUERY</span><span class="p">(</span> <span class="s">&quot;insertDate&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">GT</span> <span class="o">&lt;&lt;</span> <span class="n">lastValue</span> <span class="p">).</span><span class="n">hint</span><span class="p">(</span> <span class="n">BSON</span><span class="p">(</span> <span class="s">&quot;$natural&quot;</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Loop through the outer <tt class="docutils literal"><span class="pre">while</span> <span class="pre">(1)</span></tt> loop to re-query with the new query
+condition and repeat.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://shtylman.com/post/the-tail-of-mongodb">Detailed blog post on tailable cursor</a></p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="perform-two-phase-commits.html" title="Previous Section: Perform Two Phase Commits">&lt; &nbsp; Perform Two Phase Commits</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="isolate-sequence-of-operations.html" title="Next Section: Isolate Sequence of Operations">Isolate Sequence of Operations &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

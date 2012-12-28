@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Write Scripts for the mongo Shell &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/write-scripts-for-the-mongo-shell" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="next" title="mongo Shell Quick Reference" href="../reference/mongo-shell-reference.html" />
+<link rel="prev" title="Access the mongo Shell Help Information" href="access-mongo-shell-help.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="write-scripts-for-the-mongo-shell">
+<h1>Write Scripts for the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#write-scripts-for-the-mongo-shell" title="Permalink to this headline">¶</a></h1>
+<p>You can write scripts for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell in JavaScript
+that manipulate data in MongoDB or perform administrative
+operation. For more information about the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell see
+<a class="reference internal" href="../mongo.html"><em>Using the mongo Shell</em></a>, and see the <a class="reference internal" href="../applications/server-side-javascript.html#running-js-scripts-in-mongo-on-mongod-host"><em>Running .js files via a mongo shell Instance on the Server</em></a>
+section for more information about using these <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+script.</p>
+<p>This tutorial provides an introduction to writing JavaScript that uses
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to access MongoDB.</p>
+<div class="section" id="opening-new-connections">
+<span id="mongo-shell-new-connections"></span><h2>Opening New Connections<a class="headerlink" href="#opening-new-connections" title="Permalink to this headline">¶</a></h2>
+<p>From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell or from a JavaScript file, you can
+instantiate database connections using the <tt class="docutils literal"><span class="pre">Mongo()</span></tt> constructor:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">new</span> <span class="nx">Mongo</span><span class="p">()</span>
+<span class="k">new</span> <span class="nx">Mongo</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">host</span><span class="o">&gt;</span><span class="p">)</span>
+<span class="k">new</span> <span class="nx">Mongo</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">host</span><span class="o">:</span><span class="nx">port</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the following example that instantiates a new connection to
+the MongoDB instance running on localhost on the default port and sets
+the current <tt class="docutils literal"><span class="pre">db</span></tt> to <tt class="docutils literal"><span class="pre">myDatabase</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mongo</span><span class="p">();</span>
+<span class="nx">db</span> <span class="o">=</span> <span class="nx">conn</span><span class="p">.</span><span class="nx">getDB</span><span class="p">(</span><span class="s2">&quot;myDatabase&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Additionally, you can use the <tt class="docutils literal"><span class="pre">connect</span></tt> method to connect to the
+MongoDB instance. The following example connects to the MongoDB
+instance that is running on <tt class="docutils literal"><span class="pre">localhost</span></tt> with the non-default port
+<tt class="docutils literal"><span class="pre">207020</span></tt> and set the current <tt class="docutils literal"><span class="pre">db</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span> <span class="o">=</span> <span class="nx">connect</span><span class="p">(</span><span class="s2">&quot;localhost:27020/myDatabase&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you create new connections inside a <a class="reference internal" href="#mongo-shell-javascript-file"><em>JavaScript file</em></a>, you must specify the <tt class="docutils literal"><span class="pre">db</span></tt> variable in
+the specified methods. You <strong>cannot</strong> use <tt class="docutils literal"><span class="pre">use</span> <span class="pre">&lt;dbname&gt;</span></tt> inside the
+file. Additionally, inside the script, you would need to call
+<a class="reference internal" href="../reference/method/db.getLastErrorObj.html#db.getLastErrorObj" title="db.getLastErrorObj"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getLastErrorObj()</span></tt></a> or <a class="reference internal" href="../reference/method/db.getLastError.html#db.getLastError" title="db.getLastError"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getLastError()</span></tt></a>
+explicitly to wait for the result of <a class="reference internal" href="../core/write-operations.html"><em>write
+operations</em></a>.</p>
+</div>
+<div class="section" id="scripting">
+<span id="mongo-shell-scripting"></span><h2>Scripting<a class="headerlink" href="#scripting" title="Permalink to this headline">¶</a></h2>
+<p>From the command line, use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> to evaluate JavaScript.</p>
+<div class="section" id="eval-option">
+<h3><tt class="docutils literal"><span class="pre">--eval</span></tt> option<a class="headerlink" href="#eval-option" title="Permalink to this headline">¶</a></h3>
+<p>Use the <a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a> option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> to
+pass the shell a JavaScript fragment, as in the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo <span class="nb">test</span> --eval <span class="s2">&quot;printjson(db.getCollectionNames())&quot;</span>
+</pre></div>
+</div>
+<p>This returns the output of <a class="reference internal" href="../reference/method/db.getCollectionNames.html#db.getCollectionNames" title="db.getCollectionNames"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getCollectionNames()</span></tt></a> using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance running on port <tt class="docutils literal"><span class="pre">27017</span></tt> on the
+<tt class="docutils literal"><span class="pre">localhost</span></tt> interface.</p>
+</div>
+<div class="section" id="evaluate-a-javascript-file">
+<span id="mongo-shell-javascript-file"></span><h3>evaluate a javascript file<a class="headerlink" href="#evaluate-a-javascript-file" title="Permalink to this headline">¶</a></h3>
+<p>you can specify a <tt class="docutils literal"><span class="pre">.js</span></tt> file to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will evaluate the javascript directly. consider the
+following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo localhost:27017/test myjsfile.js
+</pre></div>
+</div>
+<p>this operation evaluates the <tt class="docutils literal"><span class="pre">myjsfile.js</span></tt> script in a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell that connects to the <tt class="docutils literal"><span class="pre">test</span></tt> <a class="reference internal" href="../reference/glossary.html#term-database"><em class="xref std std-term">database</em></a>
+on the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance accessible via the <tt class="docutils literal"><span class="pre">localhost</span></tt>
+interface on port <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>alternately, you can specify the mongodb connection parameters inside
+of the javascript file using the <tt class="docutils literal"><span class="pre">Mongo()</span></tt> constructor. See
+<a class="reference internal" href="#mongo-shell-new-connections"><em>Opening New Connections</em></a> for more information.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="access-mongo-shell-help.html" title="Previous Section: Access the mongo Shell Help Information">&lt; &nbsp; Access the mongo Shell Help Information</a></li>
+<li id="btnvup"><a href="../mongo.html" title="Parent Section: Using the mongo Shell" >&#47;&#92;&nbsp; Using the mongo Shell</a></li>
+<li id="btnvnx"><a href="../reference/mongo-shell-reference.html" title="Next Section: mongo Shell Quick Reference">mongo Shell Quick Reference &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

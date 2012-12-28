@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replication &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/replication" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Replication Fundamentals" href="core/replication.html" />
+<link rel="prev" title="Getting Started with the MongoDB JavaScript Shell" href="tutorial/getting-started.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replication">
+<h1>Replication<a class="headerlink" href="#replication" title="Permalink to this headline">¶</a></h1>
+<p>Database replication ensures redundancy, backup, and automatic failover.
+Replication occurs through groups of servers known as replica sets.</p>
+<p>This page lists the documents, tutorials, and reference pages that
+describe replica sets.</p>
+<p>For an overview, see <a class="reference internal" href="core/replication.html"><em>Replication Fundamentals</em></a>. To work with members,
+see <a class="reference internal" href="administration/replica-sets.html"><em>Replica Set Administration</em></a>. To configure deployment
+architecture, see <a class="reference internal" href="administration/replication-architectures.html"><em>Replication Architectures</em></a>. To
+modify read and write operations, see <a class="reference internal" href="applications/replication.html"><em>Application Development with Replica Sets</em></a>.
+For procedures for performing certain replication tasks, see the
+<a class="reference internal" href="#replica-set-tutorials-list"><em>list of replication tutorials</em></a>.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The following is the outline of the main documentation:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/replication.html">Replication Fundamentals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/replication.html#member-configuration-properties">Member Configuration Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication.html#failover">Failover</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication.html#consistency">Consistency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication.html#administration-and-operations">Administration and Operations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/replica-sets.html">Replica Set Administration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/replica-sets.html#member-configurations">Member Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replica-sets.html#procedures">Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replica-sets.html#security-considerations-for-replica-sets">Security Considerations for Replica Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replica-sets.html#troubleshooting-replica-sets">Troubleshooting Replica Sets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/replication-architectures.html">Replication Architectures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/replication-architectures.html#three-member-sets">Three Member Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replication-architectures.html#sets-with-four-or-more-members">Sets with Four or More Members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replication-architectures.html#geographically-distributed-sets">Geographically Distributed Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replication-architectures.html#non-production-members">Non-Production Members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/replication-architectures.html#arbiters">Arbiters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/replication.html">Application Development with Replica Sets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/replication.html#write-concern">Write Concern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/replication.html#read-preference">Read Preference</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/replication-internals.html">Replication Internals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#oplog-internals">Oplog Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#data-integrity">Data Integrity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#member-configurations">Member Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#security-internals">Security Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#election-internals">Election Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/replication-internals.html#syncing">Syncing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/replica-set-features.html">Replica Set Features and Version Compatibility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/replica-commands.html">Replica Set Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/replica-commands.html#javascript-methods">JavaScript Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/replica-commands.html#database-commands">Database Commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The following document describes master-slave replication, which is
+deprecated:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="administration/master-slave.html">Master Slave Replication</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="tutorials">
+<span id="replica-set-tutorials-list"></span><span id="index-0"></span><h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<p>The following tutorials describe certain replica set maintenance
+operations in detail:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/deploy-replica-set.html">Deploy a Replica Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/convert-standalone-to-replica-set.html">Convert a Standalone to a Replica Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/expand-replica-set.html">Add Members to a Replica Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/deploy-geographically-distributed-replica-set.html">Deploy a Geographically Distributed Replica Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/change-oplog-size.html">Change the Size of the Oplog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/force-member-to-be-primary.html">Force a Member to Become Primary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/change-hostnames-in-a-replica-set.html">Change Hostnames in a Replica Set</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/convert-secondary-into-arbiter.html">Convert a Secondary to an Arbiter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/reconfigure-replica-set-with-unavailable-members.html">Reconfigure a Replica Set with Unavailable Members</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/recover-data-following-unexpected-shutdown.html">Recover MongoDB Data following Unexpected Shutdown</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="reference">
+<span id="replication-reference"></span><h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>The following describes the replica set configuration object:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/replica-configuration.html"><em>Replica Set Configuration</em></a></li>
+</ul>
+<p>The following describe MongoDB output and status related to
+replication:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/replica-status.html"><em>Replica Set Status Reference</em></a></li>
+<li><a class="reference internal" href="reference/replication-info.html"><em>Replication Info Reference</em></a></li>
+</ul>
+<span class="target" id="replica-set-data-center-awareness"></span></div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/getting-started.html" title="Previous Section: Getting Started with the MongoDB JavaScript Shell">&lt; &nbsp; Getting Started with the MongoDB JavaScript Shell</a></li>
+<li id="btnvnx"><a href="core/replication.html" title="Next Section: Replication Fundamentals">Replication Fundamentals &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

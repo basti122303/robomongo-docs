@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Default Write Concern Change &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/drivers-write-concern" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="prev" title="Release Notes for MongoDB 2.4 (2.3 Development Series)" href="2.4.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="default-write-concern-change">
+<span id="driver-write-concern-change"></span><h1>Default Write Concern Change<a class="headerlink" href="#default-write-concern-change" title="Permalink to this headline">¶</a></h1>
+<p>These release notes outline a change to all driver interfaces released
+in November 2012. See release notes for specific drivers for
+additional information.</p>
+<div class="section" id="changes">
+<span id="write-concern-change-notes"></span><h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<p>As of the releases listed below, there are two major changes to all
+drivers:</p>
+<ol class="arabic">
+<li><p class="first">All drivers will add a new top-level connection class that will
+increase consistency for all MongoDB client interfaces.</p>
+<p>This change is non-backward breaking: existing connection classes
+will remain in all drivers for a time, and will continue to operate
+as expected. However, those previous connection classes are now
+deprecated as of these releases, and will eventually be removed
+from the driver interfaces.</p>
+<p>The new top-level connection class is named <tt class="docutils literal"><span class="pre">MongoClient</span></tt>, or
+similar depending on how host languages handle namespacing.</p>
+</li>
+<li><p class="first">The default write concern on the new <tt class="docutils literal"><span class="pre">MongoClient</span></tt> class will be
+to acknowledge all write operations <a class="footnote-reference" href="#without-arguments" id="id1">[1]</a>. This
+will allow your application to receive acknowledgment of all write
+operations.</p>
+<p>See the documentation of <a class="reference internal" href="../core/write-operations.html#write-concern"><em>Write Concern</em></a> for
+more information about write concern in MongoDB.</p>
+<p>Please migrate to the new <tt class="docutils literal"><span class="pre">MongoClient</span></tt> class expeditiously.</p>
+</li>
+</ol>
+<table class="docutils footnote" frame="void" id="without-arguments" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The drivers will call
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> without arguments, which is logically
+equivalent to the <tt class="docutils literal"><span class="pre">w:</span> <span class="pre">1</span></tt> option; however, this operation allows
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> users to override the default write concern
+with the <a class="reference internal" href="../reference/replica-configuration.html#settings.getLastErrorDefaults" title="settings.getLastErrorDefaults"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">getLastErrorDefaults</span></tt></a> setting in the
+<a class="reference internal" href="../reference/replica-configuration.html"><em>Replica Set Configuration</em></a>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="releases">
+<span id="write-concern-change-releases"></span><h2>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h2>
+<p>The following driver releases will include the changes outlined in
+<a class="reference internal" href="#write-concern-change-notes"><em>Changes</em></a>. See each driver&#8217;s release notes for
+a full account of each release as well as other related
+driver-specific changes.</p>
+<ul class="simple">
+<li>C#, version 1.7</li>
+<li>Java, version 2.10.0</li>
+<li>Node.js, version 1.2</li>
+<li>Perl, version 0.601.1</li>
+<li>PHP, version 1.4</li>
+<li>Python, version 2.4</li>
+<li>Ruby, version 1.8</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="2.4.html" title="Previous Section: Release Notes for MongoDB 2.4 (2.3 Development Series)">&lt; &nbsp; Release Notes for MongoDB 2.4 (2.3 Development Series)</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

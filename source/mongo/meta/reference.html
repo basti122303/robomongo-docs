@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MongoDB Reference Manual &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/meta/reference" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodb-reference-manual">
+<h1>MongoDB Reference Manual<a class="headerlink" href="#mongodb-reference-manual" title="Permalink to this headline">¶</a></h1>
+<p>This document contains all of the reference material from the
+<a class="reference internal" href="../contents.html"><em>MongoDB Manual</em></a>, reflecting the 2.2.2
+release. See the full manual, for complete documentation of MongoDB,
+it&#8217;s operation, and use.</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="mongo-shell-and-database-command-reference">
+<h2><tt class="docutils literal"><span class="pre">mongo</span></tt> Shell and Database Command Reference<a class="headerlink" href="#mongo-shell-and-database-command-reference" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/commands.html">Command Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/commands.html#user-commands">User Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#sharding-commands">Sharding Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#aggregation-commands">Aggregation Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#replication-commands">Replication Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#geospatial-commands">Geospatial Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#collection-commands">Collection Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#administration-commands">Administration Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#diagnostic-commands">Diagnostic Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/commands.html#other-commands">Other Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/commands.html#mongos-commands"><tt class="docutils literal"><span class="pre">mongos</span></tt> Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/commands.html#internal-use-commands">Internal Use Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/javascript.html">JavaScript Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/javascript.html#data-manipulation">Data Manipulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#query-and-update-methods">Query and Update Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#cursor-methods">Cursor Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#data-aggregation-methods">Data Aggregation Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/javascript.html#administrative-functions">Administrative Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#database-methods">Database Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#collection-methods">Collection Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#sharding-methods">Sharding Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#replica-set-methods">Replica Set Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/javascript.html#native-shell-methods">Native Shell Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/javascript.html#non-user-functions-and-methods">Non-User Functions and Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#deprecated-methods">Deprecated Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#native-methods">Native Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/javascript.html#internal-methods">Internal Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="query-and-aggregation-operator-reference">
+<h2>Query and Aggregation Operator Reference<a class="headerlink" href="#query-and-aggregation-operator-reference" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/operators.html">Operator Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/operators.html#query-selectors">Query Selectors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#comparison">Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#logical">Logical</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#element">Element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#javascript">JavaScript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#geospatial">Geospatial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#array">Array</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/operators.html#update">Update</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#fields">Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#update-operators-array">Array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#bitwise">Bitwise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/operators.html#isolation">Isolation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/operators.html#projection">Projection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/meta-query-operators.html">Meta Query Operators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/meta-query-operators.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/meta-query-operators.html#modifiers">Modifiers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/aggregation.html">Aggregation Framework Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/aggregation.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/aggregation.html#expressions">Expressions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#boolean-operators">Boolean Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#comparison-operators">Comparison Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#arithmetic-operators">Arithmetic Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#string-operators">String Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#date-operators">Date Operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/aggregation.html#conditional-expressions">Conditional Expressions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="mongodb-and-sql-interface-comparisons">
+<h2>MongoDB and SQL Interface Comparisons<a class="headerlink" href="#mongodb-and-sql-interface-comparisons" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/sql-comparison.html">SQL to MongoDB Mapping Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/sql-aggregation-comparison.html">SQL to Aggregation Framework Mapping Chart</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="status-monitoring-and-reporting-output">
+<h2>Status, Monitoring, and Reporting Output<a class="headerlink" href="#status-monitoring-and-reporting-output" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/server-status.html">Server Status Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#instance-information">Instance Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#server-status-locks">locks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#server-status-global-lock">globalLock</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/server-status.html#globallock-currentqueue">globalLock.currentQueue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/server-status.html#globallock-activeclients">globalLock.activeClients</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#mem">mem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#connections">connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#extra-info">extra_info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#indexcounters">indexCounters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#backgroundflushing">backgroundFlushing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#cursors">cursors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#network">network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#repl">repl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#opcountersrepl">opcountersRepl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#replnetworkqueue">replNetworkQueue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#opcounters">opcounters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#asserts">asserts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#writebacksqueued">writeBacksQueued</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#dur">dur</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/server-status.html#journaling">Journaling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/server-status.html#recordstats">recordStats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/database-statistics.html">Database Statistics Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/database-statistics.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/database-statistics.html#fields">Fields</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/collection-statistics.html">Collection Statistics Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/collection-statistics.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/collection-statistics.html#example-document">Example Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/collection-statistics.html#fields">Fields</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/connection-pool-stats.html">Connection Pool Statistics Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/connection-pool-stats.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/connection-pool-stats.html#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/replica-status.html">Replica Set Status Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/replica-status.html#fields">Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/replica-status.html#member-statuses">Member Statuses</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/exit-codes.html">Exit Codes and Statuses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/current-op.html">Current Operation Reporting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/current-op.html#example-output">Example Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/current-op.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/current-op.html#output-reference">Output Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="program-and-tool-reference-pages">
+<h2>Program and Tool Reference Pages<a class="headerlink" href="#program-and-tool-reference-pages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/components.html">MongoDB Package Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#core-processes">Core Processes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongod.html"><tt class="docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongos.html"><tt class="docutils literal"><span class="pre">mongos</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongo.html"><tt class="docutils literal"><span class="pre">mongo</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#windows-services">Windows Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongod.exe.html"><tt class="docutils literal"><span class="pre">mongod.exe</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongos.exe.html"><tt class="docutils literal"><span class="pre">mongos.exe</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#binary-import-and-export-tools">Binary Import and Export Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongodump.html"><tt class="docutils literal"><span class="pre">mongodump</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongorestore.html"><tt class="docutils literal"><span class="pre">mongorestore</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/bsondump.html"><tt class="docutils literal"><span class="pre">bsondump</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongooplog.html"><tt class="docutils literal"><span class="pre">mongooplog</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#data-import-and-export-tools">Data Import and Export Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongoimport.html"><tt class="docutils literal"><span class="pre">mongoimport</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongoexport.html"><tt class="docutils literal"><span class="pre">mongoexport</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#diagnostic-tools">Diagnostic Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongostat.html"><tt class="docutils literal"><span class="pre">mongostat</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongotop.html"><tt class="docutils literal"><span class="pre">mongotop</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongosniff.html"><tt class="docutils literal"><span class="pre">mongosniff</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/components.html#gridfs">GridFS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/mongofiles.html"><tt class="docutils literal"><span class="pre">mongofiles</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="internal-metadata">
+<h2>Internal Metadata<a class="headerlink" href="#internal-metadata" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/config-database.html">Config Database Contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-database.html">The <tt class="docutils literal"><span class="pre">local</span></tt> Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/system-collections.html">System Collections</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="general-system-reference">
+<h2>General System Reference<a class="headerlink" href="#general-system-reference" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/limits.html">MongoDB Limits and Thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="release-notes">
+<h2>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
+<p>Always install the latest, stable version of MongoDB. See the
+following release notes for an account of the changes in major
+versions. Release notes also include instructions for upgrade.</p>
+<p>Current stable release (v2.2-series):</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/2.2.html">Release Notes for MongoDB 2.2</a></li>
+</ul>
+</div>
+<p>See <a class="reference internal" href="../release-notes/2.2-changes.html"><em>Changes in MongoDB 2.2</em></a> for an overview of all changes
+in 2.2.</p>
+<p>Previous stable releases:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/2.0.html">Release Notes for MongoDB 2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/1.8.html">Release Notes for MongoDB 1.8</a></li>
+</ul>
+</div>
+<p>Current Development series:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/2.4.html">Release Notes for MongoDB 2.4 (2.3 Development Series)</a></li>
+</ul>
+</div>
+<p>Other MongoDB release notes:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../release-notes/drivers-write-concern.html">Default Write Concern Change</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../release-notes/drivers-write-concern.html#changes">Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../release-notes/drivers-write-concern.html#releases">Releases</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

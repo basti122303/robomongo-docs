@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Using the mongo Shell &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/mongo" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Getting Started with the mongo Shell" href="tutorial/getting-started-with-the-mongo-shell.html" />
+<link rel="prev" title="Model Data to Support Keyword Search" href="tutorial/model-data-for-keyword-search.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="using-the-mongo-shell">
+<h1>Using the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#using-the-mongo-shell" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell is an interactive JavaScript shell for
+MongoDB, and is part of all <a class="reference external" href="http://www.mongodb.org/downloads">MongoDB distributions</a>. This section provides an
+introduction to the shell, and outlines key functions, operations, and
+use of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>Most examples in the <a class="reference internal" href="contents.html"><em>MongoDB Manual</em></a> use the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell; however, many <a class="reference internal" href="applications/drivers.html"><em>drivers</em></a> provide similar interfaces to MongoDB.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-started-with-the-mongo-shell.html">Getting Started with the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started-with-the-mongo-shell.html#start-the-mongo-shell">Start the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started-with-the-mongo-shell.html#executing-queries">Executing Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started-with-the-mongo-shell.html#print">Print</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started-with-the-mongo-shell.html#exit-the-shell">Exit the Shell</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/shell-types.html">Data Types in the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/shell-types.html#date">Date</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/shell-types.html#objectid">ObjectId</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/access-mongo-shell-help.html">Access the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Help Information</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#command-line-help">Command Line Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#shell-help">Shell Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#database-help">Database Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#collection-help">Collection Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#cursor-help">Cursor Help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/access-mongo-shell-help.html#type-help">Type Help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/write-scripts-for-the-mongo-shell.html">Write Scripts for the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/write-scripts-for-the-mongo-shell.html#opening-new-connections">Opening New Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/write-scripts-for-the-mongo-shell.html#scripting">Scripting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/mongo-shell-reference.html"><tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Quick Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#mongo-shell-command-history"><tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Command History</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#command-line-options">Command Line Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#command-helpers">Command Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#basic-shell-javascript-operations">Basic Shell Javascript Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#queries">Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#error-checking-methods">Error Checking Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#administrative-command-helpers">Administrative Command Helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#opening-additional-connections">Opening Additional Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#miscellaneous">Miscellaneous</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/mongo-shell-reference.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>The <a class="reference internal" href="tutorial/getting-started.html"><em>Getting Started with the MongoDB JavaScript Shell</em></a> provides a general introduction
+to MongoDB using examples from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell. Additionally, the following documents from other sections
+address topics relevant to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell use:</p>
+<ul class="simple">
+<li><a class="reference internal" href="faq/mongo.html"><em>FAQ: The mongo Shell</em></a></li>
+<li><a class="reference internal" href="reference/mongo.html"><em>mongo</em></a></li>
+<li><a class="reference internal" href="reference/javascript.html"><em>JavaScript Interface</em></a></li>
+</ul>
+<p>Furthermore, consider the following reference material that addresses
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and its interface:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/operators.html"><em>Operator Reference</em></a></li>
+<li><a class="reference internal" href="reference/commands.html"><em>Command Reference</em></a></li>
+<li><a class="reference internal" href="reference/aggregation.html"><em>Aggregation Framework Reference</em></a></li>
+<li><a class="reference internal" href="reference/meta-query-operators.html"><em>Meta Query Operators</em></a></li>
+</ul>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/model-data-for-keyword-search.html" title="Previous Section: Model Data to Support Keyword Search">&lt; &nbsp; Model Data to Support Keyword Search</a></li>
+<li id="btnvnx"><a href="tutorial/getting-started-with-the-mongo-shell.html" title="Next Section: Getting Started with the mongo Shell">Getting Started with the mongo Shell &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

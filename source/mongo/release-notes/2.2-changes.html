@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Changes in MongoDB 2.2 &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/2.2-changes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="changes-in-mongodb-2-2">
+<h1>Changes in MongoDB 2.2<a class="headerlink" href="#changes-in-mongodb-2-2" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="2.2.html">Release Notes for MongoDB 2.2</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="2.2.html#upgrading">Upgrading</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#synopsis">Synopsis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#upgrading-a-standalone-mongod">Upgrading a Standalone <tt class="docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#upgrading-a-replica-set">Upgrading a Replica Set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#upgrading-a-sharded-cluster">Upgrading a Sharded Cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.2.html#changes">Changes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#major-features">Major Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#aggregation-framework">Aggregation Framework</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#ttl-collections">TTL Collections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#concurrency-improvements">Concurrency Improvements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#improved-data-center-awareness-with-tag-aware-sharding">Improved Data Center Awareness with Tag Aware Sharding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#fully-supported-read-preference-semantics">Fully Supported Read Preference Semantics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#compatibility-changes">Compatibility Changes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#authentication-changes">Authentication Changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#findandmodify-returns-null-value-for-upserts"><tt class="docutils literal"><span class="pre">findAndModify</span></tt> Returns Null Value for Upserts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#mongodump-output-can-only-restore-to-2-2-mongodb-instances"><tt class="docutils literal"><span class="pre">mongodump</span></tt> Output can only Restore to 2.2 MongoDB Instances</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#objectid-tostring-returns-string-literal-objectid"><tt class="docutils literal"><span class="pre">ObjectId().toString()</span></tt> Returns String Literal <tt class="docutils literal"><span class="pre">ObjectId(&quot;...&quot;)</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#objectid-valueof-returns-hexadecimal-string"><tt class="docutils literal"><span class="pre">ObjectId().valueOf()</span></tt> Returns hexadecimal string</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#behavioral-changes">Behavioral Changes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#restrictions-on-collection-names">Restrictions on Collection Names</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#restrictions-on-database-names-for-windows">Restrictions on Database Names for Windows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#id-indexes-capped-collections"><tt class="docutils literal"><span class="pre">_id</span></tt> Fields and Indexes on Capped Collections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#new-elemmatch-projection-operator">New <tt class="docutils literal"><span class="pre">$elemMatch</span></tt> Projection Operator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#windows-specific-changes">Windows Specific Changes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#windows-xp-is-not-supported">Windows XP is Not Supported</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#service-support-for-mongos-exe">Service Support for <tt class="docutils literal"><span class="pre">mongos.exe</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#log-rotate-command-support">Log Rotate Command Support</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#new-build-using-slimreadwrite-locks-for-windows-concurrency">New Build Using SlimReadWrite Locks for Windows Concurrency</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#tool-improvements">Tool Improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#index-definitions-handled-by-mongodump-and-mongorestore">Index Definitions Handled by <tt class="docutils literal"><span class="pre">mongodump</span></tt> and <tt class="docutils literal"><span class="pre">mongorestore</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#mongooplog-for-replaying-oplogs"><tt class="docutils literal"><span class="pre">mongooplog</span></tt> for Replaying Oplogs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#authentication-support-for-mongotop-and-mongostat">Authentication Support for <tt class="docutils literal"><span class="pre">mongotop</span></tt> and <tt class="docutils literal"><span class="pre">mongostat</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#write-concern-support-for-mongoimport-and-mongorestore">Write Concern Support for <tt class="docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="docutils literal"><span class="pre">mongorestore</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#mongodump-support-for-reading-from-secondaries"><tt class="docutils literal"><span class="pre">mongodump</span></tt> Support for Reading from Secondaries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#mongoimport-support-for-full-16mb-documents"><tt class="docutils literal"><span class="pre">mongoimport</span></tt> Support for full 16MB Documents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#timestamp-extended-json-format"><tt class="docutils literal"><span class="pre">Timestamp()</span></tt> Extended JSON format</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#shell-improvements">Shell Improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#improved-shell-user-interface">Improved Shell User Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#helper-to-load-server-side-functions">Helper to load Server-Side Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#support-for-bulk-inserts">Support for Bulk Inserts</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#operations">Operations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#support-for-logging-to-syslog">Support for Logging to Syslog</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#touch-command"><tt class="docutils literal"><span class="pre">touch</span></tt> Command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#indexcounters-no-longer-report-sampled-data"><tt class="docutils literal"><span class="pre">indexCounters</span></tt> No Longer Report Sampled Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#padding-specifiable-on-compact-command">Padding Specifiable on <tt class="docutils literal"><span class="pre">compact</span></tt> Command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#added-build-flag-to-use-system-libraries">Added Build Flag to Use System Libraries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#memory-allocator-changed-to-tcmalloc">Memory Allocator Changed to TCMalloc</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#replication">Replication</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#improved-logging-for-replica-set-lag">Improved Logging for Replica Set Lag</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#replica-set-members-can-sync-from-specific-members">Replica Set Members can Sync from Specific Members</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#replica-set-members-will-not-sync-from-members-without-indexes-unless-buildindexes-false">Replica Set Members will not Sync from Members Without Indexes Unless <tt class="docutils literal"><span class="pre">buildIndexes:</span> <span class="pre">false</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#new-option-to-configure-index-pre-fetching-during-replication">New Option To Configure Index Pre-Fetching during Replication</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#map-reduce-improvements">Map Reduce Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#sharding-improvements">Sharding Improvements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#index-on-shard-keys-can-now-be-a-compound-index">Index on Shard Keys Can Now Be a Compound Index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.2.html#migration-thresholds-modified">Migration Thresholds Modified</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.2.html#licensing-changes">Licensing Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2.2.html#resources">Resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2.2.html#what-s-new-in-mongodb-2-2-online-conference">What&#8217;s New in MongoDB 2.2 Online Conference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

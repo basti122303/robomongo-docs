@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Analyze Performance of Database Operations &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/manage-the-database-profiler" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Rotate Log Files" href="rotate-log-files.html" />
+<link rel="prev" title="Copy Databases Between Instances" href="copy-databases-between-instances.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="analyze-performance-of-database-operations">
+<span id="database-profiler"></span><h1>Analyze Performance of Database Operations<a class="headerlink" href="#analyze-performance-of-database-operations" title="Permalink to this headline">¶</a></h1>
+<p>The database profiler collects fine grained data about MongoDB write
+operations, cursors, database commands on a running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance. You can enable profiling on a per-database or per-instance
+basis. The profiling <a class="reference internal" href="#database-profiling-level"><em>profiling level</em></a>
+is also configurable when enabling profiling</p>
+<p>The database profiler writes all the data it collects to the
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection, which
+is a <a class="reference internal" href="../core/capped-collections.html"><em>capped collection</em></a>.  See
+<a class="reference internal" href="../reference/database-profiler.html"><em>Database Profiler Output</em></a> for overview of the data in the
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> documents created
+by the profiler.</p>
+<p>This document outlines a number of key administration options for the
+database profiler. For additional related information, consider the
+following resources:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/database-profiler.html"><em>Database Profiler Output</em></a></li>
+<li><a class="reference internal" href="../reference/command/profile.html"><em>Profile Command</em></a></li>
+<li><a class="reference internal" href="../reference/current-op.html"><em>Current Operation Reporting</em></a></li>
+</ul>
+<div class="section" id="profiling-levels">
+<span id="database-profiling-level"></span><span id="database-profiling-levels"></span><h2>Profiling Levels<a class="headerlink" href="#profiling-levels" title="Permalink to this headline">¶</a></h2>
+<p>The following profiling levels are available:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">0</span></tt> - the profiler is off, does not collect any data.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">1</span></tt> - collects profiling data for slow operations only. By default
+slow operations are those slower than 100 milliseconds.</p>
+<p>You can modify the threshold for &#8220;slow&#8221; operations with the
+<a class="reference internal" href="../reference/configuration-options.html#slowms" title="slowms"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slowms</span></tt></a> runtime option or the <tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">set</span> <span class="pre">Parameter</span></tt>
+method. See the <a class="reference internal" href="#database-profiling-specifiy-slowms-threshold"><em>Specify the Threshold for Slow Operations</em></a>
+section for more information.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">2</span></tt> - collects profiling data for all database operations.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="enable-database-profiling-and-set-the-log-level">
+<span id="database-profiling-enable-profiling"></span><h2>Enable Database Profiling and Set the Log Level<a class="headerlink" href="#enable-database-profiling-and-set-the-log-level" title="Permalink to this headline">¶</a></h2>
+<p>You can enable database profiling from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell or
+through a driver using the <a class="reference internal" href="../reference/configuration-options.html#profile" title="profile"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">profile</span></tt></a> command. This section
+will describe how to do so from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. See your <a class="reference internal" href="../applications/drivers.html"><em>driver documentation</em></a> if you want to control the profiler from
+within your application.</p>
+<p>When you enable profiling, you also set the <a class="reference internal" href="#database-profiling-levels"><em>log level</em></a>. The profiler records data in the
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a>
+collection. MongoDB creates the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection in a database after you
+enable profiling for that database.</p>
+<p>To enable profiling and set the log level, issue use the
+<a class="reference internal" href="../reference/method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell,
+passing the log level as a parameter. For example, to enable profiling
+for all database operations, consider the following operation in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The shell returns a document showing the <em>previous</em> level of profiling.
+The <tt class="docutils literal"><span class="pre">&quot;ok&quot;</span> <span class="pre">:</span> <span class="pre">1</span></tt> key-value pair indicates the operation succeeded:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;was&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;slowms&quot;</span> <span class="o">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>To verify the new setting, see the
+<a class="reference internal" href="#database-profiling-view-status"><em>Check Profiling Level</em></a> section.</p>
+<div class="section" id="specify-the-threshold-for-slow-operations">
+<span id="database-profiling-specifiy-slowms-threshold"></span><h3>Specify the Threshold for Slow Operations<a class="headerlink" href="#specify-the-threshold-for-slow-operations" title="Permalink to this headline">¶</a></h3>
+<p>The threshold for slow operations applies to the entire
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. When you change the threshold, you change it
+for all databases on the instance.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Changing the slow operation threshold for the database
+profiler also affects the logging subsystem&#8217;s slow operation
+threshold for the entire <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. Always set the
+threshold to the highest useful value.</p>
+</div>
+<p>By default the slow operation threshold is 100 milliseconds. Databases with a log level
+of <tt class="docutils literal"><span class="pre">1</span></tt> will log operations slower than 100 milliseconds.</p>
+<p>To change the threshold, pass two parameters to the
+<a class="reference internal" href="../reference/method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. The first parameter sets the
+log level for the current database, and the second sets the default
+slow operation threshold <em>for the entire</em> <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+<em>instance</em>.</p>
+<p>For example, the following command sets the log level for the current
+database to <tt class="docutils literal"><span class="pre">0</span></tt>, which disables profiling, and sets the
+slow-operation threshold for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance to 20
+milliseconds. Any database on the instance with a log level of <tt class="docutils literal"><span class="pre">1</span></tt>
+will use this threshold:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="check-profiling-level">
+<span id="database-profiling-check-level"></span><span id="database-profiling-view-status"></span><h3>Check Profiling Level<a class="headerlink" href="#check-profiling-level" title="Permalink to this headline">¶</a></h3>
+<p>To view the <a class="reference internal" href="#database-profiling-levels"><em>profiling level</em></a>, issue
+the following from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">getProfilingStatus</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The shell returns a document similar to the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;was&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;slowms&quot;</span> <span class="o">:</span> <span class="mi">100</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">was</span></tt> field indicates the current level of profiling.</p>
+<p>The <tt class="docutils literal"><span class="pre">slowms</span></tt> field indicates how long an operation must exist in
+milliseconds for an operation to pass the &#8220;slow&#8221; threshold. MongoDB
+will log operations that take longer than the threshold if the
+profiling level is <tt class="docutils literal"><span class="pre">1</span></tt>. This document returns the profiling level in
+the <tt class="docutils literal"><span class="pre">was</span></tt> field. For an explanation of log levels, see
+<a class="reference internal" href="#database-profiling-levels"><em>Profiling Levels</em></a>.</p>
+<p>To return only the log level, use the <a class="reference internal" href="../reference/method/db.getProfilingLevel.html#db.getProfilingLevel" title="db.getProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getProfilingLevel()</span></tt></a>
+helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">getProfilingLevel</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="disable-profiling">
+<h3>Disable Profiling<a class="headerlink" href="#disable-profiling" title="Permalink to this headline">¶</a></h3>
+<p>To disable profiling, use the following helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="enable-profiling-for-an-entire-mongod-instance">
+<h3>Enable Profiling for an Entire <tt class="docutils literal"><span class="pre">mongod</span></tt> Instance<a class="headerlink" href="#enable-profiling-for-an-entire-mongod-instance" title="Permalink to this headline">¶</a></h3>
+<p>For development purposes in testing environments, you can enable
+database profiling for an entire <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. The
+profiling level applies to all databases provided by the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+<p>To enable profiling for a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance, pass the following
+parameters to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> at startup or within the
+<a class="reference internal" href="../reference/configuration-options.html"><em>configuration file</em></a>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --profile<span class="o">=</span>1 --slowms<span class="o">=</span>15
+</pre></div>
+</div>
+<p>This sets the profiling level to <tt class="docutils literal"><span class="pre">1</span></tt>, which collects profiling data
+for slow operations only, and defines slow operations as those that
+last longer than <tt class="docutils literal"><span class="pre">15</span></tt> milliseconds.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/configuration-options.html#profile" title="profile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">profile</span></tt></a> and <a class="reference internal" href="../reference/configuration-options.html#slowms" title="slowms"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slowms</span></tt></a>.</p>
+</div>
+</div>
+<div class="section" id="database-profiling-and-sharding">
+<h3>Database Profiling and Sharding<a class="headerlink" href="#database-profiling-and-sharding" title="Permalink to this headline">¶</a></h3>
+<p>You <em>cannot</em> enable profiling on a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. To enable
+profiling in a shard cluster, you must enable profiling for each
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance in the cluster.</p>
+</div>
+</div>
+<div class="section" id="view-profiler-data">
+<h2>View Profiler Data<a class="headerlink" href="#view-profiler-data" title="Permalink to this headline">¶</a></h2>
+<p>The database profiler logs information about database operations in the
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection.</p>
+<p>To view log information, query the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection. To
+view example queries, see <a class="reference internal" href="#database-profiling-example-queries"><em>Profiler Overhead</em></a></p>
+<p>For an explanation of the output data, see
+<a class="reference internal" href="../reference/database-profiler.html"><em>Database Profiler Output</em></a>.</p>
+<div class="section" id="example-profiler-data-queries">
+<h3>Example Profiler Data Queries<a class="headerlink" href="#example-profiler-data-queries" title="Permalink to this headline">¶</a></h3>
+<p>This section displays example queries to the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a>
+collection. For an explanation of the query output, see
+<a class="reference internal" href="../reference/database-profiler.html"><em>Database Profiler Output</em></a>.</p>
+<p>To return the most recent 10 log entries in the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a>
+collection, run a query similar to the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ts</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To return all operations except command operations (<a class="reference internal" href="../reference/glossary.html#term-cmd"><em class="xref std std-term">$cmd</em></a>), run a query
+similar to the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">op</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$ne</span> <span class="o">:</span> <span class="s1">&#39;command&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To return operations for a particular collection, run a query similar to
+the following. This example returns operations in the <tt class="docutils literal"><span class="pre">mydb</span></tt> database&#8217;s
+<tt class="docutils literal"><span class="pre">test</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ns</span> <span class="o">:</span> <span class="s1">&#39;mydb.test&#39;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To return operations slower than <tt class="docutils literal"><span class="pre">5</span></tt> milliseconds, run a query
+similar to the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">millis</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To return information from a certain time range, run a query similar to the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+                       <span class="p">{</span>
+                        <span class="nx">ts</span> <span class="o">:</span> <span class="p">{</span>
+                              <span class="nx">$gt</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-09T03:00:00Z&quot;</span><span class="p">)</span> <span class="p">,</span>
+                              <span class="nx">$lt</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-12-09T03:40:00Z&quot;</span><span class="p">)</span>
+                             <span class="p">}</span>
+                       <span class="p">}</span>
+                      <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The following example looks at the time range, suppresses the <tt class="docutils literal"><span class="pre">user</span></tt> field
+from the output to make it easier to read, and sorts the results by how
+long each operation took to run:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+                       <span class="p">{</span>
+                         <span class="nx">ts</span> <span class="o">:</span> <span class="p">{</span>
+                               <span class="nx">$gt</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2011-07-12T03:00:00Z&quot;</span><span class="p">)</span> <span class="p">,</span>
+                               <span class="nx">$lt</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2011-07-12T03:40:00Z&quot;</span><span class="p">)</span>
+                              <span class="p">}</span>
+                       <span class="p">},</span>
+                       <span class="p">{</span> <span class="nx">user</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+                      <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">millis</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="show-the-five-most-recent-events">
+<h3>Show the Five Most Recent Events<a class="headerlink" href="#show-the-five-most-recent-events" title="Permalink to this headline">¶</a></h3>
+<p>On a database that has profiling enabled, the <tt class="docutils literal"><span class="pre">show</span> <span class="pre">profile</span></tt> helper
+in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell displays the 5 most recent operations
+that took at least 1 millisecond to execute. Issue <tt class="docutils literal"><span class="pre">show</span> <span class="pre">profile</span></tt>
+from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">profile</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="profiler-overhead">
+<span id="database-profiling-example-queries"></span><h2>Profiler Overhead<a class="headerlink" href="#profiler-overhead" title="Permalink to this headline">¶</a></h2>
+<p>When enabled, profiling has a minor effect on performance. The
+<a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection is a
+<a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a> with a default size of 1 megabyte. A
+collection of this size can typically store store several thousand
+profile documents, but some application may use more or less profiling
+data per operation.</p>
+<p>To change the size of the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection, you must:</p>
+<ol class="arabic simple">
+<li>Disable profiling.</li>
+<li>Drop the <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection.</li>
+<li>Create a new <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collection.</li>
+<li>Re-enable profiling.</li>
+</ol>
+<p>For example, to create a new <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.profile" title="&lt;database&gt;.system.profile"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">system.profile</span></tt></a> collections that&#8217;s <tt class="docutils literal"><span class="pre">4000000</span></tt> bytes, use
+the following sequence of operations in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">profile</span><span class="p">.</span><span class="nx">drop</span><span class="p">()</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">createCollection</span><span class="p">(</span> <span class="s2">&quot;system.profile&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">capped</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">size</span><span class="o">:</span><span class="mi">4000000</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="copy-databases-between-instances.html" title="Previous Section: Copy Databases Between Instances">&lt; &nbsp; Copy Databases Between Instances</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="rotate-log-files.html" title="Next Section: Rotate Log Files">Rotate Log Files &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

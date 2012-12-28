@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>flushRouterConfig &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/flushRouterConfig" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="forceerror (internal)" href="forceerror.html" />
+<link rel="prev" title="findAndModify" href="findAndModify.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="flushrouterconfig">
+<h1>flushRouterConfig<a class="headerlink" href="#flushrouterconfig" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="flushRouterConfig">
+<tt class="descname">flushRouterConfig</tt><a class="headerlink" href="#flushRouterConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../commands.html#flushRouterConfig" title="flushRouterConfig"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">flushRouterConfig</span></tt></a> clears the current cluster
+information cached by a <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance and reloads all
+<a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> metadata from the <a class="reference internal" href="../glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>.</p>
+<p>This forces an update when the configuration database holds data
+that is newer that the data cached in the <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+process.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not modify the config data, except as explicitly
+documented. A config database cannot typically tolerate manual
+manipulation.</p>
+</div>
+<p><a class="reference internal" href="../commands.html#flushRouterConfig" title="flushRouterConfig"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">flushRouterConfig</span></tt></a> is an administrative command that is
+only available for <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.2.</span></p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="findAndModify.html" title="Previous Section: findAndModify">&lt; &nbsp; findAndModify</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="forceerror.html" title="Next Section: forceerror (internal)">forceerror (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

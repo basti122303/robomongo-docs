@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Build Old Style Indexes &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/roll-back-to-v1.8-index" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Security" href="../security.html" />
+<link rel="prev" title="Rotate Log Files" href="rotate-log-files.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="build-old-style-indexes">
+<h1>Build Old Style Indexes<a class="headerlink" href="#build-old-style-indexes" title="Permalink to this headline">¶</a></h1>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">Use this procedure <em>only</em> if you <strong>must</strong> have indexes that are compatible
+with a version of MongoDB earlier than 2.0.</p>
+</div>
+<p>MongoDB version 2.0 introduced the <tt class="docutils literal"><span class="pre">{v:1}</span></tt> index format. MongoDB
+versions 2.0 and later support both the <tt class="docutils literal"><span class="pre">{v:1}</span></tt> format and the
+earlier <tt class="docutils literal"><span class="pre">{v:0}</span></tt> format.</p>
+<p>MongoDB versions prior to 2.0, however, support only the <tt class="docutils literal"><span class="pre">{v:0}</span></tt>
+format. If you need to roll back MongoDB to a version prior to 2.0,
+you must <em>drop</em> and <em>re-create</em> your indexes.</p>
+<p>To build pre-2.0 indexes, use the <a class="reference internal" href="../reference/method/db.collection.dropIndexes.html#db.collection.dropIndexes" title="db.collection.dropIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">dropIndexes()</span></tt></a> and <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> methods. You <em>cannot</em> simply reindex
+the collection. When you reindex on versions that only support
+<tt class="docutils literal"><span class="pre">{v:0}</span></tt> indexes, the <tt class="docutils literal"><span class="pre">v</span></tt> fields in the index definition still hold
+values of <tt class="docutils literal"><span class="pre">1</span></tt>, even though the indexes would now use the <tt class="docutils literal"><span class="pre">{v:0}</span></tt>
+format. If you were to upgrade again to version 2.0 or later, these
+indexes would not work.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Suppose you rolled back from MongoDB 2.0 to MongoDB 1.8, and suppose
+you had the following index on the <tt class="docutils literal"><span class="pre">items</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;v&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;mydb.items&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;name_1&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">v</span></tt> field tells you the index is a <tt class="docutils literal"><span class="pre">{v:1}</span></tt> index, which
+is incompatible with version 1.8.</p>
+<p>To drop the index, issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">dropIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>To recreate the index as a <tt class="docutils literal"><span class="pre">{v:0}</span></tt> index, issue the following
+command:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">foo</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">,</span> <span class="p">{</span> <span class="nx">v</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../release-notes/2.0.html#new-index-format"><em>Index Performance Enhancements</em></a>.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="rotate-log-files.html" title="Previous Section: Rotate Log Files">&lt; &nbsp; Rotate Log Files</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="../security.html" title="Next Section: Security">Security &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

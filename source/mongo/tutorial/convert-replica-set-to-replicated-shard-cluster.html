@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Convert a Replica Set to a Replicated Sharded Cluster &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/convert-replica-set-to-replicated-shard-cluster" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Copy Databases Between Instances" href="copy-databases-between-instances.html" />
+<link rel="prev" title="Recover MongoDB Data following Unexpected Shutdown" href="recover-data-following-unexpected-shutdown.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="convert-a-replica-set-to-a-replicated-sharded-cluster">
+<h1>Convert a Replica Set to a Replicated Sharded Cluster<a class="headerlink" href="#convert-a-replica-set-to-a-replicated-sharded-cluster" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Following this tutorial, you will convert a single 3-member
+replica set to a cluster that consists of 2 shards. Each shard
+will consist of an independent 3-member replica set.</p>
+<p>The tutorial uses a test environment running on a local system
+UNIX-like system. You should feel encouraged to &#8220;follow along at
+home.&#8221; If you need to perform this process in a production
+environment, notes throughout the document indicate procedural
+differences.</p>
+<p>The procedure, from a high level, is as follows:</p>
+<ol class="arabic simple">
+<li>Create or select a 3-member replica set and insert some data into a collection.</li>
+<li>Start the config databases and create a cluster with a single
+shard.</li>
+<li>Create a second replica set with three new <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances.</li>
+<li>Add the second replica set as a shard in the cluster.</li>
+<li>Enable sharding on the desired collection or collections.</li>
+</ol>
+</div>
+<div class="section" id="process">
+<h2>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h2>
+<p>Install MongoDB according to the instructions in the <a class="reference internal" href="../installation.html#tutorials-installation"><em>MongoDB Installation Tutorial</em></a>.</p>
+<div class="section" id="deploy-a-replica-set-with-test-data">
+<h3>Deploy a Replica Set with Test Data<a class="headerlink" href="#deploy-a-replica-set-with-test-data" title="Permalink to this headline">¶</a></h3>
+<p>If have an existing MongoDB <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> deployment, you can
+omit the this step and continue from
+<a class="reference internal" href="#convert-replica-set-to-shard-cluster-deploy-sharding-infrastructure"><em>Deploy Sharding Infrastructure</em></a>.</p>
+<p>Use the following sequence of steps to configure and deploy a replica
+set and to insert test data.</p>
+<ol class="arabic">
+<li><p class="first">Create the following directories for the first replica set instance, named firstset:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">/data/example/firstset1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/firstset2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/firstset3</span></tt></li>
+</ul>
+<p>To create directories, issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir -p /data/example/firstset1 /data/example/firstset2 /data/example/firstset3
+</pre></div>
+</div>
+</li>
+<li><p class="first">In a separate terminal window or GNU Screen
+window, start three <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances by running each of the
+following commands:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/example/firstset1 --port 10001 --replSet firstset --oplogSize 700 --rest
+mongod --dbpath /data/example/firstset2 --port 10002 --replSet firstset --oplogSize 700 --rest
+mongod --dbpath /data/example/firstset3 --port 10003 --replSet firstset --oplogSize 700 --rest
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--oplogSize"><em class="xref std std-option">--oplogSize 700</em></a>
+option restricts the size of the operation log (i.e. oplog) for
+each <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance to 700MB. Without the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--oplogSize"><em class="xref std std-option">--oplogSize</em></a> option, each
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> reserves approximately 5% of the free disk
+space on the volume. By limiting the size of the oplog, each
+instance starts more quickly. Omit this setting in production
+environments.</p>
+</div>
+</li>
+<li><p class="first">In a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell session in a new terminal, connect to the
+mongodb instance on port 10001 by running the following command. If you
+are in a production environment, first read the note below.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo localhost:10001/admin
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Above and hereafter, if you are running in a production
+environment or are testing this process with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances on multiple systems, replace &#8220;localhost&#8221; with a
+resolvable domain, hostname, or the IP address of your system.</p>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, initialize the first replica set by issuing the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">({</span><span class="s2">&quot;replSetInitiate&quot;</span> <span class="o">:</span>
+                    <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset&quot;</span><span class="p">,</span> <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10001&quot;</span><span class="p">},</span>
+                                                      <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10002&quot;</span><span class="p">},</span>
+                                                      <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10003&quot;</span><span class="p">}</span>
+             <span class="p">]}})</span>
+<span class="p">{</span>
+        <span class="s2">&quot;info&quot;</span> <span class="o">:</span> <span class="s2">&quot;Config now saved locally.  Should come online in about a minute.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, create and populate a new collection
+by issuing the following sequence of JavaScript operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">test</span>
+<span class="nx">switched</span> <span class="nx">to</span> <span class="nx">db</span> <span class="nx">test</span>
+<span class="nx">people</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Marc&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill&quot;</span><span class="p">,</span> <span class="s2">&quot;George&quot;</span><span class="p">,</span> <span class="s2">&quot;Eliot&quot;</span><span class="p">,</span> <span class="s2">&quot;Matt&quot;</span><span class="p">,</span> <span class="s2">&quot;Trey&quot;</span><span class="p">,</span> <span class="s2">&quot;Tracy&quot;</span><span class="p">,</span> <span class="s2">&quot;Greg&quot;</span><span class="p">,</span> <span class="s2">&quot;Steve&quot;</span><span class="p">,</span> <span class="s2">&quot;Kristina&quot;</span><span class="p">,</span> <span class="s2">&quot;Katie&quot;</span><span class="p">,</span> <span class="s2">&quot;Jeff&quot;</span><span class="p">];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="mi">1000000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+                             <span class="nx">name</span> <span class="o">=</span> <span class="nx">people</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="nx">people</span><span class="p">.</span><span class="nx">length</span><span class="p">)];</span>
+                             <span class="nx">user_id</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+                             <span class="kr">boolean</span> <span class="o">=</span> <span class="p">[</span><span class="kc">true</span><span class="p">,</span> <span class="kc">false</span><span class="p">][</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="p">)];</span>
+                             <span class="nx">added_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+                             <span class="nx">number</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="mi">10001</span><span class="p">);</span>
+                             <span class="nx">db</span><span class="p">.</span><span class="nx">test_collection</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="nx">name</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="o">:</span><span class="nx">user_id</span><span class="p">,</span> <span class="s2">&quot;boolean&quot;</span><span class="o">:</span> <span class="kr">boolean</span><span class="p">,</span> <span class="s2">&quot;added_at&quot;</span><span class="o">:</span><span class="nx">added_at</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="nx">number</span> <span class="p">});</span>
+                            <span class="p">}</span>
+</pre></div>
+</div>
+<p>The above operations add one million documents to the collection
+<tt class="docutils literal"><span class="pre">test_collection</span></tt>. This can take several minutes, depending on your
+system.</p>
+<p>The script adds the documents in the following form:</p>
+</li>
+</ol>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4ed5420b8fc1dd1df5886f70&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;Greg&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;boolean&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="s2">&quot;added_at&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2011-11-29T20:35:23.121Z&quot;</span><span class="p">),</span> <span class="s2">&quot;number&quot;</span> <span class="o">:</span> <span class="mi">74</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deploy-sharding-infrastructure">
+<span id="convert-replica-set-to-shard-cluster-deploy-sharding-infrastructure"></span><h3>Deploy Sharding Infrastructure<a class="headerlink" href="#deploy-sharding-infrastructure" title="Permalink to this headline">¶</a></h3>
+<p>This procedure creates the three config databases that
+store the cluster&#8217;s metadata.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For development and testing environments, a single config database is
+sufficient. In production environments, use three config
+databases. Because config instances store only the <em>metadata</em> for the
+sharded cluster, they have minimal resource requirements.</p>
+</div>
+<ol class="arabic">
+<li><p class="first">Create the following data directories for three <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>
+instances:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">/data/example/config1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/config2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/config3</span></tt></li>
+</ul>
+<p>Issue the following command at the system prompt:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir -p /data/example/config1 /data/example/config2 /data/example/config3
+</pre></div>
+</div>
+</li>
+<li><p class="first">In a
+separate terminal window or GNU Screen window,
+start the config databases by running the following commands:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr --dbpath /data/example/config1 --port 20001
+mongod --configsvr --dbpath /data/example/config2 --port 20002
+mongod --configsvr --dbpath /data/example/config3 --port 20003
+</pre></div>
+</div>
+</li>
+<li><p class="first">In a separate terminal window or GNU Screen
+window,
+start <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance by running the following
+command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongos --configdb localhost:20001,localhost:20002,localhost:20003 --port 27017 --chunkSize 1
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you are using the collection created earlier or are just
+experimenting with sharding, you can use a small
+<a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--chunkSize"><em class="xref std std-option">--chunkSize</em></a> (1MB works well.) The
+default <a class="reference internal" href="../reference/configuration-options.html#chunkSize" title="chunkSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">chunkSize</span></tt></a> of 64MB means that your
+cluster must have 64MB of data before the MongoDB&#8217;s
+automatic sharding begins working.</p>
+<p class="last">In production environments,
+do not use a small shard size.</p>
+</div>
+<p>The <a class="reference internal" href="../reference/configuration-options.html#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> options specify the <em>configuration databases</em>
+(e.g. <tt class="docutils literal"><span class="pre">localhost:20001</span></tt>, <tt class="docutils literal"><span class="pre">localhost:20002</span></tt>, and
+<tt class="docutils literal"><span class="pre">localhost:2003</span></tt>). The <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance runs on the default
+&#8220;MongoDB&#8221; port (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>), while the databases themselves
+are running on ports in the <tt class="docutils literal"><span class="pre">30001</span></tt> series. In the
+this example, you may omit
+the <a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--port"><em class="xref std std-option">--port 27017</em></a> option, as <tt class="docutils literal"><span class="pre">27017</span></tt> is the default port.</p>
+</li>
+<li><p class="first">Add the first shard in <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>. In a new terminal window
+or GNU Screen session, add the first shard, according to the
+following procedure:</p>
+<ol class="arabic">
+<li><p class="first">Connect to the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> with the following
+command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo localhost:27017/admin
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the first shard to the cluster by issuing
+the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">addShard</span> <span class="o">:</span> <span class="s2">&quot;firstset/localhost:10001,localhost:10002,localhost:10003&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Observe the following message, which denotes success:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;shardAdded&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset&quot;</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="deploy-a-second-replica-set">
+<h3>Deploy a Second Replica Set<a class="headerlink" href="#deploy-a-second-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>This procedure deploys a second replica set. This
+closely mirrors the process used to establish the first replica set
+above, omitting the test data.</p>
+<ol class="arabic">
+<li><p class="first">Create the following  data directories for the members of the
+second replica set, named <tt class="docutils literal"><span class="pre">secondset</span></tt>:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">/data/example/secondset1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/secondset2</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">/data/example/secondset3</span></tt></li>
+</ul>
+</li>
+<li><p class="first">In three new terminal windows, start three instances of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+with the following commands:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/example/secondset1 --port 10004 --replSet secondset --oplogSize 700 --rest
+mongod --dbpath /data/example/secondset2 --port 10005 --replSet secondset --oplogSize 700 --rest
+mongod --dbpath /data/example/secondset3 --port 10006 --replSet secondset --oplogSize 700 --rest
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As above, the second replica set uses the smaller
+<a class="reference internal" href="../reference/configuration-options.html#oplogSize" title="oplogSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">oplogSize</span></tt></a> configuration. Omit this setting in
+production environments.</p>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, connect to one mongodb instance by issuing
+the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo localhost:10004/admin
+</pre></div>
+</div>
+</li>
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, initialize the second replica set by issuing
+the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">({</span><span class="s2">&quot;replSetInitiate&quot;</span> <span class="o">:</span>
+                    <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10004&quot;</span><span class="p">},</span>
+                                  <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10005&quot;</span><span class="p">},</span>
+                                  <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;localhost:10006&quot;</span><span class="p">}</span>
+             <span class="p">]}})</span>
+
+<span class="p">{</span>
+     <span class="s2">&quot;info&quot;</span> <span class="o">:</span> <span class="s2">&quot;Config now saved locally.  Should come online in about a minute.&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the second replica set to the cluster. Connect to the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance created
+in the previous procedure and issue the following sequence of commands:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">addShard</span> <span class="o">:</span> <span class="s2">&quot;secondset/localhost:10004,localhost:10005,localhost:10006&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This command returns the following success message:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;shardAdded&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset&quot;</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Verify that both shards are properly configured by running the
+<a class="reference internal" href="../reference/commands.html#listShards" title="listShards"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listShards</span></tt></a> command. View this and example output
+below:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">({</span><span class="nx">listShards</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+<span class="p">{</span>
+       <span class="s2">&quot;shards&quot;</span> <span class="o">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset/localhost:10001,localhost:10003,localhost:10002&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset/localhost:10004,localhost:10006,localhost:10005&quot;</span>
+              <span class="p">}</span>
+      <span class="p">],</span>
+     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="enable-sharding">
+<h3>Enable Sharding<a class="headerlink" href="#enable-sharding" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB must have <a class="reference internal" href="../reference/glossary.html#term-sharding"><em class="xref std std-term">sharding</em></a> enabled on <em>both</em> the database and
+collection levels.</p>
+<div class="section" id="enabling-sharding-on-the-database-level">
+<h4>Enabling Sharding on the Database Level<a class="headerlink" href="#enabling-sharding-on-the-database-level" title="Permalink to this headline">¶</a></h4>
+<p>Issue the <a class="reference internal" href="../reference/commands.html#enableSharding" title="enableSharding"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">enableSharding</span></tt></a> command. The following example
+enables sharding on the &#8220;test&#8221; database:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">enableSharding</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="p">{</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-an-index-on-the-shard-key">
+<h4>Create an Index on the Shard Key<a class="headerlink" href="#create-an-index-on-the-shard-key" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB uses the shard key to
+distribute documents between shards. Once selected, you cannot change
+the shard key. Good shard keys:</p>
+<ul class="simple">
+<li>have values that are evenly distributed among all documents,</li>
+<li>group documents that are often accessed at the same time into
+contiguous chunks, and</li>
+<li>allow for effective distribution of activity among shards.</li>
+</ul>
+<p>Typically shard keys are compound, comprising of some sort of hash and
+some sort of other primary key. Selecting a shard key depends on your
+data set, application architecture, and usage pattern, and is beyond
+the scope of this document. For the purposes of this example, we will
+shard the &#8220;number&#8221; key. This typically would
+<em>not</em> be a good shard key for production deployments.</p>
+<p>Create the index with the following procedure:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">test</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">test_collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">({</span><span class="nx">number</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="../core/sharding.html#sharding-shard-key"><em>Shard Key Overview</em></a> and
+<a class="reference internal" href="../core/sharding-internals.html#sharding-internals-shard-keys"><em>Shard Key</em></a> sections.</p>
+</div>
+</div>
+<div class="section" id="shard-the-collection">
+<h4>Shard the Collection<a class="headerlink" href="#shard-the-collection" title="Permalink to this headline">¶</a></h4>
+<p>Issue the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span> <span class="o">:</span> <span class="s2">&quot;test.test_collection&quot;</span><span class="p">,</span> <span class="nx">key</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="mi">1</span><span class="p">}</span> <span class="p">})</span>
+<span class="p">{</span> <span class="s2">&quot;collectionsharded&quot;</span> <span class="o">:</span> <span class="s2">&quot;test.test_collection&quot;</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The collection <tt class="docutils literal"><span class="pre">test_collection</span></tt> is now sharded!</p>
+<p>Over the next few minutes the Balancer begins to redistribute
+chunks of documents. You can confirm this activity by switching to the
+<tt class="docutils literal"><span class="pre">test</span></tt> database and running <a class="reference internal" href="../reference/method/db.stats.html#db.stats" title="db.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.stats()</span></tt></a> or
+<a class="reference internal" href="../reference/method/db.printShardingStatus.html#db.printShardingStatus" title="db.printShardingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printShardingStatus()</span></tt></a>.</p>
+<p>As clients insert additional documents into this collection,
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> distributes the documents evenly between the shards.</p>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, issue the following commands to return
+statics against each cluster:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">test</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">stats</span><span class="p">()</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">printShardingStatus</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Example output of the <a class="reference internal" href="../reference/method/db.stats.html#db.stats" title="db.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.stats()</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="s2">&quot;raw&quot;</span> <span class="o">:</span> <span class="p">{</span>
+             <span class="s2">&quot;firstset/localhost:10001,localhost:10003,localhost:10002&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                     <span class="s2">&quot;db&quot;</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;collections&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+                     <span class="s2">&quot;objects&quot;</span> <span class="o">:</span> <span class="mi">973887</span><span class="p">,</span>
+                     <span class="s2">&quot;avgObjSize&quot;</span> <span class="o">:</span> <span class="mf">100.33173458522396</span><span class="p">,</span>
+                     <span class="s2">&quot;dataSize&quot;</span> <span class="o">:</span> <span class="mi">97711772</span><span class="p">,</span>
+                     <span class="s2">&quot;storageSize&quot;</span> <span class="o">:</span> <span class="mi">141258752</span><span class="p">,</span>
+                     <span class="s2">&quot;numExtents&quot;</span> <span class="o">:</span> <span class="mi">15</span><span class="p">,</span>
+                     <span class="s2">&quot;indexes&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;indexSize&quot;</span> <span class="o">:</span> <span class="mi">56978544</span><span class="p">,</span>
+                     <span class="s2">&quot;fileSize&quot;</span> <span class="o">:</span> <span class="mi">1006632960</span><span class="p">,</span>
+                     <span class="s2">&quot;nsSizeMB&quot;</span> <span class="o">:</span> <span class="mi">16</span><span class="p">,</span>
+                     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+             <span class="p">},</span>
+             <span class="s2">&quot;secondset/localhost:10004,localhost:10006,localhost:10005&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                     <span class="s2">&quot;db&quot;</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;collections&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+                     <span class="s2">&quot;objects&quot;</span> <span class="o">:</span> <span class="mi">26125</span><span class="p">,</span>
+                     <span class="s2">&quot;avgObjSize&quot;</span> <span class="o">:</span> <span class="mf">100.33286124401914</span><span class="p">,</span>
+                     <span class="s2">&quot;dataSize&quot;</span> <span class="o">:</span> <span class="mi">2621196</span><span class="p">,</span>
+                     <span class="s2">&quot;storageSize&quot;</span> <span class="o">:</span> <span class="mi">11194368</span><span class="p">,</span>
+                     <span class="s2">&quot;numExtents&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span>
+                     <span class="s2">&quot;indexes&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;indexSize&quot;</span> <span class="o">:</span> <span class="mi">2093056</span><span class="p">,</span>
+                     <span class="s2">&quot;fileSize&quot;</span> <span class="o">:</span> <span class="mi">201326592</span><span class="p">,</span>
+                     <span class="s2">&quot;nsSizeMB&quot;</span> <span class="o">:</span> <span class="mi">16</span><span class="p">,</span>
+                     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+             <span class="p">}</span>
+     <span class="p">},</span>
+     <span class="s2">&quot;objects&quot;</span> <span class="o">:</span> <span class="mi">1000012</span><span class="p">,</span>
+     <span class="s2">&quot;avgObjSize&quot;</span> <span class="o">:</span> <span class="mf">100.33176401883178</span><span class="p">,</span>
+     <span class="s2">&quot;dataSize&quot;</span> <span class="o">:</span> <span class="mi">100332968</span><span class="p">,</span>
+     <span class="s2">&quot;storageSize&quot;</span> <span class="o">:</span> <span class="mi">152453120</span><span class="p">,</span>
+     <span class="s2">&quot;numExtents&quot;</span> <span class="o">:</span> <span class="mi">23</span><span class="p">,</span>
+     <span class="s2">&quot;indexes&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+     <span class="s2">&quot;indexSize&quot;</span> <span class="o">:</span> <span class="mi">59071600</span><span class="p">,</span>
+     <span class="s2">&quot;fileSize&quot;</span> <span class="o">:</span> <span class="mi">1207959552</span><span class="p">,</span>
+     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example output of the <a class="reference internal" href="../reference/method/db.printShardingStatus.html#db.printShardingStatus" title="db.printShardingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printShardingStatus()</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">---</span> <span class="nx">Sharding</span> <span class="nx">Status</span> <span class="o">---</span>
+<span class="nx">sharding</span> <span class="nx">version</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="nx">shards</span><span class="o">:</span>
+       <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset&quot;</span><span class="p">,</span>  <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset/localhost:10001,localhost:10003,localhost:10002&quot;</span> <span class="p">}</span>
+       <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset&quot;</span><span class="p">,</span>  <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;secondset/localhost:10004,localhost:10006,localhost:10005&quot;</span> <span class="p">}</span>
+<span class="nx">databases</span><span class="o">:</span>
+       <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>  <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>  <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;config&quot;</span> <span class="p">}</span>
+       <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>  <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>  <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;firstset&quot;</span> <span class="p">}</span>
+                  <span class="nx">test</span><span class="p">.</span><span class="nx">test_collection</span> <span class="nx">chunks</span><span class="o">:</span>
+                                               <span class="nx">secondset</span>     <span class="mi">5</span>
+                                               <span class="nx">firstset</span>      <span class="mi">186</span>
+
+<span class="p">[...]</span>
+</pre></div>
+</div>
+<p>In a few moments you can run these commands for a second time to
+demonstrate that <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> are migrating from
+<tt class="docutils literal"><span class="pre">firstset</span></tt> to <tt class="docutils literal"><span class="pre">secondset</span></tt>.</p>
+<p>When this procedure is complete, you will have converted a replica set
+into a cluster where each shard is itself a replica set.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="recover-data-following-unexpected-shutdown.html" title="Previous Section: Recover MongoDB Data following Unexpected Shutdown">&lt; &nbsp; Recover MongoDB Data following Unexpected Shutdown</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="copy-databases-between-instances.html" title="Next Section: Copy Databases Between Instances">Copy Databases Between Instances &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

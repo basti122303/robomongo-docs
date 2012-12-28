@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Change Hostnames in a Replica Set &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/change-hostnames-in-a-replica-set" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Convert a Secondary to an Arbiter" href="convert-secondary-into-arbiter.html" />
+<link rel="prev" title="Force a Member to Become Primary" href="force-member-to-be-primary.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="change-hostnames-in-a-replica-set">
+<h1>Change Hostnames in a Replica Set<a class="headerlink" href="#change-hostnames-in-a-replica-set" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>For most <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> the hostnames
+<a class="footnote-reference" href="#hostnames-ips-dns" id="id1">[1]</a> in the <a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a> field never
+change. However, in some cases you must migrate some or all host names
+in a replica set as organizational needs change. This
+document presents two possible procedures for changing the hostnames
+in the <a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a> field. Depending on your environments
+availability requirements, you may:</p>
+<ol class="arabic">
+<li><p class="first">Make the configuration change without disrupting the availability
+of the replica set. While this ensures that your application will
+always be able to read and write data to the replica set, this
+procedure can take a long time and may incur downtime at the
+application layer. <a class="footnote-reference" href="#application-changes" id="id2">[2]</a></p>
+<p>For this procedure, see <a class="reference internal" href="#replica-set-change-hostname-no-downtime"><em>Changing Hostnames while Maintaining the Replica Set&#8217;s Availability</em></a>.</p>
+</li>
+<li><p class="first">Stop all members of the replica set at once running on the &#8220;old&#8221;
+hostnames or interfaces, make the configuration changes, and then
+start the members at the new hostnames or interfaces. While the set
+will be totally unavailable during the operation, the total
+maintenance window is often shorter.</p>
+<p>For this procedure, see <a class="reference internal" href="#replica-set-change-hostname-downtime"><em>Changing All Hostnames in Replica Set at Once</em></a>.</p>
+</li>
+</ol>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/replica-configuration.html"><em>Replica Set Configuration</em></a></li>
+<li><a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Replica Set Reconfiguration Process</em></a></li>
+<li><a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> and <a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a></li>
+</ul>
+<p>And the following tutorials:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="deploy-replica-set.html"><em>Deploy a Replica Set</em></a></li>
+<li><a class="reference internal" href="expand-replica-set.html"><em>Add Members to a Replica Set</em></a></li>
+</ul>
+</div>
+<table class="docutils footnote" frame="void" id="hostnames-ips-dns" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Always use resolvable hostnames
+for the value of the <a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a> field in the replica
+set configuration to avoid confusion and complexity.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="application-changes" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>You will have to configure your applications
+so that they can connect to the replica set at both the old and new
+locations. This often requires a restart and reconfiguration at the
+application layer, which may affect the availability of your
+applications. This re-configuration is beyond the scope of this
+document and makes the <a class="reference internal" href="#replica-set-change-hostname-downtime"><em>second option</em></a>
+preferable when you must change the hostnames of <em>all</em> members of
+the replica set at once.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="procedures">
+<h2>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h2>
+<p id="procedure-assumption-change-hostnames-replica-set">Given a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> with three members:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">database0.example.com:27017</span></tt> (the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>)</li>
+<li><tt class="docutils literal"><span class="pre">database1.example.com:27017</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">database2.example.com:27017</span></tt></li>
+</ul>
+<p>And with the following <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> output:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;database0.example.com:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;database1.example.com:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;database2.example.com:27017&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The following procedures change the members&#8217; hostnames as follows:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">mongodb0.example.net:27017</span></tt> (the primary)</li>
+<li><tt class="docutils literal"><span class="pre">mongodb1.example.net:27017</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongodb2.example.net:27017</span></tt></li>
+</ul>
+<p>Use the most appropriate procedure for your deployment.</p>
+<div class="section" id="changing-hostnames-while-maintaining-the-replica-set-s-availability">
+<span id="replica-set-change-hostname-no-downtime"></span><h3>Changing Hostnames while Maintaining the Replica Set&#8217;s Availability<a class="headerlink" href="#changing-hostnames-while-maintaining-the-replica-set-s-availability" title="Permalink to this headline">¶</a></h3>
+<p>This procedure uses the above <a class="reference internal" href="#procedure-assumption-change-hostnames-replica-set"><em>assumptions</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">For each <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> in the replica set, perform the
+following sequence of operations:</p>
+<ol class="loweralpha">
+<li><p class="first">Stop the secondary.</p>
+</li>
+<li><p class="first">Restart the secondary at the new location.</p>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the replica set&#8217;s
+primary. In our example, the primary runs on port <tt class="docutils literal"><span class="pre">27017</span></tt> so you
+would issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --port 27017
+</pre></div>
+</div>
+</li>
+<li><p class="first">Run the following reconfigure option, for the
+<a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a> value where <tt class="docutils literal"><span class="pre">n</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../reference/replica-configuration.html"><em>Replica Set Configuration</em></a> for more
+information.</p>
+</li>
+<li><p class="first">Make sure your client applications are able to access the
+set at the new location and that the secondary has a chance to
+catch up with the other members of the set.</p>
+<p>Repeat the above steps for each non-primary member of the set.</p>
+</li>
+</ol>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the primary and step
+down the primary using <a class="reference internal" href="../reference/command/replSetStepDown.html#replSetStepDown" title="replSetStepDown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetStepDown</span></tt></a>. In the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, use the <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> wrapper,
+as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">stepDown</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">When the step down succeeds, shut down the primary.</p>
+</li>
+<li><p class="first">To make the final configuration change, connect to the new primary in
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and reconfigure the <a class="reference internal" href="../reference/replica-configuration.html#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a>
+value where <tt class="docutils literal"><span class="pre">n</span></tt> is <tt class="docutils literal"><span class="pre">0</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start the original primary.</p>
+</li>
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the primary.</p>
+</li>
+<li><p class="first">To confirm the new configuration, call <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>Your output should resemble:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="changing-all-hostnames-in-replica-set-at-once">
+<span id="replica-set-change-hostname-downtime"></span><h3>Changing All Hostnames in Replica Set at Once<a class="headerlink" href="#changing-all-hostnames-in-replica-set-at-once" title="Permalink to this headline">¶</a></h3>
+<p>This procedure uses the above <a class="reference internal" href="#procedure-assumption-change-hostnames-replica-set"><em>assumptions</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">Stop all members in the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>.</p>
+</li>
+<li><p class="first">Restart each member <em>on a different port</em> and <em>without</em> using the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a> run-time option. Changing
+the port number during maintenance prevents clients from connecting
+to this host while you perform maintenance. Use the member&#8217;s usual
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a>, which in this
+example is <tt class="docutils literal"><span class="pre">/data/db1</span></tt>. Use a command that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db1/ --port 37017
+</pre></div>
+</div>
+</li>
+<li><p class="first">For each member of the replica set, perform the following sequence
+of operations:</p>
+<ol class="loweralpha">
+<li><p class="first">Open a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+running on the new, temporary port. For example, for a member
+running on a temporary port of <tt class="docutils literal"><span class="pre">37017</span></tt>, you would issue this
+command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --port 37017
+</pre></div>
+</div>
+</li>
+<li><p class="first">Edit the replica set configuration manually. The replica set
+configuration is the only document in the <tt class="docutils literal"><span class="pre">system.replset</span></tt>
+collection in the <tt class="docutils literal"><span class="pre">local</span></tt> database. Edit the replica set
+configuration with the new hostnames and correct ports for all
+the members of the replica set. Consider the following sequence of
+commands to change the hostnames in a three-member set:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">local</span>
+
+<span class="nx">cfg</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">replset</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="s2">&quot;rs&quot;</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">host</span> <span class="o">=</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">replset</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="s2">&quot;rs&quot;</span> <span class="p">}</span> <span class="p">,</span> <span class="nx">cfg</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Stop the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process on the member.</p>
+</li>
+</ol>
+</li>
+<li><p class="first">After re-configuring all members of the set, start each
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance in the normal way: use the usual port
+number and use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a> option. For
+example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db1/ --port 27017 --replSet rs
+</pre></div>
+</div>
+</li>
+<li><p class="first">Connect to one of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances
+using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --port 27017
+</pre></div>
+</div>
+</li>
+<li><p class="first">To confirm the new configuration, call <a class="reference internal" href="../reference/replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>Your output should resemble:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="force-member-to-be-primary.html" title="Previous Section: Force a Member to Become Primary">&lt; &nbsp; Force a Member to Become Primary</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="convert-secondary-into-arbiter.html" title="Next Section: Convert a Secondary to an Arbiter">Convert a Secondary to an Arbiter &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

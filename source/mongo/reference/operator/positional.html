@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$ &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/positional" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$pull" href="pull.html" />
+<link rel="prev" title="$pop" href="pop.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="id1">
+<h1>$<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_">
+<tt class="descname">$</tt><a class="headerlink" href="#_S_" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;&lt;array&gt;.$&quot;</span> <span class="pre">:</span> <span class="pre">value</span> <span class="pre">}</span></tt></p>
+<p>The positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator identifies an element in an
+<tt class="docutils literal"><span class="pre">array</span></tt> field to update without explicitly specifying the position
+of the element in the array. The positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator,
+when used with the <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method and acts as a placeholder for the
+<strong>first match</strong> of the update <tt class="docutils literal"><span class="pre">query</span> <span class="pre">selector</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">query</span> <span class="nx">selector</span><span class="o">&gt;</span> <span class="p">},</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">update</span> <span class="nx">operator</span><span class="o">&gt;:</span> <span class="p">{</span> <span class="s2">&quot;array.$&quot;</span> <span class="o">:</span> <span class="nx">value</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">array</span></tt> field <strong>must</strong> appear as part of the <tt class="docutils literal"><span class="pre">query</span> <span class="pre">selector</span></tt>.</p>
+<p>Consider the following collection <tt class="docutils literal"><span class="pre">students</span></tt> with the following documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;grades&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">90</span> <span class="p">]</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;grades&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">92</span> <span class="p">]</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;grades&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">90</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>To update <tt class="docutils literal"><span class="pre">80</span></tt> to <tt class="docutils literal"><span class="pre">82</span></tt> in the <tt class="docutils literal"><span class="pre">grades</span></tt> array in the
+first document, use the positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator if
+you do not know the position of the element in the array:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">grades</span><span class="o">:</span> <span class="mi">80</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;grades.$&quot;</span> <span class="o">:</span> <span class="mi">82</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Remember that the positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator acts as a
+placeholder for the <strong>first match</strong> of the update <tt class="docutils literal"><span class="pre">query</span> <span class="pre">selector</span></tt>.</p>
+<p>The positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator facilitates updates to arrays
+that contain embedded documents. Use the positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a>
+operator to access the fields in the embedded documents with the
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Dot+Notation+(Reaching+into+Objects)">dot notation</a> on the
+<a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">query</span> <span class="nx">selector</span><span class="o">&gt;</span> <span class="p">},</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">update</span> <span class="nx">operator</span><span class="o">&gt;:</span> <span class="p">{</span> <span class="s2">&quot;array.$.field&quot;</span> <span class="o">:</span> <span class="nx">value</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the following document in the <tt class="docutils literal"><span class="pre">students</span></tt> collection whose
+<tt class="docutils literal"><span class="pre">grades</span></tt> field value is an array of embedded documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;grades&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">grade</span><span class="o">:</span> <span class="mi">80</span><span class="p">,</span> <span class="nx">mean</span><span class="o">:</span> <span class="mi">75</span><span class="p">,</span> <span class="nx">std</span><span class="o">:</span> <span class="mi">8</span> <span class="p">},</span>
+                          <span class="p">{</span> <span class="nx">grade</span><span class="o">:</span> <span class="mi">85</span><span class="p">,</span> <span class="nx">mean</span><span class="o">:</span> <span class="mi">90</span><span class="p">,</span> <span class="nx">std</span><span class="o">:</span> <span class="mi">5</span> <span class="p">},</span>
+                          <span class="p">{</span> <span class="nx">grade</span><span class="o">:</span> <span class="mi">90</span><span class="p">,</span> <span class="nx">mean</span><span class="o">:</span> <span class="mi">85</span><span class="p">,</span> <span class="nx">std</span><span class="o">:</span> <span class="mi">3</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Use the positional <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator to update the value of the
+<tt class="docutils literal"><span class="pre">std</span></tt> field in the embedded document with the <tt class="docutils literal"><span class="pre">grade</span></tt> of <tt class="docutils literal"><span class="pre">85</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">students</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;grades.grade&quot;</span><span class="o">:</span> <span class="mi">85</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;grades.$.std&quot;</span> <span class="o">:</span> <span class="mi">6</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the following behaviors when using the positional
+<a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator:</p>
+<ul class="simple">
+<li>Do not use the positional operator <a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> with
+<a class="reference internal" href="../glossary.html#term-upsert"><em class="xref std std-term">upsert</em></a> operations because, inserts will use the <tt class="docutils literal"><span class="pre">$</span></tt> as a field name
+in the inserted document.</li>
+<li>When used with the <a class="reference internal" href="../operators.html#_S_unset" title="$unset"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$unset</span></tt></a> operator, the positional
+<a class="reference internal" href="../operators.html#_S_" title="$"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$</span></tt></a> operator does not remove the matching element from
+the array but rather sets it to <tt class="docutils literal"><span class="pre">null</span></tt>.</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a> and
+<a class="reference internal" href="../operators.html#_S_unset" title="$unset"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$unset</span></tt></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="pop.html" title="Previous Section: $pop">&lt; &nbsp; $pop</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="pull.html" title="Next Section: $pull">$pull &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

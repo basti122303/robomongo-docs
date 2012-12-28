@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Server Status Output Index &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/server-status-index" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Server Status Reference" href="server-status.html" />
+<link rel="prev" title="Connection String URI Format" href="connection-string.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="server-status-output-index">
+<h1>Server Status Output Index<a class="headerlink" href="#server-status-output-index" title="Permalink to this headline">¶</a></h1>
+<p>This document provides a quick overview and example of the
+<a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> command. The helper <a class="reference internal" href="method/db.serverStatus.html#db.serverStatus" title="db.serverStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.serverStatus()</span></tt></a>
+in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides access to this output. For full
+documentation of the content of this output, see
+<a class="reference internal" href="server-status.html"><em>Server Status Reference</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The fields included in this output vary slightly depending on the
+version of MongoDB, underlying operating system platform, and the
+kind of node, including <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member.</p>
+</div>
+<p id="server-status-example-instance-information">The &#8220;<a class="reference internal" href="server-status.html#server-status-instance-information"><em>Instance Information</em></a>&#8221; section displays
+information regarding the specific <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and its state.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+        <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;hostname&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;version&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;process&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;mongod|mongos&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pid&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;uptime&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;uptimeMillis&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;uptimeEstimate&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;localTime&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
+</pre></div>
+</div>
+<p id="server-status-example-locks">The &#8220;<a class="reference internal" href="server-status.html#server-status-locks"><em>locks</em></a>&#8221; section reports data that reflect the
+state and use of both global (i.e. <tt class="docutils literal"><span class="pre">.</span></tt>) and database specific locks:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;locks&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;.&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;R&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;W&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;R&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;W&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;admin&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;local&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                        <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-globallock">The &#8220;<a class="reference internal" href="server-status.html#server-status-globallock"><em>globalLock</em></a>&#8221; field reports on MongoDB&#8217;s
+global system lock. In most cases the <a class="reference internal" href="server-status.html#locks"><em>locks</em></a> document
+provides more fine grained data that reflects lock use:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;globalLock&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;totalTime&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;lockTime&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;currentQueue&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;readers&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;writers&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;activeClients&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;readers&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;writers&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-memory">The &#8220;<a class="reference internal" href="server-status.html#server-status-memory"><em>mem</em></a>&#8221; field reports on MongoDB&#8217;s
+current memory use:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;mem&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;bits&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;resident&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;virtual&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;supported&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;mapped&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;mappedWithJournal&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-connections">The &#8220;<a class="reference internal" href="server-status.html#server-status-connections"><em>connections</em></a>&#8221; field reports on MongoDB&#8217;s
+current memory use by the MongoDB process:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;connections&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;current&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;available&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-extrainfo">The fields in the &#8220;<a class="reference internal" href="server-status.html#server-status-extra-info"><em>extra_info</em></a>&#8221; document provide
+platform specific information. The following example block is from a
+Linux-based system:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;extra_info&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;note&quot;</span> <span class="o">:</span> <span class="s2">&quot;fields vary by platform&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;heap_usage_bytes&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;page_faults&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-indexcounters">The &#8220;<a class="reference internal" href="server-status.html#server-status-indexcounters"><em>indexCounters</em></a>&#8221; document reports on index
+use:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;indexCounters&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;btree&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;accesses&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;hits&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;misses&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;resets&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;missRatio&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-backgroundflushing">The &#8220;<a class="reference internal" href="server-status.html#server-status-backgroundflushing"><em>backgroundFlushing</em></a>&#8221; document reports on the
+process MongoDB uses to write data to disk:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;backgroundFlushing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;flushes&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;total_ms&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;average_ms&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;last_ms&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;last_finished&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-cursors">The &#8220;<a class="reference internal" href="server-status.html#server-status-cursors"><em>cursors</em></a>&#8221; document reports on current cursor
+use and state:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;cursors&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;totalOpen&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;clientCursors_size&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;timedOut&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-network">The &#8220;<a class="reference internal" href="server-status.html#server-status-network"><em>network</em></a>&#8221; document reports on network use and
+state:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;network&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;bytesIn&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;bytesOut&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;numRequests&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-repl">The &#8220;<a class="reference internal" href="server-status.html#server-status-repl"><em>repl</em></a>&#8221; document reports on the state of
+replication and the <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. This document only appears
+for replica sets.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;repl&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;setName&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;string&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ismaster&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;secondary&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;hosts&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;me&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-opcountersrepl">The &#8220;<a class="reference internal" href="server-status.html#server-status-opcounters-repl"><em>opcountersRepl</em></a>&#8221; document reports the number
+of replicated operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;opcountersRepl&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;insert&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;update&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;delete&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;getmore&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-replnetworkqueue">The &#8220;<a class="reference internal" href="server-status.html#server-status-repl-network-queue"><em>replNetworkQueue</em></a>&#8221; document holds
+information regarding the queue that <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondaries</em></a>
+use to poll data from other members of their set:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;replNetworkQueue&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;waitTimeMs&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;numElems&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;numBytes&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-opcounters">The &#8220;<a class="reference internal" href="server-status.html#server-status-opcounters"><em>opcounters</em></a>&#8221; document reports the number of
+operations this MongoDB instance has processed:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;opcounters&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;insert&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;update&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;delete&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;getmore&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-asserts">The &#8220;<a class="reference internal" href="server-status.html#server-status-asserts"><em>asserts</em></a>&#8221; document reports the number of
+assertions or errors produced by the server:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;asserts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;regular&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;warning&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;msg&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;user&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;rollovers&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-writebacksqueued">The &#8220;<a class="reference internal" href="server-status.html#server-status-writebacksqueued"><em>writeBacksQueued</em></a>&#8221; document reports the number of
+<a class="reference internal" href="glossary.html#term-writebacks"><em class="xref std std-term">writebacks</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;writeBacksQueued&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p id="server-status-example-journaling">The &#8220;<a class="reference internal" href="server-status.html#server-status-journaling"><em>dur</em></a>&#8221; document reports on data that
+reflect this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance&#8217;s journaling-related operations
+and performance during a <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit interval</a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;dur&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;commits&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;journaledMB&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;writeToDataFilesMB&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;compression&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;commitsInWriteLock&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;earlyCommits&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;timeMs&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;dt&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;prepLogBuffer&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;writeToJournal&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;writeToDataFiles&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;remapPrivateView&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p id="server-status-example-recordstats">The &#8220;<a class="reference internal" href="server-status.html#server-status-recordstats"><em>recordStats</em></a>&#8221; document reports data on
+MongoDB&#8217;s ability to predict page faults and yield write operations
+when required data isn&#8217;t in memory:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;recordStats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;accessesNotInMemory&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;pageFaultExceptionsThrown&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s2">&quot;local&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;accessesNotInMemory&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;pageFaultExceptionsThrown&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;accessesNotInMemory&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                <span class="s2">&quot;pageFaultExceptionsThrown&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+        <span class="p">}</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>The final <tt class="docutils literal"><span class="pre">ok</span></tt> field holds the return status for the
+<a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre>        <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="connection-string.html" title="Previous Section: Connection String URI Format">&lt; &nbsp; Connection String URI Format</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="server-status.html" title="Next Section: Server Status Reference">Server Status Reference &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

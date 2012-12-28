@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Using MongoDB with SSL Connections &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/ssl" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Monitoring Database Systems" href="monitoring.html" />
+<link rel="prev" title="Journaling" href="journaling.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="using-mongodb-with-ssl-connections">
+<h1>Using MongoDB with SSL Connections<a class="headerlink" href="#using-mongodb-with-ssl-connections" title="Permalink to this headline">¶</a></h1>
+<p>This document outlines the use and operation of MongoDB&#8217;s SSL
+support. SSL, allows MongoDB clients to support encrypted connections
+to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <a class="reference external" href="http://www.mongodb.org/downloads">default distribution of MongoDB</a> does <strong>not</strong> contain
+support for SSL.</p>
+<p class="last">As of the current release, to use SSL you must either: build
+MongoDB locally passing the &#8220;<tt class="docutils literal"><span class="pre">--ssl</span></tt>&#8221; option to <tt class="docutils literal"><span class="pre">scons</span></tt>, or use
+the <a class="reference external" href="http://www.10gen.com/mongodb-subscriber-edition-download">MongoDB subscriber build</a>.</p>
+</div>
+<p>These instructions outline the process for getting started with SSL
+and assume that you have already installed a build of MongoDB that
+includes SSL support and that your client driver supports SSL.</p>
+<div class="section" id="mongod-and-mongos-ssl-configuration">
+<h2><tt class="docutils literal"><span class="pre">mongod</span></tt> and <tt class="docutils literal"><span class="pre">mongos</span></tt> SSL Configuration<a class="headerlink" href="#mongod-and-mongos-ssl-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Add the following command line options to your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> invocation:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --sslOnNormalPorts --sslPEMKeyFile &lt;pem&gt; --sslPEMKeyPassword &lt;pass&gt;
+</pre></div>
+</div>
+<p>Replace &#8220;<tt class="docutils literal"><span class="pre">&lt;pem&gt;</span></tt>&#8221; with the path to your SSL certificate <tt class="docutils literal"><span class="pre">.pem</span></tt>
+file, and &#8220;<tt class="docutils literal"><span class="pre">&lt;pass&gt;</span></tt>&#8221; with the password you used to encrypt the
+<tt class="docutils literal"><span class="pre">.pem</span></tt> file.</p>
+<p>You may also specify these options in your &#8220;<tt class="docutils literal"><span class="pre">mongodb.conf</span></tt>&#8221; file with
+following options:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">sslOnNormalPorts</span> <span class="o">=</span> <span class="s">true</span>
+<span class="na">sslPEMKeyFile</span> <span class="o">=</span> <span class="s">/etc/ssl/mongodb.pem</span>
+<span class="na">sslPEMKeyPassword</span> <span class="o">=</span> <span class="s">pass</span>
+</pre></div>
+</div>
+<p>Modify these values to reflect the location of your actual <tt class="docutils literal"><span class="pre">.pem</span></tt>
+file and its password.</p>
+<p>You can specify these configuration options in a configuration file
+for <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>, or start <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> with the following
+invocation:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongos --sslOnNormalPorts --sslPEMKeyFile &lt;pem&gt; --sslPEMKeyPassword &lt;pass&gt;
+</pre></div>
+</div>
+<p>You can use any existing SSL certificate, or you can generate your own
+SSL certificate using a command that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">cd</span> /etc/ssl/
+openssl req -new -x509 -days 365 -nodes -out mongodb-cert.pem -keyout mongodb-cert.key
+</pre></div>
+</div>
+<p>To create the combined <tt class="docutils literal"><span class="pre">.pem</span></tt> file that contains the <tt class="docutils literal"><span class="pre">.key</span></tt> file
+and the <tt class="docutils literal"><span class="pre">.pem</span></tt> certificate, use the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>cat mongodb-cert.key mongodb-cert.pem &gt; mongodb.pem
+</pre></div>
+</div>
+</div>
+<div class="section" id="clients">
+<h2>Clients<a class="headerlink" href="#clients" title="Permalink to this headline">¶</a></h2>
+<p>Clients must have support for SSL to work with a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance that has SSL support enabled. The current versions of the
+Python, Java, Ruby, and Node.js drivers have support for SSL, with
+full support coming in future releases of other drivers.</p>
+<div class="section" id="mongo">
+<h3><tt class="docutils literal"><span class="pre">mongo</span></tt><a class="headerlink" href="#mongo" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell built with ssl support distributed with the
+subscriber build also supports SSL. Use the &#8220;<tt class="docutils literal"><span class="pre">--ssl</span></tt>&#8221; flag as
+follows:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --ssl --host &lt;host&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="mms">
+<h3>MMS<a class="headerlink" href="#mms" title="Permalink to this headline">¶</a></h3>
+<p>The MMS agent will also have to connect via SSL in order to gather its
+stats.  Because the agent already utilizes SSL for its communications
+to the MMS servers, this is just a matter of enabling SSL support in
+MMS itself on a per host basis.</p>
+<p>Use the &#8220;Edit&#8221; host button (i.e. the pencil) on the Hosts page in the
+MMS console and is currently enabled on a group by group basis by
+10gen.</p>
+<p>Please see the <a class="reference external" href="http://mms.10gen.com/help">MMS Manual</a> for more
+information about MMS configuration.</p>
+</div>
+<div class="section" id="pymongo">
+<h3>PyMongo<a class="headerlink" href="#pymongo" title="Permalink to this headline">¶</a></h3>
+<p>Add the &#8220;<tt class="docutils literal"><span class="pre">ssl=True</span></tt>&#8221; parameter to a PyMongo
+py:module:<cite>connection &lt;pymongo:pymongo.connection&gt;</cite>
+to create a MongoDB connection to an SSL MongoDB instance:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">Connection</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Connection</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&quot;mongodb.example.net&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">27017</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To connect to a replica set, use the following operation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">ReplicaSetConnection</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">ReplicaSetConnection</span><span class="p">(</span><span class="s">&quot;mongodb.example.net:27017&quot;</span><span class="p">,</span>
+                         <span class="n">replicaSet</span><span class="o">=</span><span class="s">&quot;mysetname&quot;</span><span class="p">,</span> <span class="n">ssl</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>PyMongo also supports an &#8220;<tt class="docutils literal"><span class="pre">ssl=true</span></tt>&#8221; option for the MongoDB URI:</p>
+<div class="highlight-none"><div class="highlight"><pre>mongodb://mongodb.example.net:27017/?ssl=true
+</pre></div>
+</div>
+</div>
+<div class="section" id="java">
+<h3>Java<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h3>
+<p>Consider the following example &#8220;<tt class="docutils literal"><span class="pre">sslApp.java</span></tt>&#8221; class file:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">com.mongodb.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.net.ssl.SSLContext</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">sslApp</span> <span class="o">{</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">args</span><span class="o">[])</span>
+     <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+
+     <span class="n">MongoOptions</span> <span class="n">o</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MongoOptions</span><span class="o">();</span>
+     <span class="n">o</span><span class="o">.</span><span class="na">socketFactory</span> <span class="o">=</span> <span class="n">SSLSocketFactory</span><span class="o">.</span><span class="na">getDefault</span><span class="o">();</span>
+
+    <span class="n">Mongo</span> <span class="n">m</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Mongo</span><span class="o">(</span> <span class="s">&quot;localhost&quot;</span> <span class="o">,</span> <span class="n">o</span> <span class="o">);</span>
+
+    <span class="n">DB</span> <span class="n">db</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="na">getDB</span><span class="o">(</span> <span class="s">&quot;test&quot;</span> <span class="o">);</span>
+     <span class="n">DBCollection</span> <span class="n">c</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="na">getCollection</span><span class="o">(</span> <span class="s">&quot;foo&quot;</span> <span class="o">);</span>
+
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">c</span><span class="o">.</span><span class="na">findOne</span><span class="o">()</span> <span class="o">);</span>
+
+<span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ruby">
+<h3>Ruby<a class="headerlink" href="#ruby" title="Permalink to this headline">¶</a></h3>
+<p>The recent versions version of the Ruby driver have support for
+connections to SSL servers. Install the latest version of the driver
+with the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>gem install mongo
+</pre></div>
+</div>
+<p>Then connect to a standalone instance, using the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">require</span> <span class="s1">&#39;rubygems&#39;</span>
+<span class="nx">require</span> <span class="s1">&#39;mongo&#39;</span>
+
+<span class="nx">connection</span> <span class="o">=</span> <span class="nx">Mongo</span><span class="o">::</span><span class="nx">Connection</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">27017</span><span class="p">,</span> <span class="o">:</span><span class="nx">ssl</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">connection</span></tt> with the following if you&#8217;re connecting to a
+replica set:</p>
+<div class="highlight-ruby"><div class="highlight"><pre><span class="n">connection</span> <span class="o">=</span> <span class="no">Mongo</span><span class="o">::</span><span class="no">ReplSetConnection</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">[</span><span class="s1">&#39;localhost:27017&#39;</span><span class="o">]</span><span class="p">,</span>
+                                          <span class="o">[</span><span class="s1">&#39;localhost:27018&#39;</span><span class="o">]</span><span class="p">,</span>
+                                          <span class="ss">:ssl</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance run on &#8220;<tt class="docutils literal"><span class="pre">localhost:27017</span></tt>&#8221; and
+&#8220;<tt class="docutils literal"><span class="pre">localhost:27018</span></tt>&#8221;.</p>
+</div>
+<div class="section" id="node-js-node-mongodb-native">
+<h3>Node.JS (<tt class="docutils literal"><span class="pre">node-mongodb-native</span></tt>)<a class="headerlink" href="#node-js-node-mongodb-native" title="Permalink to this headline">¶</a></h3>
+<p>In the <a class="reference external" href="https://github.com/mongodb/node-mongodb-native">node-mongodb-native</a> driver, use the following invocation to
+connect to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance via SSL:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">db1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Db</span><span class="p">(</span><span class="nx">MONGODB</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span><span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span> <span class="mi">27017</span><span class="p">,</span>
+                                     <span class="p">{</span> <span class="nx">auto_reconnect</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">poolSize</span><span class="o">:</span><span class="mi">4</span><span class="p">,</span> <span class="nx">ssl</span><span class="o">:</span><span class="nx">ssl</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>To connect to a replica set via SSL, use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">replSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ReplSetServers</span><span class="p">(</span> <span class="p">[</span>
+    <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span> <span class="nx">RS</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">RS</span><span class="p">.</span><span class="nx">ports</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span> <span class="nx">auto_reconnect</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">),</span>
+    <span class="k">new</span> <span class="nx">Server</span><span class="p">(</span> <span class="nx">RS</span><span class="p">.</span><span class="nx">host</span><span class="p">,</span> <span class="nx">RS</span><span class="p">.</span><span class="nx">ports</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{</span> <span class="nx">auto_reconnect</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">),</span>
+    <span class="p">],</span>
+  <span class="p">{</span><span class="nx">rs_name</span><span class="o">:</span><span class="nx">RS</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">ssl</span><span class="o">:</span><span class="nx">ssl</span><span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="net">
+<h3>.NET<a class="headerlink" href="#net" title="Permalink to this headline">¶</a></h3>
+<p>As of release 1.6, the .NET driver supports SSL connections with
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances. To connect using
+SSL, you must add an option to the connection string, specifying
+<tt class="docutils literal"><span class="pre">ssl=true</span></tt> as follows:</p>
+<div class="highlight-csharp"><div class="highlight"><pre><span class="kt">var</span> <span class="n">connectionString</span> <span class="p">=</span> <span class="s">&quot;mongodb://localhost/?ssl=true&quot;</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">server</span> <span class="p">=</span> <span class="n">MongoServer</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">connectionString</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The .NET driver will validate the certificate against the local
+trusted certificate store, in addition to providing encryption of the
+server. This behavior may produce issues during testing, if the server
+uses a self-signed certificate. If you encounter this issue, add the
+<tt class="docutils literal"><span class="pre">sslverifycertificate=false</span></tt> option to the connection string to
+prevent the .NET driver from validating the certificate, as follows:</p>
+<div class="highlight-csharp"><div class="highlight"><pre><span class="kt">var</span> <span class="n">connectionString</span> <span class="p">=</span> <span class="s">&quot;mongodb://localhost/?ssl=true&amp;sslverifycertificate=false&quot;</span><span class="p">;</span>
+<span class="kt">var</span> <span class="n">server</span> <span class="p">=</span> <span class="n">MongoServer</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">connectionString</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="journaling.html" title="Previous Section: Journaling">&lt; &nbsp; Journaling</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="monitoring.html" title="Next Section: Monitoring Database Systems">Monitoring Database Systems &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

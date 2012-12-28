@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>getParameter &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/getParameter" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="getPrevError" href="getPrevError.html" />
+<link rel="prev" title="getLog" href="getLog.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="getparameter">
+<h1>getParameter<a class="headerlink" href="#getparameter" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="getParameter">
+<tt class="descname">getParameter</tt><a class="headerlink" href="#getParameter" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../commands.html#getParameter" title="getParameter"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getParameter</span></tt></a> is an administrative command for
+retrieving the value of options normally set on the command
+line. Issue commands against the <a class="reference internal" href="../glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">getParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">option</span><span class="o">&gt;:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The values specified for <tt class="docutils literal"><span class="pre">getParameter</span></tt> and <tt class="docutils literal"><span class="pre">&lt;option&gt;</span></tt> do not
+affect the output. The command works with the following options:</p>
+<ul class="simple">
+<li><strong>quiet</strong></li>
+<li><strong>notablescan</strong></li>
+<li><strong>logLevel</strong></li>
+<li><strong>syncdelay</strong></li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../commands.html#setParameter" title="setParameter"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">setParameter</span></tt></a> for more about these parameters.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="getLog.html" title="Previous Section: getLog">&lt; &nbsp; getLog</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="getPrevError.html" title="Next Section: getPrevError">getPrevError &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

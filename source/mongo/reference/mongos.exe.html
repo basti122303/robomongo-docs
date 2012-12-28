@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongos.exe &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongos.exe" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongodump" href="mongodump.html" />
+<link rel="prev" title="mongod.exe" href="mongod.exe.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongos-exe">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongos.exe</span></tt><a class="headerlink" href="#mongos-exe" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> is the build of the MongoDB Shard
+(i.e. <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>) for the Windows
+platform. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> has all of the features of
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> on Unix-like platforms and is completely compatible
+with the other builds of <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>. In addition,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> provides several options for interacting with
+the Windows platform itself.</p>
+<p>This document only references options that are unique to
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt>. All <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> options are
+available. See the &#8220;<a class="reference internal" href="mongos.html"><em>mongos</em></a>&#8221; and the
+&#8220;<a class="reference internal" href="configuration-options.html"><em>Configuration File Options</em></a>&#8221; documents for more
+information regarding <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt>.</p>
+<p>To install and use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt>, read the
+&#8220;<a class="reference internal" href="../tutorial/install-mongodb-on-windows.html"><em>Install MongoDB on Windows</em></a>&#8221; document.</p>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="option">
+<dt id="cmdoption-mongos.exe--install">
+<tt class="descname">--install</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos.exe--install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installs <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> as a Windows Service and exits.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--remove">
+<tt class="descname">--remove</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos.exe--remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> Windows Service. If <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> is
+running, this operation will stop and then remove the service.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="#cmdoption-mongos.exe--remove"><em class="xref std std-option">--remove</em></a> requires the <a class="reference internal" href="#cmdoption-mongos.exe--serviceName"><em class="xref std std-option">--serviceName</em></a> if you
+configured a non-default <a class="reference internal" href="#cmdoption-mongos.exe--serviceName"><em class="xref std std-option">--serviceName</em></a> during the
+<a class="reference internal" href="#cmdoption-mongos.exe--install"><em class="xref std std-option">--install</em></a> operation.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--reinstall">
+<tt class="descname">--reinstall</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongos.exe--reinstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> and reinstalls <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> as a Windows
+Service.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--serviceName">
+<tt class="descname">--serviceName</tt><tt class="descclassname"> &lt;name&gt;</tt><a class="headerlink" href="#cmdoption-mongos.exe--serviceName" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default</em>: &#8220;MongoS&#8221;</p>
+<p>Set the service name of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> when running as a
+Windows Service. Use this name with the <tt class="docutils literal"><span class="pre">net</span> <span class="pre">start</span> <span class="pre">&lt;name&gt;</span></tt> and
+<tt class="docutils literal"><span class="pre">net</span> <span class="pre">stop</span> <span class="pre">&lt;name&gt;</span></tt> operations.</p>
+<p>You must use <a class="reference internal" href="#cmdoption-mongos.exe--serviceName"><em class="xref std std-option">--serviceName</em></a> in conjunction with either
+the <a class="reference internal" href="#cmdoption-mongos.exe--install"><em class="xref std std-option">--install</em></a> or <a class="reference internal" href="#cmdoption-mongos.exe--remove"><em class="xref std std-option">--remove</em></a> install option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--serviceDisplayName">
+<tt class="descname">--serviceDisplayName</tt><tt class="descclassname"> &lt;name&gt;</tt><a class="headerlink" href="#cmdoption-mongos.exe--serviceDisplayName" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default</em>: &#8220;Mongo DB Router&#8221;</p>
+<p>Sets the name listed for MongoDB on the Services administrative
+application.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--serviceDescription">
+<tt class="descname">--serviceDescription</tt><tt class="descclassname"> &lt;description&gt;</tt><a class="headerlink" href="#cmdoption-mongos.exe--serviceDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default</em>: &#8220;Mongo DB Sharding Router&#8221;</p>
+<p>Sets the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> service description.</p>
+<p>You must use <a class="reference internal" href="#cmdoption-mongos.exe--serviceDescription"><em class="xref std std-option">--serviceDescription</em></a> in conjunction with the
+<a class="reference internal" href="#cmdoption-mongos.exe--install"><em class="xref std std-option">--install</em></a> option.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For descriptions that contain spaces, you must enclose the
+description in quotes.</p>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--serviceUser">
+<tt class="descname">--serviceUser</tt><tt class="descclassname"> &lt;user&gt;</tt><a class="headerlink" href="#cmdoption-mongos.exe--serviceUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> service in the context of a certain user. This
+user must have &#8220;Log on as a service&#8221; privileges.</p>
+<p>You must use <a class="reference internal" href="#cmdoption-mongos.exe--serviceUser"><em class="xref std std-option">--serviceUser</em></a> in conjunction with the
+<a class="reference internal" href="#cmdoption-mongos.exe--install"><em class="xref std std-option">--install</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongos.exe--servicePassword">
+<tt class="descname">--servicePassword</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongos.exe--servicePassword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the password for <tt class="docutils literal"><span class="pre">&lt;user&gt;</span></tt> for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> when running with
+the <a class="reference internal" href="#cmdoption-mongos.exe--serviceUser"><em class="xref std std-option">--serviceUser</em></a> option.</p>
+<p>You must use <a class="reference internal" href="#cmdoption-mongos.exe--servicePassword"><em class="xref std std-option">--servicePassword</em></a> in conjunction with the
+<a class="reference internal" href="#cmdoption-mongos.exe--install"><em class="xref std std-option">--install</em></a> option.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongod.exe.html" title="Previous Section: mongod.exe">&lt; &nbsp; mongod.exe</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongodump.html" title="Next Section: mongodump">mongodump &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

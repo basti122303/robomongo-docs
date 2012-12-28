@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Enforce Unique Keys for Sharded Collections &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/enforce-unique-keys-for-sharded-collections" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Convert a Replica Set to a Replicated Sharded Cluster" href="convert-replica-set-to-replicated-shard-cluster.html" />
+<link rel="prev" title="Remove Shards from an Existing Sharded Cluster" href="remove-shards-from-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="enforce-unique-keys-for-sharded-collections">
+<h1>Enforce Unique Keys for Sharded Collections<a class="headerlink" href="#enforce-unique-keys-for-sharded-collections" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">unique</span></tt></a> constraint on indexes ensures
+that only one document can have a value for a field in a
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a>. For <a class="reference internal" href="../reference/limits.html#limit-sharding-unique-indexes"><em>sharded collections these unique indexes
+cannot enforce uniqueness</em></a> because
+insert and indexing operations are local to each shard. <a class="footnote-reference" href="#limitation" id="id1">[1]</a></p>
+<p>If your need to ensure that a field is always unique in all
+collections in a sharded environment, there are two options:</p>
+<ol class="arabic">
+<li><p class="first">Enforce uniqueness of the <a class="reference internal" href="../core/sharding.html#sharding-shard-key"><em>shard key</em></a>.</p>
+<p>MongoDB <em>can</em> enforce uniqueness for the <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>. For
+compound shard keys, MongoDB will enforce uniqueness on the
+<em>entire</em> key combination, and not for a specific component of the
+shard key.</p>
+</li>
+<li><p class="first">Use a secondary collection to enforce uniqueness.</p>
+<p>Create a minimal collection that only contains the unique field and
+a reference to a document in the main collection. If you always
+insert into a secondary collection <em>before</em> inserting to the main
+collection, MongoDB will produce an error if you attempt to use a
+duplicate key.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you have a small data set, you may not need to shard this
+collection and you can create multiple unique indexes. Otherwise
+you can shard on a single unique key.</p>
+</div>
+</li>
+</ol>
+<p>Regardless of method, be aware that writes to the MongoDB database are
+&#8220;fire and forget,&#8221; or &#8220;unsafe&#8221; by default: they will not return errors
+to the client if MongoDB rejects a write operation because of a
+duplicate key or other error. As a result if you want to enforce
+unique keys you <strong>must</strong> use the safe write setting in your
+driver. See your <a class="reference internal" href="../applications/drivers.html"><em>driver&#8217;s documentation</em></a> on
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> for more information.</p>
+<table class="docutils footnote" frame="void" id="limitation" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If you specify a unique index on a sharded
+collection, MongoDB will be able to enforce uniqueness only among
+the documents located on a single shard <em>at the time of creation</em>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="unique-constraints-on-the-shard-key">
+<h2>Unique Constraints on the Shard Key<a class="headerlink" href="#unique-constraints-on-the-shard-key" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="process">
+<span id="sharding-pattern-unique-procedure-shard-key"></span><h3>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h3>
+<p>To shard a collection
+using the <tt class="docutils literal"><span class="pre">unique</span></tt> constraint, specify the <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a> command in the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span> <span class="o">:</span> <span class="s2">&quot;test.users&quot;</span> <span class="p">,</span> <span class="nx">key</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">email</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">,</span> <span class="nx">unique</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Remember that the <tt class="docutils literal"><span class="pre">_id</span></tt> field index is always unique. By default, MongoDB
+inserts an <tt class="docutils literal"><span class="pre">ObjectId</span></tt> into the <tt class="docutils literal"><span class="pre">_id</span></tt> field. However,
+you can manually insert your own value into the <tt class="docutils literal"><span class="pre">_id</span></tt> field and
+use this as the shard key. To use the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field as the shard key, use the following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span> <span class="o">:</span> <span class="s2">&quot;test.users&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In any sharded collection where you are <em>not</em> sharding by the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field, you must ensure uniqueness of the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field. The best way to ensure <tt class="docutils literal"><span class="pre">_id</span></tt> is always unique is to use
+<tt class="docutils literal"><span class="pre">ObjectId</span></tt>, or another universally unique identifier (UUID.)</p>
+</div>
+</div>
+<div class="section" id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>You can only enforce uniqueness on one single field in the collection
+using this method.</li>
+<li>If you use a compound shard key, you can only enforce
+uniqueness on the <em>combination</em> of component keys in the shard
+key.</li>
+</ul>
+<p>In most cases, the best shard keys are compound keys that include elements
+that permit <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-write-scaling"><em>write scaling</em></a>
+and <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-query-isolation"><em>query isolation</em></a>, as
+well as <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>high cardinality</em></a>.
+These ideal shard keys are not often the same keys that require
+uniqueness and requires a different approach.</p>
+</div>
+</div>
+<div class="section" id="unique-constraints-on-arbitrary-fields">
+<h2>Unique Constraints on Arbitrary Fields<a class="headerlink" href="#unique-constraints-on-arbitrary-fields" title="Permalink to this headline">¶</a></h2>
+<p>If you cannot use a unique field as the shard key or if you need to
+enforce uniqueness over multiple fields, you must create another
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> to act as a &#8220;proxy collection&#8221;. This collection
+must contain both a reference to the original document (i.e. its
+<tt class="docutils literal"><span class="pre">ObjectId</span></tt>) and the unique key.</p>
+<p>If you must shard this &#8220;proxy&#8221; collection, then shard on the unique
+key using the <a class="reference internal" href="#sharding-pattern-unique-procedure-shard-key"><em>above procedure</em></a>;
+otherwise, you can simply create multiple unique indexes on the
+collection.</p>
+<div class="section" id="id2">
+<h3>Process<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Consider the following for the &#8220;proxy collection:&#8221;</p>
+<div class="highlight-javascript"><pre>{
+  "_id" : ObjectId("...")
+  "email" ": "..."
+}</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">_id</span></tt> field holds the <tt class="docutils literal"><span class="pre">ObjectId</span></tt> of the <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a>
+it reflects, and the <tt class="docutils literal"><span class="pre">email</span></tt> field is the field on which you want to
+ensure uniqueness.</p>
+<p>To shard this collection, use the following operation
+using the <tt class="docutils literal"><span class="pre">email</span></tt> field as the <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span> <span class="o">:</span> <span class="s2">&quot;records.proxy&quot;</span> <span class="p">,</span> <span class="nx">key</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">email</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">,</span> <span class="nx">unique</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>If you do not need to shard the proxy collection, use the following
+command to create a unique index on the <tt class="docutils literal"><span class="pre">email</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;email&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span><span class="nx">unique</span> <span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You may create multiple unique indexes on this collection if you do
+not plan to shard the <tt class="docutils literal"><span class="pre">proxy</span></tt> collection.</p>
+<p>To insert documents, use the following procedure in the
+<a class="reference internal" href="../reference/mongo.html#mongo"><em>JavaScript shell</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">records</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">primary_id</span> <span class="o">=</span> <span class="nx">ObjectId</span><span class="p">();</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">proxy</span><span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+   <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">primary_id</span>
+   <span class="s2">&quot;email&quot;</span> <span class="o">:</span> <span class="s2">&quot;example@example.net&quot;</span>
+<span class="p">})</span>
+
+<span class="c1">// if: the above operation returns successfully,</span>
+<span class="c1">// then continue:</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">information</span><span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+   <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">primary_id</span>
+   <span class="s2">&quot;email&quot;</span><span class="o">:</span> <span class="s2">&quot;example@example.net&quot;</span>
+   <span class="c1">// additional information...</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>You must insert a document into the <tt class="docutils literal"><span class="pre">proxy</span></tt> collection first. If
+this operation succeeds, the <tt class="docutils literal"><span class="pre">email</span></tt> field is unique, and you may
+continue by inserting the actual document into the <tt class="docutils literal"><span class="pre">information</span></tt>
+collection.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last">The full documentation of: <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a>
+and <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a>.</p>
+</div>
+</div>
+<div class="section" id="considerations">
+<h3>Considerations<a class="headerlink" href="#considerations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Your application must catch errors when inserting documents into the
+&#8220;proxy&#8221; collection and must enforce consistency between the two
+collections.</li>
+<li>If the proxy collection requires sharding, you must shard on the
+single field on which you want to enforce uniqueness.</li>
+<li>To enforce uniqueness on more than one field using sharded proxy
+collections, you must have <em>one</em> proxy collection for <em>every</em> field
+for which to enforce uniqueness. If you create multiple unique
+indexes on a single proxy collection, you will <em>not</em> be able to
+shard proxy collections.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="remove-shards-from-cluster.html" title="Previous Section: Remove Shards from an Existing Sharded Cluster">&lt; &nbsp; Remove Shards from an Existing Sharded Cluster</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="convert-replica-set-to-replicated-shard-cluster.html" title="Next Section: Convert a Replica Set to a Replicated Sharded Cluster">Convert a Replica Set to a Replicated Sharded Cluster &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

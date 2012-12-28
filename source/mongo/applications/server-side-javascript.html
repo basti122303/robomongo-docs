@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Server-side JavaScript &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/server-side-javascript" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="GridFS" href="gridfs.html" />
+<link rel="prev" title="Database References" href="database-references.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="server-side-javascript">
+<h1>Server-side JavaScript<a class="headerlink" href="#server-side-javascript" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB supports server-side execution of JavaScript code using various
+methods.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The JavaScript code execution takes a JavaScript lock.</p>
+</div>
+<div class="section" id="map-reduce">
+<span id="server-side-map-reduce"></span><h2>Map-Reduce<a class="headerlink" href="#map-reduce" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB performs the execution of JavaScript functions for
+<a class="reference internal" href="map-reduce.html"><em>Map-Reduce</em></a> operations on the server. Within these
+JavaScript functions, you must not access the database for any reason,
+including to perform reads.</p>
+<p>See the <a class="reference internal" href="../reference/method/db.collection.mapReduce.html#db.collection.mapReduce" title="db.collection.mapReduce"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.mapReduce()</span></tt></a> and the
+<a class="reference internal" href="map-reduce.html"><em>Map-Reduce</em></a> documentation for more information,
+including examples of map-reduce. See <a class="reference internal" href="map-reduce.html#map-reduce-concurrency"><em>map-reduce concurrency</em></a> section for concurrency information for
+map-reduce.</p>
+</div>
+<div class="section" id="eval-command">
+<span id="server-side-eval"></span><h2><tt class="docutils literal"><span class="pre">eval</span></tt> Command<a class="headerlink" href="#eval-command" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command, and the corresponding <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell method <a class="reference internal" href="../reference/method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a>, evaluates JavaScript functions on the
+database server. This command may be useful if you need to touch a lot
+of data lightly since the network transfer of the data could become a
+bottleneck if performing these operations on the client-side.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">By default, <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command requires a write lock. As such
+<a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> will block all other read and write operations
+while it runs.</p>
+</div>
+<p>See <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command and <a class="reference internal" href="../reference/method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> documentation for
+more information, including examples.</p>
+</div>
+<div class="section" id="running-js-files-via-a-mongo-shell-instance-on-the-server">
+<span id="running-js-scripts-in-mongo-on-mongod-host"></span><h2>Running <tt class="docutils literal"><span class="pre">.js</span></tt> files via a <tt class="docutils literal"><span class="pre">mongo</span></tt> shell Instance on the Server<a class="headerlink" href="#running-js-files-via-a-mongo-shell-instance-on-the-server" title="Permalink to this headline">¶</a></h2>
+<p>Running a JavaScript (<tt class="docutils literal"><span class="pre">.js</span></tt>) file using a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+instance on the server is a good technique for performing batch
+administrative work. When you run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell on the
+server, connecting via the localhost interface, the connection is fast
+with low latency.  Additionally, this technique has the advantage over
+the <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command since the command <a class="reference internal" href="../reference/commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a>
+blocks all other operations.</p>
+</div>
+<div class="section" id="where-operator">
+<span id="server-side-where"></span><h2><tt class="docutils literal"><span class="pre">$where</span></tt> Operator<a class="headerlink" href="#where-operator" title="Permalink to this headline">¶</a></h2>
+<p>To perform <a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a>, in addition to the standard
+operators (e.g. <a class="reference internal" href="../reference/operators.html#_S_gt" title="$gt"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$gt</span></tt></a>, <a class="reference internal" href="../reference/operators.html#_S_lt" title="$lt"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$lt</span></tt></a>), with the
+<a class="reference internal" href="../reference/operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> operator, you can also express the query condition
+either as a string or a full JavaScript function that specifies a
+SQL-like <tt class="docutils literal"><span class="pre">WHERE</span></tt> clause. However, use the standard operators whenever
+possible since <a class="reference internal" href="../reference/operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> operations have significantly slower
+performance.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not write to the database within the <a class="reference internal" href="../reference/operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a>
+JavaScript function.</p>
+</div>
+<p>See <a class="reference internal" href="../reference/operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> documentation for more information, including
+examples.</p>
+</div>
+<div class="section" id="storing-functions-server-side">
+<span id="storing-server-side-javascript"></span><h2>Storing Functions Server-side<a class="headerlink" href="#storing-functions-server-side" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We do <strong>not</strong> recommend using server-side stored functions if
+possible.</p>
+</div>
+<p>There is a special system collection named <tt class="docutils literal"><span class="pre">system.js</span></tt> that can store
+JavaScript functions for reuse.</p>
+<p>To store a function, you can use the <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.save()</span></tt></a>, as
+in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">js</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;myAddFunction&quot;</span> <span class="p">,</span>
+     <span class="nx">value</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">){</span> <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span><span class="p">;</span> <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">_id</span></tt> field holds the name of the function and is unique per
+database.</li>
+<li>The <tt class="docutils literal"><span class="pre">value</span></tt> field holds the function definition</li>
+</ul>
+<p>Once you save a function in the <tt class="docutils literal"><span class="pre">system.js</span></tt> collection, you can use
+the function from any JavaScript context (e.g. <a class="reference internal" href="#server-side-eval"><em>eval</em></a>, <a class="reference internal" href="#server-side-where"><em>$where</em></a>,
+<a class="reference internal" href="#server-side-map-reduce"><em>map-reduce</em></a>).</p>
+<p>Consider the following example from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell that
+first saves a function named <tt class="docutils literal"><span class="pre">echoFunction</span></tt> to the <tt class="docutils literal"><span class="pre">system.js</span></tt>
+collection and calls the function using <a class="reference internal" href="#server-side-eval"><em>db.eval()</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">js</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>
+                   <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;echoFunction&quot;</span><span class="p">,</span>
+                     <span class="nx">value</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">;</span> <span class="p">}</span>
+                   <span class="p">}</span>
+                 <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span> <span class="s2">&quot;echoFunction( &#39;test&#39; )&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://github.com/mongodb/mongo/tree/master/jstests/storefunc.js">http://github.com/mongodb/mongo/tree/master/jstests/storefunc.js</a> for a full example.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1: </span>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you can use
+<a class="reference internal" href="../reference/method/db.loadServerScripts.html#db.loadServerScripts" title="db.loadServerScripts"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.loadServerScripts()</span></tt></a> to load all the scripts saved in
+the <tt class="docutils literal"><span class="pre">system.js</span></tt> collection for the current db. Once loaded, you
+can invoke the functions directly in the shell, as in the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">loadServerScripts</span><span class="p">();</span>
+
+<span class="nx">echoFunction</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+
+<span class="nx">myAddFunction</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="concurrency">
+<h2>Concurrency<a class="headerlink" href="#concurrency" title="Permalink to this headline">¶</a></h2>
+<p>Refer to the individual method or operator documentation for any
+concurrency information. See also the <a class="reference internal" href="../faq/concurrency.html#faq-concurrency-operations-locks"><em>concurrency table</em></a>.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="database-references.html" title="Previous Section: Database References">&lt; &nbsp; Database References</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="gridfs.html" title="Next Section: GridFS">GridFS &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

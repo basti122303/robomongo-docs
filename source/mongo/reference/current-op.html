@@ -1,0 +1,461 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Current Operation Reporting &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/current-op" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Database Profiler Output" href="database-profiler.html" />
+<link rel="prev" title="Replication Info Reference" href="replication-info.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="current-operation-reporting">
+<h1>Current Operation Reporting<a class="headerlink" href="#current-operation-reporting" title="Permalink to this headline">¶</a></h1>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2.</span></p>
+<div class="section" id="example-output">
+<h2>Example Output<a class="headerlink" href="#example-output" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+reports on the current operations running on the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance. The operation returns the <tt class="docutils literal"><span class="pre">inprog</span></tt> array, which contains a
+document for each in progress operation. Consider the following
+example output:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;inprog&quot;</span><span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;opid&quot;</span> <span class="o">:</span> <span class="mi">3434473</span><span class="p">,</span>
+                     <span class="s2">&quot;active&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+                     <span class="s2">&quot;secs_running&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;op&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;operation&gt;&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                     <span class="p">},</span>
+                     <span class="s2">&quot;client&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;host&gt;:&lt;outgoing&gt;&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;desc&quot;</span> <span class="o">:</span> <span class="s2">&quot;conn57683&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;threadId&quot;</span> <span class="o">:</span> <span class="s2">&quot;0x7f04a637b700&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;connectionId&quot;</span> <span class="o">:</span> <span class="mi">57683</span><span class="p">,</span>
+                     <span class="s2">&quot;locks&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;^&quot;</span> <span class="o">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;^local&quot;</span> <span class="o">:</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;^&lt;database&gt;&quot;</span> <span class="o">:</span> <span class="s2">&quot;W&quot;</span>
+                     <span class="p">},</span>
+                     <span class="s2">&quot;waitingForLock&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+                     <span class="s2">&quot;msg&quot;</span><span class="o">:</span> <span class="s2">&quot;&lt;string&gt;&quot;</span>
+                     <span class="s2">&quot;numYields&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;progress&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;done&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+                             <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span>
+                     <span class="p">}</span>
+                     <span class="s2">&quot;lockStats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;timeLockedMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                                     <span class="s2">&quot;R&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;W&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">()</span>
+                             <span class="p">},</span>
+                             <span class="s2">&quot;timeAcquiringMicros&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                                     <span class="s2">&quot;R&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;W&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;r&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(),</span>
+                                     <span class="s2">&quot;w&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">()</span>
+                             <span class="p">}</span>
+                     <span class="p">}</span>
+             <span class="p">},</span>
+            <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>You may specify the <tt class="docutils literal"><span class="pre">true</span></tt> argument to <a class="reference internal" href="method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a>
+to return a more verbose output including idle connections and
+system operations. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">currentOp</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">Furthermore, active operations (i.e. where <a class="reference internal" href="#active" title="active"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">active</span></tt></a> is
+<tt class="docutils literal"><span class="pre">true</span></tt>) will return additional fields.</p>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <a class="reference internal" href="method/db.killOp.html#db.killOp" title="db.killOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.killOp()</span></tt></a> in conjunction with the
+<a class="reference internal" href="#opid" title="opid"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">opid</span></tt></a> field to terminate a currently running
+operation. Consider the following JavaScript operations for the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell that you can use to filter the output of
+identify specific types of operations:</p>
+<ul>
+<li><p class="first">Return all pending write operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">currentOp</span><span class="p">().</span><span class="nx">inprog</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span>
+   <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">){</span>
+     <span class="k">if</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">waitingForLock</span> <span class="o">&amp;&amp;</span> <span class="nx">d</span><span class="p">.</span><span class="nx">lockType</span> <span class="o">!=</span> <span class="s2">&quot;read&quot;</span><span class="p">)</span>
+        <span class="nx">printjson</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span>
+     <span class="p">})</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Return the active write operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">currentOp</span><span class="p">().</span><span class="nx">inprog</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span>
+   <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">){</span>
+     <span class="k">if</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">active</span> <span class="o">&amp;&amp;</span> <span class="nx">d</span><span class="p">.</span><span class="nx">lockType</span> <span class="o">==</span> <span class="s2">&quot;write&quot;</span><span class="p">)</span>
+        <span class="nx">printjson</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span>
+     <span class="p">})</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Return all active read operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">currentOp</span><span class="p">().</span><span class="nx">inprog</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span>
+   <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">){</span>
+     <span class="k">if</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">active</span> <span class="o">&amp;&amp;</span> <span class="nx">d</span><span class="p">.</span><span class="nx">lockType</span> <span class="o">==</span> <span class="s2">&quot;read&quot;</span><span class="p">)</span>
+        <span class="nx">printjson</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span>
+     <span class="p">})</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="output-reference">
+<h2>Output Reference<a class="headerlink" href="#output-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="opid">
+<tt class="descname">opid</tt><a class="headerlink" href="#opid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds an identifier for the operation. You can pass this value to
+<a class="reference internal" href="method/db.killOp.html#db.killOp" title="db.killOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.killOp()</span></tt></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to terminate the
+operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="active">
+<tt class="descname">active</tt><a class="headerlink" href="#active" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean value, that is <tt class="docutils literal"><span class="pre">true</span></tt> if the operation is currently running
+or <tt class="docutils literal"><span class="pre">false</span></tt> if the operation is queued and waiting for a lock to run.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="secs_running">
+<tt class="descname">secs_running</tt><a class="headerlink" href="#secs_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>The duration of the operation in seconds. MongoDB calculates this
+value by subtracting the current time from the start time of the
+operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="op">
+<tt class="descname">op</tt><a class="headerlink" href="#op" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string that identifies the type of operation. The possible values
+are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">insert</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">query</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">update</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">remove</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">getmore</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">command</span></tt></li>
+</ul>
+</dd></dl>
+
+<dl class="data">
+<dt id="ns">
+<tt class="descname">ns</tt><a class="headerlink" href="#ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="glossary.html#term-namespace"><em class="xref std std-term">namespace</em></a> the operation targets. MongoDB forms
+namespaces using the name of the <a class="reference internal" href="glossary.html#term-database"><em class="xref std std-term">database</em></a> and the name of
+the <a class="reference internal" href="glossary.html#term-collection"><em class="xref std std-term">collection</em></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="query">
+<tt class="descname">query</tt><a class="headerlink" href="#query" title="Permalink to this definition">¶</a></dt>
+<dd><p>A document containing the current operation&#8217;s query. The document
+is empty for operations that do not have queries: <tt class="docutils literal"><span class="pre">getmore</span></tt>,
+<tt class="docutils literal"><span class="pre">insert</span></tt>, and <tt class="docutils literal"><span class="pre">command</span></tt>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="client">
+<tt class="descname">client</tt><a class="headerlink" href="#client" title="Permalink to this definition">¶</a></dt>
+<dd><p>The IP address (or hostname) and the ephemeral port of the client
+connection where the operation originates. If your <tt class="docutils literal"><span class="pre">inprog</span></tt>
+array has operations from many different clients, use this string
+to relate operations to clients.</p>
+<p>For some commands, including <a class="reference internal" href="commands.html#findAndModify" title="findAndModify"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">findAndModify</span></tt></a> and
+<a class="reference internal" href="method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a>, the client will be <tt class="docutils literal"><span class="pre">0.0.0.0:0</span></tt>, rather than
+an actual client.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="desc">
+<tt class="descname">desc</tt><a class="headerlink" href="#desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>A description of the client. This string includes the
+<a class="reference internal" href="#connectionId" title="connectionId"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">connectionId</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="threadId">
+<tt class="descname">threadId</tt><a class="headerlink" href="#threadId" title="Permalink to this definition">¶</a></dt>
+<dd><p>An identifier for the thread that services the operation and its
+connection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="connectionId">
+<tt class="descname">connectionId</tt><a class="headerlink" href="#connectionId" title="Permalink to this definition">¶</a></dt>
+<dd><p>An identifier for the connection where the operation originated.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locks">
+<tt class="descname">locks</tt><a class="headerlink" href="#locks" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>The <a class="reference internal" href="#locks" title="locks"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks</span></tt></a> document reports on the kinds of locks the
+operation currently holds. The following kinds of locks are possible:</p>
+<dl class="data">
+<dt id="locks.^">
+<tt class="descclassname">locks.</tt><tt class="descname">^</tt><a class="headerlink" href="#locks.^" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#locks.^" title="locks.^"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks.^</span></tt></a> reports on the global lock state for the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. The operation must hold this for
+some global phases of an operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locks.^local">
+<tt class="descclassname">locks.</tt><tt class="descname">^local</tt><a class="headerlink" href="#locks.^local" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#locks.^" title="locks.^"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks.^</span></tt></a> reports on the lock for the <tt class="docutils literal"><span class="pre">local</span></tt>
+database. MongoDB uses the <tt class="docutils literal"><span class="pre">local</span></tt> database for a number of
+operations, but the most frequent use of the <tt class="docutils literal"><span class="pre">local</span></tt> database
+is for the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> used in replication.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locks.^&lt;database&gt;">
+<tt class="descclassname">locks.</tt><tt class="descname">^&lt;database&gt;</tt><a class="headerlink" href="#locks.^<database>" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks.^</span></tt> reports on the lock state for the
+database that this operation targets.</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#locks" title="locks"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks</span></tt></a> replaces <tt class="docutils literal"><span class="pre">lockType</span></tt> in earlier versions.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="lockType">
+<tt class="descname">lockType</tt><a class="headerlink" href="#lockType" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>The <a class="reference internal" href="#locks" title="locks"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">locks</span></tt></a> replaced the <a class="reference internal" href="#lockType" title="lockType"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">lockType</span></tt></a> field in 2.2.</p>
+<p>Identifies the type of lock the operation currently holds. The
+possible values are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">read</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">write</span></tt></li>
+</ul>
+</dd></dl>
+
+<dl class="data">
+<dt id="waitingForLock">
+<tt class="descname">waitingForLock</tt><a class="headerlink" href="#waitingForLock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a boolean value. <a class="reference internal" href="#waitingForLock" title="waitingForLock"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">waitingForLock</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt> if the
+operation is waiting for a lock and <tt class="docutils literal"><span class="pre">false</span></tt> if the operation has
+the required lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="msg">
+<tt class="descname">msg</tt><a class="headerlink" href="#msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#msg" title="msg"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">msg</span></tt></a> provides a message that describes the status and
+progress of the operation. In the case of indexing or mapReduce
+operations, the field reports the completion percentage.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="progress">
+<tt class="descname">progress</tt><a class="headerlink" href="#progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports on the progress of mapReduce or indexing operations. The
+<a class="reference internal" href="#progress" title="progress"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">progress</span></tt></a> fields corresponds to the completion percentage in
+the <a class="reference internal" href="#msg" title="msg"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">msg</span></tt></a> field. The <a class="reference internal" href="#progress" title="progress"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">progress</span></tt></a> specifies the following
+information:</p>
+<dl class="data">
+<dt id="progress.done">
+<tt class="descclassname">progress.</tt><tt class="descname">done</tt><a class="headerlink" href="#progress.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the number completed.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="progress.total">
+<tt class="descclassname">progress.</tt><tt class="descname">total</tt><a class="headerlink" href="#progress.total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the total number.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="killed">
+<tt class="descname">killed</tt><a class="headerlink" href="#killed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <tt class="docutils literal"><span class="pre">true</span></tt> if <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance is in the process of
+killing the operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="numYields">
+<tt class="descname">numYields</tt><a class="headerlink" href="#numYields" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#numYields" title="numYields"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">numYields</span></tt></a> is a counter that reports the number of times the
+operation has yielded to allow other operations to complete.</p>
+<p>Typically, operations yield when they need access to data that
+MongoDB has not yet fully read into memory. This allows
+other operations that have data in memory to complete quickly
+while MongoDB reads in data for the yielding operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="lockStats">
+<tt class="descname">lockStats</tt><a class="headerlink" href="#lockStats" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>The <a class="reference internal" href="database-profiler.html#lockStats" title="lockStats"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">lockStats</span></tt></a> document reflects the amount of time the
+operation has spent both acquiring and holding
+locks. <a class="reference internal" href="database-profiler.html#lockStats" title="lockStats"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">lockStats</span></tt></a> reports data on a per-lock type, with the
+following possible lock types:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">R</span></tt> represents the global read lock,</li>
+<li><tt class="docutils literal"><span class="pre">W</span></tt> represents the global write lock,</li>
+<li><tt class="docutils literal"><span class="pre">r</span></tt> represents the database specific read lock, and</li>
+<li><tt class="docutils literal"><span class="pre">w</span></tt> represents the database specific write lock.</li>
+</ul>
+<blockquote>
+<div><dl class="data">
+<dt id="timeLockedMicros">
+<tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#timeLockedMicros" title="timeLockedMicros"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">timeLockedMicros</span></tt></a> document reports the amount of
+time the operation has spent holding a specific lock.</p>
+<dl class="data">
+<dt id="timeLockedMicros.R">
+<tt class="descclassname">timeLockedMicros.</tt><tt class="descname">R</tt><a class="headerlink" href="#timeLockedMicros.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the amount of time in microseconds the operation has held the
+global read lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeLockedMicros.W">
+<tt class="descclassname">timeLockedMicros.</tt><tt class="descname">W</tt><a class="headerlink" href="#timeLockedMicros.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the amount of time in microseconds the operation has held the
+global write lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeLockedMicros.r">
+<tt class="descclassname">timeLockedMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#timeLockedMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the amount of time in microseconds the operation has held the
+database specific read lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeLockedMicros.w">
+<tt class="descclassname">timeLockedMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#timeLockedMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the amount of time in microseconds the operation has held the
+database specific write lock.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div></blockquote>
+<dl class="data">
+<dt id="timeAcquiringMicros">
+<tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#timeAcquiringMicros" title="timeAcquiringMicros"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">timeAcquiringMicros</span></tt></a> document reports the amount of time
+the operation has spent <em>waiting</em> to acquire a specific lock.</p>
+<dl class="data">
+<dt id="timeAcquiringMicros.R">
+<tt class="descclassname">timeAcquiringMicros.</tt><tt class="descname">R</tt><a class="headerlink" href="#timeAcquiringMicros.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the mount of time in microseconds the operation has waited for the
+global read lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeAcquiringMicros.W">
+<tt class="descclassname">timeAcquiringMicros.</tt><tt class="descname">W</tt><a class="headerlink" href="#timeAcquiringMicros.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the mount of time in microseconds the operation has waited for the
+global write lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeAcquiringMicros.r">
+<tt class="descclassname">timeAcquiringMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#timeAcquiringMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the mount of time in microseconds the operation has waited for the
+database specific read lock.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="timeAcquiringMicros.w">
+<tt class="descclassname">timeAcquiringMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#timeAcquiringMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reports the mount of time in microseconds the operation has waited for the
+database specific write lock.</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="replication-info.html" title="Previous Section: Replication Info Reference">&lt; &nbsp; Replication Info Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="database-profiler.html" title="Next Section: Database Profiler Output">Database Profiler Output &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

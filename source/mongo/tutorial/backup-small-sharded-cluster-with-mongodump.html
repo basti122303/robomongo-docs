@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Backup a Small Sharded Cluster with mongodump &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/backup-small-sharded-cluster-with-mongodump" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Create Backup of a Sharded Cluster with Filesystem Snapshots" href="backup-sharded-cluster-with-filesystem-snapshots.html" />
+<link rel="prev" title="Convert a Replica Set to a Replicated Sharded Cluster" href="convert-replica-set-to-replicated-shard-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="backup-a-small-sharded-cluster-with-mongodump">
+<h1>Backup a Small Sharded Cluster with <tt class="docutils literal"><span class="pre">mongodump</span></tt><a class="headerlink" href="#backup-a-small-sharded-cluster-with-mongodump" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>If your <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> comprises a small collection of data,
+you can connect to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and issue the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> command. You can use this approach if the following
+is true:</p>
+<ul>
+<li><p class="first">It&#8217;s possible to store the entire backup on one system or on a single
+storage device. Consider both backups of entire instances and
+incremental dumps of data.</p>
+</li>
+<li><p class="first">The state of the database at the beginning of the operation is
+not significantly different than the state of the database at the
+end of the backup.</p>
+<p>Your application must be able to operate given a copy of the data
+that reflects many moments in time. If the data collected by the
+backup operation is not sufficient to restore from, using
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> for your back ups is not viable.</p>
+</li>
+<li><p class="first">The backup can run and complete without affecting the performance of
+the cluster.</p>
+</li>
+</ul>
+<p>If these conditions are not all true, then this backup method will not
+support the needs of your deployment. Read
+<a class="reference internal" href="../administration/backups.html#sharded-cluster-backups"><em>Sharded Cluster Backup Considerations</em></a> for a high-level overview of important
+considerations as well as a list of alternate backup tutorials.</p>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> without specifying the a database or
+collection, the output will contain both the collection data and the
+sharding config metadata from the <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a>.</p>
+<p class="last">You cannot use the <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> option for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> when dumping from a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>. This option is only
+available when running directly against a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member.</p>
+</div>
+<p>To perform a backup of a shard cluster by connecting
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> by connecting directly, use the following
+operation a your system&#8217;s prompt:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --journal --host mongos3.example.net --port 27017
+</pre></div>
+</div>
+<p>This will create a database dump of the shard cluster accessible via
+the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> listening on port <tt class="docutils literal"><span class="pre">27017</span></tt> of the
+<tt class="docutils literal"><span class="pre">mongos3.example.net</span></tt> mongos instance.</p>
+<p>The dump produced by this operation will effectively &#8220;unshard&#8221; your
+data: you must re-shard and re-balance the data when you restore.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="convert-replica-set-to-replicated-shard-cluster.html" title="Previous Section: Convert a Replica Set to a Replicated Sharded Cluster">&lt; &nbsp; Convert a Replica Set to a Replicated Sharded Cluster</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="backup-sharded-cluster-with-filesystem-snapshots.html" title="Next Section: Create Backup of a Sharded Cluster with Filesystem Snapshots">Create Backup of a Sharded Cluster with Filesystem Snapshots &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

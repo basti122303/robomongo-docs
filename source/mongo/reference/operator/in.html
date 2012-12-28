@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$in &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/in" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$inc" href="inc.html" />
+<link rel="prev" title="$hint" href="hint.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="in">
+<h1>$in<a class="headerlink" href="#in" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_in">
+<tt class="descname">$in</tt><a class="headerlink" href="#_S_in" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">field:</span> <span class="pre">{</span> <span class="pre">$in:</span> <span class="pre">[&lt;value1&gt;,</span> <span class="pre">&lt;value2&gt;,</span> <span class="pre">...</span> <span class="pre">&lt;valueN&gt;</span> <span class="pre">]</span> <span class="pre">}</span> <span class="pre">}</span></tt></p>
+<p><a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a> selects the documents where the <tt class="docutils literal"><span class="pre">field</span></tt> value
+equals any value in the specified array (e.g. <tt class="docutils literal"><span class="pre">&lt;value1&gt;</span></tt>,
+<tt class="docutils literal"><span class="pre">&lt;value2&gt;</span></tt>, etc.)</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$in</span><span class="o">:</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select to select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt>
+collection where the <tt class="docutils literal"><span class="pre">qty</span></tt> field value is either <tt class="docutils literal"><span class="pre">5</span></tt> or
+<tt class="docutils literal"><span class="pre">15</span></tt>. Although you can express this query using the
+<a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator, choose the <a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a> operator rather
+than the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator when performing equality checks on
+the same field.</p>
+<p>If the <tt class="docutils literal"><span class="pre">field</span></tt> holds an array, then the <a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a> operator
+selects the documents whose <tt class="docutils literal"><span class="pre">field</span></tt> holds an array that contains
+at least one element that matches a value in the specified array
+(e.g. <tt class="docutils literal"><span class="pre">&lt;value1&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;value2&gt;</span></tt>, etc.)</p>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">tags</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$in</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;appliances&quot;</span><span class="p">,</span> <span class="s2">&quot;school&quot;</span><span class="p">]</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span><span class="kc">true</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> operation will set
+the <tt class="docutils literal"><span class="pre">sale</span></tt> field value in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection where the
+<tt class="docutils literal"><span class="pre">tags</span></tt> field holds an array with at least one element matching an
+element in the array <tt class="docutils literal"><span class="pre">[&quot;appliances&quot;,</span> <span class="pre">&quot;school&quot;]</span></tt>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>, <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a>, <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="hint.html" title="Previous Section: $hint">&lt; &nbsp; $hint</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="inc.html" title="Next Section: $inc">$inc &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

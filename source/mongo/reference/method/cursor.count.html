@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.count() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.count" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.explain()" href="cursor.explain.html" />
+<link rel="prev" title="cursor.batchSize()" href="cursor.batchSize.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-count">
+<h1>cursor.count()<a class="headerlink" href="#cursor-count" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.count">
+<tt class="descclassname">cursor.</tt><tt class="descname">count</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> method counts the number of
+documents referenced by a cursor. Append the <a class="reference internal" href="#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> method to a <a class="reference internal" href="db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> query to return the number of matching
+documents, as in the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation does not actually perform the <a class="reference internal" href="db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>; instead, the operation counts the results
+that would be returned by the <a class="reference internal" href="db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>.</p>
+<p>The <a class="reference internal" href="#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> can accept the following argument:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>applySkipLimit</strong> (<em>boolean</em>) &#8211; <p>Optional. Specifies whether to consider the effects of the
+<a class="reference internal" href="cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> and <a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> methods
+in the count. By default, the <a class="reference internal" href="#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> method ignores the effects of the
+<a class="reference internal" href="cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.skip()</span></tt></a> and <a class="reference internal" href="cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a>. Set
+<tt class="docutils literal"><span class="pre">applySkipLimit</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt> to consider the effect of
+these methods.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="cursor.size.html#cursor.size" title="cursor.size"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.size()</span></tt></a></p>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>MongoDB also provides the shell wrapper
+<a class="reference internal" href="db.collection.count.html#db.collection.count" title="db.collection.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.count()</span></tt></a> for the
+<tt class="docutils literal"><span class="pre">db.collection.find().count()</span></tt> construct.</p>
+<p>Consider the following examples of the <a class="reference internal" href="#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> method:</p>
+<ul>
+<li><p class="first">Count the number of all documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">count</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Count the number of the documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection
+with the field <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/2012')</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/2012&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">count</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Count the number of the documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection
+with the field <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/2012')</span></tt>
+<em>taking into account</em> the effect of the <tt class="docutils literal"><span class="pre">limit(5)</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">orders</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/2012&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="mi">5</span><span class="p">).</span><span class="nx">count</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.batchSize.html" title="Previous Section: cursor.batchSize()">&lt; &nbsp; cursor.batchSize()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.explain.html" title="Next Section: cursor.explain()">cursor.explain() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Create &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/create" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="CRUD" href="../crud.html" />
+<link rel="next" title="Read" href="read.html" />
+<link rel="prev" title="BSON Documents" href="../core/document.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="create">
+<h1>Create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h1>
+<p>Of the four basic database operations (i.e. CRUD), <em>create</em> operations
+are those that add new records or <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> to a
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> in MongoDB. For general information about write
+operations and the factors that affect their performance, see
+<a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a>; for documentation of the other CRUD
+operations, see the <a class="reference internal" href="../crud.html"><em>CRUD</em></a> page.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>You can create documents in a MongoDB collection using any of the
+following basic operations.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#crud-create-insert"><em>insert</em></a></li>
+<li><a class="reference internal" href="#crud-create-save"><em>create with save</em></a></li>
+<li><a class="reference internal" href="#crud-create-update"><em>create with upsert</em></a></li>
+</ul>
+<p>All insert operations in MongoDB exhibit the following properties:</p>
+<ul>
+<li><p class="first">If you attempt to insert a document without the <a class="reference internal" href="../reference/glossary.html#term-id"><em class="xref std std-term">_id</em></a> field,
+the client library <em>or</em> the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance will add an
+<tt class="docutils literal"><span class="pre">_id</span></tt> field and populate the field with a unique <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectId</em></a>.</p>
+</li>
+<li><p class="first">For operations with <a class="reference internal" href="../core/write-operations.html#write-concern"><em>write concern</em></a>, if you
+specify an <tt class="docutils literal"><span class="pre">_id</span></tt> field, the <tt class="docutils literal"><span class="pre">_id</span></tt> field must be unique within
+the collection; otherwise the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will return a
+duplicate key exception.</p>
+</li>
+<li><p class="first">The maximum BSON document size is 16 megabytes.</p>
+<p>The maximum document size helps ensure that a single document cannot
+use excessive amount of RAM or, during transmission, excessive amount
+of bandwidth. To store documents larger than the maximum size, MongoDB
+provides the GridFS API. See <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> and the
+documentation for your <a class="reference internal" href="drivers.html"><em>driver</em></a> for more
+information about GridFS.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../core/document.html"><em>Documents</em></a> have the following restrictions on field
+names:</p>
+<ul class="simple">
+<li>The field name <tt class="docutils literal"><span class="pre">_id</span></tt> is reserved for use as a primary key; its
+value must be unique in the collection, is immutable, and may be of
+any type other than an array.</li>
+<li>The field names <strong>cannot</strong> start with the <tt class="docutils literal"><span class="pre">$</span></tt> character.</li>
+<li>The field names <strong>cannot</strong> contain the <tt class="docutils literal"><span class="pre">.</span></tt> character.</li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As of these <a class="reference internal" href="../release-notes/drivers-write-concern.html#write-concern-change-releases"><em>driver versions</em></a>, all
+write operations will issue a <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command to
+confirm the result of the write operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">getLastError</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p class="last">Refer to the documentation on <a class="reference internal" href="../core/write-operations.html#write-operations-write-concern"><em>write concern</em></a> in the <a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a>
+document for more information.</p>
+</div>
+</div>
+<div class="section" id="insert">
+<span id="crud-create-insert"></span><h2>Insert<a class="headerlink" href="#insert" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> is the primary method
+to insert a document or documents into a MongoDB collection, and has
+the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-corresponding-operation-in-sql admonition">
+<p class="first admonition-title">Corresponding Operation in SQL</p>
+<p class="last">The <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method is analogous
+to the <tt class="docutils literal"><span class="pre">INSERT</span></tt> statement.</p>
+</div>
+<p>Consider the following examples that illustrate the behavior of
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a>:</p>
+<ul>
+<li><p class="first">If the collection does not exist <a class="footnote-reference" href="#show-collection" id="id1">[1]</a>, then the
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method creates the
+collection during the first insert. Specifically in the example, if
+the collection <tt class="docutils literal"><span class="pre">bios</span></tt> does not exist , then the insert operation
+will create this collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">{</span>
+      <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Backus&#39;</span> <span class="p">},</span>
+      <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Dec 03, 1924&#39;</span><span class="p">),</span>
+      <span class="nx">death</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Mar 17, 2007&#39;</span><span class="p">),</span>
+      <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;Fortran&#39;</span><span class="p">,</span> <span class="s1">&#39;ALGOL&#39;</span><span class="p">,</span> <span class="s1">&#39;Backus-Naur Form&#39;</span><span class="p">,</span> <span class="s1">&#39;FP&#39;</span> <span class="p">],</span>
+      <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;W.W. McDowell Award&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1967</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE Computer Society&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;National Medal of Science&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1975</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;National Science Foundation&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1977</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Draper Prize&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1993</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;National Academy of Engineering&#39;</span>
+                <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can confirm the insert by <a class="reference internal" href="read.html"><em>querying</em></a>
+the <tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation returns the following document from the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;first&quot;</span> <span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span> <span class="o">:</span> <span class="s2">&quot;Backus&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;birth&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1924-12-03T05:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;death&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2007-03-17T04:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;contribs&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Fortran&quot;</span><span class="p">,</span> <span class="s2">&quot;ALGOL&quot;</span><span class="p">,</span> <span class="s2">&quot;Backus-Naur Form&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;awards&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;W.W. McDowell Award&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1967</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;IEEE Computer Society&quot;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Medal of Science&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1975</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Science Foundation&quot;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Turing Award&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1977</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;ACM&quot;</span>
+               <span class="p">},</span>
+               <span class="p">{</span> <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Draper Prize&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1993</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Academy of Engineering&quot;</span>
+               <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the new document does not contain an <tt class="docutils literal"><span class="pre">_id</span></tt> field, then the
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method  adds the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field to the document and generates a unique <tt class="docutils literal"><span class="pre">ObjectId</span></tt> for the value.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;McCarthy&#39;</span> <span class="p">},</span>
+      <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Sep 04, 1927&#39;</span><span class="p">),</span>
+      <span class="nx">death</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Dec 24, 2011&#39;</span><span class="p">),</span>
+      <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;Lisp&#39;</span><span class="p">,</span> <span class="s1">&#39;Artificial Intelligence&#39;</span><span class="p">,</span> <span class="s1">&#39;ALGOL&#39;</span> <span class="p">],</span>
+      <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1971</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Kyoto Prize&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1988</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Inamori Foundation&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;National Medal of Science&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;National Science Foundation&#39;</span>
+                <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>You can verify the inserted document by the querying the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;McCarthy&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The returned document contains an <tt class="docutils literal"><span class="pre">_id</span></tt> field with the generated
+<tt class="docutils literal"><span class="pre">ObjectId</span></tt> value:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;50a1880488d113a4ae94a94a&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;first&quot;</span> <span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span> <span class="o">:</span> <span class="s2">&quot;McCarthy&quot;</span> <span class="p">},</span>
+  <span class="s2">&quot;birth&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1927-09-04T04:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;death&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2011-12-24T05:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;contribs&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Lisp&quot;</span><span class="p">,</span> <span class="s2">&quot;Artificial Intelligence&quot;</span><span class="p">,</span> <span class="s2">&quot;ALGOL&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;awards&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Turing Award&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1971</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;ACM&quot;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Kyoto Prize&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span><span class="mi">1988</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;Inamori Foundation&quot;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Medal of Science&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
+                 <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Science Foundation&quot;</span>
+               <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If you pass an array of documents to the <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method, the <a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> performs a bulk insert into a collection.</p>
+<p>The following operation inserts three documents into the
+<tt class="docutils literal"><span class="pre">bios</span></tt> collection. The operation also illustrates the
+<em>dynamic schema</em> characteristic of MongoDB. Although the document
+with <tt class="docutils literal"><span class="pre">_id:</span> <span class="pre">3</span></tt> contains a field <tt class="docutils literal"><span class="pre">title</span></tt> which does not appear in
+the other documents, MongoDB does not require the other documents to
+contain this field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span>
+   <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nx">_id</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Grace&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Hopper&#39;</span> <span class="p">},</span>
+        <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Rear Admiral&#39;</span><span class="p">,</span>
+        <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Dec 09, 1906&#39;</span><span class="p">),</span>
+        <span class="nx">death</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Jan 01, 1992&#39;</span><span class="p">),</span>
+        <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;UNIVAC&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;FLOW-MATIC&#39;</span><span class="p">,</span> <span class="s1">&#39;COBOL&#39;</span> <span class="p">],</span>
+        <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Computer Sciences Man of the Year&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1969</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Data Processing Management Association&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Distinguished Fellow&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1973</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39; British Computer Society&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;W. W. McDowell Award&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1976</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE Computer Society&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;National Medal of Technology&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1991</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;United States&#39;</span>
+                  <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nx">_id</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Kristen&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Nygaard&#39;</span> <span class="p">},</span>
+        <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Aug 27, 1926&#39;</span><span class="p">),</span>
+        <span class="nx">death</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Aug 10, 2002&#39;</span><span class="p">),</span>
+        <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;OOP&#39;</span><span class="p">,</span> <span class="s1">&#39;Simula&#39;</span> <span class="p">],</span>
+        <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Rosing Prize&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1999</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Norwegian Data Association&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">2001</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;IEEE John von Neumann Medal&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">2001</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE&#39;</span>
+                  <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nx">_id</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Ole-Johan&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Dahl&#39;</span> <span class="p">},</span>
+        <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Oct 12, 1931&#39;</span><span class="p">),</span>
+        <span class="nx">death</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Jun 29, 2002&#39;</span><span class="p">),</span>
+        <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;OOP&#39;</span><span class="p">,</span> <span class="s1">&#39;Simula&#39;</span> <span class="p">],</span>
+        <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Rosing Prize&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">1999</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Norwegian Data Association&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">2001</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;IEEE John von Neumann Medal&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="mi">2001</span><span class="p">,</span>
+                    <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE&#39;</span>
+                  <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+   <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<table class="docutils footnote" frame="void" id="show-collection" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>You can also view a list of the existing
+collections in the database using the <tt class="docutils literal"><span class="pre">show</span> <span class="pre">collections</span></tt>
+operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="create-with-save">
+<span id="crud-create-save"></span><h2>Create with Save<a class="headerlink" href="#create-with-save" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method is a specialized
+upsert that use the <tt class="docutils literal"><span class="pre">_id</span></tt> field in the <tt class="docutils literal"><span class="pre">&lt;document&gt;</span></tt> argument to
+determine whether to perform an insert or an update:</p>
+<ul class="simple">
+<li>If the <tt class="docutils literal"><span class="pre">&lt;document&gt;</span></tt> argument does not contain the <tt class="docutils literal"><span class="pre">_id</span></tt> field or
+contains an <tt class="docutils literal"><span class="pre">_id</span></tt> field with a value not in the collection, the
+<a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method performs an insert of
+the document.</li>
+<li>Otherwise, the <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method
+performs an update.</li>
+</ul>
+<p>The <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method has the
+following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the following examples that illustrate the use of the
+<a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method to perform inserts:</p>
+<ul>
+<li><p class="first">If the <tt class="docutils literal"><span class="pre">&lt;document&gt;</span></tt> does not contain the <tt class="docutils literal"><span class="pre">_id</span></tt> field, the
+<a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method performs an insert.
+Refer to the <a class="reference internal" href="#crud-create-insert"><em>insert</em></a> section for details
+of the insert operation of a document without an <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+<p>The following operation performs an insert into the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection since the document does not contain the <tt class="docutils literal"><span class="pre">_id</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>
+   <span class="p">{</span>
+      <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Guido&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;van Rossum&#39;</span><span class="p">},</span>
+      <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Jan 31, 1956&#39;</span><span class="p">),</span>
+      <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;Python&#39;</span> <span class="p">],</span>
+      <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Award for the Advancement of Free Software&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">2001</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Free Software Foundation&#39;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                  <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;NLUUG Award&#39;</span><span class="p">,</span>
+                  <span class="nx">year</span><span class="o">:</span> <span class="mi">2003</span><span class="p">,</span>
+                  <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;NLUUG&#39;</span>
+                <span class="p">}</span>
+      <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If the <tt class="docutils literal"><span class="pre">&lt;document&gt;</span></tt> contains an <tt class="docutils literal"><span class="pre">_id</span></tt> field but has a value not
+found in the collection, the <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a>
+method performs an insert. Refer to the <a class="reference internal" href="#crud-create-insert"><em>insert</em></a> section for details of the insert operation.</p>
+<p>The following operation performs an insert into the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection since the document contains an <tt class="docutils literal"><span class="pre">_id</span></tt> field whose value
+<tt class="docutils literal"><span class="pre">10</span></tt> is not found in the <tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span><span class="p">,</span> <span class="nx">aka</span><span class="o">:</span> <span class="s1">&#39;Matz&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span><span class="p">},</span>
+     <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Apr 14, 1965&#39;</span><span class="p">),</span>
+     <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;Ruby&#39;</span> <span class="p">],</span>
+     <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+               <span class="p">{</span>
+                 <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Award for the Advancement of Free Software&#39;</span><span class="p">,</span>
+                 <span class="nx">year</span><span class="o">:</span> <span class="s1">&#39;2011&#39;</span><span class="p">,</span>
+                 <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;Free Software Foundation&#39;</span>
+               <span class="p">}</span>
+     <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="create-with-upsert">
+<span id="crud-create-update"></span><h2>Create with Upsert<a class="headerlink" href="#create-with-upsert" title="Permalink to this headline">¶</a></h2>
+<p>An <em>upsert</em> eliminates the need to perform a separate database call to
+check for the existence of a record before performing either an update
+or an insert operation. Typically update operations <a class="reference internal" href="update.html"><em>update</em></a> existing documents, but in MongoDB, the
+<a class="reference internal" href="../reference/method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> operation can accept an
+<tt class="docutils literal"><span class="pre">&lt;upsert&gt;</span></tt> option as an argument. Upserts are a hybrid operation that
+use the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument to determine the write operation:</p>
+<ul class="simple">
+<li>If the query matches an existing document(s), the upsert performs an
+update.</li>
+<li>If the query matches no document in the collection, the upsert
+inserts a single document.</li>
+</ul>
+<p>Consider the following syntax for an upsert operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span>
+                      <span class="o">&lt;</span><span class="nx">update</span><span class="o">&gt;</span><span class="p">,</span>
+                      <span class="p">{</span> <span class="nx">upsert</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following examples illustrate the use of the upsert to perform
+create operations:</p>
+<ul>
+<li><p class="first">If no document matches the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <tt class="docutils literal"><span class="pre">upsert</span></tt>
+performs an insert. If the <tt class="docutils literal"><span class="pre">&lt;update&gt;</span></tt> argument includes only field
+and value pairs, the new document contains the fields and values
+specified in the <tt class="docutils literal"><span class="pre">&lt;update&gt;</span></tt> argument. If the <tt class="docutils literal"><span class="pre">_id</span></tt> field is
+omitted, the operation adds the <tt class="docutils literal"><span class="pre">_id</span></tt> field and generates a unique
+<tt class="docutils literal"><span class="pre">ObjectId</span></tt> for its value.</p>
+<p>The following <tt class="docutils literal"><span class="pre">upsert</span></tt> operation inserts a new document into the
+<tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+   <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Dennis&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Ritchie&#39;</span><span class="p">}</span> <span class="p">},</span>
+   <span class="p">{</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Dennis&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Ritchie&#39;</span><span class="p">},</span>
+     <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Sep 09, 1941&#39;</span><span class="p">),</span>
+     <span class="nx">died</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Oct 12, 2011&#39;</span><span class="p">),</span>
+     <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;UNIX&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span> <span class="p">],</span>
+     <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+               <span class="p">{</span>
+                 <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                 <span class="nx">year</span><span class="o">:</span> <span class="mi">1983</span><span class="p">,</span>
+                 <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;National Medal of Technology&#39;</span><span class="p">,</span>
+                 <span class="nx">year</span><span class="o">:</span> <span class="mi">1998</span><span class="p">,</span>
+                 <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;United States&#39;</span>
+               <span class="p">},</span>
+               <span class="p">{</span>
+                 <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Japan Prize&#39;</span><span class="p">,</span>
+                 <span class="nx">year</span><span class="o">:</span> <span class="mi">2011</span><span class="p">,</span>
+                 <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;The Japan Prize Foundation&#39;</span>
+               <span class="p">}</span>
+     <span class="p">]</span>
+   <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">upsert</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If no document matches the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the upsert operation
+inserts a new document. If the <tt class="docutils literal"><span class="pre">&lt;update&gt;</span></tt> argument includes only
+<a class="reference internal" href="../reference/operators.html#update-operators"><em>update operators</em></a>, the new document contains
+the fields and values from <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument with the operations
+from the <tt class="docutils literal"><span class="pre">&lt;update&gt;</span></tt> argument applied.</p>
+<p>The following operation inserts a new document into the
+<tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="p">{</span> <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Ken&#39;</span><span class="p">,</span> <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Thompson&#39;</span> <span class="p">}</span>
+   <span class="p">},</span>
+   <span class="p">{</span>
+     <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span>
+              <span class="nx">birth</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;Feb 04, 1943&#39;</span><span class="p">),</span>
+              <span class="nx">contribs</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;UNIX&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;UTF-8&#39;</span> <span class="p">],</span>
+              <span class="nx">awards</span><span class="o">:</span> <span class="p">[</span>
+                        <span class="p">{</span>
+                          <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                          <span class="nx">year</span><span class="o">:</span> <span class="mi">1983</span><span class="p">,</span>
+                          <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;ACM&#39;</span>
+                        <span class="p">},</span>
+                        <span class="p">{</span>
+                          <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;IEEE Richard W. Hamming Medal&#39;</span><span class="p">,</span>
+                          <span class="nx">year</span><span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
+                          <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE&#39;</span>
+                        <span class="p">},</span>
+                        <span class="p">{</span>
+                          <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;National Medal of Technology&#39;</span><span class="p">,</span>
+                          <span class="nx">year</span><span class="o">:</span> <span class="mi">1998</span><span class="p">,</span>
+                          <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;United States&#39;</span>
+                        <span class="p">},</span>
+                        <span class="p">{</span>
+                          <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Tsutomu Kanai Award&#39;</span><span class="p">,</span>
+                          <span class="nx">year</span><span class="o">:</span> <span class="mi">1999</span><span class="p">,</span>
+                          <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;IEEE&#39;</span>
+                        <span class="p">},</span>
+                        <span class="p">{</span>
+                          <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Japan Prize&#39;</span><span class="p">,</span>
+                          <span class="nx">year</span><span class="o">:</span> <span class="mi">2011</span><span class="p">,</span>
+                          <span class="nx">by</span><span class="o">:</span> <span class="s1">&#39;The Japan Prize Foundation&#39;</span>
+                        <span class="p">}</span>
+             <span class="p">]</span>
+           <span class="p">}</span>
+   <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">upsert</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/document.html" title="Previous Section: BSON Documents">&lt; &nbsp; BSON Documents</a></li>
+<li id="btnvup"><a href="../crud.html" title="Parent Section: CRUD" >&#47;&#92;&nbsp; CRUD</a></li>
+<li id="btnvnx"><a href="read.html" title="Next Section: Read">Read &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

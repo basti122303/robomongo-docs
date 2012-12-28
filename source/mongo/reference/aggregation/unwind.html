@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$unwind (aggregation) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/aggregation/unwind" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$week (aggregation)" href="week.html" />
+<link rel="prev" title="$toUpper (aggregation)" href="toUpper.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="unwind-aggregation">
+<h1>$unwind (aggregation)<a class="headerlink" href="#unwind-aggregation" title="Permalink to this headline">¶</a></h1>
+<dl class="pipeline">
+<dt id="_S_unwind">
+<tt class="descname">$unwind</tt><a class="headerlink" href="#_S_unwind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Peels off the elements of an array individually, and returns a
+stream of documents. <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> returns one document for
+every member of the unwound array within every source
+document. Take the following aggregation command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">tags</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}},</span>
+    <span class="p">{</span> <span class="nx">$unwind</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The dollar sign (i.e. <tt class="docutils literal"><span class="pre">$</span></tt>) must proceed the field
+specification handed to the <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> operator.</p>
+</div>
+<p>In the above aggregation <a class="reference internal" href="project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> selects
+(inclusively) the <tt class="docutils literal"><span class="pre">author</span></tt>, <tt class="docutils literal"><span class="pre">title</span></tt>, and <tt class="docutils literal"><span class="pre">tags</span></tt> fields, as
+well as the <tt class="docutils literal"><span class="pre">_id</span></tt> field implicitly. Then the pipeline passes the
+results of the projection to the <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> operator,
+which will unwind the <tt class="docutils literal"><span class="pre">tags</span></tt> field. This operation may return
+a sequence of documents that resemble the following for a
+collection that contains one document holding a <tt class="docutils literal"><span class="pre">tags</span></tt> field
+with an array of 3 items.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;fun&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;good&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4e6e4ef557b77501a49233f6&quot;</span><span class="p">),</span>
+                     <span class="s2">&quot;title&quot;</span> <span class="o">:</span> <span class="s2">&quot;this is my title&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;author&quot;</span> <span class="o">:</span> <span class="s2">&quot;bob&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="s2">&quot;fun&quot;</span>
+             <span class="p">}</span>
+     <span class="p">],</span>
+     <span class="s2">&quot;OK&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A single document becomes 3 documents: each document is identical
+except for the value of the <tt class="docutils literal"><span class="pre">tags</span></tt> field. Each value of <tt class="docutils literal"><span class="pre">tags</span></tt>
+is one of the values in the original &#8220;tags&#8221; array.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> has the following behaviors:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> is most useful in combination
+with <a class="reference internal" href="group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>.</li>
+<li>You may undo the effects of unwind operation with the
+<a class="reference internal" href="group.html#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> pipeline operator.</li>
+<li>If you specify a target field for <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that
+does not exist in an input document, the pipeline ignores the
+input document, and will generate no result documents.</li>
+<li>If you specify a target field for <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that is
+not an array, <a class="reference internal" href="../commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate()</span></tt></a> generates an error.</li>
+<li>If you specify a target field for <a class="reference internal" href="#_S_unwind" title="$unwind"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$unwind</span></tt></a> that
+holds an empty array (<tt class="docutils literal"><span class="pre">[]</span></tt>) in an input document, the
+pipeline ignores the input document, and will generates no
+result documents.</li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="toUpper.html" title="Previous Section: $toUpper (aggregation)">&lt; &nbsp; $toUpper (aggregation)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="week.html" title="Next Section: $week (aggregation)">$week (aggregation) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

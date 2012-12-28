@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Force a Member to Become Primary &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/force-member-to-be-primary" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Change Hostnames in a Replica Set" href="change-hostnames-in-a-replica-set.html" />
+<link rel="prev" title="Change the Size of the Oplog" href="change-oplog-size.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="force-a-member-to-become-primary">
+<h1>Force a Member to Become Primary<a class="headerlink" href="#force-a-member-to-become-primary" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>You can force a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member to become <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> by
+giving it a higher <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> value than any other
+member in the set.</p>
+<p>Optionally, you also can force a member never to become primary by
+setting its <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> value to <tt class="docutils literal"><span class="pre">0</span></tt>, which means the
+member can never seek <a class="reference internal" href="../core/replication.html#replica-set-elections"><em>election</em></a> as
+primary. For more information, see
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-secondary-only-members"><em>Secondary-Only Members</em></a>.</p>
+</div>
+<div class="section" id="procedures">
+<h2>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="force-a-member-to-be-primary-by-setting-its-priority-high">
+<span id="replica-set-force-member-to-be-primary-via-priority-setting"></span><h3>Force a Member to be Primary by Setting its Priority High<a class="headerlink" href="#force-a-member-to-be-primary-by-setting-its-priority-high" title="Permalink to this headline">¶</a></h3>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.</span></p>
+<p>For more information on priorities, see <a class="reference internal" href="../core/replication.html#replica-set-node-priority"><em>Member Priority</em></a>.</p>
+<p>This procedure assumes your current <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> is
+<tt class="docutils literal"><span class="pre">m1.example.net</span></tt> and that you&#8217;d like to instead make <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> primary.
+The procedure also assumes you have a three-member <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> with the
+configuration below. For more information on configurations, see <a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Replica Set
+Configuration Use</em></a>.</p>
+<p>This procedure assumes this configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;m1.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;m2.example.net:27017&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;m3.example.net:27017&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic">
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, use the following sequence of operations
+to make <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> the primary:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This sets <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> to have a higher
+<a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> value than the other <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances.</p>
+<p>The following sequence of events occur:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">m3.example.net</span></tt> and <tt class="docutils literal"><span class="pre">m2.example.net</span></tt> sync with
+<tt class="docutils literal"><span class="pre">m1.example.net</span></tt> (typically within 10 seconds).</li>
+<li><tt class="docutils literal"><span class="pre">m1.example.net</span></tt> sees that it no longer has highest priority and,
+in most cases, steps down. <tt class="docutils literal"><span class="pre">m1.example.net</span></tt> <em>does not</em> step down
+if <tt class="docutils literal"><span class="pre">m3.example.net</span></tt>&#8216;s sync is far behind. In that case,
+<tt class="docutils literal"><span class="pre">m1.example.net</span></tt> waits until <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> is within 10
+seconds of its optime and then steps down. This minimizes the
+amount of time with no primary following failover.</li>
+<li>The step down forces on election in which <tt class="docutils literal"><span class="pre">m3.example.net</span></tt>
+becomes primary based on its <a class="reference internal" href="../reference/replica-configuration.html#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">priority</span></tt></a> setting.</li>
+</ul>
+</li>
+<li><p class="first">Optionally, if <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> is more than 10 seconds behind
+<tt class="docutils literal"><span class="pre">m1.example.net</span></tt>&#8216;s optime, and if you don&#8217;t need to have a primary
+designated within 10 seconds, you can force <tt class="docutils literal"><span class="pre">m1.example.net</span></tt> to
+step down by running:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">({</span><span class="nx">replSetStepDown</span><span class="o">:</span><span class="mi">1000000</span><span class="p">,</span> <span class="nx">force</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This prevents <tt class="docutils literal"><span class="pre">m1.example.net</span></tt> from being primary for 1,000,000
+seconds, even if there is no other member that can become primary.
+When <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> catches up with <tt class="docutils literal"><span class="pre">m1.example.net</span></tt> it will
+become primary.</p>
+<p>If you later want to make <tt class="docutils literal"><span class="pre">m1.example.net</span></tt>
+primary again while it waits for <tt class="docutils literal"><span class="pre">m3.example.net</span></tt> to catch up,
+issue the following command to make <tt class="docutils literal"><span class="pre">m1.example.net</span></tt> seek election
+again:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">freeze</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/replica-commands.html#rs.freeze" title="rs.freeze"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.freeze()</span></tt></a> provides a wrapper around the
+<a class="reference internal" href="../reference/replica-commands.html#replSetFreeze" title="replSetFreeze"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetFreeze</span></tt></a> database command.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="force-a-member-to-be-primary-using-database-commands">
+<span id="replica-set-force-member-to-be-primary-via-dbcommands"></span><h3>Force a Member to be Primary Using Database Commands<a class="headerlink" href="#force-a-member-to-be-primary-using-database-commands" title="Permalink to this headline">¶</a></h3>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 1.8.</span></p>
+<p>Consider a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> with the following members:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">mdb0.example.net</span></tt> - the  current <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">mdb1.example.net</span></tt> - a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">mdb2.example.net</span></tt> - a secondary .</li>
+</ul>
+<p>To force a member to become primary use the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">In a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, run <a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> to ensure your replica
+set is running as expected.</p>
+</li>
+<li><p class="first">In a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance running on <tt class="docutils literal"><span class="pre">mdb2.example.net</span></tt>, freeze
+<tt class="docutils literal"><span class="pre">mdb2.example.net</span></tt> so that it does not attempt to become primary
+for 120 seconds.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">freeze</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">In a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running
+on <tt class="docutils literal"><span class="pre">mdb0.example.net</span></tt>, step down this instance that the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is not eligible to become primary for 120
+seconds:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">stepDown</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">mdb1.example.net</span></tt> becomes primary.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">During the transition, there is a short window where
+the set does not have a primary.</p>
+</div>
+</li>
+</ol>
+<p>For more information, consider the <a class="reference internal" href="../reference/replica-commands.html#rs.freeze" title="rs.freeze"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.freeze()</span></tt></a> and
+<a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> methods that wrap the
+<a class="reference internal" href="../reference/replica-commands.html#replSetFreeze" title="replSetFreeze"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetFreeze</span></tt></a> and <a class="reference internal" href="../reference/command/replSetStepDown.html#replSetStepDown" title="replSetStepDown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetStepDown</span></tt></a> commands.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="change-oplog-size.html" title="Previous Section: Change the Size of the Oplog">&lt; &nbsp; Change the Size of the Oplog</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="change-hostnames-in-a-replica-set.html" title="Next Section: Change Hostnames in a Replica Set">Change Hostnames in a Replica Set &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

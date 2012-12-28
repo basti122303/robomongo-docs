@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Collection Statistics Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/collection-statistics" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Collection Validation Data" href="collection-validation.html" />
+<link rel="prev" title="Database Statistics Reference" href="database-statistics.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="collection-statistics-reference">
+<h1>Collection Statistics Reference<a class="headerlink" href="#collection-statistics-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>To fetch collection statistics, call the <a class="reference internal" href="method/db.collection.stats.html#db.collection.stats" title="db.collection.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.stats()</span></tt></a> method on
+a collection object in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">stats</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>You may also use the literal command format:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">collStats</span><span class="o">:</span> <span class="s2">&quot;collection&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">collection</span></tt> in both examples with the name of the
+collection you want statistics for. By default, the return values will
+appear in terms of bytes. You can, however, enter a <tt class="docutils literal"><span class="pre">scale</span></tt>
+argument. For example, you can convert the return values to kilobytes
+like so:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">stats</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">collStats</span><span class="o">:</span> <span class="s2">&quot;collection&quot;</span><span class="p">,</span> <span class="nx">scale</span><span class="o">:</span> <span class="mi">1024</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">scale</span></tt> argument rounds values to whole numbers. This can
+produce unpredictable and unexpected results in some situations.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The documentation of the &#8220;<a class="reference internal" href="commands.html#collStats" title="collStats"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">collStats</span></tt></a>&#8221; command
+and the &#8220;<a class="reference internal" href="method/db.collection.stats.html#db.collection.stats" title="db.collection.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.stats()</span></tt></a>,&#8221; method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</div>
+</div>
+<div class="section" id="example-document">
+<h2>Example Document<a class="headerlink" href="#example-document" title="Permalink to this headline">¶</a></h2>
+<p>The output of <a class="reference internal" href="method/db.collection.stats.html#db.collection.stats" title="db.collection.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.stats()</span></tt></a> resembles the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+     <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;size&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;avgObjSize&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;storageSize&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;numExtents&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;nindexes&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;lastExtentSize&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;paddingFactor&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;systemFlags&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">bit</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;userFlags&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">bit</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;totalIndexSize&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="s2">&quot;indexSizes&quot;</span> <span class="o">:</span> <span class="p">{</span>
+             <span class="s2">&quot;_id_&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span>
+             <span class="s2">&quot;a_1&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span>
+     <span class="p">},</span>
+     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<dl class="stats">
+<dt id="ns">
+<tt class="descname">ns</tt><a class="headerlink" href="#ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The namespace of the current collection, which follows the format
+<tt class="docutils literal"><span class="pre">[database].[collection]</span></tt>.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="count">
+<tt class="descname">count</tt><a class="headerlink" href="#count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of objects or documents in this collection.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="size">
+<tt class="descname">size</tt><a class="headerlink" href="#size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the data stored in this collection. This value does not
+include the size of any indexes associated with the collection,
+which the <a class="reference internal" href="#totalIndexSize" title="totalIndexSize"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">totalIndexSize</span></tt></a> field reports.</p>
+<p>The <tt class="docutils literal"><span class="pre">scale</span></tt> argument affects this value.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="avgObjSize">
+<tt class="descname">avgObjSize</tt><a class="headerlink" href="#avgObjSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The average size of an object in the collection. The <tt class="docutils literal"><span class="pre">scale</span></tt>
+argument affects this value.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="storageSize">
+<tt class="descname">storageSize</tt><a class="headerlink" href="#storageSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total amount of storage allocated to this collection for
+<a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> storage.  The <tt class="docutils literal"><span class="pre">scale</span></tt> argument affects this
+value. The <a class="reference internal" href="database-statistics.html#storageSize" title="storageSize"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">storageSize</span></tt></a> does not decrease as you remove or
+shrink documents.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="numExtents">
+<tt class="descname">numExtents</tt><a class="headerlink" href="#numExtents" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total number of contiguously allocated data file regions.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="nindexes">
+<tt class="descname">nindexes</tt><a class="headerlink" href="#nindexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of indexes on the collection. All collections have at
+least one index on the <a class="reference internal" href="glossary.html#term-id"><em class="xref std std-term">_id</em></a> field.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>Before 2.2, capped collections did not necessarily have an
+index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field, and some capped collections created
+with pre-2.2 versions of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> may not have an
+<tt class="docutils literal"><span class="pre">_id</span></tt> index.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="lastExtentSize">
+<tt class="descname">lastExtentSize</tt><a class="headerlink" href="#lastExtentSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the last extent allocated. The <tt class="docutils literal"><span class="pre">scale</span></tt> argument
+affects this value.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="paddingFactor">
+<tt class="descname">paddingFactor</tt><a class="headerlink" href="#paddingFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amount of space added to the end of each document at insert
+time. The document padding provides a small amount of extra space
+on disk to allow a document to grow slightly without needing to
+move the document. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> automatically calculates this
+padding factor</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="flags">
+<tt class="descname">flags</tt><a class="headerlink" href="#flags" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>Removed in version 2.2 and replaced with the <a class="reference internal" href="#userFlags" title="userFlags"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">userFlags</span></tt></a>
+and <a class="reference internal" href="#systemFlags" title="systemFlags"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">systemFlags</span></tt></a> fields.</p>
+<p>Indicates the number of flags on the current collection. In version
+2.0, the only flag notes the existence of an <a class="reference internal" href="glossary.html#term-index"><em class="xref std std-term">index</em></a> on the
+<a class="reference internal" href="glossary.html#term-id"><em class="xref std std-term">_id</em></a> field.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="systemFlags">
+<tt class="descname">systemFlags</tt><a class="headerlink" href="#systemFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Reports the flags on this collection that reflect internal server
+options. Typically this value is <tt class="docutils literal"><span class="pre">1</span></tt> and reflects the existence
+of an <a class="reference internal" href="glossary.html#term-index"><em class="xref std std-term">index</em></a> on the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="userFlags">
+<tt class="descname">userFlags</tt><a class="headerlink" href="#userFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Reports the flags on this collection set by the user. In version
+2.2 the only user flag is <a class="reference internal" href="commands.html#usePowerOf2Sizes" title="usePowerOf2Sizes"><tt class="xref mongodb mongodb-collflag docutils literal"><span class="pre">usePowerOf2Sizes</span></tt></a>.
+If <a class="reference internal" href="commands.html#usePowerOf2Sizes" title="usePowerOf2Sizes"><tt class="xref mongodb mongodb-collflag docutils literal"><span class="pre">usePowerOf2Sizes</span></tt></a> is enabled, <a class="reference internal" href="#userFlags" title="userFlags"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">userFlags</span></tt></a> will
+be set to <tt class="docutils literal"><span class="pre">1</span></tt>, otherwise <a class="reference internal" href="#userFlags" title="userFlags"><tt class="xref mongodb mongodb-stats docutils literal"><span class="pre">userFlags</span></tt></a> will be <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+<p>See the <a class="reference internal" href="commands.html#collMod" title="collMod"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">collMod</span></tt></a> command for more information on setting user
+flags and <a class="reference internal" href="commands.html#usepowerof2sizes"><em>usePowerOf2Sizes</em></a>.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="totalIndexSize">
+<tt class="descname">totalIndexSize</tt><a class="headerlink" href="#totalIndexSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total size of all indexes. The <tt class="docutils literal"><span class="pre">scale</span></tt> argument affects this
+value.</p>
+</dd></dl>
+
+<dl class="stats">
+<dt id="indexSizes">
+<tt class="descname">indexSizes</tt><a class="headerlink" href="#indexSizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This field specifies the key and size of every existing index on
+the collection. The <tt class="docutils literal"><span class="pre">scale</span></tt> argument affects this value.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="database-statistics.html" title="Previous Section: Database Statistics Reference">&lt; &nbsp; Database Statistics Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="collection-validation.html" title="Next Section: Collection Validation Data">Collection Validation Data &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

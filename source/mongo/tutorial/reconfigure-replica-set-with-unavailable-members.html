@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Reconfigure a Replica Set with Unavailable Members &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/reconfigure-replica-set-with-unavailable-members" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Replication" href="../replication.html" />
+<link rel="next" title="Recover MongoDB Data following Unexpected Shutdown" href="recover-data-following-unexpected-shutdown.html" />
+<link rel="prev" title="Convert a Secondary to an Arbiter" href="convert-secondary-into-arbiter.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="reconfigure-a-replica-set-with-unavailable-members">
+<h1>Reconfigure a Replica Set with Unavailable Members<a class="headerlink" href="#reconfigure-a-replica-set-with-unavailable-members" title="Permalink to this headline">¶</a></h1>
+<p>To reconfigure a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> when a <strong>minority</strong> of
+members are unavailable, use the <a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a>
+operation on
+the current <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, following the example in the
+<a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Replica Set Reconfiguration Procedure</em></a>.</p>
+<p>This document provides the following options for reconfiguring a replica
+set when a <strong>majority</strong> of members are accessible:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#replica-set-force-reconfiguration"><em>Reconfigure by Forcing the Reconfiguration</em></a></li>
+<li><a class="reference internal" href="#replica-set-reconfigure-by-replacing"><em>Reconfigure by Replacing the Replica Set</em></a></li>
+</ul>
+<p>You may need to use one of these procedures, for example, in a
+geographically distributed replica set, where <em>no</em> local group of
+members can reach a majority. See
+<a class="reference internal" href="../core/replication-internals.html#replica-set-elections-and-network-partitions"><em>Elections and Network Partitions</em></a> for more
+information on this situation.</p>
+<div class="section" id="reconfigure-by-forcing-the-reconfiguration">
+<span id="replica-set-force-reconfiguration"></span><span id="index-0"></span><h2>Reconfigure by Forcing the Reconfiguration<a class="headerlink" href="#reconfigure-by-forcing-the-reconfiguration" title="Permalink to this headline">¶</a></h2>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.</span></p>
+<p>This procedure lets you recover while a majority of <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>
+members are down or unreachable. You connect to any surviving member and
+use the <tt class="docutils literal"><span class="pre">force</span></tt> option to the <a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a>  method.</p>
+<p>The <tt class="docutils literal"><span class="pre">force</span></tt> option forces a new configuration onto the. Use this procedure only to
+recover from catastrophic interruptions. Do not use <tt class="docutils literal"><span class="pre">force</span></tt> every
+time you reconfigure. Also, do not use the <tt class="docutils literal"><span class="pre">force</span></tt> option in any automatic
+scripts and do not use <tt class="docutils literal"><span class="pre">force</span></tt> when there is still a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>.</p>
+<p>To force reconfiguration:</p>
+<ol class="arabic">
+<li><p class="first">Back up a surviving member.</p>
+</li>
+<li><p class="first">Connect to a surviving member and save the current configuration.
+Consider the following example commands for saving the configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+
+<span class="nx">printjson</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">On the same member, remove the down and unreachable members of the
+replica set from the <a class="reference internal" href="../reference/replica-configuration.html#rs.conf.members" title="rs.conf.members"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members</span></tt></a> array by
+setting the array equal to the surviving members alone. Consider the
+following example, which uses the <tt class="docutils literal"><span class="pre">cfg</span></tt> variable created in the
+previous step:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span> <span class="o">=</span> <span class="p">[</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">7</span><span class="p">]]</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">On the same member, reconfigure the set by using the
+<a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> command with the <tt class="docutils literal"><span class="pre">force</span></tt> option set to
+<tt class="docutils literal"><span class="pre">true</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">,</span> <span class="p">{</span><span class="nx">force</span> <span class="o">:</span> <span class="kc">true</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This operation forces the secondary to use the new configuration. The
+configuration is then propagated to all the surviving members listed
+in the <tt class="docutils literal"><span class="pre">members</span></tt> array. The replica set then elects a new primary.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When you use <tt class="docutils literal"><span class="pre">force</span> <span class="pre">:</span> <span class="pre">true</span></tt>, the version number in the
+replica set configuration increases significantly, by tens or
+hundreds of thousands. This is normal and designed to prevent set
+version collisions if you accidentally force reconfigs on both sides of
+a network partition and then the network partitioning ends.</p>
+</div>
+</li>
+<li><p class="first">If the failure or partition was only temporary, shut down or
+decommission the removed members as soon as possible.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="reconfigure-by-replacing-the-replica-set">
+<span id="replica-set-reconfigure-by-replacing"></span><h2>Reconfigure by Replacing the Replica Set<a class="headerlink" href="#reconfigure-by-replacing-the-replica-set" title="Permalink to this headline">¶</a></h2>
+<p>Use the following procedure <strong>only</strong> for versions of MongoDB prior to
+version 2.0. If you&#8217;re running MongoDB 2.0 or later, use the above
+procedure, <a class="reference internal" href="#replica-set-force-reconfiguration"><em>Reconfigure by Forcing the Reconfiguration</em></a>.</p>
+<p>These procedures are for situations where a <em>majority</em> of the
+<a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members are down or unreachable. If a majority is
+<em>running</em>, then skip these procedures and instead use the
+<a class="reference internal" href="../reference/replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> command according to the examples in
+<a class="reference internal" href="../reference/replica-configuration.html#replica-set-reconfiguration-usage"><em>Example Reconfiguration Operations</em></a>.</p>
+<p>If you run a pre-2.0 version and a majority of your replica set is down,
+you have the two options described here. Both involve replacing the
+replica set.</p>
+<div class="section" id="reconfigure-by-turning-off-replication">
+<h3>Reconfigure by Turning Off Replication<a class="headerlink" href="#reconfigure-by-turning-off-replication" title="Permalink to this headline">¶</a></h3>
+<p>This option replaces the <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> with a <a class="reference internal" href="../reference/glossary.html#term-standalone"><em class="xref std std-term">standalone</em></a> server.</p>
+<ol class="arabic">
+<li><p class="first">Stop the surviving <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances. To ensure a clean shutdown, use
+an existing <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control script</em></a> or an invocation that resembles the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">data</span><span class="o">/</span><span class="nx">db</span><span class="o">/</span> <span class="o">--</span><span class="nx">shutdown</span>
+</pre></div>
+</div>
+<p>Set <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a> to the data directory of your
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</li>
+<li><p class="first">Create a backup of the data directory (i.e. <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>) of
+the surviving members of the set.</p>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p class="last">If you have a backup of the database you may instead remove
+this data.</p>
+</div>
+</li>
+<li><p class="first">Restart one of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances <em>without</em> the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a> parameter.</p>
+<p>The data is now accessible and provided by a single server that is
+not a replica set member. Clients can use this server for both
+reads and writes.</p>
+</li>
+</ol>
+<p>When possible, re-deploy a replica set to provide redundancy and to
+protect your deployment from operational interruption.</p>
+</div>
+<div class="section" id="reconfigure-by-breaking-the-mirror">
+<span id="replica-set-forcing-resync"></span><h3>Reconfigure by &#8220;Breaking the Mirror&#8221;<a class="headerlink" href="#reconfigure-by-breaking-the-mirror" title="Permalink to this headline">¶</a></h3>
+<p>This option selects a surviving <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member to be the
+new <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and to &#8220;seed&#8221; a new replica set. In the following
+procedure, the new primary is <tt class="docutils literal"><span class="pre">db0.example.net</span></tt>. All other members will resync
+from this member.</p>
+<ol class="arabic">
+<li><p class="first">Stop the surviving <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances. To ensure a clean shutdown, use
+an existing <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control script</em></a> or an invocation that resembles the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">mongod</span> <span class="o">--</span><span class="nx">dbpath</span> <span class="o">/</span><span class="nx">data</span><span class="o">/</span><span class="nx">db</span><span class="o">/</span> <span class="o">--</span><span class="nx">shutdown</span>
+</pre></div>
+</div>
+<p>Set <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a> to the data directory of your
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</li>
+<li><p class="first">Move the data directories (i.e. <tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt>)
+for all the members except <tt class="docutils literal"><span class="pre">db0.example.net</span></tt>, so that all the members except <tt class="docutils literal"><span class="pre">db0.example.net</span></tt>
+have empty data directories. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mv /data/db /data/db-old
+</pre></div>
+</div>
+</li>
+<li><p class="first">Move the data files for <tt class="docutils literal"><span class="pre">local</span></tt> database (i.e. <tt class="docutils literal"><span class="pre">local.*</span></tt>) so
+that <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> has no local database. For example</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir /data/local-old
+mv /data/db/local* /data/local-old/
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start each member of the replica set normally.</p>
+</li>
+<li><p class="first">Connect to <tt class="docutils literal"><span class="pre">db0.example.net</span></tt> in a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and run <a class="reference internal" href="../reference/replica-commands.html#rs.initiate" title="rs.initiate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.initiate()</span></tt></a>
+to initiate the replica set.</p>
+</li>
+<li><p class="first">Add the other set members using <a class="reference internal" href="../reference/replica-commands.html#rs.add" title="rs.add"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.add()</span></tt></a>. For example, to
+add a member running on <tt class="docutils literal"><span class="pre">db1.example.net</span></tt> at port <tt class="docutils literal"><span class="pre">27017</span></tt>, issue
+the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s2">&quot;db1.example.net:27017&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These members will resync and copy all data from <tt class="docutils literal"><span class="pre">db0.example.net</span></tt>.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="convert-secondary-into-arbiter.html" title="Previous Section: Convert a Secondary to an Arbiter">&lt; &nbsp; Convert a Secondary to an Arbiter</a></li>
+<li id="btnvup"><a href="../replication.html" title="Parent Section: Replication" >&#47;&#92;&nbsp; Replication</a></li>
+<li id="btnvnx"><a href="recover-data-following-unexpected-shutdown.html" title="Next Section: Recover MongoDB Data following Unexpected Shutdown">Recover MongoDB Data following Unexpected Shutdown &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

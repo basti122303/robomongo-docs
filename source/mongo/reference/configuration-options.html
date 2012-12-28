@@ -1,0 +1,988 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Configuration File Options &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/configuration-options" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Connection String URI Format" href="connection-string.html" />
+<link rel="prev" title="mongofiles" href="mongofiles.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="configuration-file-options">
+<h1>Configuration File Options<a class="headerlink" href="#configuration-file-options" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>Administrators and users can control <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances at runtime either directly from
+<a class="reference internal" href="mongod.html"><em>mongod&#8217;s command line arguments</em></a> or using a
+configuration file.</p>
+<p>While both methods are functionally equivalent and all settings are
+similar, the configuration file method is preferable. If you
+installed from a package and have started MongoDB using your system&#8217;s
+<a class="reference internal" href="glossary.html#term-101"><em class="xref std std-term">control script</em></a>, you&#8217;re already using a configuration file.</p>
+<p>To start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> using a config file,
+use one of the following forms:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --config /etc/mongodb.conf
+mongod -f /etc/mongodb.conf
+mongos --config /srv/mongodb/mongos.conf
+mongos -f /srv/mongodb/mongos.conf
+</pre></div>
+</div>
+<p>Declare all settings in this file using the following form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>&lt;setting&gt; <span class="o">=</span> &lt;value&gt;
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.0: </span><em>Before</em> version 2.0, Boolean (i.e. <tt class="docutils literal"><span class="pre">true|false</span></tt>) or &#8220;flag&#8221;
+parameters, register as true, if they appear in the configuration
+file, regardless of their value.</p>
+</div>
+<div class="section" id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
+<dl class="setting">
+<dt id="verbose">
+<tt class="descname">verbose</tt><a class="headerlink" href="#verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Increases the amount of internal reporting returned on standard
+output or in the log file generated by <a class="reference internal" href="#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a>. To
+enable <a class="reference internal" href="#verbose" title="verbose"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">verbose</span></tt></a> or to enable increased verbosity with
+<a class="reference internal" href="#vvvv" title="vvvv"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">vvvv</span></tt></a>, set these options as in the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nv">verbose</span> <span class="o">=</span> <span class="nb">true</span>
+<span class="nv">vvvv</span> <span class="o">=</span> <span class="nb">true</span>
+</pre></div>
+</div>
+<p>MongoDB has the following levels of verbosity:</p>
+<dl class="setting">
+<dt id="v">
+<tt class="descname">v</tt><a class="headerlink" href="#v" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Alternate form of <a class="reference internal" href="#verbose" title="verbose"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">verbose</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="vv">
+<tt class="descname">vv</tt><a class="headerlink" href="#vv" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Additional increase in verbosity of output and logging.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="vvv">
+<tt class="descname">vvv</tt><a class="headerlink" href="#vvv" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Additional increase in verbosity of output and logging.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="vvvv">
+<tt class="descname">vvvv</tt><a class="headerlink" href="#vvvv" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Additional increase in verbosity of output and logging.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="vvvvv">
+<tt class="descname">vvvvv</tt><a class="headerlink" href="#vvvvv" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Additional increase in verbosity of output and logging.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="setting">
+<dt id="quiet">
+<tt class="descname">quiet</tt><a class="headerlink" href="#quiet" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Runs the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance in a quiet
+mode that attempts to limit the amount of output. This option suppresses:</p>
+<ul class="simple">
+<li>output from <a class="reference internal" href="glossary.html#term-database-command"><em class="xref std std-term">database commands</em></a>,
+including <a class="reference internal" href="commands.html#drop" title="drop"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">drop</span></tt></a>, <tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">dropIndex</span></tt>,
+<a class="reference internal" href="commands.html#diagLogging" title="diagLogging"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">diagLogging</span></tt></a>, <a class="reference internal" href="commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a>, and
+<a class="reference internal" href="commands.html#clean" title="clean"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clean</span></tt></a>.</li>
+<li>replication activity.</li>
+<li>connection accepted events.</li>
+<li>connection closed events.</li>
+</ul>
+</dd></dl>
+
+<dl class="setting">
+<dt id="port">
+<tt class="descname">port</tt><a class="headerlink" href="#port" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 27017</p>
+<p>Specifies a TCP port for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance to listen for client connections. UNIX-like systems
+require root access for ports with numbers lower than 1000.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="bind_ip">
+<tt class="descname">bind_ip</tt><a class="headerlink" href="#bind_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> All interfaces.</p>
+<p>Set this option to configure the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process to bind to and listen for connections
+from applications on this address. You may attach <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances to any interface; however, if you
+attach the process to a publicly accessible interface, implement
+proper authentication or firewall restrictions to protect the
+integrity of your database.</p>
+<p>You may concatenate a list of comma separated values to bind
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to multiple IP addresses.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="maxConns">
+<tt class="descname">maxConns</tt><a class="headerlink" href="#maxConns" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> depends on system (i.e. ulimit and file descriptor)
+limits. Unless set, MongoDB will not limit its own connections.</p>
+<p>Specifies a value to set the maximum number of simultaneous
+connections that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will
+accept. This setting has no effect if it is higher than your
+operating system&#8217;s configured maximum connection tracking
+threshold.</p>
+<p>This is particularly useful for <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> if you have a
+client that creates a number of collections but allows them to
+timeout rather than close the collections. When you set
+<a class="reference internal" href="#maxConns" title="maxConns"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">maxConns</span></tt></a>, ensure the value is slightly higher than the
+size of the connection pool or the total number of connections to
+prevent erroneous connection spikes from propagating to the members
+of a <a class="reference internal" href="glossary.html#term-shard"><em class="xref std std-term">shard</em></a> cluster.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You cannot set <a class="reference internal" href="#maxConns" title="maxConns"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">maxConns</span></tt></a> to a value higher
+than <cite>20000</cite>.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="objcheck">
+<tt class="descname">objcheck</tt><a class="headerlink" href="#objcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to force <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to validate all requests
+from clients upon receipt to ensure that invalid <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a>
+objects are never inserted into the database. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+does not enable this by default because of the required overhead.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="logpath">
+<tt class="descname">logpath</tt><a class="headerlink" href="#logpath" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> None. (i.e. <tt class="docutils literal"><span class="pre">/dev/stdout</span></tt>)</p>
+<p>Specify the path to a file name for the log file that will hold all
+diagnostic logging information.</p>
+<p>Unless specified, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will output all log information
+to the standard output. Unless <a class="reference internal" href="#logappend" title="logappend"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logappend</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt>,
+the logfile will be overwritten when the process restarts.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Currently, MongoDB will overwrite the contents of the log file
+if the <a class="reference internal" href="#logappend" title="logappend"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logappend</span></tt></a> is not used. This behavior may
+change in the future depending on the outcome of
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4499">SERVER-4499</a>.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="logappend">
+<tt class="descname">logappend</tt><a class="headerlink" href="#logappend" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to add new entries to the end of the logfile rather
+than overwriting the content of the log when the process restarts.</p>
+<p>If this setting is not specified, then MongoDB will overwrite the
+existing logfile upon start up.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The behavior of the logging system may change in the near
+future in response to the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4499">SERVER-4499</a> case.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="syslog">
+<tt class="descname">syslog</tt><a class="headerlink" href="#syslog" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.1.0.</span></p>
+<p>Sends all logging output to the host&#8217;s <a class="reference internal" href="glossary.html#term-syslog"><em class="xref std std-term">syslog</em></a> system rather
+than to standard output or a log file as with <a class="reference internal" href="#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You cannot use <a class="reference internal" href="#syslog" title="syslog"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">syslog</span></tt></a> with <a class="reference internal" href="#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="pidfilepath">
+<tt class="descname">pidfilepath</tt><a class="headerlink" href="#pidfilepath" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> None.</p>
+<p>Specify a file location to hold the &#8220;<a class="reference internal" href="glossary.html#term-pid"><em class="xref std std-term">PID</em></a>&#8221; or process ID of the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process. Useful for tracking the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process in
+combination with the <a class="reference internal" href="#fork" title="fork"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">fork</span></tt></a> setting.</p>
+<p>Without this option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> creates no PID file.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="keyFile">
+<tt class="descname">keyFile</tt><a class="headerlink" href="#keyFile" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> None.</p>
+<p>Specify the path to a key file to store authentication
+information. This option is only useful for the connection between
+replica set members.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../administration/replica-sets.html#replica-set-security"><em>Replica Set Security</em></a>&#8221;
+and &#8220;<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a>.&#8221;</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="nounixsocket">
+<tt class="descname">nounixsocket</tt><a class="headerlink" href="#nounixsocket" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to disable listening on the UNIX socket. Unless set
+to false, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> provide a
+UNIX-socket.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="unixSocketPrefix">
+<tt class="descname">unixSocketPrefix</tt><a class="headerlink" href="#unixSocketPrefix" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> <tt class="docutils literal"><span class="pre">/tmp</span></tt></p>
+<p>Specifies a path for the UNIX socket. Unless this option has a
+value, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>, create a socket
+with the <tt class="docutils literal"><span class="pre">/tmp</span></tt> as a prefix.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="fork">
+<tt class="descname">fork</tt><a class="headerlink" href="#fork" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to enable a <a class="reference internal" href="glossary.html#term-daemon"><em class="xref std std-term">daemon</em></a> mode for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> that runs the process in the background.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="auth">
+<tt class="descname">auth</tt><a class="headerlink" href="#auth" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to enable database authentication for users
+connecting from remote hosts. Configure users via the <a class="reference internal" href="mongo.html"><em>mongo
+shell</em></a>. If no users exist, the localhost
+interface will continue to have access to the database until the
+you create the first user.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="cpu">
+<tt class="descname">cpu</tt><a class="headerlink" href="#cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to force <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to report every four
+seconds CPU utilization and the amount of time that the processor
+waits for I/O operations to complete (i.e. I/O wait.) MongoDB writes
+this data to standard output, or the logfile if using the
+<a class="reference internal" href="#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> option.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="dbpath">
+<tt class="descname">dbpath</tt><a class="headerlink" href="#dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> <tt class="docutils literal"><span class="pre">/data/db/</span></tt></p>
+<p>Set this value to designate a directory for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance to store its data. Typical locations include:
+<tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt>, <tt class="docutils literal"><span class="pre">/var/lib/mongodb</span></tt> or <tt class="docutils literal"><span class="pre">/opt/mongodb</span></tt></p>
+<p>Unless specified, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will look for data files in the
+default <tt class="docutils literal"><span class="pre">/data/db</span></tt> directory. (Windows systems use the
+<tt class="docutils literal"><span class="pre">\data\db</span></tt> directory.) If you installed using a package
+management system. Check the <tt class="docutils literal"><span class="pre">/etc/mongodb.conf</span></tt> file provided by
+your packages to see the configuration of the <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="diaglog">
+<tt class="descname">diaglog</tt><a class="headerlink" href="#diaglog" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 0</p>
+<p>Creates a very verbose, <a class="reference internal" href="glossary.html#term-diagnostic-log"><em class="xref std std-term">diagnostic log</em></a> for troubleshooting and
+recording various errors. MongoDB writes these log files in the
+<a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory in a series of files that begin with the string
+<tt class="docutils literal"><span class="pre">diaglog</span></tt> with the time logging was initiated appended as a hex
+string.</p>
+<p>The value of this setting configures the level of
+verbosity. Possible values, and their impact are as follows.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Value</strong></td>
+<td><strong>Setting</strong></td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>off. No logging.</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>Log write operations.</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>Log read operations.</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>Log both read and write operations.</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>Log write and some read operations.</td>
+</tr>
+</tbody>
+</table>
+<p>You can use the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> tool to replay this output
+for investigation. Given a typical diaglog file, located at
+<tt class="docutils literal"><span class="pre">/data/db/diaglog.4f76a58c</span></tt>, you might use a command in the
+following form to read these files:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongosniff --source DIAGLOG /data/db/diaglog.4f76a58c
+</pre></div>
+</div>
+<p><a class="reference internal" href="#diaglog" title="diaglog"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">diaglog</span></tt></a> is for internal use and not intended for most
+users.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Setting the diagnostic level to <tt class="docutils literal"><span class="pre">0</span></tt> will cause <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+to stop writing data to the <a class="reference internal" href="glossary.html#term-diagnostic-log"><em class="xref std std-term">diagnostic log</em></a> file. However,
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance will continue to keep the file open,
+even if it is no longer writing data to the file.  If you want to
+rename, move, or delete the diagnostic log you must cleanly shut
+down the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance before doing so.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="directoryperdb">
+<tt class="descname">directoryperdb</tt><a class="headerlink" href="#directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to modify the storage pattern of the data directory
+to store each database&#8217;s files in a distinct folder. This option
+will create directories within the <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> named for each
+directory.</p>
+<p>Use this option in conjunction with your file system and device
+configuration so that MongoDB will store data on a number of
+distinct disk devices to increase write throughput or disk
+capacity.</p>
+</dd></dl>
+
+<span class="target" id="setting-journal"></span><dl class="setting">
+<dt id="journal">
+<tt class="descname">journal</tt><a class="headerlink" href="#journal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> (on 64-bit systems) true</p>
+<p><em>Default:</em> (on 32-bit systems) false</p>
+<p>Set to true to enable operation journaling to ensure write
+durability and data consistency.</p>
+<p>Set to false to prevent the overhead of journaling in situations
+where durability is not required. To reduce the impact of the
+journaling on disk usage, you can leave <a class="reference internal" href="connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a>
+enabled, and set <a class="reference internal" href="#smallfiles" title="smallfiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">smallfiles</span></tt></a> to true to reduce the size
+of the data and journal files.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="journalCommitInterval">
+<tt class="descname">journalCommitInterval</tt><a class="headerlink" href="#journalCommitInterval" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 100</p>
+<p>Set this value to specify the maximum amount of time for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to allow between journal operations. The default
+value is 100 milliseconds. Lower values increase the durability of
+the journal, at the possible expense of disk performance.</p>
+<p>This option accepts values between 2 and 300 milliseconds.</p>
+<p>To force <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to commit to the journal more frequently,
+you can specify <tt class="docutils literal"><span class="pre">j:true</span></tt>. When a write operation with <tt class="docutils literal"><span class="pre">j:true</span></tt>
+pending, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will reduce
+<a class="reference internal" href="#journalCommitInterval" title="journalCommitInterval"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journalCommitInterval</span></tt></a> to a third of the set value.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="ipv6">
+<tt class="descname">ipv6</tt><a class="headerlink" href="#ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to IPv6 support to allow clients to connect to
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using IPv6 networks. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> disables
+IPv6 support by default in <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and all utilities.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="jsonp">
+<tt class="descname">jsonp</tt><a class="headerlink" href="#jsonp" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to permit <a class="reference internal" href="glossary.html#term-jsonp"><em class="xref std std-term">JSONP</em></a> access via an HTTP
+interface. Consider the security implications of allowing this
+activity before setting this option.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="noauth">
+<tt class="descname">noauth</tt><a class="headerlink" href="#noauth" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> true</p>
+<p>Disable authentication. Currently the default. Exists for future
+compatibility and clarity.</p>
+<p>For consistency use the <a class="reference internal" href="#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> option.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="nohttpinterface">
+<tt class="descname">nohttpinterface</tt><a class="headerlink" href="#nohttpinterface" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to disable the HTTP interface. This command will
+override the <a class="reference internal" href="#rest" title="rest"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">rest</span></tt></a> and disable the HTTP interface if you
+specify both.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.1.2: </span>The <a class="reference internal" href="#nohttpinterface" title="nohttpinterface"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nohttpinterface</span></tt></a> option is not available for <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances before 2.1.2</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="nojournal">
+<tt class="descname">nojournal</tt><a class="headerlink" href="#nojournal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> (on 64-bit systems) false</p>
+<p><em>Default:</em> (on 32-bit systems) true</p>
+<p>Set <tt class="docutils literal"><span class="pre">nojournal</span> <span class="pre">=</span> <span class="pre">true</span></tt> to disable durability journaling. By
+default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> enables journaling in 64-bit versions
+after v2.0.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="noprealloc">
+<tt class="descname">noprealloc</tt><a class="headerlink" href="#noprealloc" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set <tt class="docutils literal"><span class="pre">noprealloc</span> <span class="pre">=</span> <span class="pre">true</span></tt> to disable the preallocation of data
+files. This will shorten the start up time in some cases, but can
+cause significant performance penalties during normal operations.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="noscripting">
+<tt class="descname">noscripting</tt><a class="headerlink" href="#noscripting" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set <tt class="docutils literal"><span class="pre">noscripting</span> <span class="pre">=</span> <span class="pre">true</span></tt> to disable the scripting engine.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="notablescan">
+<tt class="descname">notablescan</tt><a class="headerlink" href="#notablescan" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set <tt class="docutils literal"><span class="pre">notablescan</span> <span class="pre">=</span> <span class="pre">true</span></tt> to forbid operations that require a
+table scan.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="nssize">
+<tt class="descname">nssize</tt><a class="headerlink" href="#nssize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 16</p>
+<p>Specify this value in megabytes. The maximum size is 2047 megabytes.</p>
+<p>Use this setting to control the default size for all newly created
+namespace files (i.e <tt class="docutils literal"><span class="pre">.ns</span></tt>). This option has no impact on the
+size of existing namespace files.</p>
+<p>See <a class="reference internal" href="limits.html#Number of Namespaces" title="Number of Namespaces"><tt class="xref mongodb mongodb-limit docutils literal"><span class="pre">Limits</span> <span class="pre">on</span> <span class="pre">namespaces</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="profile">
+<tt class="descname">profile</tt><a class="headerlink" href="#profile" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 0</p>
+<p>Modify this value to changes the level of database profiling, which
+inserts information about operation performance into output of
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or the log file if specified by
+<a class="reference internal" href="#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a>. The following levels are available:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Level</strong></td>
+<td><strong>Setting</strong></td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>Off. No profiling.</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>On. Only includes slow operations.</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>On. Includes all operations.</td>
+</tr>
+</tbody>
+</table>
+<p>By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> disables profiling. Database profiling
+can impact database performance because the profiler must record
+and process all database operations. Enable this option only after
+careful consideration.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="quota">
+<tt class="descname">quota</tt><a class="headerlink" href="#quota" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to enable a maximum limit for the number data files
+each database can have. The default quota is 8 data files, when
+<tt class="docutils literal"><span class="pre">quota</span></tt> is true. Adjust the quota size with the with the
+<a class="reference internal" href="#quotaFiles" title="quotaFiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">quotaFiles</span></tt></a> setting.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="quotaFiles">
+<tt class="descname">quotaFiles</tt><a class="headerlink" href="#quotaFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 8</p>
+<p>Modify limit on the number of data files per database. This option
+requires the <a class="reference internal" href="#quota" title="quota"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">quota</span></tt></a> setting.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="rest">
+<tt class="descname">rest</tt><a class="headerlink" href="#rest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to enable a simple <a class="reference internal" href="glossary.html#term-rest"><em class="xref std std-term">REST</em></a> interface.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="repair">
+<tt class="descname">repair</tt><a class="headerlink" href="#repair" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to run a repair routine on all databases following
+start up. In general you should set this option on the command line
+and <em>not</em> in the <a class="reference internal" href="../administration/configuration.html"><em>configuration file</em></a> or in a <a class="reference internal" href="glossary.html#term-101"><em class="xref std std-term">control script</em></a>.</p>
+<p>Use the <a class="reference internal" href="mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">mongod --repair</em></a> option to access this
+functionality.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> rewrites all of the database files
+during the repair routine, if you do not run <a class="reference internal" href="#repair" title="repair"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">repair</span></tt></a>
+under the same user account as <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> usually runs,
+you will need to run <tt class="docutils literal"><span class="pre">chown</span></tt> on your database files to correct
+the permissions before starting <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> again.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="repairpath">
+<tt class="descname">repairpath</tt><a class="headerlink" href="#repairpath" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a></p>
+<p>Specify the path to the directory containing MongoDB data files, to
+use in conjunction with the <a class="reference internal" href="#repair" title="repair"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">repair</span></tt></a> setting or
+<a class="reference internal" href="mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">mongod --repair</em></a> operation. Defaults to the value
+specified by <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="slowms">
+<tt class="descname">slowms</tt><a class="headerlink" href="#slowms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 100</p>
+<p>Specify values in milliseconds.</p>
+<p>Sets the threshold for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to consider a query &#8220;slow&#8221;
+for the database profiler. The database logs all slow queries to
+the log, even when the profiler is not turned on. When the database
+profiler is on, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> the profiler writes to the
+<tt class="docutils literal"><span class="pre">system.profile</span></tt> collection.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="#profile" title="profile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">profile</span></tt></a>&#8220;</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="smallfiles">
+<tt class="descname">smallfiles</tt><a class="headerlink" href="#smallfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to modify MongoDB to use a smaller default data
+file size. Specifically, <a class="reference internal" href="#smallfiles" title="smallfiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">smallfiles</span></tt></a> reduces the initial
+size for data files and limits them to 512
+megabytes. The <a class="reference internal" href="#smallfiles" title="smallfiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">smallfiles</span></tt></a> setting also reduces the size of each
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> files from 1 gigabyte to 128 megabytes.</p>
+<p>Use the <a class="reference internal" href="#smallfiles" title="smallfiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">smallfiles</span></tt></a> setting if you have a large number of databases
+that each hold a small quantity of data. The <a class="reference internal" href="#smallfiles" title="smallfiles"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">smallfiles</span></tt></a> setting can
+lead <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to create many files,
+which may affect performance for larger databases.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="syncdelay">
+<tt class="descname">syncdelay</tt><a class="headerlink" href="#syncdelay" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 60</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> writes data very quickly to the journal, and
+lazily to the data files. <em class="xref std std-option">syncdelay</em> controls how much
+time can pass before MongoDB flushes data to the datafiles via an
+<a class="reference internal" href="glossary.html#term-fsync"><em class="xref std std-term">fsync</em></a> operation. The default setting is 60 seconds.  We
+recommend almost always using the default setting of 60.</p>
+<p>The serverStatus command reports the background flush thread&#8217;s
+status via the backgroundFlushing field.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <em class="xref std std-option">--syncdelay</em> is <tt class="docutils literal"><span class="pre">0</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> flushes all
+operations to disk immediately, which has a significant impact
+on performance. Run with <a class="reference internal" href="connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a> enabled, which is the
+default for 64-bit MongoDB builds.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="sysinfo">
+<tt class="descname">sysinfo</tt><a class="headerlink" href="#sysinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>When set to <tt class="docutils literal"><span class="pre">true</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> returns diagnostic system
+information regarding the page size, the number of physical pages,
+and the number of available physical pages to standard output.</p>
+<p>More typically, run this operation by way of the <a class="reference internal" href="mongod.html#cmdoption-mongod--sysinfo"><em class="xref std std-option">mongod --sysinfo</em></a>
+command. When running with the <a class="reference internal" href="#sysinfo" title="sysinfo"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">sysinfo</span></tt></a>, only
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> only outputs the page information and no database
+process will start.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="upgrade">
+<tt class="descname">upgrade</tt><a class="headerlink" href="#upgrade" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>When set to <tt class="docutils literal"><span class="pre">true</span></tt> this option upgrades the on-disk data format
+of the files specified by the <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> to the latest
+version, if needed.</p>
+<p>This option only affects the operation of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> if the
+data files are in an old format.</p>
+<p>When specified for a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance, this option updates
+the meta data format used by the <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In most cases you should <strong>not</strong> set this value, so you can
+exercise the most control over your upgrade process. See the MongoDB
+<a class="reference external" href="http://www.mongodb.org/downloads">release notes</a> (on the
+download page) for more information about the upgrade process.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="traceExceptions">
+<tt class="descname">traceExceptions</tt><a class="headerlink" href="#traceExceptions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>For internal diagnostic use only.</p>
+</dd></dl>
+
+<div class="section" id="replication-options">
+<h3>Replication Options<a class="headerlink" href="#replication-options" title="Permalink to this headline">¶</a></h3>
+<dl class="setting">
+<dt id="replSet">
+<tt class="descname">replSet</tt><a class="headerlink" href="#replSet" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> &lt;none&gt;</p>
+<p><em>Form:</em> &lt;setname&gt;</p>
+<p>Use this setting to configure replication with replica
+sets. Specify a replica set name as an argument to this set. All
+hosts must have the same set name.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../replication.html"><em>Replication</em></a>,&#8221;
+&#8220;<a class="reference internal" href="../administration/replica-sets.html"><em>Replica Set Administration</em></a>,&#8221; and
+&#8220;<a class="reference internal" href="replica-configuration.html"><em>Replica Set Configuration</em></a>&#8220;</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="oplogSize">
+<tt class="descname">oplogSize</tt><a class="headerlink" href="#oplogSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a maximum size in megabytes for the replication operation
+log (e.g. <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>.) <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> creates an oplog
+based on the maximum amount of space available. For 64-bit systems,
+the oplog is typically 5% of available disk space.</p>
+<p>Once the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> has created the oplog for the first
+time, changing <a class="reference internal" href="#oplogSize" title="oplogSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">oplogSize</span></tt></a> will not affect the size of the
+oplog.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="fastsync">
+<tt class="descname">fastsync</tt><a class="headerlink" href="#fastsync" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>In the context of <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> replication, set this option
+to <tt class="docutils literal"><span class="pre">true</span></tt> if you have seeded this replica with a snapshot of the
+<a class="reference internal" href="glossary.html#term-dbpath"><em class="xref std std-term">dbpath</em></a> of another member of the set. Otherwise the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will attempt to perform a full sync.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the data is not perfectly synchronized <em>and</em>
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> starts with <a class="reference internal" href="#fastsync" title="fastsync"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">fastsync</span></tt></a>, then the
+secondary or slave will be permanently out of sync with the
+primary, which may cause significant consistency problems.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="replIndexPrefetch">
+<tt class="descname">replIndexPrefetch</tt><a class="headerlink" href="#replIndexPrefetch" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p><em>Default:</em> <tt class="docutils literal"><span class="pre">all</span></tt></p>
+<p><em>Values:</em> <tt class="docutils literal"><span class="pre">all</span></tt>, <tt class="docutils literal"><span class="pre">none</span></tt>, and <tt class="docutils literal"><span class="pre">_id_only</span></tt></p>
+<p>You must use <a class="reference internal" href="#replIndexPrefetch" title="replIndexPrefetch"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replIndexPrefetch</span></tt></a> in conjunction with
+<a class="reference internal" href="#replSet" title="replSet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt></a>.</p>
+<p>By default <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> will
+load all indexes related to an operation into memory before
+applying operations from the oplog. You can modify this behavior so
+that the secondaries will only load the <tt class="docutils literal"><span class="pre">_id</span></tt> index. Specify
+<tt class="docutils literal"><span class="pre">_id_only</span></tt> or <tt class="docutils literal"><span class="pre">none</span></tt> to prevent the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> from
+loading <em>any</em> index into memory.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="master-slave-replication">
+<h3>Master/Slave Replication<a class="headerlink" href="#master-slave-replication" title="Permalink to this headline">¶</a></h3>
+<dl class="setting">
+<dt id="master">
+<tt class="descname">master</tt><a class="headerlink" href="#master" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to configure the current instance to act as
+<a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a> instance in a replication configuration.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="slave">
+<tt class="descname">slave</tt><a class="headerlink" href="#slave" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set to <tt class="docutils literal"><span class="pre">true</span></tt> to configure the current instance to act as
+<a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a> instance in a replication configuration.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="source">
+<tt class="descname">source</tt><a class="headerlink" href="#source" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> &lt;&gt;</p>
+<p><em>Form:</em> &lt;host&gt;:&lt;port&gt;</p>
+<p>Used with the <a class="reference internal" href="#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> setting to specify the
+<a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a> instance from which this <a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a> instance will
+replicate</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="only">
+<tt class="descname">only</tt><a class="headerlink" href="#only" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> &lt;&gt;</p>
+<p>Used with the <a class="reference internal" href="#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> option, the <tt class="docutils literal"><span class="pre">only</span></tt> setting
+specifies only a single <a class="reference internal" href="glossary.html#term-database"><em class="xref std std-term">database</em></a> to replicate.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="slavedelay">
+<tt class="descname">slavedelay</tt><a class="headerlink" href="#slavedelay" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 0</p>
+<p>Used with the <a class="reference internal" href="#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> setting, the <tt class="docutils literal"><span class="pre">slavedelay</span></tt> setting
+configures a &#8220;delay&#8221; in seconds, for this slave to wait to apply
+operations from the <a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a> instance.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="autoresync">
+<tt class="descname">autoresync</tt><a class="headerlink" href="#autoresync" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Used with the <a class="reference internal" href="#slave" title="slave"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slave</span></tt></a> setting, set <tt class="docutils literal"><span class="pre">autoresync</span></tt> to
+<tt class="docutils literal"><span class="pre">true</span></tt> to force the <a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a> to automatically resync if the
+is more than 10 seconds behind the master. This setting may be
+problematic if the <a class="reference internal" href="mongod.html#cmdoption-mongod--oplogSize"><em class="xref std std-option">--oplogSize</em></a>
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> is too small (controlled by the <a class="reference internal" href="mongod.html#cmdoption-mongod--oplogSize"><em class="xref std std-option">--oplogSize</em></a> option.) If the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> not large
+enough to store the difference in changes between the master&#8217;s
+current state and the state of the slave, this instance will forcibly
+resync itself unnecessarily. When you set the <a class="reference internal" href="#autoresync" title="autoresync"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">autoresync</span></tt></a>
+option, the slave will not attempt an automatic resync more than
+once in a ten minute period.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sharding-cluster-options">
+<h3>Sharding Cluster Options<a class="headerlink" href="#sharding-cluster-options" title="Permalink to this headline">¶</a></h3>
+<dl class="setting">
+<dt id="configsvr">
+<tt class="descname">configsvr</tt><a class="headerlink" href="#configsvr" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set this value to <tt class="docutils literal"><span class="pre">true</span></tt> to configure this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance to operate as the <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config database</em></a> of a shard
+cluster. When running with this option, clients will not be able to
+write data to any database other than <tt class="docutils literal"><span class="pre">config</span></tt> and <tt class="docutils literal"><span class="pre">admin.</span> <span class="pre">The</span>
+<span class="pre">default</span> <span class="pre">port</span> <span class="pre">for</span> <span class="pre">:program:`mongod`</span> <span class="pre">with</span> <span class="pre">this</span> <span class="pre">option</span> <span class="pre">is</span> <span class="pre">``27019</span></tt>
+and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> writes all data files to the <tt class="docutils literal"><span class="pre">/configdb</span></tt>
+sub-directory of the <a class="reference internal" href="#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="shardsvr">
+<tt class="descname">shardsvr</tt><a class="headerlink" href="#shardsvr" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Set this value to <tt class="docutils literal"><span class="pre">true</span></tt> to configure this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance as a shard in a partitioned cluster. The default port for
+these instances is <tt class="docutils literal"><span class="pre">27018</span></tt>. The only affect of
+<a class="reference internal" href="#shardsvr" title="shardsvr"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">shardsvr</span></tt></a> is to change the port number.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="noMoveParanoia">
+<tt class="descname">noMoveParanoia</tt><a class="headerlink" href="#noMoveParanoia" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>When set to <tt class="docutils literal"><span class="pre">true</span></tt>, <a class="reference internal" href="#noMoveParanoia" title="noMoveParanoia"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">noMoveParanoia</span></tt></a> disables a
+&#8220;paranoid mode&#8221; for data writes for chunk migration operation. See
+the <a class="reference internal" href="../core/sharding-internals.html#sharding-chunk-migration"><em>chunk migration</em></a> and
+<a class="reference internal" href="commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> command documentation for more information.</p>
+<p>By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will save copies of migrated chunks on
+the &#8220;from&#8221; server during migrations as &#8220;paranoid mode.&#8221; Setting
+this option disables this paranoia.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="configdb">
+<tt class="descname">configdb</tt><a class="headerlink" href="#configdb" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> None.</p>
+<p><em>Format:</em> <tt class="docutils literal"><span class="pre">&lt;config1&gt;,&lt;config2&gt;&lt;:port&gt;,&lt;config3&gt;</span></tt></p>
+<p>Set this option to specify a configuration database
+(i.e. <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config database</em></a>) for the <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. You
+must specify either 1 configuration server or 3 configuration
+servers, in a comma separated list.</p>
+<p>This setting only affects <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances read from the first <a class="reference internal" href="glossary.html#term-config-database"><em class="xref std std-term">config
+server</em></a> in the list provided. All
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances <strong>must</strong> specify the hosts to the
+<a class="reference internal" href="#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> setting in the same order.</p>
+<p class="last">If your configuration databases reside in more that one data
+center, order the hosts in the <tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">setting</span></tt> setting so
+that the config database that is closest to the majority of your
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances is first servers in the list.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Never remove a config server from the <a class="reference internal" href="#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> parameter, even if
+the config server or servers are not available, or offline.</p>
+</div>
+</dd></dl>
+
+<dl class="setting">
+<dt id="test">
+<tt class="descname">test</tt><a class="headerlink" href="#test" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> false</p>
+<p>Only runs unit tests and does not start a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+<p>This setting only affects <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes and is for
+internal testing use only.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="chunkSize">
+<tt class="descname">chunkSize</tt><a class="headerlink" href="#chunkSize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Default:</em> 64</p>
+<p>The value of this option determines the size of each <a class="reference internal" href="glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a>
+of data distributed around the <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. The default
+value is 64 megabytes. Larger chunks may lead to an uneven
+distribution of data, while smaller chunks may lead to frequent and
+unnecessary migrations. However, in some circumstances it may be
+necessary to set a different chunk size.</p>
+<p>This setting only affects <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes. Furthermore,
+<a class="reference internal" href="#chunkSize" title="chunkSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">chunkSize</span></tt></a> <em>only</em> sets the chunk size when initializing
+the cluster for the first time. If you modify the run-time option
+later, the new value will have no effect. See the
+&#8220;<a class="reference internal" href="../administration/sharding.html#sharding-balancing-modify-chunk-size"><em>Modify Chunk Size</em></a>&#8221; procedure if you
+need to change the chunk size on an existing sharded cluster.</p>
+</dd></dl>
+
+<dl class="setting">
+<dt id="localThreshold">
+<tt class="descname">localThreshold</tt><a class="headerlink" href="#localThreshold" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p><a class="reference internal" href="#localThreshold" title="localThreshold"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">localThreshold</span></tt></a> affects the logic that program:<cite>mongos</cite>
+uses when selecting <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members to pass reads
+operations to from clients. Specify a value to
+<a class="reference internal" href="#localThreshold" title="localThreshold"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">localThreshold</span></tt></a> in milliseconds. The default value is
+<tt class="docutils literal"><span class="pre">15</span></tt>, which corresponds to the default value in all of the client
+<a class="reference internal" href="../applications/drivers.html"><em>drivers</em></a>.</p>
+<p>This setting only affects <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes.</p>
+<p>When <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> receives a request that permits reads to
+<a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members, the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">find the member of the set with the lowest ping time.</p>
+</li>
+<li><p class="first">construct a list of replica set members that is within a ping
+time of 15 milliseconds of the nearest suitable member of the
+set.</p>
+<p>If you specify a value for <a class="reference internal" href="#localThreshold" title="localThreshold"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">localThreshold</span></tt></a>,
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will construct the list of replica members
+that are within the latency allowed by this value.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will select a member to read from at
+random from this list.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>The ping time used for a set member compared by the
+<a class="reference internal" href="mongos.html#cmdoption-mongos--localThreshold"><em class="xref std std-option">--localThreshold</em></a> setting is a moving average of recent
+ping times, calculated, at most, every 10 seconds. As a result, some queries
+may reach members above the threshold until the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+recalculates the average.</p>
+<p>See the <a class="reference internal" href="../applications/replication.html#replica-set-read-preference-behavior-member-selection"><em>Member Selection</em></a>
+section of the <a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>read preference</em></a>
+documentation for more information.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongofiles.html" title="Previous Section: mongofiles">&lt; &nbsp; mongofiles</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="connection-string.html" title="Next Section: Connection String URI Format">Connection String URI Format &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$addToSet &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/addToSet" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$all" href="all.html" />
+<link rel="prev" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="addtoset">
+<h1>$addToSet<a class="headerlink" href="#addtoset" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_addToSet">
+<tt class="descname">$addToSet</tt><a class="headerlink" href="#_S_addToSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> operator adds a value to an array only <em>if</em> the
+value is <em>not</em> in the array already. If the value <em>is</em> in the
+array, <a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> returns without modifying the
+array. Otherwise, <a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> behaves the same as
+<a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a>. Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$addToSet</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> appends <tt class="docutils literal"><span class="pre">value1</span></tt> to the array stored in
+<tt class="docutils literal"><span class="pre">field</span></tt>, <em>only if</em> <tt class="docutils literal"><span class="pre">value1</span></tt> is not already a member of this
+array.</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="../operators.html#_S_each" title="$each"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$each</span></tt></a> operator is only used with the</dt>
+<dd><a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a> see the documentation of
+<a class="reference internal" href=""><em>$addToSet</em></a> for more information.</dd>
+</dl>
+<dl class="operator">
+<dt id="_S_each">
+<tt class="descname">$each</tt><a class="headerlink" href="#_S_each" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../operators.html#_S_each" title="$each"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$each</span></tt></a> operator is available within the
+<a class="reference internal" href="../operators.html#_S_addToSet" title="$addToSet"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$addToSet</span></tt></a>, which allows you to add multiple values
+to the array if they do not exist in the <tt class="docutils literal"><span class="pre">field</span></tt> array in a
+single operation. Consider the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$addToSet</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$each</span> <span class="o">:</span> <span class="p">[</span> <span class="nx">value1</span><span class="p">,</span> <span class="nx">value2</span><span class="p">,</span> <span class="nx">value3</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../operator.html" title="Previous Section: Query, Update, Projection, and Aggregation Operators">&lt; &nbsp; Query, Update, Projection, and Aggregation Operators</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="all.html" title="Next Section: $all">$all &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,1465 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Server Status Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/server-status" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Database Statistics Reference" href="database-statistics.html" />
+<link rel="prev" title="Server Status Output Index" href="server-status-index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="server-status-reference">
+<h1>Server Status Reference<a class="headerlink" href="#server-status-reference" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> command returns a collection of information that
+reflects the database&#8217;s status. These data are useful for diagnosing
+and assessing the performance of your MongoDB instance. This reference
+catalogs each datum included in the output of this command and
+provides context for using this data to more effectively administer
+your database.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>Much of the output of <a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> is also
+displayed dynamically by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>. See the
+<a class="reference internal" href="mongostat.html"><em>mongostat</em></a> command for more information.</p>
+<p class="last">For examples of the <a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> output, see
+<a class="reference internal" href="server-status-index.html"><em>Server Status Output Index</em></a>.</p>
+</div>
+<div class="section" id="instance-information">
+<span id="server-status-instance-information"></span><h2>Instance Information<a class="headerlink" href="#instance-information" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-instance-information"><em>output of the instance information fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="host">
+<tt class="descname">host</tt><a class="headerlink" href="#host" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#host" title="host"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">host</span></tt></a> field contains the system&#8217;s hostname. In Unix/Linux
+systems, this should be the same as the output of the <tt class="docutils literal"><span class="pre">hostname</span></tt>
+command.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="version">
+<tt class="descname">version</tt><a class="headerlink" href="#version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#version" title="version"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">version</span></tt></a> field contains the version of MongoDB running on
+the current <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="process">
+<tt class="descname">process</tt><a class="headerlink" href="#process" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#process" title="process"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">process</span></tt></a> field identifies which kind of MongoDB instance is
+running. Possible values are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt></li>
+</ul>
+</dd></dl>
+
+<dl class="status">
+<dt id="uptime">
+<tt class="descname">uptime</tt><a class="headerlink" href="#uptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#uptime" title="uptime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">uptime</span></tt></a> field corresponds to the number of
+seconds that the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> or <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process has
+been active.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="uptimeEstimate">
+<tt class="descname">uptimeEstimate</tt><a class="headerlink" href="#uptimeEstimate" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#uptimeEstimate" title="uptimeEstimate"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">uptimeEstimate</span></tt></a> provides the uptime as calculated from MongoDB&#8217;s
+internal course-grained time keeping system.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="localTime">
+<tt class="descname">localTime</tt><a class="headerlink" href="#localTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#localTime" title="localTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">localTime</span></tt></a> value is the current time, according to the
+server, in UTC specified in an ISODate format.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="server-status-locks">
+<span id="locks"></span><span id="id1"></span><h2>locks<a class="headerlink" href="#server-status-locks" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1.2: </span>All <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks</span></tt></a> statuses first appeared in the 2.1.2
+development release for the 2.2 series.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-locks"><em>output of the locks fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">locks</tt></dt>
+<dd><p>The <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks</span></tt></a> document contains sub-documents that provides a
+granular report on MongoDB database-level lock use. All values are
+of the <tt class="docutils literal"><span class="pre">NumberLong()</span></tt> type.</p>
+<p>Generally, fields named:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">R</span></tt> refer to the global read lock,</li>
+<li><tt class="docutils literal"><span class="pre">W</span></tt> refer to the global write lock,</li>
+<li><tt class="docutils literal"><span class="pre">r</span></tt> refer to the database specific read lock, and</li>
+<li><tt class="docutils literal"><span class="pre">w</span></tt> refer to the database specific write lock.</li>
+</ul>
+<p>If a document does not have any fields, it means that no locks have
+existed with this context since the last time the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks..">
+<tt class="descclassname">locks..</tt><tt class="descname"></tt><a class="headerlink" href="#locks.." title="Permalink to this definition">¶</a></dt>
+<dd><p>A field named <tt class="docutils literal"><span class="pre">.</span></tt> holds the first document in <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks</span></tt></a>
+that contains information about the global lock as well as
+aggregated data regarding lock use in all databases.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeLockedMicros">
+<tt class="descclassname">locks...</tt><tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#locks...timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks...timeLockedMicros" title="locks...timeLockedMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks...timeLockedMicros</span></tt></a> document reports the amount of
+time in microseconds that a lock has existed in all databases in
+this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeLockedMicros.R">
+<tt class="descclassname">locks...timeLockedMicros.</tt><tt class="descname">R</tt><a class="headerlink" href="#locks...timeLockedMicros.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">R</span></tt> field reports the amount of time in microseconds that any
+database has held the global read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeLockedMicros.W">
+<tt class="descclassname">locks...timeLockedMicros.</tt><tt class="descname">W</tt><a class="headerlink" href="#locks...timeLockedMicros.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">W</span></tt> field reports the amount of time in microseconds that any
+database has held the global write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeLockedMicros.r">
+<tt class="descclassname">locks...timeLockedMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks...timeLockedMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that any
+database has held the local read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeLockedMicros.w">
+<tt class="descclassname">locks...timeLockedMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks...timeLockedMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that any
+database has held the local write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeAcquiringMicros">
+<tt class="descclassname">locks...</tt><tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#locks...timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks...timeAcquiringMicros" title="locks...timeAcquiringMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks...timeAcquiringMicros</span></tt></a> document reports the amount of
+time in microseconds that operations have spent waiting to acquire
+a lock in all databases in this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeAcquiringMicros.R">
+<tt class="descclassname">locks...timeAcquiringMicros.</tt><tt class="descname">R</tt><a class="headerlink" href="#locks...timeAcquiringMicros.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">R</span></tt> field reports the amount of time in microseconds that any
+database has spent waiting for the global read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks...timeAcquiringMicros.W">
+<tt class="descclassname">locks...timeAcquiringMicros.</tt><tt class="descname">W</tt><a class="headerlink" href="#locks...timeAcquiringMicros.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">W</span></tt> field reports the amount of time in microseconds that any
+database has spent waiting for the global write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin">
+<tt class="descclassname">locks.</tt><tt class="descname">admin</tt><a class="headerlink" href="#locks.admin" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.admin" title="locks.admin"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.admin</span></tt></a> document contains two sub-documents that
+report data regarding lock use in the <a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeLockedMicros">
+<tt class="descclassname">locks.admin.</tt><tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#locks.admin.timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.admin.timeLockedMicros" title="locks.admin.timeLockedMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.admin.timeLockedMicros</span></tt></a> document reports the amount of
+time in microseconds that locks have existed in the context of the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeLockedMicros.r">
+<tt class="descclassname">locks.admin.timeLockedMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.admin.timeLockedMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> has held the read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeLockedMicros.w">
+<tt class="descclassname">locks.admin.timeLockedMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.admin.timeLockedMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> has held the write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeAcquiringMicros">
+<tt class="descclassname">locks.admin.</tt><tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#locks.admin.timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.admin.timeAcquiringMicros" title="locks.admin.timeAcquiringMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.admin.timeAcquiringMicros</span></tt></a> document reports on the
+amount of field time in microseconds that operations have spent
+waiting to acquire a lock for the <a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeAcquiringMicros.r">
+<tt class="descclassname">locks.admin.timeAcquiringMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.admin.timeAcquiringMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a read lock on the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.admin.timeAcquiringMicros.w">
+<tt class="descclassname">locks.admin.timeAcquiringMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.admin.timeAcquiringMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a write lock on the
+<a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local">
+<tt class="descclassname">locks.</tt><tt class="descname">local</tt><a class="headerlink" href="#locks.local" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.local" title="locks.local"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.local</span></tt></a> document contains two sub-documents that
+report data regarding lock use in the <tt class="docutils literal"><span class="pre">local</span></tt> database. The
+local database contains a number of instance specific data,
+including the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> for replication.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeLockedMicros">
+<tt class="descclassname">locks.local.</tt><tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#locks.local.timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.local.timeLockedMicros" title="locks.local.timeLockedMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.local.timeLockedMicros</span></tt></a> document reports on the amount
+of time in microseconds that locks have existed in the context of
+the <tt class="docutils literal"><span class="pre">local</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeLockedMicros.r">
+<tt class="descclassname">locks.local.timeLockedMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.local.timeLockedMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that the
+<tt class="docutils literal"><span class="pre">local</span></tt> database has held the read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeLockedMicros.w">
+<tt class="descclassname">locks.local.timeLockedMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.local.timeLockedMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that the
+<tt class="docutils literal"><span class="pre">local</span></tt> database has held the write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeAcquiringMicros">
+<tt class="descclassname">locks.local.</tt><tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#locks.local.timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.local.timeAcquiringMicros" title="locks.local.timeAcquiringMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.local.timeAcquiringMicros</span></tt></a> document reports on the
+amount of time in microseconds that operations have spent waiting
+to acquire a lock for the <tt class="docutils literal"><span class="pre">local</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeAcquiringMicros.r">
+<tt class="descclassname">locks.local.timeAcquiringMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.local.timeAcquiringMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a read lock on the <tt class="docutils literal"><span class="pre">local</span></tt>
+database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.local.timeAcquiringMicros.w">
+<tt class="descclassname">locks.local.timeAcquiringMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.local.timeAcquiringMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a write lock on the <tt class="docutils literal"><span class="pre">local</span></tt>
+database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;">
+<tt class="descclassname">locks.</tt><tt class="descname">&lt;database&gt;</tt><a class="headerlink" href="#locks.<database>" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each additional database <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks</span></tt></a> includes a document
+that reports on the lock use for this database. The names of these
+documents reflect the database name itself.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeLockedMicros">
+<tt class="descclassname">locks.&lt;database&gt;.</tt><tt class="descname">timeLockedMicros</tt><a class="headerlink" href="#locks.<database>.timeLockedMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.&lt;database&gt;.timeLockedMicros" title="locks.&lt;database&gt;.timeLockedMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.&lt;database&gt;.timeLockedMicros</span></tt></a> document reports on the amount
+of time in microseconds that locks have existed in the context of
+the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeLockedMicros.r">
+<tt class="descclassname">locks.&lt;database&gt;.timeLockedMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.<database>.timeLockedMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that the
+<tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database has held the read lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeLockedMicros.w">
+<tt class="descclassname">locks.&lt;database&gt;.timeLockedMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.<database>.timeLockedMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that the
+<tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database has held the write lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeAcquiringMicros">
+<tt class="descclassname">locks.&lt;database&gt;.</tt><tt class="descname">timeAcquiringMicros</tt><a class="headerlink" href="#locks.<database>.timeAcquiringMicros" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#locks.&lt;database&gt;.timeAcquiringMicros" title="locks.&lt;database&gt;.timeAcquiringMicros"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks.&lt;database&gt;.timeAcquiringMicros</span></tt></a> document reports on the
+amount of time in microseconds that operations have spent waiting
+to acquire a lock for the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeAcquiringMicros.r">
+<tt class="descclassname">locks.&lt;database&gt;.timeAcquiringMicros.</tt><tt class="descname">r</tt><a class="headerlink" href="#locks.<database>.timeAcquiringMicros.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">r</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a read lock on the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt>
+database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="locks.&lt;database&gt;.timeAcquiringMicros.w">
+<tt class="descclassname">locks.&lt;database&gt;.timeAcquiringMicros.</tt><tt class="descname">w</tt><a class="headerlink" href="#locks.<database>.timeAcquiringMicros.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">w</span></tt> field reports the amount of time in microseconds that
+operations have spent waiting to acquire a write lock on the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt>
+database.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="server-status-global-lock">
+<span id="server-status-globallock"></span><span id="global-lock"></span><span id="globallock"></span><span id="id2"></span><h2>globalLock<a class="headerlink" href="#server-status-global-lock" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-globallock"><em>output of the globalLock fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="globalLock">
+<tt class="descname">globalLock</tt><a class="headerlink" href="#globalLock" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a> data structure contains information regarding
+the database&#8217;s current lock state, historical lock status, current
+operation queue, and the number of active clients.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.totalTime">
+<tt class="descclassname">globalLock.</tt><tt class="descname">totalTime</tt><a class="headerlink" href="#globalLock.totalTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.totalTime" title="globalLock.totalTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.totalTime</span></tt></a> represents the time, in
+microseconds, since the database last started and creation of the
+<a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a>. This is roughly equivalent to total server
+uptime.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.lockTime">
+<tt class="descclassname">globalLock.</tt><tt class="descname">lockTime</tt><a class="headerlink" href="#globalLock.lockTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.lockTime" title="globalLock.lockTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.lockTime</span></tt></a> represents the time, in
+microseconds, since the database last started, that the
+<a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a> has been <em>held</em>.</p>
+<p>Consider this value in combination with the value of
+<a class="reference internal" href="#globalLock.totalTime" title="globalLock.totalTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.totalTime</span></tt></a>. MongoDB aggregates these values in
+the <a class="reference internal" href="#globalLock.ratio" title="globalLock.ratio"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.ratio</span></tt></a> value. If the
+<a class="reference internal" href="#globalLock.ratio" title="globalLock.ratio"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.ratio</span></tt></a> value is small but
+<a class="reference internal" href="#globalLock.totalTime" title="globalLock.totalTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.totalTime</span></tt></a> is high the <a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a> has
+typically been held frequently for shorter periods of time, which
+may be indicative of a more normal use pattern. If the
+<a class="reference internal" href="#globalLock.lockTime" title="globalLock.lockTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.lockTime</span></tt></a> is higher and the
+<a class="reference internal" href="#globalLock.totalTime" title="globalLock.totalTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.totalTime</span></tt></a> is smaller (relatively,) then fewer
+operations are responsible for a greater portion of server&#8217;s use
+(relatively.)</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.ratio">
+<tt class="descclassname">globalLock.</tt><tt class="descname">ratio</tt><a class="headerlink" href="#globalLock.ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span><a class="reference internal" href="#globalLock.ratio" title="globalLock.ratio"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.ratio</span></tt></a> was removed. See <a class="reference internal" href="current-op.html#locks" title="locks"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">locks</span></tt></a>.</p>
+<p>The value of <a class="reference internal" href="#globalLock.ratio" title="globalLock.ratio"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.ratio</span></tt></a> displays the relationship between
+<a class="reference internal" href="#globalLock.lockTime" title="globalLock.lockTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.lockTime</span></tt></a> and <a class="reference internal" href="#globalLock.totalTime" title="globalLock.totalTime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.totalTime</span></tt></a>.</p>
+<p>Low values indicate that operations have held the <a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a>
+frequently for shorter periods of time. High values indicate that
+operations have held <a class="reference internal" href="#globalLock" title="globalLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock</span></tt></a> infrequently for longer periods of
+time.</p>
+</dd></dl>
+
+<div class="section" id="globallock-currentqueue">
+<span id="id3"></span><h3>globalLock.currentQueue<a class="headerlink" href="#globallock-currentqueue" title="Permalink to this headline">¶</a></h3>
+<dl class="status">
+<dt id="globalLock.currentQueue">
+<tt class="descclassname">globalLock.</tt><tt class="descname">currentQueue</tt><a class="headerlink" href="#globalLock.currentQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#globalLock.currentQueue" title="globalLock.currentQueue"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue</span></tt></a> data structure value provides more
+granular information concerning the number of operations queued
+because of a lock.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.currentQueue.total">
+<tt class="descclassname">globalLock.currentQueue.</tt><tt class="descname">total</tt><a class="headerlink" href="#globalLock.currentQueue.total" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.currentQueue.total" title="globalLock.currentQueue.total"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue.total</span></tt></a> provides a combined
+total of operations queued waiting for the lock.</p>
+<p>A consistently small queue, particularly of shorter operations
+should cause no concern. Also, consider this value in light of the
+size of queue waiting for the read lock
+(e.g. <a class="reference internal" href="#globalLock.currentQueue.readers" title="globalLock.currentQueue.readers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue.readers</span></tt></a>) and write-lock
+(e.g. <a class="reference internal" href="#globalLock.currentQueue.writers" title="globalLock.currentQueue.writers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue.writers</span></tt></a>) individually.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.currentQueue.readers">
+<tt class="descclassname">globalLock.currentQueue.</tt><tt class="descname">readers</tt><a class="headerlink" href="#globalLock.currentQueue.readers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.currentQueue.readers" title="globalLock.currentQueue.readers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue.readers</span></tt></a> is the number of
+operations that are currently queued and waiting for the
+read-lock. A consistently small read-queue, particularly of
+shorter operations should cause no concern.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.currentQueue.writers">
+<tt class="descclassname">globalLock.currentQueue.</tt><tt class="descname">writers</tt><a class="headerlink" href="#globalLock.currentQueue.writers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.currentQueue.writers" title="globalLock.currentQueue.writers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.currentQueue.writers</span></tt></a> is the number of
+operations that are currently queued and waiting for the
+write-lock. A consistently small write-queue, particularly of
+shorter operations is no cause for concern.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="globallock-activeclients">
+<h3>globalLock.activeClients<a class="headerlink" href="#globallock-activeclients" title="Permalink to this headline">¶</a></h3>
+<dl class="status">
+<dt id="globalLock.activeClients">
+<tt class="descclassname">globalLock.</tt><tt class="descname">activeClients</tt><a class="headerlink" href="#globalLock.activeClients" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#globalLock.activeClients" title="globalLock.activeClients"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients</span></tt></a> data structure provides more
+granular information about the number of connected clients and the
+operation types (e.g. read or write) performed by these clients.</p>
+<p>Use this data to provide context for the <a class="reference internal" href="#globallock-currentqueue"><em>currentQueue</em></a> data.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.activeClients.total">
+<tt class="descclassname">globalLock.activeClients.</tt><tt class="descname">total</tt><a class="headerlink" href="#globalLock.activeClients.total" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.activeClients.total" title="globalLock.activeClients.total"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients.total</span></tt></a> is the total number
+of active client connections to the database. This combines clients
+that are performing read operations
+(e.g. <a class="reference internal" href="#globalLock.activeClients.readers" title="globalLock.activeClients.readers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients.readers</span></tt></a>) and clients that
+are performing write operations (e.g. <a class="reference internal" href="#globalLock.activeClients.writers" title="globalLock.activeClients.writers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients.writers</span></tt></a>).</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.activeClients.readers">
+<tt class="descclassname">globalLock.activeClients.</tt><tt class="descname">readers</tt><a class="headerlink" href="#globalLock.activeClients.readers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.activeClients.readers" title="globalLock.activeClients.readers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients.readers</span></tt></a> contains a count
+of the active client connections performing read operations.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="globalLock.activeClients.writers">
+<tt class="descclassname">globalLock.activeClients.</tt><tt class="descname">writers</tt><a class="headerlink" href="#globalLock.activeClients.writers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#globalLock.activeClients.writers" title="globalLock.activeClients.writers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">globalLock.activeClients.writers</span></tt></a> contains a count
+of active client connections performing write operations.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="mem">
+<span id="server-status-memory"></span><span id="memory-status"></span><h2>mem<a class="headerlink" href="#mem" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-memory"><em>output of the memory fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">mem</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem</span></tt> data structure holds information regarding the target
+system architecture of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and current memory use.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.bits">
+<tt class="descclassname">mem.</tt><tt class="descname">bits</tt><a class="headerlink" href="#mem.bits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#mem.bits" title="mem.bits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.bits</span></tt></a> is either <tt class="docutils literal"><span class="pre">64</span></tt> or <tt class="docutils literal"><span class="pre">32</span></tt>,
+depending on which target architecture specified during the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> compilation process. In most instances this is
+<tt class="docutils literal"><span class="pre">64</span></tt>, and this value does not change over time.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.resident">
+<tt class="descclassname">mem.</tt><tt class="descname">resident</tt><a class="headerlink" href="#mem.resident" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#mem.resident" title="mem.resident"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.resident</span></tt></a> is roughly equivalent to the amount
+of RAM, in bytes, currently used by the database process. In normal
+use this value tends to grow. In dedicated database servers this
+number tends to approach the total amount of system memory.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.virtual">
+<tt class="descclassname">mem.</tt><tt class="descname">virtual</tt><a class="headerlink" href="#mem.virtual" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#mem.virtual" title="mem.virtual"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.virtual</span></tt></a> displays the quantity, in megabytes (MB), of virtual memory
+used by the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process. In typical deployments this value
+is slightly larger than <a class="reference internal" href="#mem.mapped" title="mem.mapped"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mapped</span></tt></a>. If this value is
+significantly (i.e. gigabytes) larger than <a class="reference internal" href="#mem.mapped" title="mem.mapped"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mapped</span></tt></a>,
+this could indicate a memory leak.</p>
+<p>With <a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journaling</em></a> enabled, the value of <a class="reference internal" href="#mem.virtual" title="mem.virtual"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.virtual</span></tt></a>
+is twice the value of <a class="reference internal" href="#mem.mapped" title="mem.mapped"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mapped</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.supported">
+<tt class="descclassname">mem.</tt><tt class="descname">supported</tt><a class="headerlink" href="#mem.supported" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#mem.supported" title="mem.supported"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.supported</span></tt></a> is true when the underlying system supports
+extended memory information. If this value is false and the system
+does not support extended memory information, then other
+<tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem</span></tt> values may not be accessible to the database server.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.mapped">
+<tt class="descclassname">mem.</tt><tt class="descname">mapped</tt><a class="headerlink" href="#mem.mapped" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#mem.mapped" title="mem.mapped"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mapped</span></tt></a> provides the amount of mapped memory,
+in megabytes (MB), by
+the database. Because MongoDB uses memory-mapped files, this value
+is likely to be to be roughly equivalent to the total size of your
+database or databases.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="mem.mappedWithJournal">
+<tt class="descclassname">mem.</tt><tt class="descname">mappedWithJournal</tt><a class="headerlink" href="#mem.mappedWithJournal" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#mem.mappedWithJournal" title="mem.mappedWithJournal"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mappedWithJournal</span></tt></a> provides the amount of
+mapped memory, in megabytes (MB), including the memory used for
+journaling.
+This value will always be twice the value of <a class="reference internal" href="#mem.mapped" title="mem.mapped"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">mem.mapped</span></tt></a>.
+This field is only included if journaling is enabled.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="connections">
+<span id="server-status-connections"></span><h2>connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-connections"><em>output of the connections fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">connections</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">connections</span></tt> sub document data regarding the
+current connection status and availability of the database
+server. Use these values to asses the current load and capacity
+requirements of the server.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="connections.current">
+<tt class="descclassname">connections.</tt><tt class="descname">current</tt><a class="headerlink" href="#connections.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#connections.current" title="connections.current"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">connections.current</span></tt></a> corresponds to the number of
+connections to the database server from clients. This number
+includes the current shell session. Consider the value of
+<a class="reference internal" href="#connections.available" title="connections.available"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">connections.available</span></tt></a> to add more context to this
+datum.</p>
+<p>This figure will include the current shell connection as well as
+any inter-node connections to support a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> or
+<a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="connections.available">
+<tt class="descclassname">connections.</tt><tt class="descname">available</tt><a class="headerlink" href="#connections.available" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#connections.available" title="connections.available"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">connections.available</span></tt></a> provides a count of the number of unused
+available connections that the database can provide. Consider this
+value in combination with the value of
+<a class="reference internal" href="#connections.current" title="connections.current"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">connections.current</span></tt></a> to understand the connection load on
+the database, and the <a class="reference internal" href="../administration/ulimit.html"><em>Linux ulimit Settings</em></a> document for
+more information about system thresholds on available connections.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="extra-info">
+<span id="server-status-extrainfo"></span><span id="id4"></span><span id="server-status-extra-info"></span><h2>extra_info<a class="headerlink" href="#extra-info" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-extrainfo"><em>output of the extra_info fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="extra_info">
+<tt class="descname">extra_info</tt><a class="headerlink" href="#extra_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#extra_info" title="extra_info"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">extra_info</span></tt></a> data structure holds data collected by the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance about the underlying system. Your system may
+only report a subset of these fields.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="extra_info.note">
+<tt class="descclassname">extra_info.</tt><tt class="descname">note</tt><a class="headerlink" href="#extra_info.note" title="Permalink to this definition">¶</a></dt>
+<dd><p>The field <a class="reference internal" href="#extra_info.note" title="extra_info.note"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">extra_info.note</span></tt></a> reports that the data in this
+structure depend on the underlying platform, and has the text:
+&#8220;fields vary by platform.&#8221;</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="extra_info.heap_usage_bytes">
+<tt class="descclassname">extra_info.</tt><tt class="descname">heap_usage_bytes</tt><a class="headerlink" href="#extra_info.heap_usage_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#extra_info.heap_usage_bytes" title="extra_info.heap_usage_bytes"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">extra_info.heap_usage_bytes</span></tt></a> field is only available on
+Unix/Linux systems, and reports the total size in bytes of heap space
+used by the database process.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="extra_info.page_faults">
+<tt class="descclassname">extra_info.</tt><tt class="descname">page_faults</tt><a class="headerlink" href="#extra_info.page_faults" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#extra_info.page_faults" title="extra_info.page_faults"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">extra_info.page_faults</span></tt></a> field is only available on Unix/Linux
+systems, and reports the total number of page faults that require
+disk operations. Page faults refer to operations that require the
+database server to access data which isn&#8217;t available in active
+memory. The <a class="reference internal" href="#extra_info.page_faults" title="extra_info.page_faults"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">page_fault</span></tt></a> counter may increase dramatically during
+moments of poor performance and may correlate with limited
+memory environments and larger data sets. Limited and sporadic page
+faults do not necessarily indicate an issue.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indexcounters">
+<span id="server-status-indexcounters"></span><h2>indexCounters<a class="headerlink" href="#indexcounters" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-indexcounters"><em>output of the indexCounters fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="indexCounters">
+<tt class="descname">indexCounters</tt><a class="headerlink" href="#indexCounters" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>Previously, data in the <a class="reference internal" href="#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> document
+reported sampled data, and were only useful in relative
+comparison to each other, because they could not reflect
+absolute index use. In 2.2 and later, these data reflect actual
+index use.</p>
+<p>The <a class="reference internal" href="#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> data structure reports information
+regarding the state and use of indexes in MongoDB.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree">
+<tt class="descclassname">indexCounters.</tt><tt class="descname">btree</tt><a class="headerlink" href="#indexCounters.btree" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#indexCounters.btree" title="indexCounters.btree"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree</span></tt></a> data structure contains data
+regarding MongoDB&#8217;s <a class="reference internal" href="glossary.html#term-btree"><em class="xref std std-term">btree</em></a> indexes.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree.accesses">
+<tt class="descclassname">indexCounters.btree.</tt><tt class="descname">accesses</tt><a class="headerlink" href="#indexCounters.btree.accesses" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#indexCounters.btree.accesses" title="indexCounters.btree.accesses"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.accesses</span></tt></a> reports the number of times
+that operations have accessed indexes. This value is the
+combination of the <a class="reference internal" href="#indexCounters.btree.hits" title="indexCounters.btree.hits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.hits</span></tt></a> and
+<a class="reference internal" href="#indexCounters.btree.misses" title="indexCounters.btree.misses"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.misses</span></tt></a>. Higher values indicate that
+your database has indexes and that queries are taking advantage of
+these indexes. If this number does not grow over time, this might
+indicate that your indexes do not effectively support your use.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree.hits">
+<tt class="descclassname">indexCounters.btree.</tt><tt class="descname">hits</tt><a class="headerlink" href="#indexCounters.btree.hits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#indexCounters.btree.hits" title="indexCounters.btree.hits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.hits</span></tt></a> value reflects the number of
+times that an index has been accessed and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is able
+to return the index from memory.</p>
+<p>A higher value indicates effective index
+use. <a class="reference internal" href="#indexCounters.btree.hits" title="indexCounters.btree.hits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.hits</span></tt></a> values that represent a
+greater proportion of the <a class="reference internal" href="#indexCounters.btree.accesses" title="indexCounters.btree.accesses"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.accesses</span></tt></a>
+value, tend to indicate more effective index configuration.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree.misses">
+<tt class="descclassname">indexCounters.btree.</tt><tt class="descname">misses</tt><a class="headerlink" href="#indexCounters.btree.misses" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#indexCounters.btree.misses" title="indexCounters.btree.misses"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.misses</span></tt></a> value represents the
+number of times that an operation attempted to access an index that
+was not in memory. These &#8220;misses,&#8221; do not indicate a failed query
+or operation, but rather an inefficient use of the index. Lower
+values in this field indicate better index use and likely overall
+performance as well.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree.resets">
+<tt class="descclassname">indexCounters.btree.</tt><tt class="descname">resets</tt><a class="headerlink" href="#indexCounters.btree.resets" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#indexCounters.btree.resets" title="indexCounters.btree.resets"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.resets</span></tt></a> value reflects the number
+of times that the index counters have been reset since the database
+last restarted. Typically this value is <tt class="docutils literal"><span class="pre">0</span></tt>, but use this value
+to provide context for the data specified by other
+<a class="reference internal" href="#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> values.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="indexCounters.btree.missRatio">
+<tt class="descclassname">indexCounters.btree.</tt><tt class="descname">missRatio</tt><a class="headerlink" href="#indexCounters.btree.missRatio" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#indexCounters.btree.missRatio" title="indexCounters.btree.missRatio"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.missRatio</span></tt></a> value is the ratio of
+<a class="reference internal" href="#indexCounters.btree.hits" title="indexCounters.btree.hits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.hits</span></tt></a> to
+<a class="reference internal" href="#indexCounters.btree.misses" title="indexCounters.btree.misses"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters.btree.misses</span></tt></a> misses. This value is
+typically <tt class="docutils literal"><span class="pre">0</span></tt> or approaching <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="backgroundflushing">
+<span id="server-status-background-flushing"></span><span id="server-status-backgroundflushing"></span><h2>backgroundFlushing<a class="headerlink" href="#backgroundflushing" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-backgroundflushing"><em>output of the backgroundFlushing fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="backgroundFlushing">
+<tt class="descname">backgroundFlushing</tt><a class="headerlink" href="#backgroundFlushing" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> periodically flushes writes to disk. In the default
+configuration, this happens every 60 seconds. The
+<a class="reference internal" href="#backgroundFlushing" title="backgroundFlushing"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing</span></tt></a> data structure contains data regarding
+these operations. Consider these values if you have concerns about
+write performance and <a class="reference internal" href="#journaling-status"><em>journaling</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="backgroundFlushing.flushes">
+<tt class="descclassname">backgroundFlushing.</tt><tt class="descname">flushes</tt><a class="headerlink" href="#backgroundFlushing.flushes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#backgroundFlushing.flushes" title="backgroundFlushing.flushes"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.flushes</span></tt></a> is a counter that collects the
+number of times the database has flushed all writes to disk. This
+value will grow as database runs for longer periods of time.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="backgroundFlushing.total_ms">
+<tt class="descclassname">backgroundFlushing.</tt><tt class="descname">total_ms</tt><a class="headerlink" href="#backgroundFlushing.total_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#backgroundFlushing.total_ms" title="backgroundFlushing.total_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.total_ms</span></tt></a> value provides the total number
+of milliseconds (ms) that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> processes have spent
+writing (i.e. flushing) data to disk. Because this is an absolute
+value, consider the value of <a class="reference internal" href="#backgroundFlushing.flushes" title="backgroundFlushing.flushes"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.flushes</span></tt></a>
+and <a class="reference internal" href="#backgroundFlushing.average_ms" title="backgroundFlushing.average_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.average_ms</span></tt></a> to provide better
+context for this datum.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="backgroundFlushing.average_ms">
+<tt class="descclassname">backgroundFlushing.</tt><tt class="descname">average_ms</tt><a class="headerlink" href="#backgroundFlushing.average_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#backgroundFlushing.average_ms" title="backgroundFlushing.average_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.average_ms</span></tt></a> value describes the
+relationship between the number of flushes and the total amount of
+time that the database has spent writing data to disk. The larger
+<a class="reference internal" href="#backgroundFlushing.flushes" title="backgroundFlushing.flushes"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.flushes</span></tt></a> is, the more likely this value
+is likely to represent a &#8220;normal,&#8221; time; however, abnormal data can
+skew this value.</p>
+<p>Use the <a class="reference internal" href="#backgroundFlushing.last_ms" title="backgroundFlushing.last_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.last_ms</span></tt></a> to ensure that a high
+average is not skewed by transient historical issue or a
+random write distribution.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="backgroundFlushing.last_ms">
+<tt class="descclassname">backgroundFlushing.</tt><tt class="descname">last_ms</tt><a class="headerlink" href="#backgroundFlushing.last_ms" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#backgroundFlushing.last_ms" title="backgroundFlushing.last_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.last_ms</span></tt></a> field is the amount
+of time, in milliseconds, that the last flush operation took to
+complete. Use this value to verify that the current performance of
+the server and is in line with the historical data provided by
+<a class="reference internal" href="#backgroundFlushing.average_ms" title="backgroundFlushing.average_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.average_ms</span></tt></a> and
+<a class="reference internal" href="#backgroundFlushing.total_ms" title="backgroundFlushing.total_ms"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.total_ms</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="backgroundFlushing.last_finished">
+<tt class="descclassname">backgroundFlushing.</tt><tt class="descname">last_finished</tt><a class="headerlink" href="#backgroundFlushing.last_finished" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#backgroundFlushing.last_finished" title="backgroundFlushing.last_finished"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">backgroundFlushing.last_finished</span></tt></a> field provides a timestamp
+of the last completed flush operation in the <a class="reference internal" href="glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a>
+format. If this value is more than a few minutes old relative to
+your server&#8217;s current time and accounting for differences in time
+zone, restarting the database may result in some data loss.</p>
+<p>Also consider ongoing operations that might skew this value by
+routinely block write operations.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="cursors">
+<span id="server-status-cursors"></span><h2>cursors<a class="headerlink" href="#cursors" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-cursors"><em>output of the cursors</em></a> fields.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">cursors</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">cursors</span></tt> data structure contains data regarding cursor state
+and use.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="cursors.totalOpen">
+<tt class="descclassname">cursors.</tt><tt class="descname">totalOpen</tt><a class="headerlink" href="#cursors.totalOpen" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#cursors.totalOpen" title="cursors.totalOpen"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">cursors.totalOpen</span></tt></a> provides the number of cursors that
+MongoDB is maintaining for clients. Because MongoDB exhausts unused
+cursors, typically this value small or zero. However, if there is a
+queue, stale tailable cursors, or a large number of operations this
+value may rise.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="cursors.clientCursors_size">
+<tt class="descclassname">cursors.</tt><tt class="descname">clientCursors_size</tt><a class="headerlink" href="#cursors.clientCursors_size" title="Permalink to this definition">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">Deprecated since version 1.x: </span>See <a class="reference internal" href="#cursors.totalOpen" title="cursors.totalOpen"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">cursors.totalOpen</span></tt></a> for this datum.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="cursors.timedOut">
+<tt class="descclassname">cursors.</tt><tt class="descname">timedOut</tt><a class="headerlink" href="#cursors.timedOut" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#cursors.timedOut" title="cursors.timedOut"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">cursors.timedOut</span></tt></a> provides a counter of the total number
+of cursors that have timed out since the server process started. If
+this number is large or growing at a regular rate, this may
+indicate an application error.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="network">
+<span id="server-status-network"></span><h2>network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-network"><em>output of the network fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">network</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network</span></tt> data structure contains data regarding MongoDB&#8217;s
+network use.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="network.bytesIn">
+<tt class="descclassname">network.</tt><tt class="descname">bytesIn</tt><a class="headerlink" href="#network.bytesIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#network.bytesIn" title="network.bytesIn"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network.bytesIn</span></tt></a> field reflects the
+amount of network traffic, in bytes, received <em>by</em> this
+database. Use this value to ensure that network traffic sent to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process is consistent with expectations and
+overall inter-application traffic.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="network.bytesOut">
+<tt class="descclassname">network.</tt><tt class="descname">bytesOut</tt><a class="headerlink" href="#network.bytesOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#network.bytesOut" title="network.bytesOut"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network.bytesOut</span></tt></a> field reflects the amount of
+network traffic, in bytes, sent <em>from</em> this database. Use this
+value to ensure that network traffic sent by the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process
+is consistent with expectations and overall inter-application
+traffic.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="network.numRequests">
+<tt class="descclassname">network.</tt><tt class="descname">numRequests</tt><a class="headerlink" href="#network.numRequests" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#network.numRequests" title="network.numRequests"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network.numRequests</span></tt></a> field is a counter of the total number
+of distinct requests that the server has received. Use this value
+to provide context for the <a class="reference internal" href="#network.bytesIn" title="network.bytesIn"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network.bytesIn</span></tt></a> and
+<a class="reference internal" href="#network.bytesOut" title="network.bytesOut"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">network.bytesOut</span></tt></a> values to ensure that MongoDB&#8217;s network
+utilization is consistent with expectations and application use.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="repl">
+<span id="server-status-repl"></span><h2>repl<a class="headerlink" href="#repl" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-repl"><em>output of the repl fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">repl</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">repl</span></tt> data structure contains status information for
+MongoDB&#8217;s replication (i.e. &#8220;replica set&#8221;) configuration. These
+values only appear when the current host has replication enabled.</p>
+<p>See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="repl.setName">
+<tt class="descclassname">repl.</tt><tt class="descname">setName</tt><a class="headerlink" href="#repl.setName" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#repl.setName" title="repl.setName"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">repl.setName</span></tt></a> field contains a string with the name of the
+current replica set. This value reflects the <a class="reference internal" href="mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a>
+command line argument, or <a class="reference internal" href="configuration-options.html#replSet" title="replSet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt></a> value in the
+configuration file.</p>
+<p>See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="repl.ismaster">
+<tt class="descclassname">repl.</tt><tt class="descname">ismaster</tt><a class="headerlink" href="#repl.ismaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#repl.ismaster" title="repl.ismaster"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">repl.ismaster</span></tt></a> field is either <tt class="docutils literal"><span class="pre">true</span></tt> or
+<tt class="docutils literal"><span class="pre">false</span></tt> and reflects whether the current node is the master or
+primary node in the replica set.</p>
+<p>See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="repl.secondary">
+<tt class="descclassname">repl.</tt><tt class="descname">secondary</tt><a class="headerlink" href="#repl.secondary" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#repl.secondary" title="repl.secondary"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">repl.secondary</span></tt></a> field is either <tt class="docutils literal"><span class="pre">true</span></tt> or
+<tt class="docutils literal"><span class="pre">false</span></tt> and reflects whether the current node is a secondary
+node in the replica set.</p>
+<p>See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="repl.hosts">
+<tt class="descclassname">repl.</tt><tt class="descname">hosts</tt><a class="headerlink" href="#repl.hosts" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#repl.hosts" title="repl.hosts"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">repl.hosts</span></tt></a> is an array that lists the other nodes in the
+current replica set. Each member of the replica set appears in the
+form of <tt class="docutils literal"><span class="pre">hostname:port</span></tt>.</p>
+<p>See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="opcountersrepl">
+<span id="server-status-opcounters-repl"></span><span id="server-status-opcountersrepl"></span><h2>opcountersRepl<a class="headerlink" href="#opcountersrepl" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-opcountersrepl"><em>output of the opcountersRepl fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="opcountersRepl">
+<tt class="descname">opcountersRepl</tt><a class="headerlink" href="#opcountersRepl" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#opcountersRepl" title="opcountersRepl"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl</span></tt></a> data structure, similar to the
+<tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters</span></tt> data structure, provides an overview of
+database replication operations by type and makes it possible to
+analyze the load on the replica in more granular manner.  These
+values only appear when the current host has replication enabled.</p>
+<p>These values will differ from the <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters</span></tt> values
+because of how MongoDB serializes operations during replication.
+See <a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> for more information on replication.</p>
+<p>These numbers will grow over time in response to database
+use. Analyze these values over time to track database utilization.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.insert">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">insert</tt><a class="headerlink" href="#opcountersRepl.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.insert" title="opcountersRepl.insert"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.insert</span></tt></a> provides a counter of the total number
+of replicated insert operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+last started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.query">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">query</tt><a class="headerlink" href="#opcountersRepl.query" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.query" title="opcountersRepl.query"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.query</span></tt></a> provides a counter of the total number
+of replicated queries since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.update">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">update</tt><a class="headerlink" href="#opcountersRepl.update" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.update" title="opcountersRepl.update"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.update</span></tt></a> provides a counter of the total number
+of replicated update operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+last started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.delete">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">delete</tt><a class="headerlink" href="#opcountersRepl.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.delete" title="opcountersRepl.delete"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.delete</span></tt></a> provides a counter of the total number
+of replicated delete operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+last started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.getmore">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">getmore</tt><a class="headerlink" href="#opcountersRepl.getmore" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.getmore" title="opcountersRepl.getmore"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.getmore</span></tt></a> provides a counter of the total number
+of &#8220;getmore&#8221; operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started. This counter can be high even if the query count is low.
+Secondary nodes send <tt class="docutils literal"><span class="pre">getMore</span></tt> operations as part of the replication
+process.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcountersRepl.command">
+<tt class="descclassname">opcountersRepl.</tt><tt class="descname">command</tt><a class="headerlink" href="#opcountersRepl.command" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcountersRepl.command" title="opcountersRepl.command"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcountersRepl.command</span></tt></a> provides a counter of the total number
+of replicated commands issued to the database since the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last started.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="replnetworkqueue">
+<span id="server-status-repl-network-queue"></span><span id="server-status-replnetworkqueue"></span><h2>replNetworkQueue<a class="headerlink" href="#replnetworkqueue" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.1.2.</span></p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-replnetworkqueue"><em>output of the replNetworkQueue fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="replNetworkQueue">
+<tt class="descname">replNetworkQueue</tt><a class="headerlink" href="#replNetworkQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#replNetworkQueue" title="replNetworkQueue"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">replNetworkQueue</span></tt></a> document reports on the network
+replication buffer, which permits replication operations to happen
+in the background. This feature is internal.</p>
+<p>This document only appears on <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of
+<a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="replNetworkQueue.waitTimeMs">
+<tt class="descclassname">replNetworkQueue.</tt><tt class="descname">waitTimeMs</tt><a class="headerlink" href="#replNetworkQueue.waitTimeMs" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#replNetworkQueue.waitTimeMs" title="replNetworkQueue.waitTimeMs"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">replNetworkQueue.waitTimeMs</span></tt></a> reports the amount of time that
+a <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> waits to add operations to network queue. This
+value is cumulative.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="replNetworkQueue.numElems">
+<tt class="descclassname">replNetworkQueue.</tt><tt class="descname">numElems</tt><a class="headerlink" href="#replNetworkQueue.numElems" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#replNetworkQueue.numElems" title="replNetworkQueue.numElems"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">replNetworkQueue.numElems</span></tt></a> reports the number of operations
+stored in the queue.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="replNetworkQueue.numBytes">
+<tt class="descclassname">replNetworkQueue.</tt><tt class="descname">numBytes</tt><a class="headerlink" href="#replNetworkQueue.numBytes" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#replNetworkQueue.numBytes" title="replNetworkQueue.numBytes"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">replNetworkQueue.numBytes</span></tt></a> reports the total size of the
+network replication queue.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="opcounters">
+<span id="server-status-opcounters"></span><h2>opcounters<a class="headerlink" href="#opcounters" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-opcounters"><em>output of the opcounters fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">opcounters</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters</span></tt> data structure provides an overview of
+database operations by type and makes it possible to analyze the
+load on the database in more granular manner.</p>
+<p>These numbers will grow over time and in response to database
+use. Analyze these values over time to track database utilization.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.insert">
+<tt class="descclassname">opcounters.</tt><tt class="descname">insert</tt><a class="headerlink" href="#opcounters.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.insert" title="opcounters.insert"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.insert</span></tt></a> provides a counter of the total number
+of insert operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.query">
+<tt class="descclassname">opcounters.</tt><tt class="descname">query</tt><a class="headerlink" href="#opcounters.query" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.query" title="opcounters.query"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.query</span></tt></a> provides a counter of the total number
+of queries since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.update">
+<tt class="descclassname">opcounters.</tt><tt class="descname">update</tt><a class="headerlink" href="#opcounters.update" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.update" title="opcounters.update"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.update</span></tt></a> provides a counter of the total number
+of update operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.delete">
+<tt class="descclassname">opcounters.</tt><tt class="descname">delete</tt><a class="headerlink" href="#opcounters.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.delete" title="opcounters.delete"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.delete</span></tt></a> provides a counter of the total number
+of delete operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.getmore">
+<tt class="descclassname">opcounters.</tt><tt class="descname">getmore</tt><a class="headerlink" href="#opcounters.getmore" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.getmore" title="opcounters.getmore"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.getmore</span></tt></a> provides a counter of the total number
+of &#8220;getmore&#8221; operations since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance last
+started. This counter can be high even if the query count is low.
+Secondary nodes send <tt class="docutils literal"><span class="pre">getMore</span></tt> operations as part of the replication
+process.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="opcounters.command">
+<tt class="descclassname">opcounters.</tt><tt class="descname">command</tt><a class="headerlink" href="#opcounters.command" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#opcounters.command" title="opcounters.command"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">opcounters.command</span></tt></a> provides a counter of the total number
+of commands issued to the database since the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance last started.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="asserts">
+<span id="server-status-asserts"></span><h2>asserts<a class="headerlink" href="#asserts" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-asserts"><em>output of the asserts fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">asserts</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts</span></tt> document reports the number of asserts on the
+database. While assert errors are typically uncommon, if there are
+non-zero values for the <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts</span></tt>, you should check the log
+file for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process for more information. In
+many cases these errors are trivial, but are worth investigating.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="asserts.regular">
+<tt class="descclassname">asserts.</tt><tt class="descname">regular</tt><a class="headerlink" href="#asserts.regular" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#asserts.regular" title="asserts.regular"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts.regular</span></tt></a> counter tracks the number of regular
+assertions raised since the server process started. Check the log
+file for more information about these messages.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="asserts.warning">
+<tt class="descclassname">asserts.</tt><tt class="descname">warning</tt><a class="headerlink" href="#asserts.warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#asserts.warning" title="asserts.warning"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts.warning</span></tt></a> counter tracks the number of warnings
+raised since the server process started. Check the log file for
+more information about these warnings.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="asserts.msg">
+<tt class="descclassname">asserts.</tt><tt class="descname">msg</tt><a class="headerlink" href="#asserts.msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#asserts.msg" title="asserts.msg"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts.msg</span></tt></a> counter tracks the number of message
+assertions raised since the server process started. Check the log
+file for more information about these messages.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="asserts.user">
+<tt class="descclassname">asserts.</tt><tt class="descname">user</tt><a class="headerlink" href="#asserts.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#asserts.user" title="asserts.user"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts.user</span></tt></a> counter reports the number of &#8220;user asserts&#8221;
+that have occurred since the last time the server process
+started. These are errors that user may generate, such as out of
+disk space or duplicate key. You can prevent these assertions by
+fixing a problem with your application or deployment. Check the
+MongoDB log for more information.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="asserts.rollovers">
+<tt class="descclassname">asserts.</tt><tt class="descname">rollovers</tt><a class="headerlink" href="#asserts.rollovers" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#asserts.rollovers" title="asserts.rollovers"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts.rollovers</span></tt></a> counter displays the number of
+times that the rollover counters have rolled over since the last
+time the server process started. The counters will rollover to zero
+after 2<sup>30</sup> assertions. Use this value to provide
+context to the other values in the <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">asserts</span></tt> data structure.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="writebacksqueued">
+<span id="server-status-write-backs-queued"></span><span id="server-status-writebacksqueued"></span><h2>writeBacksQueued<a class="headerlink" href="#writebacksqueued" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-writebacksqueued"><em>output of the writeBacksQueued fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt id="writeBacksQueued">
+<tt class="descname">writeBacksQueued</tt><a class="headerlink" href="#writeBacksQueued" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#writeBacksQueued" title="writeBacksQueued"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">writeBacksQueued</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt> when there
+are operations from a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance queued for
+retrying. Typically this option is false.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="glossary.html#term-writebacks"><em class="xref std std-term">writeBacks</em></a></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="dur">
+<span id="server-status-journaling"></span><span id="journaling-status"></span><span id="durability-status"></span><h2>dur<a class="headerlink" href="#dur" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.8.</span></p>
+<div class="section" id="journaling">
+<h3>Journaling<a class="headerlink" href="#journaling" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-journaling"><em>output of the journaling fields</em></a>.</p>
+</div>
+<dl class="status">
+<dt>
+<tt class="descname">dur</tt></dt>
+<dd><p>The <tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur</span></tt> (for &#8220;durability&#8221;) document contains data
+regarding the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>&#8216;s journaling-related operations and
+performance. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> must be running with journaling for
+these data to appear in the output of &#8220;<a class="reference internal" href="commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a>&#8221;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The data values are <strong>not</strong> cumulative but are reset on a regular
+basis as determined by the <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit interval</a>. This interval is ~100
+milliseconds (ms) by default (or 30ms if the journal file is on
+the same file system as your data files) and is cut by 1/3 when
+there is a <a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command pending. The
+interval is configurable using the <tt class="docutils literal"><span class="pre">--journalCommitInterval</span></tt>
+option.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling">Journaling</a>&#8221; for more information about journaling operations.</p>
+</div>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.commits">
+<tt class="descclassname">dur.</tt><tt class="descname">commits</tt><a class="headerlink" href="#dur.commits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.commits" title="dur.commits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.commits</span></tt></a> provides the number of transactions
+written to the <a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> during the last <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group
+commit interval</a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.journaledMB">
+<tt class="descclassname">dur.</tt><tt class="descname">journaledMB</tt><a class="headerlink" href="#dur.journaledMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.journaledMB" title="dur.journaledMB"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.journaledMB</span></tt></a> provides the amount of data in
+megabytes (MB) written to <a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> during the last
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit interval</a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.writeToDataFilesMB">
+<tt class="descclassname">dur.</tt><tt class="descname">writeToDataFilesMB</tt><a class="headerlink" href="#dur.writeToDataFilesMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.writeToDataFilesMB" title="dur.writeToDataFilesMB"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.writeToDataFilesMB</span></tt></a> provides the amount of data in
+megabytes (MB) written from <a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to the data files during the
+last <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit interval</a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.compression">
+<tt class="descclassname">dur.</tt><tt class="descname">compression</tt><a class="headerlink" href="#dur.compression" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.0.</span></p>
+<p>The <a class="reference internal" href="#dur.compression" title="dur.compression"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.compression</span></tt></a> represents the compression ratio of
+the data written to the <a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">(</span> <span class="nx">journaled_size_of_data</span> <span class="o">/</span> <span class="nx">uncompressed_size_of_data</span> <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.commitsInWriteLock">
+<tt class="descclassname">dur.</tt><tt class="descname">commitsInWriteLock</tt><a class="headerlink" href="#dur.commitsInWriteLock" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.commitsInWriteLock" title="dur.commitsInWriteLock"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.commitsInWriteLock</span></tt></a> provides a count of the commits
+that occurred while a write lock was held. Commits in a write lock
+indicate a MongoDB node under a heavy write load and call for
+further diagnosis.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.earlyCommits">
+<tt class="descclassname">dur.</tt><tt class="descname">earlyCommits</tt><a class="headerlink" href="#dur.earlyCommits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.earlyCommits" title="dur.earlyCommits"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.earlyCommits</span></tt></a> value reflects the number of times
+MongoDB requested a commit before the scheduled <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group
+commit interval</a>. Use this
+value to ensure that your <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit interval</a> is not too long for your
+deployment.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS">
+<tt class="descclassname">dur.</tt><tt class="descname">timeMS</tt><a class="headerlink" href="#dur.timeMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS" title="dur.timeMS"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS</span></tt></a> document provides information about the
+performance of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance during the various
+phases of journaling in the last <a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling#Journaling-GroupCommits">journal group commit
+interval</a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS.dt">
+<tt class="descclassname">dur.timeMS.</tt><tt class="descname">dt</tt><a class="headerlink" href="#dur.timeMS.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS.dt" title="dur.timeMS.dt"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS.dt</span></tt></a> value provides, in milliseconds, the
+amount of time over which MongoDB collected the <a class="reference internal" href="#dur.timeMS" title="dur.timeMS"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS</span></tt></a>
+data. Use this field to provide context to the other
+<a class="reference internal" href="#dur.timeMS" title="dur.timeMS"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS</span></tt></a> field values.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS.prepLogBuffer">
+<tt class="descclassname">dur.timeMS.</tt><tt class="descname">prepLogBuffer</tt><a class="headerlink" href="#dur.timeMS.prepLogBuffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS.prepLogBuffer" title="dur.timeMS.prepLogBuffer"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS.prepLogBuffer</span></tt></a> value provides, in milliseconds,
+the amount of time spent preparing to write to the journal. Smaller
+values indicate better journal performance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS.writeToJournal">
+<tt class="descclassname">dur.timeMS.</tt><tt class="descname">writeToJournal</tt><a class="headerlink" href="#dur.timeMS.writeToJournal" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS.writeToJournal" title="dur.timeMS.writeToJournal"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS.writeToJournal</span></tt></a> value provides, in milliseconds,
+the amount of time spent actually writing to the journal. File
+system speeds and device interfaces can affect performance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS.writeToDataFiles">
+<tt class="descclassname">dur.timeMS.</tt><tt class="descname">writeToDataFiles</tt><a class="headerlink" href="#dur.timeMS.writeToDataFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS.writeToDataFiles" title="dur.timeMS.writeToDataFiles"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS.writeToDataFiles</span></tt></a> value provides, in
+milliseconds, the amount of time spent writing to data files after
+journaling. File system speeds and device interfaces can affect
+performance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="dur.timeMS.remapPrivateView">
+<tt class="descclassname">dur.timeMS.</tt><tt class="descname">remapPrivateView</tt><a class="headerlink" href="#dur.timeMS.remapPrivateView" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#dur.timeMS.remapPrivateView" title="dur.timeMS.remapPrivateView"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">dur.timeMS.remapPrivateView</span></tt></a> value provides, in
+milliseconds, the amount of time spent remapping copy-on-write memory
+mapped views. Smaller values indicate better journal performance.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="recordstats">
+<span id="server-status-record-stats"></span><span id="server-status-recordstats"></span><h2>recordStats<a class="headerlink" href="#recordstats" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last"><a class="reference internal" href="server-status-index.html#server-status-example-recordstats"><em>output of the recordStats</em></a> fields.</p>
+</div>
+<dl class="status">
+<dt id="recordStats">
+<tt class="descname">recordStats</tt><a class="headerlink" href="#recordStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#recordStats" title="recordStats"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats</span></tt></a> document provides fine grained reporting
+on page faults on a per database level.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.accessesNotInMemory">
+<tt class="descclassname">recordStats.</tt><tt class="descname">accessesNotInMemory</tt><a class="headerlink" href="#recordStats.accessesNotInMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.accessesNotInMemory" title="recordStats.accessesNotInMemory"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.accessesNotInMemory</span></tt></a> reflects the number of
+times <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> needed to access a memory page that was
+<em>not</em> resident in memory for <em>all</em> databases managed by this
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.pageFaultExceptionsThrown">
+<tt class="descclassname">recordStats.</tt><tt class="descname">pageFaultExceptionsThrown</tt><a class="headerlink" href="#recordStats.pageFaultExceptionsThrown" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.pageFaultExceptionsThrown" title="recordStats.pageFaultExceptionsThrown"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.pageFaultExceptionsThrown</span></tt></a> reflects the
+number of page fault exceptions thrown by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> when
+accessing data for <em>all</em> databases managed by this
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.local.accessesNotInMemory">
+<tt class="descclassname">recordStats.local.</tt><tt class="descname">accessesNotInMemory</tt><a class="headerlink" href="#recordStats.local.accessesNotInMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.local.accessesNotInMemory" title="recordStats.local.accessesNotInMemory"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.local.accessesNotInMemory</span></tt></a> reflects the number of
+times <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> needed to access a memory page that was
+<em>not</em> resident in memory for the <tt class="docutils literal"><span class="pre">local</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.local.pageFaultExceptionsThrown">
+<tt class="descclassname">recordStats.local.</tt><tt class="descname">pageFaultExceptionsThrown</tt><a class="headerlink" href="#recordStats.local.pageFaultExceptionsThrown" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.local.pageFaultExceptionsThrown" title="recordStats.local.pageFaultExceptionsThrown"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.local.pageFaultExceptionsThrown</span></tt></a> reflects the
+number of page fault exceptions thrown by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> when
+accessing data for the <tt class="docutils literal"><span class="pre">local</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.admin.accessesNotInMemory">
+<tt class="descclassname">recordStats.admin.</tt><tt class="descname">accessesNotInMemory</tt><a class="headerlink" href="#recordStats.admin.accessesNotInMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.admin.accessesNotInMemory" title="recordStats.admin.accessesNotInMemory"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.admin.accessesNotInMemory</span></tt></a> reflects the number of
+times <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> needed to access a memory page that was
+<em>not</em> resident in memory for the <a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.admin.pageFaultExceptionsThrown">
+<tt class="descclassname">recordStats.admin.</tt><tt class="descname">pageFaultExceptionsThrown</tt><a class="headerlink" href="#recordStats.admin.pageFaultExceptionsThrown" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.admin.pageFaultExceptionsThrown" title="recordStats.admin.pageFaultExceptionsThrown"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.admin.pageFaultExceptionsThrown</span></tt></a> reflects the
+number of page fault exceptions thrown by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> when
+accessing data for the <a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.&lt;database&gt;.accessesNotInMemory">
+<tt class="descclassname">recordStats.&lt;database&gt;.</tt><tt class="descname">accessesNotInMemory</tt><a class="headerlink" href="#recordStats.<database>.accessesNotInMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.&lt;database&gt;.accessesNotInMemory" title="recordStats.&lt;database&gt;.accessesNotInMemory"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.&lt;database&gt;.accessesNotInMemory</span></tt></a> reflects the number of
+times <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> needed to access a memory page that was
+<em>not</em> resident in memory for the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="recordStats.&lt;database&gt;.pageFaultExceptionsThrown">
+<tt class="descclassname">recordStats.&lt;database&gt;.</tt><tt class="descname">pageFaultExceptionsThrown</tt><a class="headerlink" href="#recordStats.<database>.pageFaultExceptionsThrown" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#recordStats.&lt;database&gt;.pageFaultExceptionsThrown" title="recordStats.&lt;database&gt;.pageFaultExceptionsThrown"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">recordStats.&lt;database&gt;.pageFaultExceptionsThrown</span></tt></a> reflects the
+number of page fault exceptions thrown by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> when
+accessing data for the <tt class="docutils literal"><span class="pre">&lt;database&gt;</span></tt> database.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="server-status-index.html" title="Previous Section: Server Status Output Index">&lt; &nbsp; Server Status Output Index</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="database-statistics.html" title="Next Section: Database Statistics Reference">Database Statistics Reference &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

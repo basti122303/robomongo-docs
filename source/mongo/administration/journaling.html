@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Journaling &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/journaling" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Using MongoDB with SSL Connections" href="ssl.html" />
+<link rel="prev" title="Run-time Database Configuration" href="configuration.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="journaling">
+<h1>Journaling<a class="headerlink" href="#journaling" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB uses <em>write ahead logging</em> or <a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journaling</em></a> to
+guarantee <a class="reference internal" href="../core/write-operations.html"><em>write operation</em></a> durability
+by way of a an on disk journal. Before applying a change to the data
+files, MongoDB writes this operation to the journal. Then, if MongoDB
+terminates or encounters an error unexpectedly before it can write the
+data to disk, MongoDB can re-apply the write operation and maintain a
+consistent state.</p>
+<p>Journaling ensures that <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodb</span></tt> is crash resilient. <em>Without</em>
+a journal, if <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodb</span></tt> exits unexpectedly, you must assume
+your data is in an inconsistent state and must either run
+<a class="reference internal" href="../tutorial/recover-data-following-unexpected-shutdown.html"><em>repair</em></a>
+or preferably <a class="reference internal" href="replica-sets.html#replica-set-resync-stale-member"><em>resync</em></a> from a
+clean member of the replica set.</p>
+<p>When journaling is enabled, if <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodb</span></tt> stops unexpectedly,
+the program can recover everything written to the journal, and the
+data is in a consistent state. By default, the greatest extent of lost
+writes, i.e., those not made to the journal, is no more than the last
+100 milliseconds.</p>
+<p>With journaling, if you want a data set to reside entirely in RAM, you
+need enough RAM to hold the dataset plus the &#8220;write working set.&#8221; The
+&#8220;write working set&#8221; is the amount of unique data you expect to see
+written between re-mappings of the private view. For information on
+views, see <a class="reference internal" href="#journaling-storage-views"><em>Storage Views used in Journaling</em></a>.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last versionchanged">
+<span class="versionmodified">Changed in version 2.0: </span>For 64-bit builds of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, journaling is enabled by default.
+For other platforms, see <a class="reference internal" href="../reference/connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a>.</p>
+</div>
+<div class="section" id="procedures">
+<h2>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="enable-journaling">
+<h3>Enable Journaling<a class="headerlink" href="#enable-journaling" title="Permalink to this headline">¶</a></h3>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0: </span>For 64-bit builds of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, journaling is enabled by default.</p>
+<p>To enable journaling, start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with the
+<em class="xref std std-option">--journal</em> command line option.</p>
+<p>If no journal files exist, when <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> starts, it must
+preallocates new journal files. During this operation, the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is not listening for connections until preallocation
+completes: for some systems this may take a several minutes. During
+this period your applications and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell are not
+available.</p>
+</div>
+<div class="section" id="disable-journaling">
+<h3>Disable Journaling<a class="headerlink" href="#disable-journaling" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not disable journaling on production systems. If your
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance stops without shutting down cleanly
+unexpectedly for any reason, (e.g. power failure) and you are
+not running with journaling, then you must recover from an
+unaffected <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member or backup, as described in
+<a class="reference internal" href="../tutorial/recover-data-following-unexpected-shutdown.html"><em>repair</em></a>.</p>
+</div>
+<p>To disable journaling, start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--nojournal"><em class="xref std std-option">--nojournal</em></a> command line option.</p>
+<p>To disable journaling, shut down <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> cleanly and restart
+with <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--nojournal"><em class="xref std std-option">--nojournal</em></a>.</p>
+</div>
+<div class="section" id="get-commit-acknowledgment">
+<h3>Get Commit Acknowledgment<a class="headerlink" href="#get-commit-acknowledgment" title="Permalink to this headline">¶</a></h3>
+<p>You can get commit acknowledgement with the
+<a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command and the <tt class="docutils literal"><span class="pre">j</span></tt> option. For details, see
+<a class="reference internal" href="../core/write-operations.html#write-concern-operation"><em>Internal Operation of Write Concern</em></a>.</p>
+</div>
+<div class="section" id="avoid-preallocation-lag">
+<span id="journaling-avoid-preallocation-lag"></span><h3>Avoid Preallocation Lag<a class="headerlink" href="#avoid-preallocation-lag" title="Permalink to this headline">¶</a></h3>
+<p>To avoid <a class="reference internal" href="#journaling-journal-files"><em>preallocation lag</em></a>, you can
+preallocate files in the journal directory by copying them from another
+instance of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+<p>Preallocated files do not contain data. It is safe to later remove them.
+But if you restart <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with journaling, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+will create them again.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following sequence preallocates journal files for an
+instance of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running on port <tt class="docutils literal"><span class="pre">27017</span></tt> with a database
+path of <tt class="docutils literal"><span class="pre">/data/db</span></tt>.</p>
+<p>For demonstration purposes, the sequence starts by creating a set of
+journal files in the usual way.</p>
+<ol class="last arabic">
+<li><p class="first">Create a temporary directory into which to create a set of journal
+files:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mkdir ~/tmpDbpath
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create a set of journal files by staring a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance that uses the temporary directory:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 10000 --dbpath ~/tmpDbpath --journal
+</pre></div>
+</div>
+</li>
+<li><p class="first">When you see the following log output, indicating <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> has the files,
+press CONTROL+C to stop the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance:</p>
+<div class="highlight-sh"><div class="highlight"><pre>web admin interface listening on port 11000
+</pre></div>
+</div>
+</li>
+<li><p class="first">Preallocate journal files for the new instance of
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> by moving the journal files from the data directory
+of the existing instance to the data directory of the new instance:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mv ~/tmpDbpath/journal /data/db/
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start the new <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --port 27017 --dbpath /data/db --journal
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="monitor-journal-status">
+<h3>Monitor Journal Status<a class="headerlink" href="#monitor-journal-status" title="Permalink to this headline">¶</a></h3>
+<p>Use the following commands and methods to monitor journal status:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a></p>
+<p>The <a class="reference internal" href="../reference/commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> command returns database status
+information that is useful for assessing performance.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/command/journalLatencyTest.html#journalLatencyTest" title="journalLatencyTest"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">journalLatencyTest</span></tt></a></p>
+<p>Use <a class="reference internal" href="../reference/command/journalLatencyTest.html#journalLatencyTest" title="journalLatencyTest"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">journalLatencyTest</span></tt></a> to measure how long it takes on
+your volume to write to the disk in an append-only fashion. You can
+run this command on an idle system to get a baseline sync time for
+journaling. You can also run this command on a busy system to see the
+sync time on a busy system, which may be higher if the journal
+directory is on the same volume as the data files.</p>
+<p>The <a class="reference internal" href="../reference/command/journalLatencyTest.html#journalLatencyTest" title="journalLatencyTest"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">journalLatencyTest</span></tt></a> command also provides a way to
+check if your disk drive is buffering writes in its local cache. If
+the number is very low (i.e., less than 2 milliseconds) and the drive
+is non-SSD, the drive is probably buffering writes. In that case,
+enable cache write-through for the device in your operating system,
+unless you have a disk controller card with battery backed RAM.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="change-the-group-commit-interval">
+<span id="journaling-journal-commit-interval"></span><h3>Change the Group Commit Interval<a class="headerlink" href="#change-the-group-commit-interval" title="Permalink to this headline">¶</a></h3>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.</span></p>
+<p>You can set the group commit interval using the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--journalCommitInterval"><em class="xref std std-option">--journalCommitInterval</em></a>
+command line option. The allowed range is <tt class="docutils literal"><span class="pre">2</span></tt> to <tt class="docutils literal"><span class="pre">300</span></tt> milliseconds.</p>
+<p>Lower values increase the durability of the journal at the expense of
+disk performance.</p>
+</div>
+<div class="section" id="recover-data-after-unexpected-shutdown">
+<h3>Recover Data After Unexpected Shutdown<a class="headerlink" href="#recover-data-after-unexpected-shutdown" title="Permalink to this headline">¶</a></h3>
+<p>On a restart after a crash, MongoDB replays all journal files in the
+journal directory before the server becomes available. If MongoDB must
+replay journal files, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> notes these events in the log
+output.</p>
+<p>There is no reason to run <a class="reference internal" href="../reference/configuration-options.html#repair" title="repair"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repair</span></tt></a> in these situations.</p>
+</div>
+</div>
+<div class="section" id="journaling-internals">
+<span id="id1"></span><h2>Journaling Internals<a class="headerlink" href="#journaling-internals" title="Permalink to this headline">¶</a></h2>
+<p>When running with journaling, MongoDB stores and applies <a class="reference internal" href="../core/write-operations.html"><em>write
+operations</em></a> in memory and in the journal before
+the changes are in the data files.</p>
+<div class="section" id="journal-files">
+<span id="journaling-journal-files"></span><h3>Journal Files<a class="headerlink" href="#journal-files" title="Permalink to this headline">¶</a></h3>
+<p>With journaling enabled, MongoDB creates a journal directory within
+the directory defined by <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>, which is <tt class="file docutils literal"><span class="pre">/data/db</span></tt>
+by default. The journal directory holds journal files, which contain
+write-ahead redo logs. The directory also holds a last-sequence-number
+file. A clean shutdown removes all the files in the journal directory.</p>
+<p>Journal files are append-only files and have file names prefixed with
+<tt class="docutils literal"><span class="pre">j._</span></tt>. When a journal file holds 1 gigabyte of data, MongoDB creates
+a new journal file. Once MongoDB applies all the write operations in
+the journal files, it deletes these files. Unless you
+write <em>many</em> bytes of data per-second, the journal directory should
+contain only two or three journal files.</p>
+<p>To limit the size of each journal file to 128 megabytes, use the
+:setting`smallfiles` run time option when starting <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+<p>To speed the frequent sequential writes that occur to the current
+journal file, you can ensure that the journal directory is on a
+different system.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">If you place the journal on a different filesystem from your data
+files you <em>cannot</em> use a filesystem snapshot to capture consistent
+backups of a <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> directory.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Depending on your file system, you might experience a preallocation
+lag the first time you start a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with
+journaling enabled. MongoDB preallocates journal files if it is
+faster on your file system to create files of a
+pre-defined. The amount of time required to pre-allocate
+lag might last several minutes, during which you will not be able
+to connect to the database.  This is a one-time preallocation and
+does not occur with future invocations.</p>
+</div>
+<p>To avoid preallocation lag, see <a class="reference internal" href="#journaling-avoid-preallocation-lag"><em>Avoid Preallocation Lag</em></a>.</p>
+</div>
+<div class="section" id="storage-views-used-in-journaling">
+<span id="journaling-storage-views"></span><h3>Storage Views used in Journaling<a class="headerlink" href="#storage-views-used-in-journaling" title="Permalink to this headline">¶</a></h3>
+<p>Journaling adds three storage views to MongoDB.</p>
+<p>The <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> stores modified data for upload to the MongoDB
+data files. The <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> is the only view with direct access
+to the MongoDB data files. When running with journaling, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+asks the operating system to map your existing on-disk data files to the
+<tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> memory view. The operating system maps the files but
+does not load them. MongoDB later loads data files to <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> as
+needed.</p>
+<p>The <tt class="docutils literal"><span class="pre">private</span> <span class="pre">view</span></tt> stores data for use in <a class="reference internal" href="../core/read-operations.html"><em>read operations</em></a>. MongoDB maps <tt class="docutils literal"><span class="pre">private</span> <span class="pre">view</span></tt> to the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt>
+and is the first place MongoDB applies new <a class="reference internal" href="../core/write-operations.html"><em>write operations</em></a>.</p>
+<p>The journal is an on-disk view that stores new write operations
+after MongoDB applies the operation to the <tt class="docutils literal"><span class="pre">private</span> <span class="pre">cache</span></tt> but
+before applying them to the data files. The journal provides durability.
+If the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance were to crash without having applied
+the writes to the data files, the journal could replay the writes to
+the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> for eventual upload to the data files.</p>
+</div>
+<div class="section" id="how-journaling-records-write-operations">
+<span id="journaling-record-write-operation"></span><h3>How Journaling Records Write Operations<a class="headerlink" href="#how-journaling-records-write-operations" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB copies the write operations to the journal in batches called
+group commits. By default, MongoDB performs a group commit every 100
+milliseconds: as a result MongoDB commits all operations within a 100
+millisecond window in a single batch. These &#8220;group commits&#8221; help
+minimize the performance impact of journaling.</p>
+<p>Journaling stores raw operations that allow MongoDB to reconstruct the
+following:</p>
+<ul class="simple">
+<li>document insertion/updates</li>
+<li>index modifications</li>
+<li>changes to the namespace files</li>
+</ul>
+<p>As <a class="reference internal" href="../core/write-operations.html"><em>write operations</em></a> occur, MongoDB
+writes the data to the <tt class="docutils literal"><span class="pre">private</span> <span class="pre">view</span></tt> in RAM and then copies the write
+operations in batches to the journal. The journal stores the operations
+on disk to ensure durability. MongoDB adds the operations as entries on
+the journal&#8217;s forward pointer. Each entry describes which bytes the
+write operation changed in the data files.</p>
+<p>MongoDB next applies the journal&#8217;s write operations to the <tt class="docutils literal"><span class="pre">shared</span>
+<span class="pre">view</span></tt>. At this point, the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> becomes inconsistent with the
+data files.</p>
+<p>At default intervals of 60 seconds, MongoDB asks the operating system to
+flush the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> to disk. This brings the data files up-to-date
+with the latest write operations.</p>
+<p>When MongoDB flushes write operations to the data files, MongoDB removes the
+write operations from the journal&#8217;s behind pointer. The behind pointer
+is always far back from advanced pointer.</p>
+<p>As part of journaling, MongoDB routinely asks the operating system to
+remap the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> to the <tt class="docutils literal"><span class="pre">private</span> <span class="pre">view</span></tt>, for consistency.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The interaction between the <tt class="docutils literal"><span class="pre">shared</span> <span class="pre">view</span></tt> and the on-disk
+data files is similar to how MongoDB works <em>without</em>
+journaling, which is that MongoDB asks the operating system to flush
+in-memory changes back to the data files every 60 seconds.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="configuration.html" title="Previous Section: Run-time Database Configuration">&lt; &nbsp; Run-time Database Configuration</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="ssl.html" title="Next Section: Using MongoDB with SSL Connections">Using MongoDB with SSL Connections &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

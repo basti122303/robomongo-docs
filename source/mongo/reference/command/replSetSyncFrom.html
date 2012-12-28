@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>replSetSyncFrom &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/replSetSyncFrom" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="replSetTest (internal)" href="replSetTest.html" />
+<link rel="prev" title="replSetStepDown" href="replSetStepDown.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replsetsyncfrom">
+<h1>replSetSyncFrom<a class="headerlink" href="#replsetsyncfrom" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="replSetSyncFrom">
+<tt class="descname">replSetSyncFrom</tt><a class="headerlink" href="#replSetSyncFrom" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> &#8211; Specifies the name and port number of the set member
+that you want <em>this</em> member to sync from. Use
+the <tt class="docutils literal"><span class="pre">[hostname]:[port]</span></tt> form.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="../replica-commands.html#replSetSyncFrom" title="replSetSyncFrom"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetSyncFrom</span></tt></a> allows you to explicitly configure
+which host the current <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will poll <a class="reference internal" href="../glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>
+entries from. This operation may be useful for testing different
+patterns and in situations where a set member is not syncing from
+the host you want. The member to sync from must be a valid
+source for data in the set; a member of a replica set cannot sync from:</p>
+<ul class="simple">
+<li>itself.</li>
+<li>an arbiter, because arbiters do not hold data.</li>
+<li>a member that does not build indexes.</li>
+<li>an unreachable member.</li>
+<li>a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance that is not a member of the same
+replica set.</li>
+</ul>
+<p>If you attempt to sync from a member that is more than 10 seconds
+behind the current member, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will return and log a
+warning, but <em>will</em> sync from such members.</p>
+<p>The command has the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">replSetSyncFrom</span><span class="o">:</span> <span class="s2">&quot;[hostname]:[port]&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>To run the command in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, use the following
+invocation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">replSetSyncFrom</span><span class="o">:</span> <span class="s2">&quot;[hostname]:[port]&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You may also use the <a class="reference internal" href="../replica-commands.html#rs.syncFrom" title="rs.syncFrom"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.syncFrom()</span></tt></a> helper in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, in an operation with the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">syncFrom</span><span class="p">(</span><span class="s2">&quot;[hostname]:[port]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../replica-commands.html#replSetSyncFrom" title="replSetSyncFrom"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetSyncFrom</span></tt></a> provides a temporary override of
+default behavior. When you restart the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance, if the connection that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> uses to
+sync, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will revert to the default logic for
+selecting a sync source.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="replSetStepDown.html" title="Previous Section: replSetStepDown">&lt; &nbsp; replSetStepDown</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="replSetTest.html" title="Next Section: replSetTest (internal)">replSetTest (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

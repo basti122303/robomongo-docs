@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Rotate Log Files &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/rotate-log-files" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Build Old Style Indexes" href="roll-back-to-v1.8-index.html" />
+<link rel="prev" title="Analyze Performance of Database Operations" href="manage-the-database-profiler.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="rotate-log-files">
+<h1>Rotate Log Files<a class="headerlink" href="#rotate-log-files" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Log rotation archives the current log file and starts a new one.
+Specifically, log rotation renames the current log file by appending
+the filename with a timestamp, <a class="footnote-reference" href="#timestamp-format" id="id1">[1]</a> opens a new log
+file, and finally closes the old log. MongoDB will only rotate logs,
+when you use the <a class="reference internal" href="../reference/commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> command, or issue the process
+a <tt class="docutils literal"><span class="pre">SIGURS1</span></tt> signal as described in this procedure.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">For information on logging, see the
+<a class="reference internal" href="../administration/monitoring.html#monitoring-standard-loggging"><em>Process Logging</em></a> section.</p>
+</div>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>The following steps create and rotate a log file:</p>
+<ol class="arabic">
+<li><p class="first">Start a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with verbose logging, with appending
+enabled, and with the following log file:</p>
+<div class="highlight-javascript"><pre>mongod -v --logpath /var/log/mongodb/server1.log --logappend</pre>
+</div>
+</li>
+<li><p class="first">In a separate terminal, list the matching files:</p>
+<div class="highlight-javascript"><pre>ls /var/log/mongodb/server1.log*</pre>
+</div>
+<p>For results, you get:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">server1</span><span class="p">.</span><span class="nx">log</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Rotate the log file using <em>one</em> of the following methods.</p>
+<ul>
+<li><p class="first">From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, issue the <a class="reference internal" href="../reference/commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a>
+command from the <tt class="docutils literal"><span class="pre">admin</span></tt> database:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">logRotate</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This is the only available method to rotate log files on
+Windows systems.</p>
+</li>
+<li><p class="first">From the UNIX shell, rotate logs for a single process by issuing
+the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">kill</span> <span class="o">-</span><span class="nx">SIGUSR1</span> <span class="o">&lt;</span><span class="nx">mongod</span> <span class="nx">process</span> <span class="nx">id</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">From the UNIX shell, rotate logs for all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+processes on a machine by issuing the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">killall</span> <span class="o">-</span><span class="nx">SIGUSR1</span> <span class="nx">mongod</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">List the matching files again:</p>
+<div class="highlight-javascript"><pre>ls /var/log/mongodb/server1.log*</pre>
+</div>
+<p>For results you get something similar to the following. The
+timestamps will be different.</p>
+<div class="highlight-none"><div class="highlight"><pre>server1.log  server1.log.2011-11-24T23-30-00
+</pre></div>
+</div>
+<p>The example results indicate a log rotation performed at exactly
+<tt class="docutils literal"><span class="pre">11:30</span> <span class="pre">pm</span></tt> on <tt class="docutils literal"><span class="pre">November</span> <span class="pre">24th,</span> <span class="pre">2011</span> <span class="pre">UTC</span></tt>, which is the local time
+offset by the local time zone. The original log file is the one with
+the timestamp. The new log is <tt class="docutils literal"><span class="pre">server1.log</span></tt> file.</p>
+<p>If you issue a second <a class="reference internal" href="../reference/commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> command an hour later,
+then an additional file would appear when listing matching files,
+as in the following example:</p>
+<div class="highlight-none"><div class="highlight"><pre>server1.log  server1.log.2011-11-24T23-30-00  server1.log.2011-11-25T00-30-00
+</pre></div>
+</div>
+<p>This operation does not modify the
+<tt class="docutils literal"><span class="pre">server1.log.2011-11-24T23-30-00</span></tt> file created earlier, while
+<tt class="docutils literal"><span class="pre">server1.log.2011-11-25T00-30-00</span></tt> is the previous <tt class="docutils literal"><span class="pre">server1.log</span></tt>
+file, renamed. <tt class="docutils literal"><span class="pre">server1.log</span></tt> is a new, empty file that receives
+all new log output.</p>
+</li>
+</ol>
+<table class="docutils footnote" frame="void" id="timestamp-format" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>MongoDB renders this timestamp in UTC (GMT) and
+formatted as <a class="reference internal" href="../reference/glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="manage-the-database-profiler.html" title="Previous Section: Analyze Performance of Database Operations">&lt; &nbsp; Analyze Performance of Database Operations</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="roll-back-to-v1.8-index.html" title="Next Section: Build Old Style Indexes">Build Old Style Indexes &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,1308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Sharded Cluster Administration &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/sharding" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Sharded Cluster Architectures" href="sharding-architectures.html" />
+<link rel="prev" title="Sharding Fundamentals" href="../core/sharding.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sharded-cluster-administration">
+<span id="sharding-administration"></span><span id="index-0"></span><h1>Sharded Cluster Administration<a class="headerlink" href="#sharded-cluster-administration" title="Permalink to this headline">¶</a></h1>
+<p>This document describes common administrative tasks for sharded
+clusters. For complete documentation of sharded clusters see the
+<a class="reference internal" href="../sharding.html"><em>Sharding</em></a> section of this manual.</p>
+<div class="contents local topic" id="sharding-procedures">
+<p class="topic-title first">Sharding Procedures:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#set-up-a-sharded-cluster" id="id2">Set up a Sharded Cluster</a></li>
+<li><a class="reference internal" href="#cluster-management" id="id3">Cluster Management</a><ul>
+<li><a class="reference internal" href="#add-a-shard-to-a-cluster" id="id4">Add a Shard to a Cluster</a></li>
+<li><a class="reference internal" href="#remove-a-shard-from-a-cluster" id="id5">Remove a Shard from a Cluster</a></li>
+<li><a class="reference internal" href="#list-databases-with-sharding-enabled" id="id6">List Databases with Sharding Enabled</a></li>
+<li><a class="reference internal" href="#list-shards" id="id7">List Shards</a></li>
+<li><a class="reference internal" href="#view-cluster-details" id="id8">View Cluster Details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#chunk-management" id="id9">Chunk Management</a><ul>
+<li><a class="reference internal" href="#split-chunks" id="id10">Split Chunks</a></li>
+<li><a class="reference internal" href="#create-chunks-pre-splitting" id="id11">Create Chunks (Pre-Splitting)</a></li>
+<li><a class="reference internal" href="#modify-chunk-size" id="id12">Modify Chunk Size</a></li>
+<li><a class="reference internal" href="#migrate-chunks" id="id13">Migrate Chunks</a></li>
+<li><a class="reference internal" href="#strategies-for-bulk-inserts-in-sharded-clusters" id="id14">Strategies for Bulk Inserts in Sharded Clusters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#balancer-operations" id="id15">Balancer Operations</a><ul>
+<li><a class="reference internal" href="#check-the-balancer-lock" id="id16">Check the Balancer Lock</a></li>
+<li><a class="reference internal" href="#schedule-the-balancing-window" id="id17">Schedule the Balancing Window</a></li>
+<li><a class="reference internal" href="#remove-a-balancing-window-schedule" id="id18">Remove a Balancing Window Schedule</a></li>
+<li><a class="reference internal" href="#disable-the-balancer" id="id19">Disable the Balancer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#config-server-maintenance" id="id20">Config Server Maintenance</a><ul>
+<li><a class="reference internal" href="#deploy-three-config-servers-for-production-deployments" id="id21">Deploy Three Config Servers for Production Deployments</a></li>
+<li><a class="reference internal" href="#migrate-config-servers-with-the-same-hostname" id="id22">Migrate Config Servers with the Same Hostname</a></li>
+<li><a class="reference internal" href="#migrate-config-servers-with-different-hostnames" id="id23">Migrate Config Servers with Different Hostnames</a></li>
+<li><a class="reference internal" href="#replace-a-config-server" id="id24">Replace a Config Server</a></li>
+<li><a class="reference internal" href="#backup-cluster-metadata" id="id25">Backup Cluster Metadata</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#troubleshooting" id="id26">Troubleshooting</a><ul>
+<li><a class="reference internal" href="#all-data-remains-on-one-shard" id="id27">All Data Remains on One Shard</a></li>
+<li><a class="reference internal" href="#one-shard-receives-too-much-traffic" id="id28">One Shard Receives too much Traffic</a></li>
+<li><a class="reference internal" href="#the-cluster-does-not-balance" id="id29">The Cluster does not Balance</a></li>
+<li><a class="reference internal" href="#migrations-render-cluster-unusable" id="id30">Migrations Render Cluster Unusable</a></li>
+<li><a class="reference internal" href="#disable-balancing-during-backups" id="id31">Disable Balancing During Backups</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="set-up-a-sharded-cluster">
+<span id="sharding-procedure-setup"></span><h2>Set up a Sharded Cluster<a class="headerlink" href="#set-up-a-sharded-cluster" title="Permalink to this headline">¶</a></h2>
+<p>Before deploying a cluster, see <a class="reference internal" href="../core/sharding.html#sharding-requirements"><em>Sharding Requirements</em></a>.</p>
+<p>For testing purposes, you can run all the required shard <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> processes on a
+single server. For production, use the configurations described in
+<a class="reference internal" href="replication-architectures.html"><em>Replication Architectures</em></a>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Sharding and &#8220;localhost&#8221; Addresses</p>
+<p class="last">If you use either &#8220;localhost&#8221; or <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> as the hostname
+portion of any host identifier, for example as the <tt class="docutils literal"><span class="pre">host</span></tt> argument
+to <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> or the value to the
+<a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a>
+run time option, then you must use &#8220;localhost&#8221; or
+<tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> for <em>all</em> host settings for any MongoDB instances in
+the cluster. If you mix localhost addresses and remote host address,
+MongoDB will error.</p>
+</div>
+<p>If you have an existing replica set, you can use the
+<a class="reference internal" href="../tutorial/convert-replica-set-to-replicated-shard-cluster.html"><em>Convert a Replica Set to a Replicated Sharded Cluster</em></a>
+tutorial as a guide. If you&#8217;re deploying a cluster from scratch, see
+the <a class="reference internal" href="../tutorial/deploy-shard-cluster.html"><em>Deploy a Sharded Cluster</em></a> tutorial for more detail or
+use the following procedure as a quick starting point:</p>
+<ol class="arabic">
+<li><p class="first">Create data directories for each of the three (3) config server instances.</p>
+</li>
+<li><p class="first">Start the three config server instances. For example, to start a
+config server instance running on TCP port <tt class="docutils literal"><span class="pre">27018</span></tt> with the data
+stored in <tt class="docutils literal"><span class="pre">/data/configdb</span></tt>, type the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr --dbpath /data/configdb --port 27018
+</pre></div>
+</div>
+<p>For additional command options, see <a class="reference internal" href="../reference/mongod.html"><em>mongod</em></a>
+and <a class="reference internal" href="../reference/configuration-options.html"><em>Configuration File Options</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All config servers must be running and available when you first initiate
+a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+</div>
+</li>
+<li><p class="first">Start a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. For example, to start a
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> that connects to config server instance running on the following hosts:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">mongoc0.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongoc1.example.net</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mongoc2.example.net</span></tt></li>
+</ul>
+<p>You would issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongos --configdb mongoc0.example.net:27018,mongoc1.example.net:27018,mongoc2.example.net:27018
+</pre></div>
+</div>
+</li>
+<li><p class="first">Connect to one of the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances. For example, if
+a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is accessible at <tt class="docutils literal"><span class="pre">mongos0.example.net</span></tt> on
+port <tt class="docutils literal"><span class="pre">27017</span></tt>, issue the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo mongos0.example.net
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add shards to the cluster.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In production deployments, all shards should be replica sets.</p>
+<p class="last">To deploy a replica set, see the
+<a class="reference internal" href="../tutorial/deploy-replica-set.html"><em>Deploy a Replica Set</em></a> tutorial.</p>
+</div>
+<p>From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell connected
+to the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance, call the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a>
+method for each shard to add to the cluster.</p>
+<p>For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;mongodb0.example.net:27027&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">mongodb0.example.net:27027</span></tt> is a member of a replica
+set, call the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> method with an argument that
+resembles the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;&lt;setName&gt;/mongodb0.example.net:27027&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace, <tt class="docutils literal"><span class="pre">&lt;setName&gt;</span></tt> with the name of the replica set, and
+MongoDB will discover all other members of the replica set.
+Repeat this step for each new shard in your cluster.</p>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p class="last">You can specify a name for the shard and a maximum size. See
+<a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a>.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.3.</span></p>
+<p>Before version 2.0.3, you must specify the shard in the following
+form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>replicaSetName/&lt;seed1&gt;,&lt;seed2&gt;,&lt;seed3&gt;
+</pre></div>
+</div>
+<p>For example, if the name of the replica set is <tt class="docutils literal"><span class="pre">repl0</span></tt>, then
+your <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> command would be:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;repl0/mongodb0.example.net:27027,mongodb1.example.net:27017,mongodb2.example.net:27017&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first">Enable sharding for each database you want to shard.
+While sharding operates on a per-collection basis, you must enable
+sharding for each database that holds collections you want to shard.
+This step is a meta-data change and will not redistribute your data.</p>
+<p>MongoDB enables sharding on a per-database basis. This is only a
+meta-data change and will not redistribute your data. To enable
+sharding for a given database, use the <a class="reference internal" href="../reference/commands.html#enableSharding" title="enableSharding"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">enableSharding</span></tt></a>
+command or the <a class="reference internal" href="../reference/method/sh.enableSharding.html#sh.enableSharding" title="sh.enableSharding"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.enableSharding()</span></tt></a> shell helper.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">enableSharding</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">database</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">enableSharding</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">database</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>MongoDB creates databases automatically upon their first use.</p>
+<p class="last">Once you enable sharding for a database, MongoDB assigns a
+<a class="reference internal" href="../reference/glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a> for that database, where MongoDB stores all data
+before sharding begins.</p>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="sharding-administration-shard-collection">
+<li><p class="first">Enable sharding on a per-collection basis.</p>
+<p>Finally, you must explicitly specify collections to shard. The
+collections must belong to a database for which you have enabled
+sharding. When you shard a collection, you also choose the shard
+key. To shard a collection, run the <a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a>
+command or the <a class="reference internal" href="../reference/method/sh.shardCollection.html#sh.shardCollection" title="sh.shardCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.shardCollection()</span></tt></a> shell helper.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span><span class="o">:</span> <span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span> <span class="nx">key</span><span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">shard</span><span class="o">-</span><span class="nx">key</span><span class="o">&gt;:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;&lt;database&gt;.&lt;collection&gt;&quot;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">shard</span><span class="o">-</span><span class="nx">key</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">shardCollection</span><span class="o">:</span> <span class="s2">&quot;myapp.users&quot;</span><span class="p">,</span> <span class="nx">key</span><span class="o">:</span> <span class="p">{</span> <span class="nx">username</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">shardCollection</span><span class="p">(</span><span class="s2">&quot;myapp.users&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">username</span><span class="o">:</span> <span class="mi">1</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>The choice of shard key is incredibly important: it affects
+everything about the cluster from the efficiency of your queries to
+the distribution of data. Furthermore, you cannot change a
+collection&#8217;s shard key after setting it.</p>
+<p>See the <a class="reference internal" href="../core/sharding.html#sharding-shard-key"><em>Shard Key Overview</em></a> and the
+more in depth documentation of <a class="reference internal" href="../core/sharding-internals.html#sharding-internals-shard-keys"><em>Shard Key Qualities</em></a> to help you select better shard
+keys.</p>
+<p>If you do not specify a shard key, MongoDB will shard the
+collection using the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="cluster-management">
+<h2>Cluster Management<a class="headerlink" href="#cluster-management" title="Permalink to this headline">¶</a></h2>
+<p>This section outlines procedures for adding and remove shards, as well
+as general monitoring and maintenance of a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+<div class="section" id="add-a-shard-to-a-cluster">
+<span id="sharding-procedure-add-shard"></span><h3>Add a Shard to a Cluster<a class="headerlink" href="#add-a-shard-to-a-cluster" title="Permalink to this headline">¶</a></h3>
+<p>To add a shard to an <em>existing</em> sharded cluster, use the following
+procedure:</p>
+<ol class="arabic">
+<li><p class="first">Connect to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">First, you need to tell the cluster where to find the individual
+shards. You can do this using the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command or
+the <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> helper:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;&lt;hostname&gt;:&lt;port&gt;&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;hostname&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;port&gt;</span></tt> with the hostname and TCP
+port number of where the shard is accessible.
+Alternately specify a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> name and at least one
+hostname which is a member of the replica set.</p>
+<p>For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;mongodb0.example.net:27027&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In production deployments, all shards should be replica sets.</p>
+</div>
+<p>Repeat for each shard in your cluster.</p>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>You may specify a &#8220;name&#8221; as an argument to the
+<a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">addShard</span><span class="o">:</span> <span class="nx">mongodb0</span><span class="p">.</span><span class="nx">example</span><span class="p">.</span><span class="nx">net</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">You cannot specify a name for a shard using the
+<a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. If
+you use the helper or do not specify a shard name, then MongoDB
+will assign a name upon creation.</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0.3: </span>Before version 2.0.3, you must specify the shard in the
+following form: the replica set name, followed by a forward
+slash, followed by a comma-separated list of seeds for the
+replica set. For example, if the name of the replica set is
+&#8220;myapp1&#8221;, then your <a class="reference internal" href="../reference/method/sh.addShard.html#sh.addShard" title="sh.addShard"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShard()</span></tt></a> command might resemble:<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShard</span><span class="p">(</span> <span class="s2">&quot;repl0/mongodb0.example.net:27027,mongodb1.example.net:27017,mongodb2.example.net:27017&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>It may take some time for <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> to migrate to the
+new shard.</p>
+<p class="last">For an introduction to balancing, see <a class="reference internal" href="../core/sharding.html#sharding-balancing"><em>Balancing and Distribution</em></a>. For
+lower level information on balancing, see <a class="reference internal" href="../core/sharding-internals.html#sharding-balancing-internals"><em>Cluster Balancer</em></a>.</p>
+</div>
+</div>
+<div class="section" id="remove-a-shard-from-a-cluster">
+<span id="sharding-procedure-remove-shard"></span><h3>Remove a Shard from a Cluster<a class="headerlink" href="#remove-a-shard-from-a-cluster" title="Permalink to this headline">¶</a></h3>
+<p>To remove a <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> from a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, you must:</p>
+<ul class="simple">
+<li>Migrate <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> to another shard or database.</li>
+<li>Ensure that this shard is not the <a class="reference internal" href="../reference/glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a> for any databases in
+the cluster. If it is, move the &#8220;primary&#8221; status for these databases
+to other shards.</li>
+<li>Finally, remove the shard from the cluster&#8217;s configuration.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To successfully migrate data from a shard, the <a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a>
+process <strong>must</strong> be active.</p>
+</div>
+<p>The procedure to remove a shard is as follows:</p>
+<ol class="arabic">
+<li><p class="first">Connect to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Determine the name of the shard you will be removing.</p>
+<p>You must specify the name of the shard. You may have specified this
+shard name when you first ran the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command. If not,
+you can find out the name of the shard by running the
+<a class="reference internal" href="../reference/commands.html#listShards" title="listShards"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listShards</span></tt></a> or <a class="reference internal" href="../reference/commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a>
+commands or the <a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a> shell helper.</p>
+<p>The following examples will remove a shard named <tt class="docutils literal"><span class="pre">mongodb0</span></tt> from the cluster.</p>
+</li>
+<li><p class="first">Begin removing chunks from the shard.</p>
+<p>Start by running the <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command. This will
+start &#8220;draining&#8221; or migrating chunks from the shard you&#8217;re removing
+to another shard in the cluster.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeshard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation will return the following response immediately:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span> <span class="o">:</span> <span class="s2">&quot;draining started successfully&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;started&quot;</span> <span class="p">,</span> <span class="nx">shard</span> <span class="o">:</span><span class="s2">&quot;mongodb0&quot;</span> <span class="p">,</span> <span class="nx">ok</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Depending on your network capacity and the amount of data in the
+shard, this operation can take anywhere from a few minutes to several
+days to complete.</p>
+</li>
+<li><p class="first">View progress of the migration.</p>
+<p>You can run the <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command again at any stage of the
+process to view the progress of the migration, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeShard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The output should look something like this:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span><span class="o">:</span> <span class="s2">&quot;draining ongoing&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;ongoing&quot;</span> <span class="p">,</span> <span class="nx">remaining</span><span class="o">:</span> <span class="p">{</span> <span class="nx">chunks</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span> <span class="nx">dbs</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="nx">ok</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>In the <tt class="docutils literal"><span class="pre">remaining</span></tt> sub-document <tt class="docutils literal"><span class="pre">{</span> <span class="pre">chunks:</span> <span class="pre">xx,</span> <span class="pre">dbs:</span> <span class="pre">y</span> <span class="pre">}</span></tt>, a
+counter displays the remaining number of chunks that MongoDB must
+migrate to other shards and the number of MongoDB databases that have
+&#8220;primary&#8221; status on this shard.</p>
+<p>Continue checking the status of the <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command
+until the remaining number of chunks to transfer is 0.</p>
+</li>
+<li><p class="first">Move any databases to other shards in the cluster as needed.</p>
+<p>This is only necessary when removing a shard that is also the
+<a class="reference internal" href="../reference/glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a> for one or more databases.</p>
+<p>Issue the following command at the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">movePrimary</span><span class="o">:</span> <span class="s2">&quot;myapp&quot;</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s2">&quot;mongodb1&quot;</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>This command will migrate all remaining non-sharded data in the
+database named <tt class="docutils literal"><span class="pre">myapp</span></tt> to the shard named <tt class="docutils literal"><span class="pre">mongodb1</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not run the <a class="reference internal" href="../reference/commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> command until you have <em>finished</em>
+draining the shard.</p>
+</div>
+<p>The command will not return until MongoDB completes moving all
+data. The response from this command will resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1&quot;</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Run <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> again to clean up all metadata
+information and finalize the shard removal, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeshard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>When successful, this command will return a document like this:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span><span class="o">:</span> <span class="s2">&quot;remove shard completed successfully&quot;</span> <span class="p">,</span> <span class="nx">stage</span><span class="o">:</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="nx">host</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Once the value of the <tt class="docutils literal"><span class="pre">stage</span></tt> field is &#8220;completed,&#8221; you may safely
+stop the processes comprising the <tt class="docutils literal"><span class="pre">mongodb0</span></tt> shard.</p>
+</div>
+<div class="section" id="list-databases-with-sharding-enabled">
+<h3>List Databases with Sharding Enabled<a class="headerlink" href="#list-databases-with-sharding-enabled" title="Permalink to this headline">¶</a></h3>
+<p>To list the databases that have sharding enabled, query the
+<tt class="docutils literal"><span class="pre">databases</span></tt> collection in the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>.
+A database has sharding enabled if the value of the <tt class="docutils literal"><span class="pre">partitioned</span></tt>
+field is <tt class="docutils literal"><span class="pre">true</span></tt>. Connect to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance with a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and run the following operation to get a full
+list of databases with sharding enabled:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">databases</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;partitioned&quot;</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>You can use the following sequence of commands when to
+return a list of all databases in the cluster:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">databases</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If this returns the following result set:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;config&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;animals&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;m0.example.net:30001&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;farms&quot;</span><span class="p">,</span> <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;m1.example2.net:27017&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p class="last">Then sharding is only enabled for the <tt class="docutils literal"><span class="pre">animals</span></tt> database.</p>
+</div>
+</div>
+<div class="section" id="list-shards">
+<h3>List Shards<a class="headerlink" href="#list-shards" title="Permalink to this headline">¶</a></h3>
+<p>To list the current set of configured shards, use the <a class="reference internal" href="../reference/commands.html#listShards" title="listShards"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listShards</span></tt></a>
+command, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">listShards</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="view-cluster-details">
+<h3>View Cluster Details<a class="headerlink" href="#view-cluster-details" title="Permalink to this headline">¶</a></h3>
+<p>To view cluster details, issue <a class="reference internal" href="../reference/method/db.printShardingStatus.html#db.printShardingStatus" title="db.printShardingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printShardingStatus()</span></tt></a> or
+<a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a>. Both methods return the same output.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In the following example output from <a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sharding</span> <span class="pre">version</span></tt> displays the version number of the shard
+metadata.</li>
+<li><tt class="docutils literal"><span class="pre">shards</span></tt> displays a list of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances
+used as shards in the cluster.</li>
+<li><tt class="docutils literal"><span class="pre">databases</span></tt> displays all databases in the cluster,
+including database that do not have sharding enabled.</li>
+<li>The <tt class="docutils literal"><span class="pre">chunks</span></tt> information for the <tt class="docutils literal"><span class="pre">foo</span></tt> database displays how
+many chunks are on each shard and displays the range of each chunk.</li>
+</ul>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="o">---</span> <span class="nx">Sharding</span> <span class="nx">Status</span> <span class="o">---</span>
+  <span class="nx">sharding</span> <span class="nx">version</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+  <span class="nx">shards</span><span class="o">:</span>
+    <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0000&quot;</span><span class="p">,</span>  <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;m0.example.net:30001&quot;</span> <span class="p">}</span>
+    <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0001&quot;</span><span class="p">,</span>  <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;m3.example2.net:50000&quot;</span> <span class="p">}</span>
+  <span class="nx">databases</span><span class="o">:</span>
+    <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;admin&quot;</span><span class="p">,</span>  <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>  <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;config&quot;</span> <span class="p">}</span>
+    <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;animals&quot;</span><span class="p">,</span>  <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>  <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0000&quot;</span> <span class="p">}</span>
+        <span class="nx">foo</span><span class="p">.</span><span class="nx">big</span> <span class="nx">chunks</span><span class="o">:</span>
+                <span class="nx">shard0001</span>    <span class="mi">1</span>
+                <span class="nx">shard0000</span>    <span class="mi">6</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$minKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;elephant&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0001</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;elephant&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;giraffe&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;giraffe&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;hippopotamus&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;hippopotamus&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;lion&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;lion&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;rhinoceros&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;rhinoceros&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;springbok&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;springbok&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$maxKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="nx">foo</span><span class="p">.</span><span class="nx">large</span> <span class="nx">chunks</span><span class="o">:</span>
+                <span class="nx">shard0001</span>    <span class="mi">1</span>
+                <span class="nx">shard0000</span>    <span class="mi">5</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$minKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;hen&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0001</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;hen&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;horse&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;horse&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;owl&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;owl&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;rooster&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="nx">jumbo</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;rooster&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;sheep&quot;</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="s2">&quot;sheep&quot;</span> <span class="p">}</span> <span class="o">--&gt;&gt;</span> <span class="p">{</span> <span class="s2">&quot;a&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$maxKey</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="nx">on</span> <span class="o">:</span> <span class="nx">shard0000</span> <span class="nx">Timestamp</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="p">{</span>  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>  <span class="s2">&quot;partitioned&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>  <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;shard0000&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="chunk-management">
+<h2>Chunk Management<a class="headerlink" href="#chunk-management" title="Permalink to this headline">¶</a></h2>
+<p>This section describes various operations on <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> in
+<a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>. MongoDB automates most
+chunk management operations. However, these chunk management
+operations are accessible to administrators for use in some
+situations, typically surrounding initial setup, deployment, and data
+ingestion.</p>
+<div class="section" id="split-chunks">
+<span id="sharding-procedure-create-split"></span><h3>Split Chunks<a class="headerlink" href="#split-chunks" title="Permalink to this headline">¶</a></h3>
+<p>Normally, MongoDB splits a <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> following inserts when a
+chunk exceeds the <a class="reference internal" href="../core/sharding-internals.html#sharding-chunk-size"><em>chunk size</em></a>. The
+<a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> may migrate recently split chunks to a new shard
+immediately if <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> predicts future insertions will
+benefit from the move.</p>
+<p>MongoDB treats all chunks the same, whether split manually or
+automatically by the system.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You cannot merge or combine chunks once you have split them.</p>
+</div>
+<p>You may want to split chunks manually if:</p>
+<ul class="simple">
+<li>you have a large amount of data in your cluster and very few
+<a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a>,
+as is the case after deploying a cluster using existing data.</li>
+<li>you expect to add a large amount of data that would
+initially reside in a single chunk or shard.</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p class="last">You plan to insert a large amount of data with <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>
+values between <tt class="docutils literal"><span class="pre">300</span></tt> and <tt class="docutils literal"><span class="pre">400</span></tt>, <em>but</em> all values of your shard
+keys are between <tt class="docutils literal"><span class="pre">250</span></tt> and <tt class="docutils literal"><span class="pre">500</span></tt> are in a single chunk.</p>
+</div>
+<p>Use <a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a> to determine the current chunks ranges across
+the cluster.</p>
+<p>To split chunks manually, use the <a class="reference internal" href="../reference/commands.html#split" title="split"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">split</span></tt></a> command with
+operators: <tt class="docutils literal"><span class="pre">middle</span></tt> and <tt class="docutils literal"><span class="pre">find</span></tt>. The equivalent shell helpers are
+<a class="reference internal" href="../reference/method/sh.splitAt.html#sh.splitAt" title="sh.splitAt"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitAt()</span></tt></a> or <a class="reference internal" href="../reference/method/sh.splitFind.html#sh.splitFind" title="sh.splitFind"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitFind()</span></tt></a>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following command will split the chunk that contains
+the value of <tt class="docutils literal"><span class="pre">63109</span></tt> for the <tt class="docutils literal"><span class="pre">zipcode</span></tt> field in the <tt class="docutils literal"><span class="pre">people</span></tt>
+collection of the <tt class="docutils literal"><span class="pre">records</span></tt> database:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">splitFind</span><span class="p">(</span> <span class="s2">&quot;records.people&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;zipcode&quot;</span><span class="o">:</span> <span class="mi">63109</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="../reference/method/sh.splitFind.html#sh.splitFind" title="sh.splitFind"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitFind()</span></tt></a> will split the chunk that contains the
+<em>first</em> document returned that matches this query into two equally
+sized chunks. You must specify the full namespace
+(i.e. &#8220;<tt class="docutils literal"><span class="pre">&lt;database&gt;.&lt;collection&gt;</span></tt>&#8221;) of the sharded collection to
+<a class="reference internal" href="../reference/method/sh.splitFind.html#sh.splitFind" title="sh.splitFind"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitFind()</span></tt></a>. The query in <a class="reference internal" href="../reference/method/sh.splitFind.html#sh.splitFind" title="sh.splitFind"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitFind()</span></tt></a> need
+not contain the shard key, though it almost always makes sense to
+query for the shard key in this case, and including the shard key will
+expedite the operation.</p>
+<p>Use <a class="reference internal" href="../reference/method/sh.splitAt.html#sh.splitAt" title="sh.splitAt"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.splitAt()</span></tt></a> to split a chunk in two using the queried
+document as the partition point:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">splitAt</span><span class="p">(</span> <span class="s2">&quot;records.people&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;zipcode&quot;</span><span class="o">:</span> <span class="mi">63109</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>However, the location of the document that this query finds with
+respect to the other documents in the chunk does not affect how the
+chunk splits.</p>
+</div>
+<div class="section" id="create-chunks-pre-splitting">
+<span id="sharding-administration-create-chunks"></span><span id="sharding-administration-pre-splitting"></span><h3>Create Chunks (Pre-Splitting)<a class="headerlink" href="#create-chunks-pre-splitting" title="Permalink to this headline">¶</a></h3>
+<p>In most situations a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> will create and distribute
+chunks automatically without user intervention. However, in a limited
+number of use profiles, MongoDB cannot create enough chunks or
+distribute data fast enough to support required throughput. Consider
+the following scenarios:</p>
+<ul>
+<li><p class="first">you must partition an existing data collection that resides on a
+single shard.</p>
+</li>
+<li><p class="first">you must ingest a large volume of data into a cluster that
+isn&#8217;t balanced, or where the ingestion of data will lead to an
+imbalance of data.</p>
+<p>This can arise in an initial data loading, or in a case where you
+must insert a large volume of data into a single chunk, as is the
+case when you must insert at the beginning or end of the chunk
+range, as is the case for monotonically increasing or decreasing
+shard keys.</p>
+</li>
+</ul>
+<p>Preemptively splitting chunks increases cluster throughput for these
+operations, by reducing the overhead of migrating chunks that hold
+data during the write operation. MongoDB only creates splits after an
+insert operation, and can only migrate a single chunk at a time. Chunk
+migrations are resource intensive and further complicated by large
+write volume to the migrating chunk.</p>
+<p>To create and migrate chunks manually, use the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">Split empty chunks in your collection by manually performing
+<a class="reference internal" href="../reference/commands.html#split" title="split"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">split</span></tt></a> command on chunks.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To create chunks for documents in the <tt class="docutils literal"><span class="pre">myapp.users</span></tt>
+collection, using the <tt class="docutils literal"><span class="pre">email</span></tt> field as the <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>,
+use the following operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">x</span><span class="o">=</span><span class="mi">97</span><span class="p">;</span> <span class="nx">x</span><span class="o">&lt;</span><span class="mi">97</span><span class="o">+</span><span class="mi">26</span><span class="p">;</span> <span class="nx">x</span><span class="o">++</span> <span class="p">){</span>
+  <span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">y</span><span class="o">=</span><span class="mi">97</span><span class="p">;</span> <span class="nx">y</span><span class="o">&lt;</span><span class="mi">97</span><span class="o">+</span><span class="mi">26</span><span class="p">;</span> <span class="nx">y</span><span class="o">+=</span><span class="mi">6</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">split</span> <span class="o">:</span> <span class="s2">&quot;myapp.users&quot;</span> <span class="p">,</span> <span class="nx">middle</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">email</span> <span class="o">:</span> <span class="nx">prefix</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p class="last">This assumes a collection size of 100 million documents.</p>
+</div>
+</li>
+<li><p class="first">Migrate chunks manually using the <a class="reference internal" href="../reference/commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> command:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To migrate all of the manually created user profiles evenly,
+putting each prefix chunk on the next shard from the other, run
+the following commands in the mongo shell:</p>
+<blockquote class="last">
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">shServer</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;sh0.example.net&quot;</span><span class="p">,</span> <span class="s2">&quot;sh1.example.net&quot;</span><span class="p">,</span> <span class="s2">&quot;sh2.example.net&quot;</span><span class="p">,</span> <span class="s2">&quot;sh3.example.net&quot;</span><span class="p">,</span> <span class="s2">&quot;sh4.example.net&quot;</span> <span class="p">];</span>
+<span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">x</span><span class="o">=</span><span class="mi">97</span><span class="p">;</span> <span class="nx">x</span><span class="o">&lt;</span><span class="mi">97</span><span class="o">+</span><span class="mi">26</span><span class="p">;</span> <span class="nx">x</span><span class="o">++</span> <span class="p">){</span>
+  <span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">y</span><span class="o">=</span><span class="mi">97</span><span class="p">;</span> <span class="nx">y</span><span class="o">&lt;</span><span class="mi">97</span><span class="o">+</span><span class="mi">26</span><span class="p">;</span> <span class="nx">y</span><span class="o">+=</span><span class="mi">6</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">+</span> <span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="nx">y</span><span class="p">);</span>
+    <span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">({</span><span class="nx">moveChunk</span> <span class="o">:</span> <span class="s2">&quot;myapp.users&quot;</span><span class="p">,</span> <span class="nx">find</span> <span class="o">:</span> <span class="p">{</span><span class="nx">email</span> <span class="o">:</span> <span class="nx">prefix</span><span class="p">},</span> <span class="nx">to</span> <span class="o">:</span> <span class="nx">shServer</span><span class="p">[(</span><span class="nx">y</span><span class="o">-</span><span class="mi">97</span><span class="p">)</span><span class="o">/</span><span class="mi">6</span><span class="p">]})</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<p>You can also let the balancer automatically distribute the new
+chunks. For an introduction to balancing, see
+<a class="reference internal" href="../core/sharding.html#sharding-balancing"><em>Balancing and Distribution</em></a>. For lower level information on balancing,
+see <a class="reference internal" href="../core/sharding-internals.html#sharding-balancing-internals"><em>Cluster Balancer</em></a>.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="modify-chunk-size">
+<span id="sharding-balancing-modify-chunk-size"></span><h3>Modify Chunk Size<a class="headerlink" href="#modify-chunk-size" title="Permalink to this headline">¶</a></h3>
+<p>When you initialize a sharded cluster, the default chunk size is 64
+megabytes. This default chunk size works well for most deployments. However, if you
+notice that automatic migrations are incurring a level of I/O that
+your hardware cannot handle, you may want to reduce the chunk
+size. For the automatic splits and migrations, a small chunk size
+leads to more rapid and frequent migrations.</p>
+<p>To modify the chunk size, use the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">Connect to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command to switch to the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Issue the following <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a>
+operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span><span class="s2">&quot;chunksize&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">size</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Where the value of <tt class="docutils literal"><span class="pre">&lt;size&gt;</span></tt> reflects the new chunk size in
+megabytes. Here, you&#8217;re essentially writing a document whose values
+store the global chunk size configuration value.</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <a class="reference internal" href="../reference/configuration-options.html#chunkSize" title="chunkSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">chunkSize</span></tt></a> and <a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--chunkSize"><em class="xref std std-option">--chunkSize</em></a>
+options, passed at runtime to the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> <strong>do not</strong>
+affect the chunk size after you have initialized the cluster.</p>
+<p class="last">To eliminate confusion you should <em>always</em> set chunk size using the
+above procedure and never use the runtime options.</p>
+</div>
+<p>Modifying the chunk size has several limitations:</p>
+<ul class="simple">
+<li>Automatic splitting only occurs when inserting <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> or updating existing documents.</li>
+<li>If you lower the chunk size it may take time for all chunks to split to
+the new size.</li>
+<li>Splits cannot be &#8220;undone.&#8221;</li>
+</ul>
+<p>If you increase the chunk size, existing chunks must grow through
+insertion or updates until they reach the new size.</p>
+</div>
+<div class="section" id="migrate-chunks">
+<span id="sharding-balancing-manual-migration"></span><h3>Migrate Chunks<a class="headerlink" href="#migrate-chunks" title="Permalink to this headline">¶</a></h3>
+<p>In most circumstances, you should let the automatic balancer
+migrate <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> between <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shards</em></a>.
+However, you may want to migrate chunks manually in a few cases:</p>
+<ul class="simple">
+<li>If you create chunks by <a class="reference internal" href="../reference/glossary.html#term-pre-splitting"><em class="xref std std-term">pre-splitting</em></a> the data in your
+collection, you will have to migrate chunks manually to distribute
+chunks evenly across the shards. Use pre-splitting in limited
+situations, to support bulk data ingestion.</li>
+<li>If the balancer in an active cluster cannot distribute chunks within
+the balancing window, then you will have to migrate chunks manually.</li>
+</ul>
+<p>For more information on how chunks move between shards, see
+<a class="reference internal" href="../core/sharding-internals.html#sharding-balancing-internals"><em>Cluster Balancer</em></a>, in particular the section
+<a class="reference internal" href="../core/sharding-internals.html#sharding-chunk-migration"><em>Chunk Migration</em></a>.</p>
+<p>To migrate chunks, use the <a class="reference internal" href="../reference/commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> command.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>To return a list of shards, use the <a class="reference internal" href="../reference/commands.html#listShards" title="listShards"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listShards</span></tt></a>
+command.</p>
+<p class="last">Specify shard names using the <a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command
+using the <tt class="docutils literal"><span class="pre">name</span></tt> argument. If you do not specify a name in the
+<a class="reference internal" href="../reference/commands.html#addShard" title="addShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">addShard</span></tt></a> command, MongoDB will assign a name
+automatically.</p>
+</div>
+<p>The following example assumes that the field <tt class="docutils literal"><span class="pre">username</span></tt> is the
+<a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> for a collection named <tt class="docutils literal"><span class="pre">users</span></tt> in the <tt class="docutils literal"><span class="pre">myapp</span></tt>
+database, and that the value <tt class="docutils literal"><span class="pre">smith</span></tt> exists within the <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a>
+you want to migrate.</p>
+<p>To move this chunk, you would issue the following command from a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell connected to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">adminCommand</span><span class="p">({</span><span class="nx">moveChunk</span> <span class="o">:</span> <span class="s2">&quot;myapp.users&quot;</span><span class="p">,</span> <span class="nx">find</span> <span class="o">:</span> <span class="p">{</span><span class="nx">username</span> <span class="o">:</span> <span class="s2">&quot;smith&quot;</span><span class="p">},</span> <span class="nx">to</span> <span class="o">:</span> <span class="s2">&quot;mongodb-shard3.example.net&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This command moves the chunk that includes the shard key value &#8220;smith&#8221; to the
+<a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> named <tt class="docutils literal"><span class="pre">mongodb-shard3.example.net</span></tt>. The command will
+block until the migration is complete.</p>
+<p>See <a class="reference internal" href="#sharding-administration-create-chunks"><em>Create Chunks (Pre-Splitting)</em></a> for an introduction
+to pre-splitting.</p>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.2: </span><a class="reference internal" href="../reference/commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> command has the: <tt class="docutils literal"><span class="pre">_secondaryThrottle</span></tt>
+parameter. When set to <tt class="docutils literal"><span class="pre">true</span></tt>, MongoDB ensures that
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members have replicated operations before allowing
+new chunk migrations.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>The <a class="reference internal" href="../reference/commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> command may produce the following error
+message:</p>
+<div class="highlight-none"><div class="highlight"><pre>The collection&#39;s metadata lock is already taken.
+</pre></div>
+</div>
+<p class="last">These errors occur when clients have too many open <a class="reference internal" href="../reference/glossary.html#term-cursor"><em class="xref std std-term">cursors</em></a> that access the chunk you are migrating. You can either
+wait until the cursors complete their operation or close the
+cursors manually.</p>
+</div>
+</div>
+<div class="section" id="strategies-for-bulk-inserts-in-sharded-clusters">
+<span id="sharding-bulk-inserts"></span><span id="index-2"></span><h3>Strategies for Bulk Inserts in Sharded Clusters<a class="headerlink" href="#strategies-for-bulk-inserts-in-sharded-clusters" title="Permalink to this headline">¶</a></h3>
+<p>Large bulk insert operations including initial data ingestion or
+routine data import, can have a significant impact on a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded
+cluster</em></a>. Consider the following strategies and possibilities for
+bulk insert operations:</p>
+<ul>
+<li><p class="first">If the collection does not have data, then there is only one
+<a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a>, which must reside on a single shard. MongoDB must
+receive data, create splits, and distribute chunks to the available
+shards. To avoid this performance cost, you can pre-split the
+collection, as described in <a class="reference internal" href="#sharding-administration-pre-splitting"><em>Create Chunks (Pre-Splitting)</em></a>.</p>
+</li>
+<li><p class="first">You can parallels import by sending insert operations to more than
+one <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. If the collection is empty,
+pre-split first, as described in
+<a class="reference internal" href="#sharding-administration-pre-splitting"><em>Create Chunks (Pre-Splitting)</em></a>.</p>
+</li>
+<li><p class="first">If your shard key increases monotonically during an insert then all
+the inserts will go to the last chunk in the collection, which will
+always end up on a single shard. Therefore, the insert capacity of the
+cluster will never exceed the insert capacity of a single shard.</p>
+<p>If your insert volume is never larger than what a single shard can
+process, then there is no problem; however, if the insert volume
+exceeds that range, and you cannot avoid a monotonically
+increasing shard key, then consider the following modifications to
+your application:</p>
+<ul class="simple">
+<li>Reverse all the bits of the shard key to preserves the information
+while avoiding the correlation of insertion order and increasing
+sequence of values.</li>
+<li>Swap the first and last 16-bit words to &#8220;shuffle&#8221; the inserts.</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following example, in C++, swaps the leading and
+trailing 16-bit word of <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectIds</em></a>
+generated so that they are no longer monotonically increasing.</p>
+<div class="last highlight-cpp"><div class="highlight"><pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">mongo</span><span class="p">;</span>
+<span class="n">OID</span> <span class="n">make_an_id</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">OID</span> <span class="n">x</span> <span class="o">=</span> <span class="n">OID</span><span class="o">::</span><span class="n">gen</span><span class="p">();</span>
+  <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">x</span><span class="p">.</span><span class="n">getData</span><span class="p">();</span>
+  <span class="n">swap</span><span class="p">(</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="o">&amp;</span><span class="p">)</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="o">&amp;</span><span class="p">)</span> <span class="n">p</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="p">);</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">foo</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// create an object</span>
+  <span class="n">BSONObj</span> <span class="n">o</span> <span class="o">=</span> <span class="n">BSON</span><span class="p">(</span> <span class="s">&quot;_id&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">make_an_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;x&quot;</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;name&quot;</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;jane&quot;</span> <span class="p">);</span>
+  <span class="c1">// now we might insert o into a sharded collection...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>For information on choosing a shard key, see <a class="reference internal" href="../core/sharding.html#sharding-shard-key"><em>Shard Keys</em></a>
+and see <a class="reference internal" href="../core/sharding-internals.html#sharding-internals-shard-keys"><em>Shard Key Internals</em></a> (in
+particular, <a class="reference internal" href="../core/sharding-internals.html#sharding-internals-operations-and-reliability"><em>Operations and Reliability</em></a> and
+<a class="reference internal" href="../core/sharding-internals.html#sharding-internals-choose-shard-key"><em>Choosing a Shard Key</em></a>).</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="balancer-operations">
+<span id="sharding-balancing-operations"></span><span id="index-5"></span><h2>Balancer Operations<a class="headerlink" href="#balancer-operations" title="Permalink to this headline">¶</a></h2>
+<p>This section describes provides common administrative procedures related
+to balancing. For an introduction to balancing, see
+<a class="reference internal" href="../core/sharding.html#sharding-balancing"><em>Balancing and Distribution</em></a>. For lower level information on balancing, see
+<a class="reference internal" href="../core/sharding-internals.html#sharding-balancing-internals"><em>Cluster Balancer</em></a>.</p>
+<div class="section" id="check-the-balancer-lock">
+<span id="sharding-balancing-check-lock"></span><h3>Check the Balancer Lock<a class="headerlink" href="#check-the-balancer-lock" title="Permalink to this headline">¶</a></h3>
+<p>To see if the balancer process is active in your <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">cluster</em></a>, do the following:</p>
+<ol class="arabic">
+<li><p class="first">Connect to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command to switch to the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use the following query to return the balancer lock:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">locks</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>When this command returns, you will see output like the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>   <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span><span class="p">,</span>
+<span class="s2">&quot;process&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongos0.example.net:1292810611:1804289383&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;state&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+     <span class="s2">&quot;ts&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4d0f872630c42d1978be8a2e&quot;</span><span class="p">),</span>
+   <span class="s2">&quot;when&quot;</span> <span class="o">:</span> <span class="s2">&quot;Mon Dec 20 2010 11:41:10 GMT-0500 (EST)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;who&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongos0.example.net:1292810611:1804289383:Balancer:846930886&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;why&quot;</span> <span class="o">:</span> <span class="s2">&quot;doing balance round&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>This output confirms that:</p>
+<ul class="simple">
+<li>The balancer originates from the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> running on the
+system with the hostname <tt class="docutils literal"><span class="pre">mongos0.example.net</span></tt>.</li>
+<li>The value in the <tt class="docutils literal"><span class="pre">state</span></tt> field indicates that a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+has the lock. For version 2.0 and later, the value of an active lock
+is <tt class="docutils literal"><span class="pre">2</span></tt>; for earlier versions the value is <tt class="docutils literal"><span class="pre">1</span></tt>.</li>
+</ul>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>You can also use the following shell helper, which returns a
+boolean to report if the balancer is active:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">getBalancerState</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="schedule-the-balancing-window">
+<span id="sharding-schedule-balancing-window"></span><h3>Schedule the Balancing Window<a class="headerlink" href="#schedule-the-balancing-window" title="Permalink to this headline">¶</a></h3>
+<p>In some situations, particularly when your data set grows slowly and a
+migration can impact performance, it&#8217;s useful to be able to ensure
+that the balancer is active only at certain times.  Use the following
+procedure to specify a window during which the <a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a> will
+be able to migrate chunks:</p>
+<ol class="arabic">
+<li><p class="first">Connect to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command to switch to the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Use an operation modeled on the following example <a class="reference internal" href="../reference/method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> operation to modify the balancer&#8217;s
+window:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span> <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">activeWindow</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">start</span> <span class="o">:</span> <span class="s2">&quot;&lt;start-time&gt;&quot;</span><span class="p">,</span> <span class="nx">stop</span> <span class="o">:</span> <span class="s2">&quot;&lt;stop-time&gt;&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span> <span class="kc">true</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;start-time&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;end-time&gt;</span></tt> with time values using
+two digit hour and minute values (e.g <tt class="docutils literal"><span class="pre">HH:MM</span></tt>) that describe the
+beginning and end boundaries of the balancing window.
+These times will be evaluated relative to the time zone of each individual
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance in the sharded cluster.
+For instance, running the following
+will force the balancer to run between 11PM and 6AM local time only:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span> <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">activeWindow</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">start</span> <span class="o">:</span> <span class="s2">&quot;23:00&quot;</span><span class="p">,</span> <span class="nx">stop</span> <span class="o">:</span> <span class="s2">&quot;6:00&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span> <span class="kc">true</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The balancer window must be sufficient to <em>complete</em> the migration
+of all data inserted during the day.</p>
+<p class="last">As data insert rates can change based on activity and usage
+patterns, it is important to ensure that the balancing window you
+select will be sufficient to support the needs of your deployment.</p>
+</div>
+</div>
+<div class="section" id="remove-a-balancing-window-schedule">
+<h3>Remove a Balancing Window Schedule<a class="headerlink" href="#remove-a-balancing-window-schedule" title="Permalink to this headline">¶</a></h3>
+<p>If you have <a class="reference internal" href="#sharding-schedule-balancing-window"><em>set the balancing window</em></a> and wish to remove the schedule
+so that the balancer is always running, issue the following sequence
+of operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span> <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$unset</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">activeWindow</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="disable-the-balancer">
+<span id="sharding-balancing-disable-temporally"></span><h3>Disable the Balancer<a class="headerlink" href="#disable-the-balancer" title="Permalink to this headline">¶</a></h3>
+<p>By default the balancer may run at any time and only moves chunks as
+needed. To disable the balancer for a short period of time and prevent
+all migration, use the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">Connect to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue <em>one</em> of the following operations to disable the balancer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">stopBalancer</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Later, issue <em>one</em> the following operations to enable the balancer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">startBalancer</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If a migration is in progress progress, the system will complete
+the in progress migration. After disabling, you can use the
+following operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to determine if
+there are no migrations in progress:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="k">while</span><span class="p">(</span> <span class="nx">db</span><span class="p">.</span><span class="nx">locks</span><span class="p">.</span><span class="nx">findOne</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;balancer&quot;</span><span class="p">}).</span><span class="nx">state</span> <span class="p">)</span> <span class="p">{</span>
+       <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;waiting...&quot;</span><span class="p">);</span> <span class="nx">sleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The above process and the <a class="reference internal" href="../reference/method/sh.setBalancerState.html#sh.setBalancerState" title="sh.setBalancerState"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.setBalancerState()</span></tt></a>,
+<tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.startBalancer()</span></tt>, and <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.stopBalancer()</span></tt> helpers provide
+wrappers on the following process, which may be useful if you need to
+run this operation from a driver that does not have helper functions:</p>
+<ol class="arabic">
+<li><p class="first">Connect to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the cluster using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Issue the following command to switch to the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Issue the following update to disable the balancer:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">stopped</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">}</span> <span class="p">,</span> <span class="kc">true</span> <span class="p">);</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To enable the balancer again, alter the value of &#8220;stopped&#8221; as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">stopped</span><span class="o">:</span> <span class="kc">false</span> <span class="p">}</span> <span class="p">}</span> <span class="p">,</span> <span class="kc">true</span> <span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="config-server-maintenance">
+<span id="sharding-procedure-config-server"></span><span id="index-6"></span><h2>Config Server Maintenance<a class="headerlink" href="#config-server-maintenance" title="Permalink to this headline">¶</a></h2>
+<p>Config servers store all cluster metadata, most importantly,
+the mapping from <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> to <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shards</em></a>.
+This section provides an overview of the basic
+procedures to migrate, replace, and maintain these servers.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>Config Servers</em></a></p>
+</div>
+<div class="section" id="deploy-three-config-servers-for-production-deployments">
+<h3>Deploy Three Config Servers for Production Deployments<a class="headerlink" href="#deploy-three-config-servers-for-production-deployments" title="Permalink to this headline">¶</a></h3>
+<p>For redundancy, all production <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>
+should deploy three config servers processes on three different
+machines.</p>
+<p>Do not use only a single config server for production deployments.
+Only use a single config server deployments for testing.  You should
+upgrade to three config servers immediately if you are shifting to
+production.  The following process shows how to convert a test
+deployment with only one config server to production deployment with
+three config servers.</p>
+<ol class="arabic">
+<li><p class="first">Shut down all existing MongoDB processes. This includes:</p>
+<ul class="simple">
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances or <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>
+that provide your shards.</li>
+<li>the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance that provides your existing config
+database.</li>
+<li>all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances in your cluster.</li>
+</ul>
+</li>
+<li><p class="first">Copy the entire <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> file system tree from the
+existing config server to the two machines that will provide the
+additional config servers. These commands, issued on the system
+with the existing <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a>, <tt class="docutils literal"><span class="pre">mongo-config0.example.net</span></tt> may
+resemble the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>rsync -az /data/configdb mongo-config1.example.net:/data/configdb
+rsync -az /data/configdb mongo-config2.example.net:/data/configdb
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start all three config servers, using the same invocation that you
+used for the single config server.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr
+</pre></div>
+</div>
+</li>
+<li><p class="first">Restart all shard <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="migrate-config-servers-with-the-same-hostname">
+<span id="sharding-process-config-server-migrate-same-hostname"></span><h3>Migrate Config Servers with the Same Hostname<a class="headerlink" href="#migrate-config-servers-with-the-same-hostname" title="Permalink to this headline">¶</a></h3>
+<p>Use this process when you need to migrate a config server to a new
+system but the new system will be accessible using the same host
+name.</p>
+<ol class="arabic">
+<li><p class="first">Shut down the config server that you&#8217;re moving.</p>
+<p>This will render all config data for your cluster <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>read only</em></a>.</p>
+</li>
+<li><p class="first">Change the DNS entry that points to the system that provided the old
+config server, so that the <em>same</em> hostname points to the new
+system.</p>
+<p>How you do this depends on how you organize your DNS and
+hostname resolution services.</p>
+</li>
+<li><p class="first">Move the entire <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> file system tree from the old
+config server to the new config server. This command, issued on the
+old config server system, may resemble the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>rsync -az /data/configdb mongo-config0.example.net:/data/configdb
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start the config instance on the new system. The default invocation
+is:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr
+</pre></div>
+</div>
+</li>
+</ol>
+<p>When you start the third config server, your cluster will become
+writable and it will be able to create new splits and migrate chunks
+as needed.</p>
+</div>
+<div class="section" id="migrate-config-servers-with-different-hostnames">
+<span id="sharding-process-config-server-migrate-different-hostname"></span><h3>Migrate Config Servers with Different Hostnames<a class="headerlink" href="#migrate-config-servers-with-different-hostnames" title="Permalink to this headline">¶</a></h3>
+<p>Use this process when you need to migrate a <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a> to a new
+server and it <em>will not</em> be accessible via the same hostname. If
+possible, avoid changing the hostname so that you can use the
+<a class="reference internal" href="#sharding-process-config-server-migrate-same-hostname"><em>previous procedure</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">Shut down the <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config server</em></a> you&#8217;re moving.</p>
+<p>This will render all config data for your cluster &#8220;read only:&#8221;</p>
+<div class="highlight-sh"><div class="highlight"><pre>rsync -az /data/configdb mongodb.config2.example.net:/data/configdb
+</pre></div>
+</div>
+</li>
+<li><p class="first">Start the config instance on the new system. The default invocation
+is:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr
+</pre></div>
+</div>
+</li>
+<li><p class="first">Shut down all existing MongoDB processes. This includes:</p>
+<ul class="simple">
+<li>all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances or <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>
+that provide your shards.</li>
+<li>the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances that provide your existing
+<a class="reference internal" href="../reference/config-database.html#config-database"><em>config databases</em></a>.</li>
+<li>all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances in your cluster.</li>
+</ul>
+</li>
+<li><p class="first">Restart all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> processes that provide the shard
+servers.</p>
+</li>
+<li><p class="first">Update the <a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--configdb"><em class="xref std std-option">--configdb</em></a> parameter (or
+<a class="reference internal" href="../reference/configuration-options.html#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a>) for all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances and
+restart all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="replace-a-config-server">
+<h3>Replace a Config Server<a class="headerlink" href="#replace-a-config-server" title="Permalink to this headline">¶</a></h3>
+<p>Use this procedure only if you need to replace one of your config
+servers after it becomes inoperable (e.g. hardware failure.) This
+process assumes that the hostname of the instance will not change. If
+you must change the hostname of the instance, use the process for
+<a class="reference internal" href="#sharding-process-config-server-migrate-different-hostname"><em>migrating a config server to a different hostname</em></a>.</p>
+<ol class="arabic">
+<li><p class="first">Provision a new system, with the same hostname as the previous
+host.</p>
+<p>You will have to ensure that the new system has the same IP address
+and hostname as the system it&#8217;s replacing <em>or</em> you will need to
+modify the DNS records and wait for them to propagate.</p>
+</li>
+<li><p class="first">Shut down <em>one</em> (and only one) of the existing config servers. Copy
+all this host&#8217;s <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> file system tree from the current system
+to the system that will provide the new config server. This
+command, issued on the system with the data files, may resemble the
+following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>rsync -az /data/configdb mongodb.config2.example.net:/data/configdb
+</pre></div>
+</div>
+</li>
+<li><p class="first">Restart the config server process that you used in the previous
+step to copy the data files to the new config server instance.</p>
+</li>
+<li><p class="first">Start the new config server instance. The default invocation is:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the course of this procedure <em>never</em> remove a config server from
+the <a class="reference internal" href="../reference/configuration-options.html#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> parameter on any of the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances. If you need to change the name of a config server,
+always make sure that all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances have three
+config servers specified in the <a class="reference internal" href="../reference/configuration-options.html#configdb" title="configdb"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">configdb</span></tt></a> setting at all
+times.</p>
+</div>
+</div>
+<div class="section" id="backup-cluster-metadata">
+<h3>Backup Cluster Metadata<a class="headerlink" href="#backup-cluster-metadata" title="Permalink to this headline">¶</a></h3>
+<p>The cluster will remain operational <a class="footnote-reference" href="#read-only" id="id1">[1]</a> without one
+of the config database&#8217;s <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances, creating a backup
+of the cluster metadata from the config database is straight forward:</p>
+<ol class="arabic simple">
+<li>Shut down one of the <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config databases</em></a>.</li>
+<li>Create a full copy of the data files (i.e. the path specified by
+the <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> option for the config instance.)</li>
+<li>Restart the original configuration server.</li>
+</ol>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="backups.html"><em>Backup and Restoration Strategies</em></a>.</p>
+</div>
+<table class="docutils footnote" frame="void" id="read-only" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>While one of the three config servers unavailable, no
+the cluster cannot split any chunks nor can it migrate chunks
+between shards. Your application will be able to write data to the
+cluster. The <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>Config Servers</em></a> section of the
+documentation provides more information on this topic.</td></tr>
+</tbody>
+</table>
+<span class="target" id="index-7"></span></div>
+</div>
+<div class="section" id="troubleshooting">
+<span id="sharding-troubleshooting"></span><span id="index-8"></span><h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
+<p>The two most important factors in maintaining a successful sharded cluster are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../core/sharding-internals.html#sharding-internals-shard-keys"><em>choosing an appropriate shard key</em></a> and</li>
+<li><a class="reference internal" href="../core/sharding.html#sharding-capacity-planning"><em>sufficient capacity to support current and future operations</em></a>.</li>
+</ul>
+<p>You can prevent most issues encountered with sharding by ensuring that
+you choose the best possible <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> for your deployment and
+ensure that you are always adding additional capacity to your cluster
+well before the current resources become saturated. Continue reading
+for specific issues you may encounter in a production environment.</p>
+<div class="section" id="all-data-remains-on-one-shard">
+<span id="sharding-troubleshooting-not-splitting"></span><h3>All Data Remains on One Shard<a class="headerlink" href="#all-data-remains-on-one-shard" title="Permalink to this headline">¶</a></h3>
+<p>Your cluster must have sufficient data for sharding to make
+sense. Sharding works by migrating chunks between the shards until
+each shard has roughly the same number of chunks.</p>
+<p>The default chunk size is 64 megabytes. MongoDB will not begin
+migrations until the imbalance of chunks in the cluster exceeds the
+<a class="reference internal" href="../core/sharding-internals.html#sharding-migration-thresholds"><em>migration threshold</em></a>. While the
+default chunk size is configurable with the <a class="reference internal" href="../reference/configuration-options.html#chunkSize" title="chunkSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">chunkSize</span></tt></a>
+setting, these behaviors help prevent unnecessary chunk migrations,
+which can degrade the performance of your cluster as a whole.</p>
+<p>If you have just deployed a sharded cluster, make sure that you have
+enough data to make sharding effective. If you do not have sufficient
+data to create more than eight 64 megabyte chunks, then all data will
+remain on one shard. Either lower the <a class="reference internal" href="../core/sharding-internals.html#sharding-chunk-size"><em>chunk size</em></a> setting, or add more data to the cluster.</p>
+<p>As a related problem, the system will split chunks only on
+inserts or updates, which means that if you configure sharding and do not
+continue to issue insert and update operations, the database will not
+create any chunks. You can either wait until your application inserts
+data <em>or</em> <a class="reference internal" href="#sharding-procedure-create-split"><em>split chunks manually</em></a>.</p>
+<p>Finally, if your shard key has a low <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>cardinality</em></a>, MongoDB may not be able to create
+sufficient splits among the data.</p>
+</div>
+<div class="section" id="one-shard-receives-too-much-traffic">
+<h3>One Shard Receives too much Traffic<a class="headerlink" href="#one-shard-receives-too-much-traffic" title="Permalink to this headline">¶</a></h3>
+<p>In some situations, a single shard or a subset of the cluster will
+receive a disproportionate portion of the traffic and workload. In
+almost all cases this is the result of a shard key that does not
+effectively allow <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-write-scaling"><em>write scaling</em></a>.</p>
+<p>It&#8217;s also possible that you have &#8220;hot chunks.&#8221; In this case, you may
+be able to solve the problem by splitting and then migrating parts of
+these chunks.</p>
+<p>In the worst case, you may have to consider re-sharding your data
+and <a class="reference internal" href="../core/sharding-internals.html#sharding-internals-choose-shard-key"><em>choosing a different shard key</em></a>
+to correct this pattern.</p>
+</div>
+<div class="section" id="the-cluster-does-not-balance">
+<h3>The Cluster does not Balance<a class="headerlink" href="#the-cluster-does-not-balance" title="Permalink to this headline">¶</a></h3>
+<p>If you have just deployed your sharded cluster, you may want to
+consider the <a class="reference internal" href="#sharding-troubleshooting-not-splitting"><em>troubleshooting suggestions for a new cluster where
+data remains on a single shard</em></a>.</p>
+<p>If the cluster was initially balanced, but later developed an uneven
+distribution of data, consider the following possible causes:</p>
+<ul class="simple">
+<li>You have deleted or removed a significant amount of data from the
+cluster. If you have added additional data, it may have a
+different distribution with regards to its shard key.</li>
+<li>Your <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> has low <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-cardinality"><em>cardinality</em></a>
+and MongoDB cannot split the chunks any further.</li>
+<li>Your data set is growing faster than the balancer can distribute
+data around the cluster. This is uncommon and
+typically is the result of:<ul>
+<li>a <a class="reference internal" href="#sharding-schedule-balancing-window"><em>balancing window</em></a> that
+is too short, given the rate of data growth.</li>
+<li>an uneven distribution of <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-write-scaling"><em>write operations</em></a> that requires more data
+migration. You may have to choose a different shard key to resolve
+this issue.</li>
+<li>poor network connectivity between shards, which may lead to chunk
+migrations that take too long to complete. Investigate your
+network configuration and interconnections between shards.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="migrations-render-cluster-unusable">
+<h3>Migrations Render Cluster Unusable<a class="headerlink" href="#migrations-render-cluster-unusable" title="Permalink to this headline">¶</a></h3>
+<p>If migrations impact your cluster or application&#8217;s performance,
+consider the following options, depending on the nature of the impact:</p>
+<ol class="arabic simple">
+<li>If migrations only interrupt your clusters sporadically, you can
+limit the <a class="reference internal" href="#sharding-schedule-balancing-window"><em>balancing window</em></a> to prevent balancing activity
+during peak hours. Ensure that there is enough time remaining to
+keep the data from becoming out of balance again.</li>
+<li>If the balancer is always migrating chunks to the detriment of
+overall cluster performance:<ul>
+<li>You may want to attempt <a class="reference internal" href="#sharding-balancing-modify-chunk-size"><em>decreasing the chunk size</em></a>
+to limit the size of the migration.</li>
+<li>Your cluster may be over capacity, and you may want to attempt to
+<a class="reference internal" href="#sharding-procedure-add-shard"><em>add one or two shards</em></a> to
+the cluster to distribute load.</li>
+</ul>
+</li>
+</ol>
+<p>It&#8217;s also possible, that your shard key causes your
+application to direct all writes to a single shard. This kind of
+activity pattern can require the balancer to migrate most data soon after writing
+it. Consider redeploying your cluster  with a shard key that provides
+better <a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-write-scaling"><em>write scaling</em></a>.</p>
+</div>
+<div class="section" id="disable-balancing-during-backups">
+<h3>Disable Balancing During Backups<a class="headerlink" href="#disable-balancing-during-backups" title="Permalink to this headline">¶</a></h3>
+<p>If MongoDB migrates a <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> during a <a class="reference internal" href="backups.html"><em>backup</em></a>, you can end with an inconsistent snapshot
+of your <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. Never run a backup while the balancer is
+active. To ensure that the balancer is inactive during your backup
+operation:</p>
+<ul class="simple">
+<li>Set the <a class="reference internal" href="#sharding-schedule-balancing-window"><em>balancing window</em></a>
+so that the balancer is inactive during the backup. Ensure that the
+backup can complete while you have the balancer disabled.</li>
+<li><a class="reference internal" href="#sharding-balancing-disable-temporally"><em>manually disable the balancer</em></a>
+for the duration of the backup procedure.</li>
+</ul>
+<p>Confirm that the balancer is not active using the
+<a class="reference internal" href="../reference/method/sh.setBalancerState.html#sh.getBalancerState" title="sh.getBalancerState"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.getBalancerState()</span></tt></a> method before starting a backup
+operation. When the backup procedure is complete you can reactivate
+the balancer process.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/sharding.html" title="Previous Section: Sharding Fundamentals">&lt; &nbsp; Sharding Fundamentals</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="sharding-architectures.html" title="Next Section: Sharded Cluster Architectures">Sharded Cluster Architectures &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Indexes &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/indexes" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Indexing Overview" href="core/indexes.html" />
+<link rel="prev" title="Simple Aggregation Methods and Commands" href="reference/simple-aggregation.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="indexes">
+<span id="id1"></span><h1>Indexes<a class="headerlink" href="#indexes" title="Permalink to this headline">¶</a></h1>
+<p>Indexes provide high performance read operations for frequently used
+queries. Indexes are particularly useful where the total size of the
+documents exceeds the amount of available RAM.</p>
+<p>For basic concepts and options, see <a class="reference internal" href="core/indexes.html"><em>Indexing Overview</em></a>. For procedures
+and operational concerns, see <a class="reference internal" href="administration/indexes.html"><em>Indexing Operations</em></a>. For
+information on how applications might use indexes, see
+<a class="reference internal" href="applications/indexes.html"><em>Indexing Strategies</em></a>.</p>
+<p>The following outlines the indexing documentation:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/indexes.html">Indexing Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/indexes.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/indexes.html#index-types">Index Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/indexes.html#index-creation-options">Index Creation Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/indexes.html#index-feature">Index Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/indexes.html#index-behaviors-and-limitations">Index Behaviors and Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/indexes.html">Indexing Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#create-an-index">Create an Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#create-a-compound-index">Create a Compound Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#special-creation-options">Special Creation Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#information-about-indexes">Information about Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#remove-indexes">Remove Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#rebuild-indexes">Rebuild Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#build-indexes-on-replica-sets">Build Indexes on Replica Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/indexes.html#monitor-and-control-index-building">Monitor and Control Index Building</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/indexes.html">Indexing Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#create-indexes-to-support-your-queries">Create Indexes to Support Your Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#use-compound-indexes-to-support-several-different-queries">Use Compound Indexes to Support Several Different Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#create-indexes-that-support-covered-queries">Create Indexes that Support Covered Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#use-indexes-to-sort-query-results">Use Indexes to Sort Query Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#ensure-indexes-fit-ram">Ensure Indexes Fit RAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#create-queries-that-ensure-selectivity">Create Queries that Ensure Selectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/indexes.html#consider-performance-when-creating-indexes-for-write-heavy-applications">Consider Performance when Creating Indexes for Write-heavy Applications</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/geospatial-indexes.html">Geospatial Queries with <tt class="docutils literal"><span class="pre">2d</span></tt> Indexes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#proximity-queries">Proximity Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#distance-queries">Distance Queries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#limit-the-number-of-results">Limit the Number of Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#circles">Circles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#rectangles">Rectangles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/geospatial-indexes.html#polygons">Polygons</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/geospatial-indexes.html"><tt class="docutils literal"><span class="pre">2d</span></tt> Geospatial Indexes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#store-location-data">Store Location Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#create-a-geospatial-index">Create a Geospatial Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#distance-calculation">Distance Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#geohash-values">Geohash Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#geospatial-indexes-and-sharding">Geospatial Indexes and Sharding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/geospatial-indexes.html#multi-location-documents">Multi-location Documents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="reference/simple-aggregation.html" title="Previous Section: Simple Aggregation Methods and Commands">&lt; &nbsp; Simple Aggregation Methods and Commands</a></li>
+<li id="btnvnx"><a href="core/indexes.html" title="Next Section: Indexing Overview">Indexing Overview &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

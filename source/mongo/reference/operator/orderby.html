@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$orderby &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/orderby" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$polygon" href="polygon.html" />
+<link rel="prev" title="$or" href="or.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="orderby">
+<h1>$orderby<a class="headerlink" href="#orderby" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_orderby">
+<tt class="descname">$orderby</tt><a class="headerlink" href="#_S_orderby" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#_S_orderby" title="$orderby"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$orderby</span></tt></a> operator sorts the results of a query in
+ascending or descending order.</p>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides the <a class="reference internal" href="../method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.sort()</span></tt></a>
+method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also specify the option in either of the following forms:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">_addSpecial</span><span class="p">(</span> <span class="s2">&quot;$orderby&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">age</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$query</span><span class="o">:</span> <span class="p">{},</span> <span class="nx">$orderby</span><span class="o">:</span> <span class="p">{</span> <span class="nx">age</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>These examples return all documents in the collection named
+<tt class="docutils literal"><span class="pre">collection</span></tt> sorted by the <tt class="docutils literal"><span class="pre">age</span></tt> field in descending order.
+Specify a value to <a class="reference internal" href="#_S_orderby" title="$orderby"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$orderby</span></tt></a> of negative one (e.g.
+<tt class="docutils literal"><span class="pre">-1</span></tt>, as above) to sort in descending order or a positive value
+(e.g. <tt class="docutils literal"><span class="pre">1</span></tt>) to sort in ascending order.</p>
+<p>Unless you have a index for the specified key pattern, use
+<a class="reference internal" href="#_S_orderby" title="$orderby"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$orderby</span></tt></a> in conjunction with <a class="reference internal" href="maxScan.html#_S_maxScan" title="$maxScan"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$maxScan</span></tt></a> and/or
+<a class="reference internal" href="../method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> to avoid requiring MongoDB to perform a
+large in-memory sort. The <a class="reference internal" href="../method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.limit()</span></tt></a> increases the
+speed and reduces the amount of memory required to return this query
+by way of an optimized algorithm.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="or.html" title="Previous Section: $or">&lt; &nbsp; $or</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="polygon.html" title="Next Section: $polygon">$polygon &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

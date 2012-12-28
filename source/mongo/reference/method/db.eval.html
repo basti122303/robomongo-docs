@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.eval() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.eval" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.fsyncLock()" href="db.fsyncLock.html" />
+<link rel="prev" title="db.dropDatabase()" href="db.dropDatabase.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-eval">
+<h1>db.eval()<a class="headerlink" href="#db-eval" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.eval">
+<tt class="descclassname">db.</tt><tt class="descname">eval</tt><big>(</big><em>function</em>, <em>arguments</em><big>)</big><a class="headerlink" href="#db.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> provides the ability to run JavaScript code
+on the MongoDB server. It is a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell wrapper around
+the <a class="reference internal" href="../commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command.</p>
+<p>The method accepts the following parameters:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>function</strong> (<em>JavaScript</em>) &#8211; <p>A JavaScript function.</p>
+<p>The function need not take any arguments, as in the first
+example, or may optionally take arguments as in the second:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">function</span> <span class="p">(</span><span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">)</span> <span class="p">{</span>
+   <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><strong>arguments</strong> &#8211; A list of arguments to pass to the JavaScript <tt class="docutils literal"><span class="pre">function</span></tt> if
+the function accepts arguments. Omit if the <tt class="docutils literal"><span class="pre">function</span></tt> does
+not take arguments.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Consider the following example of the <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">incAmount</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">myCollection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="nx">name</span> <span class="p">}</span> <span class="p">);</span>
+
+            <span class="nx">doc</span> <span class="o">=</span> <span class="nx">doc</span> <span class="o">||</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="nx">name</span> <span class="p">,</span> <span class="nx">num</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">,</span> <span class="nx">total</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">,</span> <span class="nx">avg</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+            <span class="nx">doc</span><span class="p">.</span><span class="nx">num</span><span class="o">++</span><span class="p">;</span>
+            <span class="nx">doc</span><span class="p">.</span><span class="nx">total</span> <span class="o">+=</span> <span class="nx">incAmount</span><span class="p">;</span>
+            <span class="nx">doc</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">total</span> <span class="o">/</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">num</span><span class="p">;</span>
+
+            <span class="nx">db</span><span class="p">.</span><span class="nx">myCollection</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="nx">doc</span> <span class="p">);</span>
+            <span class="k">return</span> <span class="nx">doc</span><span class="p">;</span>
+         <span class="p">},</span>
+         <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span> <span class="mi">5</span> <span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>The <tt class="docutils literal"><span class="pre">db</span></tt> in the function refers to the current database.</li>
+<li><tt class="docutils literal"><span class="pre">&quot;&lt;name&gt;&quot;</span></tt> is the argument passed to the function, and
+corresponds to the <tt class="docutils literal"><span class="pre">name</span></tt> argument.</li>
+<li><tt class="docutils literal"><span class="pre">5</span></tt> is an argument to the function and corresponds to the
+<tt class="docutils literal"><span class="pre">incAmount</span></tt> field.</li>
+</ul>
+<p>If you want to use the server&#8217;s interpreter, you must run
+<a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a>. Otherwise, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell&#8217;s
+JavaScript interpreter evaluates functions entered directly into the
+shell.</p>
+<p>If an error occurs, <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> throws an exception. Consider
+the following invalid function that uses the variable <tt class="docutils literal"><span class="pre">x</span></tt> without
+declaring it as an argument:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nb">eval</span><span class="p">(</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">x</span><span class="p">;</span> <span class="p">},</span> <span class="mi">3</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>The statement will result in the following exception:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;errno&quot;</span> <span class="o">:</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span>
+   <span class="s2">&quot;errmsg&quot;</span> <span class="o">:</span> <span class="s2">&quot;invoke failed: JS Error: ReferenceError: x is not defined nofile_b:1&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">0</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<ul class="last simple">
+<li>The <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> operation takes a write lock by
+default.  This means that <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> blocks all other
+read and write operations to the database while
+the <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> operation runs. However, if you are using the
+<a class="reference internal" href="../commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a> command using <a class="reference internal" href="db.runCommand.html#db.runCommand" title="db.runCommand"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.runCommand()</span></tt></a>
+rather than the helper, you can disable the lock by setting
+the <tt class="docutils literal"><span class="pre">nolock</span></tt> flag to <tt class="docutils literal"><span class="pre">true</span></tt> if the <a class="reference internal" href="../commands.html#eval" title="eval"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">eval</span></tt></a>
+performs a strictly read-only operation.</li>
+<li><a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> also takes a JavaScript lock which blocks
+all</li>
+<li>Do not use <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> for long running operations, as
+<a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> blocks all other operations. Consider using
+<a class="reference internal" href="../../applications/server-side-javascript.html"><em>other server side code execution options</em></a>.</li>
+<li>You can not use <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> with <a class="reference internal" href="../glossary.html#term-sharding"><em class="xref std std-term">sharded</em></a> data. In general, you should avoid using
+<a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> in <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>; nevertheless,
+it is possible to use <a class="reference internal" href="#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> with non-sharded
+collections and databases stored in <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</li>
+</ul>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../../applications/server-side-javascript.html"><em>Server-side JavaScript</em></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.dropDatabase.html" title="Previous Section: db.dropDatabase()">&lt; &nbsp; db.dropDatabase()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.fsyncLock.html" title="Next Section: db.fsyncLock()">db.fsyncLock() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

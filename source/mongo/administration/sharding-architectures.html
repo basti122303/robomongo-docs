@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Sharded Cluster Architectures &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/sharding-architectures" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Sharding Internals" href="../core/sharding-internals.html" />
+<link rel="prev" title="Sharded Cluster Administration" href="sharding.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <span class="target" id="index-0"></span><div class="section" id="sharded-cluster-architectures">
+<span id="sharding-architecture"></span><span id="index-1"></span><h1>Sharded Cluster Architectures<a class="headerlink" href="#sharded-cluster-architectures" title="Permalink to this headline">¶</a></h1>
+<p>This document describes the organization and design of <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded
+cluster</em></a> deployments. For documentation of common administrative tasks
+related to sharded clusters, see <a class="reference internal" href="sharding.html"><em>Sharded Cluster Administration</em></a>. For
+complete documentation of sharded clusters see the <a class="reference internal" href="../sharding.html"><em>Sharding</em></a>
+section of this manual.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../core/sharding.html#sharding-requirements"><em>Sharding Requirements</em></a>.</p>
+</div>
+<div class="section" id="deploying-a-test-cluster">
+<h2>Deploying a Test Cluster<a class="headerlink" href="#deploying-a-test-cluster" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Use this architecture for testing and development only.</p>
+</div>
+<p>You can deploy a very minimal cluster for testing and
+development. These <em>non-production</em> clusters have the following
+components:</p>
+<ul class="simple">
+<li>1 <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config server</em></a>.</li>
+<li>At least one <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance (either <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>
+or as a standalone node.)</li>
+<li>1 <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</li>
+</ul>
+</div>
+<div class="section" id="deploying-a-production-cluster">
+<span id="sharding-production-architecture"></span><h2>Deploying a Production Cluster<a class="headerlink" href="#deploying-a-production-cluster" title="Permalink to this headline">¶</a></h2>
+<p>When deploying a production cluster, you must ensure that the
+data is redundant and that your systems are highly available. To that
+end, a production-level cluster must have the following
+components:</p>
+<ul>
+<li><p class="first">3 <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a>, each residing on a
+discrete system.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A single <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> must have exclusive use of its
+<a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a>. If you have
+multiple shards, you will need to have a group of config servers
+for each cluster.</p>
+</div>
+</li>
+<li><p class="first">2 or more <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>, for the <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shards</em></a>.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last">For more information on replica sets see
+<a class="reference internal" href="replication-architectures.html"><em>Replication Architectures</em></a> and
+<a class="reference internal" href="../replication.html"><em>Replication</em></a>.</p>
+</div>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances. Typically, you will deploy a single
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance on each application server. Alternatively,
+you may deploy several <cite>mongos</cite> nodes and let your application connect
+to these via a load balancer.</p>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="sharding.html#sharding-procedure-add-shard"><em>Add a Shard to a Cluster</em></a> and
+<a class="reference internal" href="sharding.html#sharding-procedure-remove-shard"><em>Remove a Shard from a Cluster</em></a>.</p>
+</div>
+</div>
+<div class="section" id="sharded-and-non-sharded-data">
+<h2>Sharded and Non-Sharded Data<a class="headerlink" href="#sharded-and-non-sharded-data" title="Permalink to this headline">¶</a></h2>
+<p>Sharding operates on the collection level. You can shard multiple
+collections within a database, or have multiple databases with
+sharding enabled. <a class="footnote-reference" href="#sharding-databases" id="id1">[1]</a> However, in production
+deployments some databases and collections will use sharding, while
+other databases and collections will only reside on a single database
+instance or replica set (i.e. a <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a>.)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Regardless of the data architecture of your <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>,
+ensure that all queries and operations use the <a class="reference internal" href="../reference/glossary.html#term-mongos"><em class="xref std std-term">mongos</em></a>
+router to access the data cluster. Use the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> even
+for operations that do not impact the sharded data.</p>
+</div>
+<p>Every database has a &#8220;primary&#8221; <a class="footnote-reference" href="#overloaded-primary-term" id="id2">[2]</a> shard that
+holds all un-sharded collections in that database. All collections
+that <em>are not</em> sharded reside on the primary for their database. Use
+the <a class="reference internal" href="../reference/commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> command to change the primary shard for a
+database. Use the <a class="reference internal" href="../reference/commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a> command or the
+<a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a> to see an overview of the cluster, which contains
+information about the <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> and database distribution within the
+cluster.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <a class="reference internal" href="../reference/commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> command can be expensive because
+it copies all non-sharded data to the new shard, during which
+that data will be unavailable for other operations.</p>
+</div>
+<p>When you deploy a new <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, the &#8220;first shard&#8221; becomes
+the primary for all databases before enabling sharding. Databases
+created subsequently, may reside on any shard in the cluster.</p>
+<table class="docutils footnote" frame="void" id="sharding-databases" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>As you configure sharding, you will use the
+<a class="reference internal" href="../reference/commands.html#enableSharding" title="enableSharding"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">enableSharding</span></tt></a> command to enable sharding for a
+database. This simply makes it possible to use the
+<a class="reference internal" href="../reference/commands.html#shardCollection" title="shardCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shardCollection</span></tt></a> command on a collection within that database.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="overloaded-primary-term" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>The term &#8220;primary&#8221; in the context of
+databases and sharding, has nothing to do with the term
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> in the context of <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="high-availability-and-mongodb">
+<span id="sharding-high-availability"></span><h2>High Availability and MongoDB<a class="headerlink" href="#high-availability-and-mongodb" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference internal" href="#sharding-production-architecture"><em>production</em></a>
+<a class="reference internal" href="../reference/glossary.html#term-cluster"><em class="xref std std-term">cluster</em></a> has no single point of failure. This section introduces the
+availability concerns for MongoDB deployments, and highlights
+potential failure scenarios and available resolutions:</p>
+<ul>
+<li><p class="first">Application servers or <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances become unavailable.</p>
+<p>If each application server has its own <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance,
+other application servers can continue access the
+database. Furthermore, <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances do not maintain
+persistent state, and they can restart and become unavailable
+without loosing any state or data. When a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance
+starts, it retrieves a copy of the <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config database</em></a> and can
+begin routing queries.</p>
+</li>
+<li><p class="first">A single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> becomes unavailable in a shard.</p>
+<p><a class="reference internal" href="../replication.html"><em>Replica sets</em></a> provide high availability for
+shards. If the unavailable <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>,
+then the replica set will <a class="reference internal" href="../core/replication.html#replica-set-elections"><em>elect</em></a> a new
+primary. If the unavailable <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is a
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>, and it connects within its <a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>recovery window</em></a>. In a three member replica set, even if
+a single member of the set experiences catastrophic failure, two
+other members have full copies of the data.</p>
+<p>Always investigate availability interruptions and failures. If a
+system is unrecoverable, replace it and create a new member of the
+replica set as soon as possible to replace the lost redundancy.</p>
+</li>
+<li><p class="first">All members of a replica set become unavailable.</p>
+<p>If all members of a replica set within a shard are unavailable, all
+data held in on that shard is unavailable. However, the data on all
+other shards will remain available, and it&#8217;s possible to read and
+write data to the other shards. However, your application must be
+able to deal with partial results, and you should investigate the
+cause of the interruption and attempt to recover the shard as soon
+as possible.</p>
+</li>
+<li><p class="first">One or two <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config database</em></a> become unavailable.</p>
+<p>Three distinct <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances provide the <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config
+database</em></a> using a special two-phase commits to maintain consistent
+state between these <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances. Cluster
+operation will continue as normal but <a class="reference internal" href="../core/sharding.html#sharding-balancing"><em>chunk migration</em></a> and the cluster can create no new <a class="reference internal" href="sharding.html#sharding-procedure-create-split"><em>chunk
+splits</em></a>. Replace the config server
+as soon as possible. If all multiple config databases become
+unavailable, the cluster can become inoperable.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All config servers must be running and available when you first initiate
+a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sharding.html" title="Previous Section: Sharded Cluster Administration">&lt; &nbsp; Sharded Cluster Administration</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="../core/sharding-internals.html" title="Next Section: Sharding Internals">Sharding Internals &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

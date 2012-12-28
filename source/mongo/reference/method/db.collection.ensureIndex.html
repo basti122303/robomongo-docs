@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.collection.ensureIndex() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.collection.ensureIndex" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.collection.find()" href="db.collection.find.html" />
+<link rel="prev" title="db.collection.dropIndexes()" href="db.collection.dropIndexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-collection-ensureindex">
+<h1>db.collection.ensureIndex()<a class="headerlink" href="#db-collection-ensureindex" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.collection.ensureIndex">
+<tt class="descclassname">db.collection.</tt><tt class="descname">ensureIndex</tt><big>(</big><em>keys</em>, <em>options</em><big>)</big><a class="headerlink" href="#db.collection.ensureIndex" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keys</strong> (<em>document</em>) &#8211; A <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that contains
+pairs with the name of the field or
+fields to index and order of the index. A
+<tt class="docutils literal"><span class="pre">1</span></tt> specifies ascending and a <tt class="docutils literal"><span class="pre">-1</span></tt>
+specifies descending.</li>
+<li><strong>options</strong> (<em>document</em>) &#8211; A <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that controls the creation
+of the index. This argument is optional.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Index names, including their full namespace
+(i.e. <tt class="docutils literal"><span class="pre">database.collection</span></tt>) can be no longer than 128
+characters. See the <a class="reference internal" href="db.collection.getIndexes.html#db.collection.getIndexes" title="db.collection.getIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.getIndexes()</span></tt></a> field
+&#8220;<tt class="xref mongodb mongodb-data docutils literal"><span class="pre">name</span></tt>&#8221; for the names of existing indexes.</p>
+</div>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last">The <a class="reference internal" href="../../indexes.html"><em>Indexes</em></a> section of this manual for full
+documentation of indexes and indexing in MongoDB.</p>
+</div>
+<p>Creates an index on the field specified, if that index does not
+already exist. If the <tt class="docutils literal"><span class="pre">keys</span></tt> document specifies more than one
+field, than <a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a> creates a <a class="reference internal" href="../glossary.html#term-compound-index"><em class="xref std std-term">compound
+index</em></a>. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">({</span> <span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This command creates an index, in ascending order, on the field
+<tt class="docutils literal"><span class="pre">[key]</span></tt>. To specify a compound index use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">({</span> <span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="nx">key1</span><span class="p">]</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>This command creates a compound index on the <tt class="docutils literal"><span class="pre">key</span></tt> field
+(in ascending order) and <tt class="docutils literal"><span class="pre">key1</span></tt> field (in descending order.)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Typically the order of an index is only important when doing
+<a class="reference internal" href="cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.sort()</span></tt></a> operations on the indexed fields.</p>
+</div>
+<p>The available options, possible values, and the default settings
+are as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Option</strong></th>
+<th class="head"><strong>Plugin</strong></th>
+<th class="head"><strong>Default</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>background</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>unique</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>name</td>
+<td>string</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td>cache</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>dropDups</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>sparse</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>expireAfterSeconds</td>
+<td>integer</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td>v</td>
+<td>index version</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>background</strong> (<em>Boolean</em>) &#8211; Specify <tt class="docutils literal"><span class="pre">true</span></tt> to build the index
+in the background so that building an
+index will <em>not</em> block other database
+activities.</li>
+<li><strong>unique</strong> (<em>Boolean</em>) &#8211; Specify <tt class="docutils literal"><span class="pre">true</span></tt> to create a unique index
+so that the collection will not accept
+insertion of documents where the index key
+or keys matches an existing value in the
+index.</li>
+<li><strong>name</strong> (<em>string</em>) &#8211; Specify the name of the index. If unspecified,
+MongoDB will generate an index name by concatenating
+the names of the indexed fields and the sort order.</li>
+<li><strong>cache</strong> (<em>Boolean</em>) &#8211; Specify <tt class="docutils literal"><span class="pre">false</span></tt> to prevent caching of this
+<a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a> call in
+the index cache.</li>
+<li><strong>dropDups</strong> (<em>Boolean</em>) &#8211; Specify <tt class="docutils literal"><span class="pre">true</span></tt> when creating a unique
+index, on a field that <em>may</em> have
+duplicate to index only the first
+occurrence of a key, and <strong>remove</strong> all
+documents from the collection that
+contain subsequent occurrences of that
+key.</li>
+<li><strong>sparse</strong> (<em>Boolean</em>) &#8211; If <tt class="docutils literal"><span class="pre">true</span></tt>, the index only references
+documents with the specified field. These
+indexes use less space, but behave
+differently in some situations
+(particularly sorts.)</li>
+<li><strong>expireAfterSeconds</strong> (<em>integer</em>) &#8211; Specify a value, in seconds, as
+a <a class="reference internal" href="../glossary.html#term-ttl"><em class="xref std std-term">TTL</em></a> to control how
+long MongoDB will retain
+documents in this collection.
+See &#8220;<a class="reference internal" href="../../tutorial/expire-data.html"><em>Expire Data from Collections by Setting TTL</em></a>&#8221;
+for more information on this
+functionality.</li>
+<li><strong>v</strong> &#8211; Only specify a different index version in unusual
+situations. The latest index version (version 1) provides a smaller
+and faster index format.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Please be aware of the following behaviors of
+<a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a>:</p>
+<ul>
+<li><p class="first">To add or change index options you must drop the index using the
+<a class="reference internal" href="db.collection.dropIndex.html#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> and issue another
+<a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> operation
+with the new options.</p>
+<p>If you create an index with one set of options, and then issue
+<a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> method
+command with the same index fields and different options without
+first dropping the index, <a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> will <em>not</em> rebuild the existing
+index with the new options.</p>
+</li>
+<li><p class="first">If you call multiple <a class="reference internal" href="#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a>
+methods with the same index specification at the same time, only
+the first operation will succeed, all other operations will have
+no effect.</p>
+</li>
+<li><p class="first">Non-background indexing operations will block all other
+operations on a database.</p>
+</li>
+<li><p class="first">You cannot stop a foreground index build once it&#8217;s begun. See the
+<a class="reference internal" href="../../administration/indexes.html#indexes-admin-stop-in-progress-build"><em>Monitor and Control Index Building</em></a> for more
+information.</p>
+</li>
+</ul>
+<table class="docutils footnote" frame="void" id="id1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>The default index version depends on the version of
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running when creating the index. Before version
+2.0, the this value was 0; versions 2.0 and later use version 1.</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.collection.dropIndexes.html" title="Previous Section: db.collection.dropIndexes()">&lt; &nbsp; db.collection.dropIndexes()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.collection.find.html" title="Next Section: db.collection.find()">db.collection.find() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

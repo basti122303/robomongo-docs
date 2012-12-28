@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>create &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/create" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="cursorInfo" href="cursorInfo.html" />
+<link rel="prev" title="count" href="count.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="create">
+<h1>create<a class="headerlink" href="#create" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">create</tt></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">create</span></tt> command explicitly creates a collection. The command
+uses the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">create</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection_name</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>To create a <a class="reference internal" href="../glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a> limited to 40 KB, issue command in
+the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">create</span><span class="o">:</span> <span class="s2">&quot;collection&quot;</span><span class="p">,</span> <span class="nx">capped</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">size</span><span class="o">:</span> <span class="mi">40</span> <span class="o">*</span> <span class="mi">1024</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The options for creating capped collections are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>capped</strong> &#8211; Specify <tt class="docutils literal"><span class="pre">true</span></tt> to create a <a class="reference internal" href="../glossary.html#term-capped-collection"><em class="xref std std-term">capped collection</em></a>.</li>
+<li><strong>autoIndexId</strong> &#8211; Specify <tt class="docutils literal"><span class="pre">false</span></tt> to disable the automatic
+index created on the <tt class="docutils literal"><span class="pre">_id</span></tt> field. Before
+2.2, the default value for <tt class="docutils literal"><span class="pre">autoIndexId</span></tt> was
+<tt class="docutils literal"><span class="pre">false</span></tt>. See <a class="reference internal" href="../../release-notes/2.2.html#id-indexes-capped-collections"><em>_id Fields and Indexes on Capped Collections</em></a>
+for more information.</li>
+<li><strong>size</strong> &#8211; The maximum size for the capped collection. Once a
+capped collection reaches its max size, MongoDB will
+drop old documents from the database to make way for
+the new documents. You must specify a <tt class="docutils literal"><span class="pre">size</span></tt>
+argument for all capped collections.</li>
+<li><strong>max</strong> &#8211; The maximum number of documents to preserve in the
+capped collection. This limit is subject to the
+overall size of the capped collection. If a capped
+collection reaches its maximum size before it contains
+the maximum number of documents, the database will
+remove old documents. Thus, if you use this option,
+ensure that the total size for the capped collection
+is sufficient to contain the max.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="../method/db.createCollection.html#db.createCollection" title="db.createCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.createCollection()</span></tt></a> provides a wrapper function that
+provides access to this functionality.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command obtains a write lock on the affected database and
+will block other operations until it has completed. The write
+lock for this operation is typically short lived; however,
+allocations for large capped collections may take longer.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="count.html" title="Previous Section: count">&lt; &nbsp; count</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursorInfo.html" title="Next Section: cursorInfo">cursorInfo &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

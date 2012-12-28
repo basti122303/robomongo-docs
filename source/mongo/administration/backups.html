@@ -1,0 +1,624 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Backup and Restoration Strategies &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/backups" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Linux ulimit Settings" href="ulimit.html" />
+<link rel="prev" title="Importing and Exporting MongoDB Data" href="import-export.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="backup-and-restoration-strategies">
+<h1>Backup and Restoration Strategies<a class="headerlink" href="#backup-and-restoration-strategies" title="Permalink to this headline">¶</a></h1>
+<p>This document provides an inventory of database backup strategies for
+use with MongoDB. This document contains the following sections:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#backup-overview"><em>Backup Overview</em></a> and <a class="reference internal" href="#backup-considerations"><em>Production Considerations for Backup Strategies</em></a> describe the
+approaches for backing up your MongoDB environment.</li>
+<li><a class="reference internal" href="#block-level-backup"><em>Using Block Level Backup Methods</em></a> and <a class="reference internal" href="#database-dumps"><em>Using Binary Database Dumps for Backups</em></a> describe specific
+strategies.</li>
+<li><a class="reference internal" href="#backups-with-sharding-and-replication"><em>Sharded Cluster and Replica Set Backups</em></a> describes considerations
+specific to <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> and <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded
+clusters</em></a>.</li>
+</ul>
+<div class="section" id="backup-overview">
+<span id="id1"></span><h2>Backup Overview<a class="headerlink" href="#backup-overview" title="Permalink to this headline">¶</a></h2>
+<p>Production systems should always have some consideration and strategy
+for taking and restoring backups. The goal of a backup strategy is to
+produce a full and consistent copy of the data that you can use to
+bring up a new or replacement database instance. However, in some
+cases, taking backups is difficult or impossible, given large data
+volumes, distributed architectures, and data transmission speeds.</p>
+<p>Nevertheless, with MongoDB, there are two major approaches to backups:
+<a class="footnote-reference" href="#replication-as-backups" id="id2">[1]</a></p>
+<ul>
+<li><p class="first">Using system-level tools, like disk image snapshots.</p>
+<p>See <a class="reference internal" href="#block-level-backup"><em>Using Block Level Backup Methods</em></a>.</p>
+</li>
+<li><p class="first">Using various capacities present in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> tool.</p>
+<p>See <a class="reference internal" href="#database-dumps"><em>Using Binary Database Dumps for Backups</em></a>.</p>
+</li>
+</ul>
+<p>The methods described in this document operate by copying the data file
+on the disk level. If your system does not provide functionality for
+this kind of backup, see the section on <a class="reference internal" href="#database-dumps"><em>Using Binary Database Dumps for Backups</em></a>.</p>
+<p>Ensuring that the state captured by the backup is consistent and usable
+is the primary challenge of producing backups of database systems.
+Backups that you cannot produce reliably, or restore from feasibly are
+worthless.</p>
+<p>As you develop your backup system, take into consideration the specific
+features of your deployment, your use patterns, and your architecture.</p>
+<p>Because every environment is unique it&#8217;s important to regularly test the
+backups that you capture to ensure that your backup system is
+practically, and not just theoretically, functional.</p>
+<table class="docutils footnote" frame="void" id="replication-as-backups" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>In many situations increasing the amount
+of replication provides useful assurances with data sets that are
+difficult to restore in a timely manner.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="production-considerations-for-backup-strategies">
+<span id="backup-considerations"></span><h2>Production Considerations for Backup Strategies<a class="headerlink" href="#production-considerations-for-backup-strategies" title="Permalink to this headline">¶</a></h2>
+<p>When evaluating a backup strategy for your MongoDB deployment consider
+the following factors:</p>
+<ul class="simple">
+<li>Geography. Ensure that you move some backups away from the your
+primary database infrastructure. It&#8217;s important to be able to
+restore your database if you lose access to a system or site.</li>
+<li>System errors. Ensure that your backups can survive situations where
+hardware failures or disk errors impact the integrity or
+availability of your backups.</li>
+<li>Production constraints. Backup operations themselves sometimes
+require substantial system resources. It&#8217;s important to consider the
+time of the backup schedule relative to peak usage and maintenance
+windows.</li>
+<li>System capabilities. Some of the block-level
+snapshot tools requires special support on the operating-system or
+infrastructure level.</li>
+<li>Database configuration. <a class="reference internal" href="../reference/glossary.html#term-replication"><em class="xref std std-term">Replication</em></a> and <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">sharding</em></a> can affect the process, and impact of the backup implementation.</li>
+<li>Actual requirements. You may be able to save time, effort, and space
+by including only crucial data in the most frequent backups and
+backing up less crucial data less frequently.</li>
+</ul>
+<p>With this information in hand you can begin to develop a backup plan
+for your database. Remember that all backup plans must be:</p>
+<ul class="simple">
+<li>Tested. If you cannot effectively restore your database from the
+backup, then your backups are useless. Test backup restoration
+regularly in practical situations to ensure that your backup system
+provides value.</li>
+<li>Automated. Database backups need to run regularly and
+automatically. Also automate tests of backup restoration.</li>
+</ul>
+</div>
+<div class="section" id="using-block-level-backup-methods">
+<span id="block-level-backup"></span><h2>Using Block Level Backup Methods<a class="headerlink" href="#using-block-level-backup-methods" title="Permalink to this headline">¶</a></h2>
+<p>This section provides an overview of using disk/block level
+snapshots (i.e. <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> or storage appliance) to backup a MongoDB
+instance. These tools make a quick block-level backup of the device
+that holds MongoDB&#8217;s data files. These methods complete quickly, work
+reliably, and typically provide the easiest backup systems method to
+implement.</p>
+<p>Snapshots work by creating pointers between the live data and a
+special snapshot volume. These pointers are theoretically equivalent
+to &#8220;hard links.&#8221; As the working data diverges from the snapshot,
+the snapshot process uses a copy-on-write strategy. As a result the snapshot
+only stores modified data.</p>
+<p>After making the snapshot, you mount the snapshot image on your
+file system and copy data from the snapshot. The resulting backup
+contains a full copy of all data.</p>
+<p>Snapshots have the following limitations:</p>
+<ul>
+<li><p class="first">The database must be in a consistent or recoverable state when the
+snapshot takes place. This means that all writes accepted by the
+database need to be fully written to disk: either to the
+<a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journal</em></a> or to data files.</p>
+<p>If all writes are not on disk when the backup occurs, the backup
+will not reflect these changes. If writes are <em>in progress</em> when the
+backup occurs, the data files will reflect an inconsistent
+state. With <a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journaling</em></a> all data-file states
+resulting from in-progress writes are recoverable; without
+journaling you must flush all pending writes to disk before
+running the backup operation and must ensure that no writes occur during
+the entire backup procedure.</p>
+<p>If you do use journaling, the journal must reside on the same volume
+as the data.</p>
+</li>
+<li><p class="first">Snapshots create an image of an entire disk image. Unless you need
+to back up your entire system, consider isolating your MongoDB data
+files, journal (if applicable), and configuration on one logical
+disk that doesn&#8217;t contain any other data.</p>
+<p>Alternately, store all MongoDB data files on a dedicated device
+so that you can make backups without duplicating extraneous data.</p>
+</li>
+<li><p class="first">Ensure that you copy data from snapshots and onto other systems to
+ensure that data is safe from site failures.</p>
+</li>
+</ul>
+<div class="section" id="backup-with-journaling">
+<span id="id3"></span><h3>Backup With Journaling<a class="headerlink" href="#backup-with-journaling" title="Permalink to this headline">¶</a></h3>
+<p>If your system has snapshot capability and your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+has journaling enabled, then you can use any kind of file system or
+volume/block level snapshot tool to create backups.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 1.9.2.</span></p>
+<p>Journaling is only enabled by default on 64-bit builds of
+MongoDB.</p>
+<p class="last">To enable journaling on all other builds, specify
+<a class="reference internal" href="../reference/connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a> = <tt class="docutils literal"><span class="pre">true</span></tt> in the configuration or use the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--journal"><em class="xref std std-option">--journal</em></a> run-time option for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+</div>
+<p>Many service providers provide a block-level backup service based on
+disk image snapshots. If you manage your own infrastructure on a
+Linux-based system, configure your system with <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> to provide
+your disk packages and provide snapshot capability. You can also use
+LVM-based setups <em>within</em> a cloud/virtualized environment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Running <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> provides additional flexibility and enables the
+possibility of using snapshots to back up MongoDB.</p>
+</div>
+<p>If you use Amazon&#8217;s EBS service in a software RAID 10 configuration, use
+<a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> to capture a consistent disk image. Also, see the special
+considerations described in <a class="reference internal" href="#backup-amazon-software-raid"><em>Amazon EBS in Software RAID 10 Configuration</em></a>.</p>
+<p>The following sections provide an overview of a simple backup process
+using <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> on a Linux system. While the tools, commands, and paths may
+be (slightly) different on your system the following steps provide a
+high level overview of the backup operation.</p>
+<div class="section" id="create-snapshot">
+<span id="lvm-backup-operation"></span><h4>Create Snapshot<a class="headerlink" href="#create-snapshot" title="Permalink to this headline">¶</a></h4>
+<p>To create a snapshot with <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a>, issue a command, as root, in the
+following format:</p>
+<div class="highlight-sh"><div class="highlight"><pre>lvcreate --size 100M --snapshot --name mdb-snap01 /dev/vg0/mongodb
+</pre></div>
+</div>
+<p>This command creates an <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> snapshot (with the <tt class="docutils literal"><span class="pre">--snapshot</span></tt> option)
+named <tt class="docutils literal"><span class="pre">mdb-snap01</span></tt> of the <tt class="docutils literal"><span class="pre">mongodb</span></tt> volume in the <tt class="docutils literal"><span class="pre">vg0</span></tt>
+volume group.</p>
+<p>This example creates a snapshot named <tt class="docutils literal"><span class="pre">mdb-snap01</span></tt> located at
+<tt class="docutils literal"><span class="pre">/dev/vg0/mdb-snap01</span></tt>. The location and paths to your systems volume
+groups and devices may vary slightly depending on your operating
+system&#8217;s <a class="reference internal" href="../reference/glossary.html#term-lvm"><em class="xref std std-term">LVM</em></a> configuration.</p>
+<p>The snapshot has a cap of at 100 megabytes, because of the parameter
+<tt class="docutils literal"><span class="pre">--size</span> <span class="pre">100M</span></tt>. This size does not reflect the total amount of the
+data on the disk, but rather the quantity of differences between the
+current state of <tt class="docutils literal"><span class="pre">/dev/vg0/mongodb</span></tt> and the creation of the snapshot
+(i.e. <tt class="docutils literal"><span class="pre">/dev/vg0/mdb-snap01</span></tt>.)</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Ensure that you create snapshots with enough space to account for
+data growth, particularly for the period of time that it takes to copy
+data out of the system or to a temporary image.</p>
+<p class="last">If your snapshot runs out of space, the snapshot image
+becomes unusable. Discard this logical volume and create another.</p>
+</div>
+<p>The snapshot will exist when the command returns. You can restore
+directly from the snapshot at any time or by creating a new logical
+volume and restoring from this snapshot to the alternate image.</p>
+<p>While snapshots are great for creating high quality backups very
+quickly, they are not ideal as a format for storing backup
+data. Snapshots typically depend and reside on the same storage
+infrastructure as the original disk images. Therefore, it&#8217;s crucial
+that you archive these snapshots and store them elsewhere.</p>
+</div>
+<div class="section" id="archive-snapshots">
+<h4>Archive Snapshots<a class="headerlink" href="#archive-snapshots" title="Permalink to this headline">¶</a></h4>
+<p>After creating a snapshot, mount the snapshot and move the data to
+separate storage. Your system might try to compress the backup images as
+you move the offline. Consider the following procedure to fully
+archive the data from the snapshot:</p>
+<div class="highlight-sh"><div class="highlight"><pre>umount /dev/vg0/mdb-snap01
+dd <span class="k">if</span><span class="o">=</span>/dev/vg0/mdb-snap01 | tar -czf mdb-snap01.tar.gz
+</pre></div>
+</div>
+<p>The above command sequence:</p>
+<ul>
+<li><p class="first">Ensures that the <tt class="docutils literal"><span class="pre">/dev/vg0/mdb-snap01</span></tt> device is not mounted.</p>
+</li>
+<li><p class="first">Does a block level copy of the entire snapshot image using the <tt class="docutils literal"><span class="pre">dd</span></tt>
+command, and compresses the result in a gzipped tar archive in the
+current working directory.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command will create a large <tt class="docutils literal"><span class="pre">tar.gz</span></tt> file in your current
+working directory. Make sure that you run this command in a file
+system that has enough free space.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="restore-snapshot">
+<span id="backup-restore-snapshot"></span><h4>Restore Snapshot<a class="headerlink" href="#restore-snapshot" title="Permalink to this headline">¶</a></h4>
+<p>To restore a backup created with the above method, use the following
+procedure:</p>
+<div class="highlight-sh"><div class="highlight"><pre>lvcreate --size 1G --name mdb-new vg0
+tar -xzf mdb-snap01.tar.gz | dd <span class="nv">of</span><span class="o">=</span>/dev/vg0/mdb-new
+mount /dev/vg0/mdb-new /srv/mongodb
+</pre></div>
+</div>
+<p>The above sequence:</p>
+<ul>
+<li><p class="first">Creates a new logical volume named <tt class="docutils literal"><span class="pre">mdb-new</span></tt>, in the <tt class="docutils literal"><span class="pre">/dev/vg0</span></tt>
+volume group. The path to the new device will be <tt class="docutils literal"><span class="pre">/dev/vg0/mdb-new</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>This volume will have a maximum size of 1 gigabyte. The original
+file system must have had a total size of 1 gigabyte or smaller, or
+else the restoration will fail.</p>
+<p class="last">Change <tt class="docutils literal"><span class="pre">1G</span></tt> to your desired volume size.</p>
+</div>
+</li>
+<li><p class="first">Uncompresses and unarchives the <tt class="docutils literal"><span class="pre">mdb-snap01.tar.gz</span></tt> into the
+<tt class="docutils literal"><span class="pre">mdb-new</span></tt> disk image.</p>
+</li>
+<li><p class="first">Mounts the <tt class="docutils literal"><span class="pre">mdb-new</span></tt> disk image to the <tt class="docutils literal"><span class="pre">/srv/mongodb</span></tt> directory.
+Modify the mount point to correspond to your MongoDB data file
+location, or other location as needed.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="restore-directly-from-a-snapshot">
+<span id="backup-restore-from-snapshot"></span><h4>Restore Directly from a Snapshot<a class="headerlink" href="#restore-directly-from-a-snapshot" title="Permalink to this headline">¶</a></h4>
+<p>To restore a backup without writing to a compressed <tt class="docutils literal"><span class="pre">tar</span></tt> archive, use
+the following sequence:</p>
+<div class="highlight-sh"><div class="highlight"><pre>umount /dev/vg0/mdb-snap01
+lvcreate --size 1G --name mdb-new vg0
+dd <span class="k">if</span><span class="o">=</span>/dev/vg0/mdb-snap01 <span class="nv">of</span><span class="o">=</span>/dev/vg0/mdb-new
+mount /dev/vg0/mdb-new /srv/mongodb
+</pre></div>
+</div>
+</div>
+<div class="section" id="remote-backup-storage">
+<h4>Remote Backup Storage<a class="headerlink" href="#remote-backup-storage" title="Permalink to this headline">¶</a></h4>
+<p>You can implement off-system backups using the <a class="reference internal" href="#backup-restore-from-snapshot"><em>combined process</em></a> and SSH.</p>
+<p>This sequence is identical to procedures explained above, except that it
+archives and compresses the backup on a remote system using SSH.</p>
+<p>Consider the following procedure:</p>
+<div class="highlight-sh"><div class="highlight"><pre>umount /dev/vg0/mdb-snap01
+dd <span class="k">if</span><span class="o">=</span>/dev/vg0/mdb-snap01 | ssh username@example.com tar -czf /opt/backup/mdb-snap01.tar.gz
+lvcreate --size 1G --name mdb-new vg0
+ssh username@example.com tar -xzf /opt/backup/mdb-snap01.tar.gz | dd <span class="nv">of</span><span class="o">=</span>/dev/vg0/mdb-new
+mount /dev/vg0/mdb-new /srv/mongodb
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="backup-without-journaling">
+<span id="id4"></span><h3>Backup Without Journaling<a class="headerlink" href="#backup-without-journaling" title="Permalink to this headline">¶</a></h3>
+<p>If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance does not run with journaling
+enabled, or if your journal is on a separate volume, obtaining a
+functional backup of a consistent state is more complicated.
+As described in this section, you must flush all
+writes to disk and lock the database to prevent writes during the
+backup process. If you have a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> configuration,
+then for your backup use a
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> which is not receiving reads (i.e. <a class="reference internal" href="../reference/glossary.html#term-hidden-member"><em class="xref std std-term">hidden
+member</em></a>).</p>
+<ol class="arabic">
+<li><p class="first">To flush writes to disk and to &#8220;lock&#8221; the database (to prevent
+further writes), issue the <a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> method in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">fsyncLock</span><span class="p">();</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Perform the backup operation described in <a class="reference internal" href="#lvm-backup-operation"><em>Create Snapshot</em></a>.</p>
+</li>
+<li><p class="first">To unlock the database after the snapshot has completed, use the
+following command in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">fsyncUnlock</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0: </span>MongoDB 2.0 added <a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> and
+<a class="reference internal" href="../reference/method/db.fsyncUnlock.html#db.fsyncUnlock" title="db.fsyncUnlock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncUnlock()</span></tt></a> helpers to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell.  Prior to this version, use the <a class="reference internal" href="../reference/commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a>
+command with the <tt class="docutils literal"><span class="pre">lock</span></tt> option, as follows:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">fsync</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">lock</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">fsync</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">lock</span><span class="o">:</span> <span class="kc">false</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The database cannot be locked with <a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> while profiling is enabled.
+You must disable profiling before locking the database with <a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>.
+Disable profiling using <a class="reference internal" href="../reference/method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a> as follows in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>When used in combination with <a class="reference internal" href="../reference/commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a> or
+<a class="reference internal" href="../reference/method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> may block some
+reads, including those from <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, when
+queued write operation waits behind the <a class="reference internal" href="../reference/commands.html#fsync" title="fsync"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">fsync</span></tt></a>
+lock.</p>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="amazon-ebs-in-software-raid-10-configuration">
+<span id="backup-amazon-software-raid"></span><h3>Amazon EBS in Software RAID 10 Configuration<a class="headerlink" href="#amazon-ebs-in-software-raid-10-configuration" title="Permalink to this headline">¶</a></h3>
+<p>If your deployment depends on Amazon&#8217;s Elastic Block Storage (EBS)
+with RAID configured <em>within</em> your instance, it is impossible to get a
+consistent state across all disks using the platform&#8217;s snapshot
+tool. As a result you may:</p>
+<ul>
+<li><p class="first">Flush all writes to disk and create a write lock to ensure
+consistent state during the backup process.</p>
+<p>If you choose this option see <a class="reference internal" href="#backup-without-journaling"><em>Backup Without Journaling</em></a>.</p>
+</li>
+<li><p class="first">Configure LVM to run and hold your MongoDB data files on top of the
+RAID within your system.</p>
+<p>If you choose this option, perform the LVM backup operation described
+in <a class="reference internal" href="#lvm-backup-operation"><em>Create Snapshot</em></a>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-binary-database-dumps-for-backups">
+<span id="database-dumps"></span><h2>Using Binary Database Dumps for Backups<a class="headerlink" href="#using-binary-database-dumps-for-backups" title="Permalink to this headline">¶</a></h2>
+<p>This section describes the process for writing the entire contents of
+your MongoDB instance to a file in a binary format. If
+disk-level snapshots are not available, this approach
+provides the best option for full system database backups.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The <a class="reference internal" href="../reference/mongodump.html"><em>mongodump</em></a> and <a class="reference internal" href="../reference/mongorestore.html"><em>mongorestore</em></a>
+documents contain complete documentation of these tools. If you
+have questions about these tools not covered here, please refer to
+these documents.</p>
+<p class="last">If your system has disk level snapshot capabilities, consider the
+backup methods described in <a class="reference internal" href="#block-level-backup"><em>Using Block Level Backup Methods</em></a>.</p>
+</div>
+<div class="section" id="database-dump-with-mongodump">
+<h3>Database Dump with <tt class="docutils literal"><span class="pre">mongodump</span></tt><a class="headerlink" href="#database-dump-with-mongodump" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> utility can perform a live backup of data or
+can work against an inactive set of database files.
+The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> utility can create a dump for an entire
+server/database/collection (or part of a collection using of query),
+even when the database is running and active. If you run
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> without any arguments, the command connects to
+the local database instance (e.g. <tt class="docutils literal"><span class="pre">127.0.0.1</span></tt> or <tt class="docutils literal"><span class="pre">localhost</span></tt>) and
+creates a database backup named <tt class="docutils literal"><span class="pre">dump/</span></tt> in the current directory.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The format of data created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> tool from the
+2.2 distribution or later is different and incompatible with
+earlier versions of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+</div>
+<p>To limit the amount of data included in the database dump, you can
+specify <em class="xref std std-option">--database</em> and
+<a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--collection"><em class="xref std std-option">--collection</em></a> as options to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> command. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --collection collection --db <span class="nb">test</span>
+</pre></div>
+</div>
+<p>This command creates a dump of the collection named <tt class="docutils literal"><span class="pre">collection</span></tt>
+from the database <tt class="docutils literal"><span class="pre">test</span></tt> in a <tt class="file docutils literal"><span class="pre">dump/</span></tt> subdirectory of the current
+working directory.</p>
+<p>Use the <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> option with
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> to collect the <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries to build a
+point-in-time snapshot of a database within a replica set. With <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> copies all the data from
+the source database as well as all of the <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries from
+the beginning of the backup procedure to until the backup procedure
+completes. This backup procedure, in conjunction with
+<a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--oplogReplay"><em class="xref std std-option">mongorestore --oplogReplay</em></a>,
+allows you to restore a backup that reflects a consistent and specific
+moment in time.</p>
+<p>If your MongoDB instance is not running, you can use the
+<a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--dbpath"><em class="xref std std-option">--dbpath</em></a> option to specify the
+location to your MongoDB instance&#8217;s database files. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+reads from the data files directly with this operation. This
+locks the data directory to prevent conflicting writes. The
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process must <em>not</em> be running or attached to these
+data files when you run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> in this
+configuration. Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --dbpath /srv/mongodb
+</pre></div>
+</div>
+<p>Additionally, the <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--host"><em class="xref std std-option">--host</em></a> and
+<a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--port"><em class="xref std std-option">--port</em></a> options allow you to specify a
+non-local host to connect to capture the dump. Consider the following
+example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --host mongodb1.example.net --port 3017 --username user --password pass --out /opt/backup/mongodump-2011-10-24
+</pre></div>
+</div>
+<p>On any <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> command you may, as above, specify username
+and password credentials to specify database authentication.</p>
+<div class="section" id="restore-database-from-binary-dump-with-mongorestore">
+<span id="backup-restore-dump"></span><h4>Restore Database from Binary Dump with <tt class="docutils literal"><span class="pre">mongorestore</span></tt><a class="headerlink" href="#restore-database-from-binary-dump-with-mongorestore" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> utility restores a binary backup created by
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>. Consider the following example command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore dump-2011-10-25/
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> imports the database backup located in
+the <tt class="file docutils literal"><span class="pre">dump-2011-10-25</span></tt> directory to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance
+running on the localhost interface. By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>
+looks for a database dump in the <tt class="file docutils literal"><span class="pre">dump/</span></tt> directory and restores
+that. If you wish to restore to a non-default host, the
+<a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--host"><em class="xref std std-option">--host</em></a> and <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--port"><em class="xref std std-option">--port</em></a>
+options allow you to specify a non-local host to connect to capture
+the dump. Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --host mongodb1.example.net --port 3017 --username user --password pass /opt/backup/mongodump-2011-10-24
+</pre></div>
+</div>
+<p>On any <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> command you may specify
+username and password credentials, as above.</p>
+<p>If you created your database dump using the <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--oplog"><em class="xref std std-option">--oplog</em></a> option to ensure a point-in-time snapshot, call
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> with the
+<a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--oplogReplay"><em class="xref std std-option">--oplogReplay</em></a>
+option, as in the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --oplogReplay
+</pre></div>
+</div>
+<p>You may also consider using the <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--objcheck"><em class="xref std std-option">mongorestore --objcheck</em></a>
+option to check the integrity of objects while inserting them into the
+database, or you may consider the <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--drop"><em class="xref std std-option">mongorestore --drop</em></a> option to drop each
+collection from the database before restoring from
+backups. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> also includes the ability to a filter
+to all input before inserting it into the new database. Consider the
+following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --filter <span class="s1">&#39;{&quot;field&quot;: 1}&#39;</span>
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> only adds documents to the database from
+the dump located in the <tt class="file docutils literal"><span class="pre">dump/</span></tt> folder <em>if</em> the documents have a
+field name <tt class="docutils literal"><span class="pre">field</span></tt> that holds a value of <tt class="docutils literal"><span class="pre">1</span></tt>. Enclose the
+filter in single quotes (e.g. <tt class="docutils literal"><span class="pre">'</span></tt>) to prevent the filter from
+interacting with your shell environment.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongorestore --dbpath /srv/mongodb --journal
+</pre></div>
+</div>
+<p>Here, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> restores the database dump located in
+<tt class="file docutils literal"><span class="pre">dump/</span></tt> folder into the data files located at <tt class="file docutils literal"><span class="pre">/srv/mongodb</span></tt>.
+Additionally,
+the <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--journal"><em class="xref std std-option">--journal</em></a> option ensures that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> records all operation in the durability
+<a class="reference internal" href="../reference/glossary.html#term-journal"><em class="xref std std-term">journal</em></a>. The journal prevents data file corruption if anything
+(e.g. power failure, disk failure, etc.)  interrupts the restore
+operation.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/mongodump.html"><em>mongodump</em></a> and
+<a class="reference internal" href="../reference/mongorestore.html"><em>mongorestore</em></a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="sharded-cluster-and-replica-set-backups">
+<span id="backups-with-sharding-and-replication"></span><h2>Sharded Cluster and Replica Set Backups<a class="headerlink" href="#sharded-cluster-and-replica-set-backups" title="Permalink to this headline">¶</a></h2>
+<p>The underlying architecture of <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a> and <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a> presents several
+challenges for creating backups. This section describes how to make
+quality backups in environments with these configurations and how to
+perform restorations.</p>
+<div class="section" id="sharded-cluster-backup-considerations">
+<span id="sharded-cluster-backups"></span><h3>Sharded Cluster Backup Considerations<a class="headerlink" href="#sharded-cluster-backup-considerations" title="Permalink to this headline">¶</a></h3>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">To capture a point-in-time backup from a sharded
+cluster you <strong>must</strong> stop <em>all</em> writes to the cluster. On a running
+production system, you can only capture an <em>approximation</em> of
+point-in-time snapshot.</p>
+</div>
+<p>Sharded clusters complicate backup operations, as distributed
+systems. True point-in-time backups are only possible when stopping all write
+activity from the application. To create a precise moment-in-time
+snapshot of a cluster, stop all application write activity to the
+database, capture a backup, and only allow write operations to the
+database after the backup is complete.</p>
+<p>However, you can capture a backup of a cluster that <strong>approximates</strong> a
+point-in-time backup by capturing a backup from a secondary member of
+the replica sets that provide the shards in the cluster at roughly the
+same moment. If you decide to use an approximate-point-in-time backup
+method, ensure that your application can operate using a copy of the
+data that does not reflect a single moment in time.</p>
+<p>The following documents describe all sharded cluster related backup
+procedures:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../tutorial/backup-small-sharded-cluster-with-mongodump.html"><em>Backup a Small Sharded Cluster with mongodump</em></a></li>
+<li><a class="reference internal" href="../tutorial/backup-sharded-cluster-with-filesystem-snapshots.html"><em>Create Backup of a Sharded Cluster with Filesystem Snapshots</em></a></li>
+<li><a class="reference internal" href="../tutorial/backup-sharded-cluster-with-database-dumps.html"><em>Create Backup of a Sharded Cluster with Database Dumps</em></a></li>
+<li><a class="reference internal" href="../tutorial/schedule-backup-window-for-sharded-clusters.html"><em>Schedule Backup Window for Sharded Clusters</em></a></li>
+<li><a class="reference internal" href="../tutorial/restore-single-shard.html"><em>Restore a Single Shard</em></a></li>
+<li><a class="reference internal" href="../tutorial/restore-sharded-cluster.html"><em>Restore Sharded Clusters</em></a></li>
+</ul>
+</div>
+<div class="section" id="replica-set-backup-considerations">
+<span id="replica-set-backups"></span><h3>Replica Set Backup Considerations<a class="headerlink" href="#replica-set-backup-considerations" title="Permalink to this headline">¶</a></h3>
+<p>In most cases, backing up data stored in a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> is
+similar to backing up data stored in a single instance. It&#8217;s possible to
+lock a single <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> or <a class="reference internal" href="../reference/glossary.html#term-slave"><em class="xref std std-term">slave</em></a> database and then
+on create a backup from that instance. When you unlock the database, the secondary or
+slave  will catch up with the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> or <a class="reference internal" href="../reference/glossary.html#term-master"><em class="xref std std-term">master</em></a>. You may also
+chose to deploy a dedicated <a class="reference internal" href="../reference/glossary.html#term-hidden-member"><em class="xref std std-term">hidden member</em></a> for backup purposes.</p>
+<p>If you have a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> where each <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> is itself a replica
+set, you can use this method to create a backup of the entire cluster
+without disrupting the operation of the node. In these situations you
+should still turn off the balancer when you create backups.</p>
+<p>For any cluster, using a non-primary/non-master node to create backups is
+particularly advantageous in that the backup operation does not
+affect the performance of the primary or master. Replication
+itself provides some measure of redundancy. Nevertheless, keeping
+point-in time backups of your cluster to provide for disaster recovery
+and as an additional layer of protection is crucial.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="import-export.html" title="Previous Section: Importing and Exporting MongoDB Data">&lt; &nbsp; Importing and Exporting MongoDB Data</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="ulimit.html" title="Next Section: Linux ulimit Settings">Linux ulimit Settings &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

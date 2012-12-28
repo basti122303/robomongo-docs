@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongoimport &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongoimport" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongoexport" href="mongoexport.html" />
+<link rel="prev" title="mongooplog" href="mongooplog.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongoimport">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongoimport</span></tt><a class="headerlink" href="#mongoimport" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> tool provides a route to import content from a
+JSON, CSV, or TSV export created by <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>, or
+potentially, another third-party export tool. See the
+&#8220;<a class="reference internal" href="../administration/import-export.html"><em>Importing and Exporting MongoDB Data</em></a>&#8221; document for a more in depth
+usage overview, and the &#8220;<a class="reference internal" href="mongoexport.html"><em>mongoexport</em></a>&#8221; document for more
+information regarding <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>, which
+provides the inverse &#8220;importing&#8221; capability.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Do not use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> for
+full instance, production backups because they will not reliably capture data type
+information. Use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> as
+described in &#8220;<a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a>&#8221; for this kind of
+functionality.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongoimport</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including
+the option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> program.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-h</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to which
+you want to restore the database. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt>
+will attempt to connect to a MongoDB process ruining on the
+localhost port numbered <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, use the <a class="reference internal" href="#cmdoption-mongoimport--host"><em class="xref std std-option">--host</em></a> argument with a
+setname, followed by a slash and a comma-separated list of host and
+port names. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> will, given the seed of at least
+one connected set member, connect to primary node of that set. This
+option would resemble:</p>
+<div class="highlight-sh"><div class="highlight"><pre>--host repl0/mongo0.example.net,mongo0.example.net,27018,mongo1.example.net,mongo2.example.net
+</pre></div>
+</div>
+<p>You can always connect directly to a single MongoDB instance by
+specifying the host and port number directly.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running on
+the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongoimport--host"><em class="xref std std-option">mongoimport --host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if your
+database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongoimport--password"><em class="xref std std-option">mongoimport --password</em></a> option to supply a password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongoimport--username"><em class="xref std std-option">mongoimport --username</em></a> option to
+supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongoimport--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongoimport--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt>
+will prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the directory of the MongoDB data files. If used, the
+<a class="reference internal" href="#cmdoption-mongoimport--dbpath"><em class="xref std std-option">--dbpath</em></a> option enables
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to attach directly to local data files and
+insert the data without the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. To run with
+<tt class="docutils literal"><span class="pre">--dbpath</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> needs to lock access to the
+data directory: as a result, no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can access the
+same path while the process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoimport--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the
+corresponding option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, which allows
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to import data into MongoDB instances that
+have every database&#8217;s files saved in discrete directories on the
+disk. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongoimport--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> write to the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the data files will remain in a
+consistent state during the write process. This option is only
+relevant when specifying the <a class="reference internal" href="#cmdoption-mongoimport--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--db">
+<tt class="descname">--db</tt><tt class="descclassname"> &lt;db&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"> &lt;db&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoimport--db"><em class="xref std std-option">--db</em></a> option to specify a database for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to restore data. If you do not specify a
+<tt class="docutils literal"><span class="pre">&lt;db&gt;</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> creates new databases that
+correspond to the databases where data originated and data may be
+overwritten. Use this option to restore data into a MongoDB
+instance that already has data, or to restore only some data in the
+specified backup.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--collection">
+<tt class="descname">--collection</tt><tt class="descclassname"> &lt;collection&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-c</tt><tt class="descclassname"> &lt;collection&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoimport--collection"><em class="xref std std-option">--collection</em></a> option to specify a collection for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> to restore. If you do not specify a
+<tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> imports all collections
+created. Existing data may be overwritten. Use this option to
+restore data into a MongoDB instance that already has data, or to
+restore only some data in the specified imported data set.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--fields">
+<tt class="descname">--fields</tt><tt class="descclassname"> &lt;field1[,filed2]&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-f</tt><tt class="descclassname"> &lt;field1[,filed2]&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a field or number fields to <em>import</em> from the specified
+file. All other fields present in the export will be <em>excluded</em>
+during importation. Comma separate a list of fields to limit the
+fields imported.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--fieldFile">
+<tt class="descname">--fieldFile</tt><tt class="descclassname"> &lt;filename&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--fieldFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>As an alternative to &#8220;<a class="reference internal" href="#cmdoption-mongoimport--fields"><em class="xref std std-option">mongoimport --fields</em></a>&#8221; the
+<a class="reference internal" href="#cmdoption-mongoimport--fieldFile"><em class="xref std std-option">--fieldFile</em></a> option allows you to specify a file
+(e.g. <tt class="docutils literal"><span class="pre">&lt;file&gt;`</span></tt>) to hold a list of field names to specify a list
+of fields to <em>include</em> in the export. All other fields will be
+<em>excluded</em> from the export. Place one field per line.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--ignoreBlanks">
+<tt class="descname">--ignoreBlanks</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--ignoreBlanks" title="Permalink to this definition">¶</a></dt>
+<dd><p>In <a class="reference internal" href="glossary.html#term-csv"><em class="xref std std-term">csv</em></a> and <a class="reference internal" href="glossary.html#term-tsv"><em class="xref std std-term">tsv</em></a> exports, ignore empty fields. If not
+specified, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> creates fields without values in
+imported documents.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--type">
+<tt class="descname">--type</tt><tt class="descclassname"> &lt;json|csv|tsv&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declare the type of export format to import. The default format is
+<a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a>, but it&#8217;s possible to import <a class="reference internal" href="glossary.html#term-csv"><em class="xref std std-term">csv</em></a> and
+<a class="reference internal" href="glossary.html#term-tsv"><em class="xref std std-term">tsv</em></a> files.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--file">
+<tt class="descname">--file</tt><tt class="descclassname"> &lt;filename&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the location of a file containing the data to
+import. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> will read data from standard input
+(e.g. &#8220;stdin.&#8221;) if you do not specify a file.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--drop">
+<tt class="descname">--drop</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--drop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the importation procedure so that the target instance
+drops every collection before restoring the collection from the
+dumped backup.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--headerline">
+<tt class="descname">--headerline</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--headerline" title="Permalink to this definition">¶</a></dt>
+<dd><p>If using &#8220;<a class="reference internal" href="#cmdoption-mongoimport--type"><em class="xref std std-option">--type csv</em></a>&#8221; or
+&#8220;<a class="reference internal" href="#cmdoption-mongoimport--type"><em class="xref std std-option">--type tsv</em></a>,&#8221; use the first line as
+field names. Otherwise, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> will import the first
+line as a distinct document.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--upsert">
+<tt class="descname">--upsert</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--upsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the import process to update existing objects in the
+database if they match an imported object, while inserting all
+other objects.</p>
+<p>If you do not specify a field or fields using the
+<a class="reference internal" href="#cmdoption-mongoimport--upsertFields"><em class="xref std std-option">--upsertFields</em></a> <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> will upsert on the
+basis of the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--upsertFields">
+<tt class="descname">--upsertFields</tt><tt class="descclassname"> &lt;field1[,field2]&gt;</tt><a class="headerlink" href="#cmdoption-mongoimport--upsertFields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a list of fields for the query portion of the
+<a class="reference internal" href="glossary.html#term-upsert"><em class="xref std std-term">upsert</em></a>. Use this option if the <tt class="docutils literal"><span class="pre">_id</span></tt> fields in the
+existing documents don&#8217;t match the field in the document, but
+another field or field combination can uniquely identify
+documents as a basis for performing upsert operations.</p>
+<p>To ensure adequate performance, indexes should exist for this
+field or fields.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--stopOnError">
+<tt class="descname">--stopOnError</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--stopOnError" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Forces <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to halt the import operation at the
+first error rather than continuing the operation despite errors.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoimport--jsonArray">
+<tt class="descname">--jsonArray</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoimport--jsonArray" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>The limit on document size increased from 4MB to 16MB.</p>
+<p>Accept import of data expressed with multiple MongoDB document
+within a single <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> array.</p>
+<p>Use in conjunction with <a class="reference internal" href="mongoexport.html#cmdoption-mongoexport--jsonArray"><em class="xref std std-option">mongoexport --jsonArray</em></a> to
+import data written as a single <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> array. Limited to
+imports of 16 MB or smaller.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>In this example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> imports the <a class="reference internal" href="glossary.html#term-csv"><em class="xref std std-term">csv</em></a>
+formatted data in the <tt class="docutils literal"><span class="pre">/opt/backups/contacts.csv</span></tt> into the
+collection <tt class="docutils literal"><span class="pre">contacts</span></tt> in the <tt class="docutils literal"><span class="pre">users</span></tt> database on the MongoDB
+instance running on the localhost port numbered <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoimport --db users --collection contacts --type csv --file /opt/backups/contacts.csv
+</pre></div>
+</div>
+<p>In the following example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> imports the data in
+the <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> formatted file <tt class="docutils literal"><span class="pre">contacts.json</span></tt> into the collection
+<tt class="docutils literal"><span class="pre">contacts</span></tt> on the MongoDB instance running on the localhost port
+number 27017. Journaling is explicitly enabled.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoimport --collection contacts --file contacts.json --journal
+</pre></div>
+</div>
+<p>In the next example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> takes data passed to it on
+standard input (i.e. with a <tt class="docutils literal"><span class="pre">|</span></tt> pipe.)  and imports it into the
+collection <tt class="docutils literal"><span class="pre">contacts</span></tt> in the <tt class="docutils literal"><span class="pre">sales</span></tt> database is the
+MongoDB datafiles located at <tt class="docutils literal"><span class="pre">/srv/mongodb/</span></tt>. if the import process
+encounters an error, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> will halt because of
+the <a class="reference internal" href="#cmdoption-mongoimport--stopOnError"><em class="xref std std-option">--stopOnError</em></a> option.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoimport --db sales --collection contacts --stopOnError --dbpath /srv/mongodb/
+</pre></div>
+</div>
+<p>In the final example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> imports data from the
+file <tt class="docutils literal"><span class="pre">/opt/backups/mdb1-examplenet.json</span></tt> into the collection
+<tt class="docutils literal"><span class="pre">contacts</span></tt> within the database <tt class="docutils literal"><span class="pre">marketing</span></tt> on a remote MongoDB
+database. This <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> accesses the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance running on the host <tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt> over port
+<tt class="docutils literal"><span class="pre">37017</span></tt>, which requires the username <tt class="docutils literal"><span class="pre">user</span></tt> and the password
+<tt class="docutils literal"><span class="pre">pass</span></tt>.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoimport --host mongodb1.example.net --port 37017 --username user --password pass --collection contacts --db marketing --file /opt/backups/mdb1-examplenet.json
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongooplog.html" title="Previous Section: mongooplog">&lt; &nbsp; mongooplog</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongoexport.html" title="Next Section: mongoexport">mongoexport &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

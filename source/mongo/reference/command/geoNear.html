@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>geoNear &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/geoNear" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="geoSearch" href="geoSearch.html" />
+<link rel="prev" title="fsync" href="fsync.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="geonear">
+<h1>geoNear<a class="headerlink" href="#geonear" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="geoNear">
+<tt class="descname">geoNear</tt><a class="headerlink" href="#geoNear" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command provides an alternative to the
+<a class="reference internal" href="../operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">$near</span></tt></a> operator. In addition to the
+functionality of <a class="reference internal" href="../operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a>, <a class="reference internal" href="../commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> returns the distance of
+each item from the specified point along with additional diagnostic
+information. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">geoNear</span> <span class="o">:</span> <span class="s2">&quot;places&quot;</span> <span class="p">,</span> <span class="nx">near</span> <span class="o">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="nx">num</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Here, <a class="reference internal" href="../commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> returns the 10 items nearest to the
+coordinates <tt class="docutils literal"><span class="pre">[50,50]</span></tt> in the collection named
+<tt class="docutils literal"><span class="pre">places</span></tt>. <cite>geoNear</cite> provides the following options (specify all
+distances in the same units as the document coordinate system:)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Fields:</th><td class="field-body"><ul class="first last simple">
+<li><strong>near</strong> &#8211; Takes the coordinates (e.g. <tt class="docutils literal"><span class="pre">[</span> <span class="pre">x,</span> <span class="pre">y</span> <span class="pre">]</span></tt>) to use as
+the center of a geospatial query.</li>
+<li><strong>num</strong> &#8211; Optional. Specifies the maximum number of documents to
+return. The default value is 100.</li>
+<li><strong>maxDistance</strong> &#8211; Optional. Limits the results to those falling within
+a given distance of the center coordinate.</li>
+<li><strong>query</strong> &#8211; Optional. Further narrows the results using any standard
+MongoDB query operator or selection. See <a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a>
+and &#8220;<a class="reference internal" href="../operators.html"><em>Operator Reference</em></a>&#8221; for more
+information.</li>
+<li><strong>spherical</strong> &#8211; Optional. Default: <tt class="docutils literal"><span class="pre">false</span></tt>. When <tt class="docutils literal"><span class="pre">true</span></tt>
+MongoDB will return the query as if the
+coordinate system references points on a
+spherical plane rather than a plane.</li>
+<li><strong>distanceMultiplier</strong> &#8211; <p>Optional. Specifies a factor to multiply
+all distances returned by
+<a class="reference internal" href="../commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>. For example, use
+<tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt> to convert from
+spherical queries returned in radians to
+linear units (i.e. miles or kilometers)
+by multiplying by the radius of the
+Earth.</p>
+<span class="target" id="index-0"></span></li>
+<li><strong>includeLocs</strong> &#8211; Optional. Default: <tt class="docutils literal"><span class="pre">false</span></tt>. When specified
+<tt class="docutils literal"><span class="pre">true</span></tt>, the query will return the location of
+the matching documents in the result.</li>
+<li><strong>uniqueDocs</strong> &#8211; Optional. Default <tt class="docutils literal"><span class="pre">true</span></tt>. The default settings
+will only return a matching document once, even
+if more than one of its location fields match
+the query. When <tt class="docutils literal"><span class="pre">false</span></tt> the query will return
+documents with multiple matching location fields
+more than once. See <a class="reference internal" href="../operators.html#_S_uniqueDocs" title="$uniqueDocs"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$uniqueDocs</span></tt></a> for
+more information on this option</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="fsync.html" title="Previous Section: fsync">&lt; &nbsp; fsync</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="geoSearch.html" title="Next Section: geoSearch">geoSearch &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

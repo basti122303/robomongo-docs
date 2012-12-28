@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Release Notes for MongoDB 2.2 &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/2.2" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Release Notes for MongoDB 2.0" href="2.0.html" />
+<link rel="prev" title="Glossary" href="../reference/glossary.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="release-notes-for-mongodb-2-2">
+<h1>Release Notes for MongoDB 2.2<a class="headerlink" href="#release-notes-for-mongodb-2-2" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="see-the-full-index-of-this-page-for-a-complete-list-of-changes-included-in-2-2">
+<p class="topic-title first">See the <a class="reference internal" href="2.2-changes.html"><em>full index of this page</em></a> for
+           a complete list of changes included in 2.2.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#upgrading" id="id2">Upgrading</a></li>
+<li><a class="reference internal" href="#changes" id="id3">Changes</a></li>
+<li><a class="reference internal" href="#licensing-changes" id="id4">Licensing Changes</a></li>
+<li><a class="reference internal" href="#resources" id="id5">Resources</a></li>
+</ul>
+</div>
+<div class="section" id="upgrading">
+<h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB 2.2 is a production release series and succeeds the 2.0
+production release series.</p>
+<p>MongoDB 2.0 data files are compatible with 2.2-series binaries without any
+special migration process. However, always perform the upgrade process for replica
+sets and sharded clusters using the procedures that follow.</p>
+<p>Always upgrade to the latest point release in the 2.2 point
+release. Currently the latest release of MongoDB is 2.2.2.</p>
+<div class="section" id="synopsis">
+<h3>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, 2.2 is a drop-in replacement for 2.0 and 1.8.</p>
+</li>
+<li><p class="first">Check your <a class="reference internal" href="../applications/drivers.html"><em>driver</em></a> documentation for
+information regarding required compatibility upgrades, and always
+run the recent release of your driver.</p>
+<p>Typically, only users running with authentication, will need to
+upgrade drivers before continuing with the upgrade to 2.2.</p>
+</li>
+<li><p class="first">For all deployments using authentication, upgrade the
+drivers (i.e. client libraries), before upgrading the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance or instances.</p>
+</li>
+<li><p class="first">For all upgrades of sharded clusters:</p>
+<ul class="simple">
+<li>turn off the balancer during the upgrade process. See the
+<a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the Balancer</em></a> section for more
+information.</li>
+<li>upgrade all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances before upgrading any
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances.</li>
+</ul>
+</li>
+</ul>
+<p>Other than the above restrictions, 2.2 processes can interoperate with
+2.0 and 1.8 tools and processes. You can safely upgrade the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> components of a deployment
+one by one while the deployment is otherwise operational.  Be sure to
+read the detailed upgrade procedures below before upgrading production
+systems.</p>
+<table class="docutils footnote" frame="void" id="secondaries-first" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>To minimize the interruption caused by
+<a class="reference internal" href="../core/replication.html#replica-set-elections"><em>election process</em></a>, always upgrade the
+secondaries of the set first, then <a class="reference internal" href="../reference/command/replSetStepDown.html#replSetStepDown" title="replSetStepDown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">step</span> <span class="pre">down</span></tt></a> the primary, and then upgrade the primary.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="upgrading-a-standalone-mongod">
+<span id="upgrade-standalone"></span><h3>Upgrading a Standalone <tt class="docutils literal"><span class="pre">mongod</span></tt><a class="headerlink" href="#upgrading-a-standalone-mongod" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download binaries of the latest release in the 2.2 series from the
+<a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+<li>Shutdown your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. Replace the existing
+binary with the 2.2 <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary and restart MongoDB.</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-replica-set">
+<span id="upgrade-replica-set"></span><h3>Upgrading a Replica Set<a class="headerlink" href="#upgrading-a-replica-set" title="Permalink to this headline">¶</a></h3>
+<p>You can upgrade to 2.2 by performing a &#8220;rolling&#8221;
+upgrade of the set by upgrading the members individually while the
+other members are available to minimize downtime. Use the following
+procedure:</p>
+<ol class="arabic">
+<li><p class="first">Upgrade the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of the set one at a time by
+shutting down the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and replacing the 2.0 binary
+with the 2.2 binary.  After upgrading a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance,
+wait for the member to recover to <tt class="docutils literal"><span class="pre">SECONDARY</span></tt> state
+before upgrading the next instance.
+To check the member&#8217;s state, issue <a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+<li><p class="first">Use the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell method <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> to
+step down the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> to allow the normal <a class="reference internal" href="../core/replication.html#replica-set-failover"><em>failover</em></a> procedure.  <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a>
+expedites the failover procedure and is preferable to shutting down
+the primary directly.</p>
+<p>Once the primary has stepped down and another member has assumed
+<tt class="docutils literal"><span class="pre">PRIMARY</span></tt> state, as observed in the output of
+<a class="reference internal" href="../reference/replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a>, shut down the previous primary and replace
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary with the 2.2 binary and start the new
+process.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Replica set failover is not instant but will
+render the set unavailable to read or accept writes
+until the failover process completes. Typically this takes
+10 seconds or more. You may wish to plan the upgrade during
+a predefined maintenance window.</p>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-sharded-cluster">
+<span id="upgrade-sharded-cluster"></span><span id="upgrade-shard-cluster"></span><h3>Upgrading a Sharded Cluster<a class="headerlink" href="#upgrading-a-sharded-cluster" title="Permalink to this headline">¶</a></h3>
+<p>Use the following procedure to upgrade a sharded cluster:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the balancer</em></a>.</li>
+<li>Upgrade all <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances <em>first</em>, in any order.</li>
+<li>Upgrade all of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> config server instances
+using the <a class="reference internal" href="#upgrade-standalone"><em>stand alone</em></a> procedure.
+To keep the cluster online, be that at all times at least one config
+server is up.</li>
+<li>Upgrade each shard&#8217;s replica set, using the <a class="reference internal" href="#upgrade-replica-set"><em>upgrade
+procedure for replica sets</em></a> detailed above.</li>
+<li>re-enable the balancer.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Balancing is not currently supported in <em>mixed</em> 2.0.x and 2.2.0
+deployments. Thus you will want to reach a consistent version for all
+shards within a reasonable period of time, e.g. same-day.
+See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6902">SERVER-6902</a> for more information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="major-features">
+<h3>Major Features<a class="headerlink" href="#major-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="aggregation-framework">
+<h4>Aggregation Framework<a class="headerlink" href="#aggregation-framework" title="Permalink to this headline">¶</a></h4>
+<p>The aggregation framework makes it possible to do aggregation
+operations without needing to use <a class="reference internal" href="../reference/glossary.html#term-map-reduce"><em class="xref std std-term">map-reduce</em></a>. The
+<a class="reference internal" href="../reference/commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> command exposes the aggregation framework, and the
+<a class="reference internal" href="../reference/method/db.collection.aggregate.html#db.collection.aggregate" title="db.collection.aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.aggregate()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+provides an interface to these operations. Consider the following
+resources for background on the aggregation framework and its use:</p>
+<ul class="simple">
+<li>Documentation: <a class="reference internal" href="../applications/aggregation.html"><em>Aggregation Framework</em></a></li>
+<li>Reference: <a class="reference internal" href="../reference/aggregation.html"><em>Aggregation Framework Reference</em></a></li>
+<li>Examples: <a class="reference internal" href="../tutorial/aggregation-examples.html"><em>Aggregation Framework Examples</em></a></li>
+</ul>
+</div>
+<div class="section" id="ttl-collections">
+<h4>TTL Collections<a class="headerlink" href="#ttl-collections" title="Permalink to this headline">¶</a></h4>
+<p>TTL collections remove expired data from a collection, using a special
+index and a background thread that deletes expired documents every
+minute. These collections are useful as an alternative to
+<a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped collections</em></a> in some cases, such as for data
+warehousing and caching cases, including: machine generated event data,
+logs, and session information that needs to persist in a database
+for only a limited period of time.</p>
+<p>For more information, see the <a class="reference internal" href="../tutorial/expire-data.html"><em>Expire Data from Collections by Setting TTL</em></a> tutorial.</p>
+</div>
+<div class="section" id="concurrency-improvements">
+<h4>Concurrency Improvements<a class="headerlink" href="#concurrency-improvements" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB 2.2 increases the server&#8217;s capacity for concurrent
+operations with the following improvements:</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4328">DB Level Locking</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3357">Improved Yielding on Page Faults</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4538">Improved Page Fault Detection on Windows</a></li>
+</ol>
+<p>To reflect these changes, MongoDB now provides changed and improved
+reporting for concurrency and use, see <a class="reference internal" href="../reference/server-status.html#locks"><em>locks</em></a> and
+<a class="reference internal" href="../reference/server-status.html#server-status-record-stats"><em>recordStats</em></a> in <a class="reference internal" href="../reference/server-status.html"><em>server status</em></a> and see <a class="reference internal" href="../reference/current-op.html"><em>current operation output</em></a>, <a class="reference internal" href="../reference/method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a>,
+<a class="reference internal" href="../reference/mongotop.html"><em>mongotop</em></a>, and <a class="reference internal" href="../reference/mongostat.html"><em>mongostat</em></a>.</p>
+</div>
+<div class="section" id="improved-data-center-awareness-with-tag-aware-sharding">
+<h4>Improved Data Center Awareness with Tag Aware Sharding<a class="headerlink" href="#improved-data-center-awareness-with-tag-aware-sharding" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB 2.2 adds additional support for geographic distribution or
+other custom partitioning for sharded collections in <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">clusters</em></a>. By using this &#8220;tag aware&#8221; sharding, you can
+automatically ensure that data in a sharded database system is always
+on specific shards. For example, with tag aware sharding, you can
+ensure that data is closest to the application servers that use that
+data most frequently.</p>
+<p>Shard tagging controls data location, and is complementary but
+separate from replica set tagging, which controls <a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>read
+preference</em></a> and <a class="reference internal" href="../core/write-operations.html#write-concern"><em>write concern</em></a>. For example, shard tagging can pin all
+&#8220;USA&#8221; data to one or more logical shards, while replica set tagging
+can control which <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances (e.g. &#8220;<tt class="docutils literal"><span class="pre">production</span></tt>&#8221;
+or &#8220;<tt class="docutils literal"><span class="pre">reporting</span></tt>&#8221;) the application uses to service requests.</p>
+<p>See the documentation for the following helpers in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell that support tagged sharding configuration:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/method/sh.addShardTag.html#sh.addShardTag" title="sh.addShardTag"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShardTag()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/sh.addTagRange.html#sh.addTagRange" title="sh.addTagRange"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addTagRange()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/sh.removeShardTag.html#sh.removeShardTag" title="sh.removeShardTag"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.removeShardTag()</span></tt></a></li>
+</ul>
+<p>Also, see the <a class="reference external" href="http://www.mongodb.org/display/DOCS/Tag+Aware+Sharding">wiki page for tag aware sharding</a>.</p>
+</div>
+<div class="section" id="fully-supported-read-preference-semantics">
+<h4>Fully Supported Read Preference Semantics<a class="headerlink" href="#fully-supported-read-preference-semantics" title="Permalink to this headline">¶</a></h4>
+<p>All MongoDB clients and drivers now support full <a class="reference internal" href="../applications/replication.html#replica-set-read-preference"><em>read
+preferences</em></a>, including consistent
+support for a full range of <a class="reference internal" href="../applications/replication.html#replica-set-read-preference-modes"><em>read preference modes</em></a> and <a class="reference internal" href="../applications/replication.html#replica-set-read-preference-tag-sets"><em>tag sets</em></a>. This support extends to the
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and applies identically to single replica sets and
+to the replica sets for each shard in a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+<p>Additional read preference support now exists in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell using the <a class="reference internal" href="../reference/method/cursor.readPref.html#cursor.readPref" title="cursor.readPref"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">readPref()</span></tt></a> cursor method.</p>
+</div>
+</div>
+<div class="section" id="compatibility-changes">
+<h3>Compatibility Changes<a class="headerlink" href="#compatibility-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="authentication-changes">
+<h4>Authentication Changes<a class="headerlink" href="#authentication-changes" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB 2.2 provides more reliable and robust support for
+authentication clients, including drivers and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instances.</p>
+<p>If your cluster runs with authentication:</p>
+<ul class="simple">
+<li>For all drivers, use the latest release of your driver and check
+its release notes.</li>
+<li>In sharded environments,
+to ensure that your cluster remains available during the upgrade
+process you <strong>must</strong> use the <a class="reference internal" href="#upgrade-shard-cluster"><em>upgrade procedure for sharded clusters</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="findandmodify-returns-null-value-for-upserts">
+<span id="findandmodify-returns-null"></span><h4><tt class="docutils literal"><span class="pre">findAndModify</span></tt> Returns Null Value for Upserts<a class="headerlink" href="#findandmodify-returns-null-value-for-upserts" title="Permalink to this headline">¶</a></h4>
+<p>In version 2.2, for <a class="reference internal" href="../reference/glossary.html#term-upsert"><em class="xref std std-term">upsert</em></a> operations, <a class="reference internal" href="../reference/commands.html#findAndModify" title="findAndModify"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">findAndModify</span></tt></a>
+commands will now return the following output:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span><span class="s1">&#39;ok&#39;</span><span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="o">:</span> <span class="kc">null</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, <a class="reference internal" href="../reference/commands.html#findAndModify" title="findAndModify"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">findAndModify</span></tt></a> operations
+running as upserts will only output a <tt class="docutils literal"><span class="pre">null</span></tt> value.</p>
+<p>Previously, in version 2.0 these operations would return an empty
+document, e.g. <tt class="docutils literal"><span class="pre">{</span> <span class="pre">}</span></tt>.</p>
+<p>See: <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6226">SERVER-6226</a> for more information.</p>
+</div>
+<div class="section" id="mongodump-output-can-only-restore-to-2-2-mongodb-instances">
+<h4><tt class="docutils literal"><span class="pre">mongodump</span></tt> Output can only Restore to 2.2 MongoDB Instances<a class="headerlink" href="#mongodump-output-can-only-restore-to-2-2-mongodb-instances" title="Permalink to this headline">¶</a></h4>
+<p>If you use the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> tool from the 2.2 distribution to
+create a dump of a database, you may only restore that dump to a 2.2
+database.</p>
+<p>See: <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6961">SERVER-6961</a> for more information.</p>
+</div>
+<div class="section" id="objectid-tostring-returns-string-literal-objectid">
+<span id="objectid-tostring-valueof-methods"></span><h4><tt class="docutils literal"><span class="pre">ObjectId().toString()</span></tt> Returns String Literal <tt class="docutils literal"><span class="pre">ObjectId(&quot;...&quot;)</span></tt><a class="headerlink" href="#objectid-tostring-returns-string-literal-objectid" title="Permalink to this headline">¶</a></h4>
+<p>In version 2.2, the <a class="reference internal" href="../reference/method/ObjectId.toString.html#ObjectId.toString" title="ObjectId.toString"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ObjectId.toString()</span></tt></a> method returns the
+string representation of the <a class="reference internal" href="../core/object-id.html#core-object-id-class"><em>ObjectId()</em></a>
+object and has the format <tt class="docutils literal"><span class="pre">ObjectId(&quot;...&quot;)</span></tt>.</p>
+<p>Consider the following example that calls the <a class="reference internal" href="../reference/method/ObjectId.toString.html#ObjectId.toString" title="ObjectId.toString"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">toString()</span></tt></a> method on the
+<tt class="docutils literal"><span class="pre">ObjectId(&quot;507c7f79bcf86cd7994f6c0e&quot;)</span></tt> object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507c7f79bcf86cd7994f6c0e&quot;</span><span class="p">).</span><span class="nx">toString</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The method now returns the <em>string</em>
+<tt class="docutils literal"><span class="pre">ObjectId(&quot;507c7f79bcf86cd7994f6c0e&quot;)</span></tt>.</p>
+<p>Previously, in version 2.0, the method would return the <em>hexadecimal
+string</em> <tt class="docutils literal"><span class="pre">507c7f79bcf86cd7994f6c0e</span></tt>.</p>
+<p>If compatibility between versions 2.0 and 2.2 is required, use
+<a class="reference internal" href="../core/object-id.html#core-object-id-class"><em>ObjectId().str</em></a>, which holds the
+hexadecimal string value in both versions.</p>
+</div>
+<div class="section" id="objectid-valueof-returns-hexadecimal-string">
+<h4><tt class="docutils literal"><span class="pre">ObjectId().valueOf()</span></tt> Returns hexadecimal string<a class="headerlink" href="#objectid-valueof-returns-hexadecimal-string" title="Permalink to this headline">¶</a></h4>
+<p>In version 2.2, the <a class="reference internal" href="../reference/method/ObjectId.valueOf.html#ObjectId.valueOf" title="ObjectId.valueOf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ObjectId.valueOf()</span></tt></a> method returns the
+value of the <a class="reference internal" href="../core/object-id.html#core-object-id-class"><em>ObjectId()</em></a> object as a
+lowercase hexadecimal string.</p>
+<p>Consider the following example that calls the <a class="reference internal" href="../reference/method/ObjectId.valueOf.html#ObjectId.valueOf" title="ObjectId.valueOf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">valueOf()</span></tt></a> method on the
+<tt class="docutils literal"><span class="pre">ObjectId(&quot;507c7f79bcf86cd7994f6c0e&quot;)</span></tt> object:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507c7f79bcf86cd7994f6c0e&quot;</span><span class="p">).</span><span class="nx">valueOf</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The method now returns the <em>hexadecimal string</em>
+<tt class="docutils literal"><span class="pre">507c7f79bcf86cd7994f6c0e</span></tt>.</p>
+<p>Previously, in version 2.0, the method would return the <em>object</em>
+<tt class="docutils literal"><span class="pre">ObjectId(&quot;507c7f79bcf86cd7994f6c0e&quot;)</span></tt>.</p>
+<p>If compatibility between versions 2.0 and 2.2 is required, use
+<a class="reference internal" href="../core/object-id.html#core-object-id-class"><em>ObjectId().str</em></a> attribute, which holds the
+hexadecimal string value in both versions.</p>
+</div>
+</div>
+<div class="section" id="behavioral-changes">
+<h3>Behavioral Changes<a class="headerlink" href="#behavioral-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="restrictions-on-collection-names">
+<span id="rn-2-2-collection-name-restriction"></span><h4>Restrictions on Collection Names<a class="headerlink" href="#restrictions-on-collection-names" title="Permalink to this headline">¶</a></h4>
+<p>In version 2.2, collection names cannot:</p>
+<ul class="simple">
+<li>contain the <tt class="docutils literal"><span class="pre">$</span></tt>.</li>
+<li>be an empty string (e.g. <tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>).</li>
+</ul>
+<p>This change does not affect collections created with now illegal names
+in earlier versions of MongoDB.</p>
+<p>These new restrictions are in addition to the existing restrictions on
+collection names which are:</p>
+<ul class="simple">
+<li>A collection name should begin with a letter or an underscore.</li>
+<li>A collection name cannot contain the null character.</li>
+<li>Begin with the <tt class="docutils literal"><span class="pre">system.</span></tt> prefix. MongoDB
+reserves <tt class="docutils literal"><span class="pre">system.</span></tt>
+for system collections, such as the
+<tt class="docutils literal"><span class="pre">system.indexes</span></tt> collection.</li>
+<li>The maximum size of a collection name is 128 characters, including
+the name of the database. However, for maximum flexibility,
+collections should have names less than 80 characters.</li>
+</ul>
+<p>Collections names may have any other valid UTF-8 string.</p>
+<p>See the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4442">SERVER-4442</a> and the
+<a class="reference internal" href="../faq/developers.html#faq-restrictions-on-collection-names"><em>Are there any restrictions on the names of Collections?</em></a> FAQ item.</p>
+</div>
+<div class="section" id="restrictions-on-database-names-for-windows">
+<span id="rn-2-2-database-name-restriction-windows"></span><h4>Restrictions on Database Names for Windows<a class="headerlink" href="#restrictions-on-database-names-for-windows" title="Permalink to this headline">¶</a></h4>
+<p>Database names running on Windows can no longer contain the following
+characters:</p>
+<div class="highlight-none"><div class="highlight"><pre>/\. &quot;*&lt;&gt;:|?
+</pre></div>
+</div>
+<p>The names of the data files include the database name. If you attempt
+to upgrade a database instance with one or more of these characters,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will refuse to start.</p>
+<p>Change the name of these databases before upgrading. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4584">SERVER-4584</a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6729">SERVER-6729</a> for more information.</p>
+</div>
+<div class="section" id="id-indexes-capped-collections">
+<span id="id-fields-and-indexes-on-capped-collections"></span><h4><tt class="docutils literal"><span class="pre">_id</span></tt> Fields and Indexes on Capped Collections<a class="headerlink" href="#id-indexes-capped-collections" title="Permalink to this headline">¶</a></h4>
+<p>All <a class="reference internal" href="../reference/glossary.html#term-capped-collection"><em class="xref std std-term">capped collections</em></a> now have an <tt class="docutils literal"><span class="pre">_id</span></tt>
+field by default, <em>if</em> they exist outside of the <tt class="docutils literal"><span class="pre">local</span></tt> database,
+and now have indexes on the <tt class="docutils literal"><span class="pre">_id</span></tt> field. This change only affects capped
+collections created with 2.2 instances and does not affect existing
+capped collections.</p>
+<p>See: <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-5516">SERVER-5516</a> for more information.</p>
+</div>
+<div class="section" id="new-elemmatch-projection-operator">
+<h4>New <tt class="docutils literal"><span class="pre">$elemMatch</span></tt> Projection Operator<a class="headerlink" href="#new-elemmatch-projection-operator" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference internal" href="../reference/projection/elemMatch.html#_S_elemMatch" title="$elemMatch"><tt class="xref mongodb mongodb-projection docutils literal"><span class="pre">$elemMatch</span></tt></a> operator allows applications to narrow
+the data returned from queries so that the query operation will only
+return the first matching element in an array. See the
+<a class="reference internal" href="../reference/projection/elemMatch.html"><em>$elemMatch (projection)</em></a> documentation and the
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2238">SERVER-2238</a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-828">SERVER-828</a> issues for more
+information.</p>
+</div>
+</div>
+<div class="section" id="windows-specific-changes">
+<h3>Windows Specific Changes<a class="headerlink" href="#windows-specific-changes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="windows-xp-is-not-supported">
+<h4>Windows XP is Not Supported<a class="headerlink" href="#windows-xp-is-not-supported" title="Permalink to this headline">¶</a></h4>
+<p>As of 2.2, MongoDB does not support Windows XP. Please upgrade to a
+more recent version of Windows to use the latest releases of
+MongoDB. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-5648">SERVER-5648</a> for more information.</p>
+</div>
+<div class="section" id="service-support-for-mongos-exe">
+<h4>Service Support for <tt class="docutils literal"><span class="pre">mongos.exe</span></tt><a class="headerlink" href="#service-support-for-mongos-exe" title="Permalink to this headline">¶</a></h4>
+<p>You may now run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> instances as a Windows
+Service. See the <a class="reference internal" href="../reference/mongos.exe.html"><em>mongos.exe</em></a> reference and
+<a class="reference internal" href="../tutorial/install-mongodb-on-windows.html#tutorial-mongod-as-windows-service"><em>MongoDB as a Windows Service</em></a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-1589">SERVER-1589</a> for
+more information.</p>
+</div>
+<div class="section" id="log-rotate-command-support">
+<h4>Log Rotate Command Support<a class="headerlink" href="#log-rotate-command-support" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB for Windows now supports log rotation by way of the
+<a class="reference internal" href="../reference/commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> database command. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2612">SERVER-2612</a> for
+more information.</p>
+</div>
+<div class="section" id="new-build-using-slimreadwrite-locks-for-windows-concurrency">
+<h4>New Build Using SlimReadWrite Locks for Windows Concurrency<a class="headerlink" href="#new-build-using-slimreadwrite-locks-for-windows-concurrency" title="Permalink to this headline">¶</a></h4>
+<p>Labeled &#8220;2008+&#8221; on the <a class="reference external" href="http://www.mongodb.org/downloads">Downloads Page</a>, this build for 64-bit
+versions of Windows Server 2008 R2 and for Windows 7 or newer, offers
+increased performance over the standard 64-bit Windows build of
+MongoDB. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3844">SERVER-3844</a> for more information.</p>
+</div>
+</div>
+<div class="section" id="tool-improvements">
+<h3>Tool Improvements<a class="headerlink" href="#tool-improvements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="index-definitions-handled-by-mongodump-and-mongorestore">
+<h4>Index Definitions Handled by <tt class="docutils literal"><span class="pre">mongodump</span></tt> and <tt class="docutils literal"><span class="pre">mongorestore</span></tt><a class="headerlink" href="#index-definitions-handled-by-mongodump-and-mongorestore" title="Permalink to this headline">¶</a></h4>
+<p>When you specify the <a class="reference internal" href="../reference/mongodump.html#cmdoption-mongodump--collection"><em class="xref std std-option">--collection</em></a>
+option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> will now backup
+the definitions for all indexes that exist on the source
+database. When you attempt to restore this backup with
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, the target <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will rebuild all
+indexes. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-808">SERVER-808</a> for more information.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> now includes the <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--noIndexRestore"><em class="xref std std-option">--noIndexRestore</em></a> option to provide the preceding
+behavior. Use <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--noIndexRestore"><em class="xref std std-option">--noIndexRestore</em></a>
+to prevent <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> from building
+previous indexes.</p>
+</div>
+<div class="section" id="mongooplog-for-replaying-oplogs">
+<h4><tt class="docutils literal"><span class="pre">mongooplog</span></tt> for Replaying Oplogs<a class="headerlink" href="#mongooplog-for-replaying-oplogs" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> tool makes it possible to pull <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>
+entries from <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance and apply them to another
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. You can use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> to
+achieve point-in-time backup of a MongoDB data set. See the
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3873">SERVER-3873</a> case and the <a class="reference internal" href="../reference/mongooplog.html"><em>mongooplog</em></a>
+documentation.</p>
+</div>
+<div class="section" id="authentication-support-for-mongotop-and-mongostat">
+<h4>Authentication Support for <tt class="docutils literal"><span class="pre">mongotop</span></tt> and <tt class="docutils literal"><span class="pre">mongostat</span></tt><a class="headerlink" href="#authentication-support-for-mongotop-and-mongostat" title="Permalink to this headline">¶</a></h4>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> now contain support for
+username/password authentication. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3875">SERVER-3875</a> and
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3871">SERVER-3871</a> for more information regarding this change. Also
+consider the documentation of the following options for additional
+information:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/mongotop.html#cmdoption-mongotop--username"><em class="xref std std-option">mongotop --username</em></a></li>
+<li><a class="reference internal" href="../reference/mongotop.html#cmdoption-mongotop--password"><em class="xref std std-option">mongotop --password</em></a></li>
+<li><a class="reference internal" href="../reference/mongostat.html#cmdoption-mongostat--username"><em class="xref std std-option">mongostat --username</em></a></li>
+<li><a class="reference internal" href="../reference/mongostat.html#cmdoption-mongostat--password"><em class="xref std std-option">mongostat --password</em></a></li>
+</ul>
+</div>
+<div class="section" id="write-concern-support-for-mongoimport-and-mongorestore">
+<h4>Write Concern Support for <tt class="docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="docutils literal"><span class="pre">mongorestore</span></tt><a class="headerlink" href="#write-concern-support-for-mongoimport-and-mongorestore" title="Permalink to this headline">¶</a></h4>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> now provides an option to halt the import if
+the operation encounters an error, such as a network interruption, a
+duplicate key exception, or a write error.
+The <a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--stopOnError"><em class="xref std std-option">--stopOnError</em></a> option
+will
+produce an error rather than silently continue importing data. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3937">SERVER-3937</a> for more information.</p>
+<p>In <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, the <a class="reference internal" href="../reference/mongorestore.html#cmdoption-mongorestore--w"><em class="xref std std-option">--w</em></a>
+option provides support for configurable write concern.</p>
+</div>
+<div class="section" id="mongodump-support-for-reading-from-secondaries">
+<h4><tt class="docutils literal"><span class="pre">mongodump</span></tt> Support for Reading from Secondaries<a class="headerlink" href="#mongodump-support-for-reading-from-secondaries" title="Permalink to this headline">¶</a></h4>
+<p>You can now run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> when connected to a
+<a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> member of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3854">SERVER-3854</a> for more information.</p>
+</div>
+<div class="section" id="mongoimport-support-for-full-16mb-documents">
+<h4><tt class="docutils literal"><span class="pre">mongoimport</span></tt> Support for full 16MB Documents<a class="headerlink" href="#mongoimport-support-for-full-16mb-documents" title="Permalink to this headline">¶</a></h4>
+<p>Previously, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> would only import documents that
+were less than 4 megabytes in size. This issue is now corrected, and
+you may use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> to import documents that are at
+least 16 megabytes ins size. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4593">SERVER-4593</a> for more
+information.</p>
+</div>
+<div class="section" id="timestamp-extended-json-format">
+<h4><tt class="docutils literal"><span class="pre">Timestamp()</span></tt> Extended JSON format<a class="headerlink" href="#timestamp-extended-json-format" title="Permalink to this headline">¶</a></h4>
+<p>MongoDB extended JSON now includes a new <tt class="docutils literal"><span class="pre">Timestamp()</span></tt> type to
+represent the Timestamp type that MongoDB uses for timestamps in the
+<a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> among other contexts.</p>
+<p>This permits tools like <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>
+to query for specific timestamps. Consider the following
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> operation:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongodump --db <span class="nb">local</span> --collection oplog.rs --query <span class="s1">&#39;{&quot;ts&quot;:{&quot;$gt&quot;:{&quot;$timestamp&quot; : {&quot;t&quot;: 1344969612000, &quot;i&quot;: 1 }}}}&#39;</span>  --out oplog-dump
+</pre></div>
+</div>
+<p>See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3483">SERVER-3483</a> for more information.</p>
+</div>
+</div>
+<div class="section" id="shell-improvements">
+<h3>Shell Improvements<a class="headerlink" href="#shell-improvements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="improved-shell-user-interface">
+<h4>Improved Shell User Interface<a class="headerlink" href="#improved-shell-user-interface" title="Permalink to this headline">¶</a></h4>
+<p>2.2 includes a number of changes that improve the overall quality and
+consistency of the user interface for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<ul class="simple">
+<li>Full Unicode support.</li>
+<li>Bash-like line editing features. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4312">SERVER-4312</a> for more
+information.</li>
+<li>Multi-line command support in shell history.
+See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3470">SERVER-3470</a> for more information.</li>
+<li>Windows support for the <tt class="docutils literal"><span class="pre">edit</span></tt> command. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3998">SERVER-3998</a> for
+more information.</li>
+</ul>
+</div>
+<div class="section" id="helper-to-load-server-side-functions">
+<h4>Helper to load Server-Side Functions<a class="headerlink" href="#helper-to-load-server-side-functions" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference internal" href="../reference/method/db.loadServerScripts.html#db.loadServerScripts" title="db.loadServerScripts"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.loadServerScripts()</span></tt></a> loads the contents of the current
+database&#8217;s <tt class="docutils literal"><span class="pre">system.js</span></tt> collection into the current <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell session. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-1651">SERVER-1651</a> for more information.</p>
+</div>
+<div class="section" id="support-for-bulk-inserts">
+<h4>Support for Bulk Inserts<a class="headerlink" href="#support-for-bulk-inserts" title="Permalink to this headline">¶</a></h4>
+<p>If you pass an array of <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> to the
+<a class="reference internal" href="../reference/method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">insert()</span></tt></a> method, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell will now perform a bulk insert operation. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3819">SERVER-3819</a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2395">SERVER-2395</a> for more information.</p>
+</div>
+</div>
+<div class="section" id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="support-for-logging-to-syslog">
+<h4>Support for Logging to Syslog<a class="headerlink" href="#support-for-logging-to-syslog" title="Permalink to this headline">¶</a></h4>
+<p>See the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2957">SERVER-2957</a> case and the documentation of
+the <a class="reference internal" href="../reference/configuration-options.html#syslog" title="syslog"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">syslog</span></tt></a> run-time option or the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--syslog"><em class="xref std std-option">mongod --syslog</em></a>
+and <a class="reference internal" href="../reference/mongos.html#cmdoption-mongos--syslog"><em class="xref std std-option">mongos --syslog</em></a> command line-options.</p>
+</div>
+<div class="section" id="touch-command">
+<h4><tt class="docutils literal"><span class="pre">touch</span></tt> Command<a class="headerlink" href="#touch-command" title="Permalink to this headline">¶</a></h4>
+<p>Added the <a class="reference internal" href="../reference/commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> command to read the data and/or indexes
+from a collection into memory. See: <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2023">SERVER-2023</a> and
+<a class="reference internal" href="../reference/commands.html#touch" title="touch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">touch</span></tt></a> for more information.</p>
+</div>
+<div class="section" id="indexcounters-no-longer-report-sampled-data">
+<h4><tt class="docutils literal"><span class="pre">indexCounters</span></tt> No Longer Report Sampled Data<a class="headerlink" href="#indexcounters-no-longer-report-sampled-data" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference internal" href="../reference/server-status.html#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> now report actual counters that reflect index
+use and state. In previous versions, these data were sampled. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-5784">SERVER-5784</a> and <a class="reference internal" href="../reference/server-status.html#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> for more information.</p>
+</div>
+<div class="section" id="padding-specifiable-on-compact-command">
+<h4>Padding Specifiable on <tt class="docutils literal"><span class="pre">compact</span></tt> Command<a class="headerlink" href="#padding-specifiable-on-compact-command" title="Permalink to this headline">¶</a></h4>
+<p>See the documentation of the <a class="reference internal" href="../reference/commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> and the
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4018">SERVER-4018</a> issue for more information.</p>
+</div>
+<div class="section" id="added-build-flag-to-use-system-libraries">
+<h4>Added Build Flag to Use System Libraries<a class="headerlink" href="#added-build-flag-to-use-system-libraries" title="Permalink to this headline">¶</a></h4>
+<p>The Boost library, version 1.49, is now embedded in the MongoDB
+code base.</p>
+<p>If you want to build MongoDB binaries using system Boost libraries,
+you can pass <tt class="docutils literal"><span class="pre">scons</span></tt> using the <tt class="docutils literal"><span class="pre">--use-system-boost</span></tt> flag, as follows:</p>
+<div class="highlight-sh"><div class="highlight"><pre>scons --use-system-boost
+</pre></div>
+</div>
+<p>When building MongoDB, you can also pass <tt class="docutils literal"><span class="pre">scons</span></tt> a flag to compile
+MongoDB using only system libraries rather than the included versions
+of the libraries. For example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>scons --use-system-all
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3829">SERVER-3829</a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-5172">SERVER-5172</a> issues for more
+information.</p>
+</div>
+<div class="section" id="memory-allocator-changed-to-tcmalloc">
+<h4>Memory Allocator Changed to TCMalloc<a class="headerlink" href="#memory-allocator-changed-to-tcmalloc" title="Permalink to this headline">¶</a></h4>
+<p>To improve performance, MongoDB 2.2 uses the TCMalloc memory
+allocator from Google Perftools. For more information about this
+change see the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-188">SERVER-188</a> and <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4683">SERVER-4683</a>. For more
+information about TCMalloc, see the documentation of <a class="reference external" href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">TCMalloc</a> itself.</p>
+</div>
+</div>
+<div class="section" id="replication">
+<h3>Replication<a class="headerlink" href="#replication" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="improved-logging-for-replica-set-lag">
+<h4>Improved Logging for Replica Set Lag<a class="headerlink" href="#improved-logging-for-replica-set-lag" title="Permalink to this headline">¶</a></h4>
+<p>When <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of a replica set fall behind in
+replication, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> now provides better reporting in the
+log. This makes it possible to track replication in general and
+identify what process may produce errors or halt replication. See
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3575">SERVER-3575</a> for more information.</p>
+</div>
+<div class="section" id="replica-set-members-can-sync-from-specific-members">
+<h4>Replica Set Members can Sync from Specific Members<a class="headerlink" href="#replica-set-members-can-sync-from-specific-members" title="Permalink to this headline">¶</a></h4>
+<p>The new <a class="reference internal" href="../reference/replica-commands.html#replSetSyncFrom" title="replSetSyncFrom"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetSyncFrom</span></tt></a> command and new
+<a class="reference internal" href="../reference/replica-commands.html#rs.syncFrom" title="rs.syncFrom"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.syncFrom()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell make it
+possible for you to manually configure from which member of the set a
+replica will poll <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries. Use these commands to
+override the default selection logic if needed. Always exercise
+caution with <a class="reference internal" href="../reference/replica-commands.html#replSetSyncFrom" title="replSetSyncFrom"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetSyncFrom</span></tt></a> when overriding the default
+behavior.</p>
+</div>
+<div class="section" id="replica-set-members-will-not-sync-from-members-without-indexes-unless-buildindexes-false">
+<h4>Replica Set Members will not Sync from Members Without Indexes Unless <tt class="docutils literal"><span class="pre">buildIndexes:</span> <span class="pre">false</span></tt><a class="headerlink" href="#replica-set-members-will-not-sync-from-members-without-indexes-unless-buildindexes-false" title="Permalink to this headline">¶</a></h4>
+<p>To prevent inconsistency between members of replica sets, if the
+member of a replica set has <a class="reference internal" href="../reference/replica-configuration.html#members[n].buildIndexes" title="members[n].buildIndexes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].buildIndexes</span></tt></a> set to
+<tt class="docutils literal"><span class="pre">true</span></tt>, other members of the replica set will <em>not</em> sync from this
+member, unless they also have <a class="reference internal" href="../reference/replica-configuration.html#members[n].buildIndexes" title="members[n].buildIndexes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].buildIndexes</span></tt></a> set to
+<tt class="docutils literal"><span class="pre">true</span></tt>. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4160">SERVER-4160</a> for more information.</p>
+</div>
+<div class="section" id="new-option-to-configure-index-pre-fetching-during-replication">
+<h4>New Option To Configure Index Pre-Fetching during Replication<a class="headerlink" href="#new-option-to-configure-index-pre-fetching-during-replication" title="Permalink to this headline">¶</a></h4>
+<p>By default, when replicating options, <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondaries</em></a>
+will pre-fetch <a class="reference internal" href="../indexes.html#indexes"><em>Indexes</em></a> associated with a query to improve replication
+throughput in most cases. The <a class="reference internal" href="../reference/configuration-options.html#replIndexPrefetch" title="replIndexPrefetch"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replIndexPrefetch</span></tt></a> setting and
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replIndexPrefetch"><em class="xref std std-option">--replIndexPrefetch</em></a> option allow administrators to disable
+this feature or allow the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> to pre-fetch only the
+index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6718">SERVER-6718</a> for more information.</p>
+</div>
+</div>
+<div class="section" id="map-reduce-improvements">
+<h3>Map Reduce Improvements<a class="headerlink" href="#map-reduce-improvements" title="Permalink to this headline">¶</a></h3>
+<p>In 2.2 Map Reduce received the following improvements:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4521">Improved support for sharded MapReduce</a>, and</li>
+<li><a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4158">MapReduce will retry jobs following a config error</a>.</li>
+</ul>
+</div>
+<div class="section" id="sharding-improvements">
+<h3>Sharding Improvements<a class="headerlink" href="#sharding-improvements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="index-on-shard-keys-can-now-be-a-compound-index">
+<h4>Index on Shard Keys Can Now Be a Compound Index<a class="headerlink" href="#index-on-shard-keys-can-now-be-a-compound-index" title="Permalink to this headline">¶</a></h4>
+<p>If your shard key uses the prefix of an existing index, then you do not
+need to maintain a separate index for your shard key in addition to
+your existing index. This index, however, cannot be a multi-key
+index. See the &#8220;<a class="reference internal" href="../core/sharding-internals.html#sharding-shard-key-indexes"><em>Shard Key Indexes</em></a>&#8221; documentation and
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-1506">SERVER-1506</a> for more information.</p>
+</div>
+<div class="section" id="migration-thresholds-modified">
+<h4>Migration Thresholds Modified<a class="headerlink" href="#migration-thresholds-modified" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference internal" href="../core/sharding-internals.html#sharding-migration-thresholds"><em>migration thresholds</em></a> have
+changed in 2.2 to permit more even distribution of <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> in collections that have smaller quantities of data. See the
+<a class="reference internal" href="../core/sharding-internals.html#sharding-migration-thresholds"><em>Migration Thresholds</em></a> documentation for more
+information.</p>
+</div>
+</div>
+</div>
+<div class="section" id="licensing-changes">
+<h2>Licensing Changes<a class="headerlink" href="#licensing-changes" title="Permalink to this headline">¶</a></h2>
+<p>Added License notice for Google Perftools (TCMalloc Utility). See the
+<a class="reference external" href="https://github.com/mongodb/mongo/blob/v2.2/distsrc/THIRD-PARTY-NOTICES#L231">License Notice</a>
+and the <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4683">SERVER-4683</a> for more information.</p>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://mongodb.org/downloads">MongoDB Downloads</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+SERVER+AND+fixVersion+in+%28%222.1.0%22%2C+%222.1.1%22%2C+%222.1.2%22%2C+%222.2.0-rc0%22%2C+%222.2.0-rc1%22%2C+%222.2.0-rc2%22%29+ORDER+BY+component+ASC%2C+key+DESC">All JIRA Issues resolved in 2.2</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/secure/IssueNavigator.jspa?requestId=11225">All Backwards Incompatible Changes</a></li>
+<li><a class="reference external" href="https://github.com/mongodb/mongo/blob/v2.2/distsrc/THIRD-PARTY-NOTICES">All Third Party License Notices</a></li>
+</ul>
+<div class="section" id="what-s-new-in-mongodb-2-2-online-conference">
+<h3>What&#8217;s New in MongoDB 2.2 Online Conference<a class="headerlink" href="#what-s-new-in-mongodb-2-2-online-conference" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/whats-new-mongodb-2-dot-2-introduction">Introduction and Welcome</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/what's-new-mongodb-2-dot-2-aggregation">The Aggregation Framework</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/what's-new-mongodb-2-dot-2-concurrency">Concurrency</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/what's-new-mongodb-2-dot-2-data">Data Center Awareness</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/what's-new-mongodb-2-dot-2-ttl">TTL Collections</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/webinar/what's-new-mongodb-2-dot-2-closing">Closing Remarks and Q&amp;A</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../reference/glossary.html" title="Previous Section: Glossary">&lt; &nbsp; Glossary</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="2.0.html" title="Next Section: Release Notes for MongoDB 2.0">Release Notes for MongoDB 2.0 &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

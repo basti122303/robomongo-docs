@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>setParameter &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/setParameter" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="setShardVersion" href="setShardVersion.html" />
+<link rel="prev" title="serverStatus" href="serverStatus.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="setparameter">
+<h1>setParameter<a class="headerlink" href="#setparameter" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="setParameter">
+<tt class="descname">setParameter</tt><a class="headerlink" href="#setParameter" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../commands.html#setParameter" title="setParameter"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">setParameter</span></tt></a> is an administrative command for
+modifying options normally set on the command line. You must issue
+the <a class="reference internal" href="../commands.html#setParameter" title="setParameter"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">setParameter</span></tt></a> command against the <a class="reference internal" href="../glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>
+in the form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">option</span><span class="o">&gt;:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Replace the <tt class="docutils literal"><span class="pre">&lt;option&gt;</span></tt> with one of the following options
+supported by this command:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Options:</th><td class="field-body"><ul class="first last simple">
+<li><strong>journalCommitInterval</strong> (<em>integer</em>) &#8211; <p>Specify an integer between <tt class="docutils literal"><span class="pre">1</span></tt> and <tt class="docutils literal"><span class="pre">500</span></tt> signifying the number
+of milliseconds (ms) between journal commits.</p>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">journalCommitInterval</span></tt> to <tt class="docutils literal"><span class="pre">200</span></tt> ms:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">journalCommitInterval</span><span class="o">:</span> <span class="mi">200</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#journalCommitInterval" title="journalCommitInterval"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journalCommitInterval</span></tt></a>.</p>
+</div>
+</li>
+<li><strong>logLevel</strong> (<em>integer</em>) &#8211; <p>Specify an integer between <tt class="docutils literal"><span class="pre">0</span></tt> and <tt class="docutils literal"><span class="pre">5</span></tt> signifying the
+verbosity of the logging, where <tt class="docutils literal"><span class="pre">5</span></tt> is the most verbose.</p>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">logLevel</span></tt> to <tt class="docutils literal"><span class="pre">2</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">logLevel</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#verbose" title="verbose"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">verbose</span></tt></a>.</p>
+</div>
+</li>
+<li><strong>notablescan</strong> (<em>boolean</em>) &#8211; <p>Specify whether queries must use indexes. If <tt class="docutils literal"><span class="pre">true</span></tt>,
+queries that perform a table scan instead of using an index
+will fail.</p>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">notablescan</span></tt> to true:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">notablescan</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#notablescan" title="notablescan"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">notablescan</span></tt></a>.</p>
+</div>
+</li>
+<li><strong>traceExceptions</strong> (<em>boolean</em>) &#8211; <p class="versionadded">
+<span class="versionmodified">New in version 2.1.</span></p>
+<p>Configures <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> log full stack traces on assertions or
+errors. If <tt class="docutils literal"><span class="pre">true</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will log full stack
+traces on assertions or errors.</p>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">traceExceptions</span></tt> to true:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">traceExceptions</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#traceExceptions" title="traceExceptions"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">traceExceptions</span></tt></a>.</p>
+</div>
+</li>
+<li><strong>quiet</strong> (<em>boolean</em>) &#8211; <p>Sets quiet logging mode. If
+<tt class="docutils literal"><span class="pre">true</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will go into a quiet logging
+mode which will not log the following events/activities:</p>
+<blockquote>
+<div><ul>
+<li>connection events;</li>
+<li>the <a class="reference internal" href="../commands.html#drop" title="drop"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">drop</span></tt></a> command, the
+<a class="reference internal" href="../commands.html#dropIndexes" title="dropIndexes"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">dropIndexes</span></tt></a> command, the
+<a class="reference internal" href="../commands.html#diagLogging" title="diagLogging"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">diagLogging</span></tt></a> command, the
+<a class="reference internal" href="../commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a> command, and the
+<a class="reference internal" href="../commands.html#clean" title="clean"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clean</span></tt></a> command; and</li>
+<li>replication synchronization activities.</li>
+</ul>
+</div></blockquote>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">quiet</span></tt> to true:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">quiet</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#quiet" title="quiet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">quiet</span></tt></a>.</p>
+</div>
+</li>
+<li><strong>syncdelay</strong> (<em>integer</em>) &#8211; <p>Specify the interval in seconds between <a class="reference internal" href="../glossary.html#term-fsync"><em class="xref std std-term">fsyncs</em></a> (i.e., flushes of memory to disk). By default,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will flush memory to disk every 60
+seconds. Do not change this value unless you see a
+background flush average greater than 60 seconds.</p>
+<p>Consider the following example which sets the
+<tt class="docutils literal"><span class="pre">syncdelay</span></tt> to <tt class="docutils literal"><span class="pre">60</span></tt> seconds:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">setParameter</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">syncdelay</span><span class="o">:</span> <span class="mi">60</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../configuration-options.html#syncdelay" title="syncdelay"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">syncdelay</span></tt></a>.</p>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="serverStatus.html" title="Previous Section: serverStatus">&lt; &nbsp; serverStatus</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="setShardVersion.html" title="Next Section: setShardVersion">setShardVersion &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

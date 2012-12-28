@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>GridFS &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/gridfs" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="ObjectId" href="../core/object-id.html" />
+<link rel="prev" title="Server-side JavaScript" href="server-side-javascript.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="gridfs">
+<span id="index-0"></span><h1>GridFS<a class="headerlink" href="#gridfs" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> is a specification for storing and retrieving files
+that exceed the <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a>-document <a class="reference internal" href="../reference/limits.html#limit-bson-document-size"><em>size limit</em></a> of 16MB.</p>
+<p>Instead of storing a file in an single document, GridFS divides a file
+into parts, or chunks, <a class="footnote-reference" href="#chunk-disambiguation" id="id1">[1]</a> and stores each of
+those chunks as a separate document. By default GridFS limits chunk
+size to 256k. GridFS uses two collections to store files. One
+collection stores the file chunks, and the other stores file metadata.</p>
+<p>When you query a GridFS store for a file, the driver or client will
+reassemble the chunks as needed. You can perform range queries on
+files stored through GridFS.  You also can access information from
+arbitrate sections of files, which allows you to &#8220;skip&#8221; into the
+middle of a video of audio file.</p>
+<p>GridFS is useful not only for storing files that exceed 16MB but also
+for storing any files for which you want access without having to load
+the entire file into memory. For more information on the indications
+of GridFS, see <a class="reference internal" href="../faq/developers.html#faq-developers-when-to-use-gridfs"><em>When should I use GridFS?</em></a>.</p>
+<table class="docutils footnote" frame="void" id="chunk-disambiguation" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The use of the term <em>chunks</em> in the context
+of GridFS is not related to the use of the term <em>chunks</em> in
+the context of sharding.</td></tr>
+</tbody>
+</table>
+<div class="section" id="implement-gridfs">
+<span id="gridfs-implement"></span><span id="index-1"></span><h2>Implement GridFS<a class="headerlink" href="#implement-gridfs" title="Permalink to this headline">¶</a></h2>
+<p>To store and retrieve files using <a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a>, use either of the following:</p>
+<ul class="simple">
+<li>A MongoDB driver. See the <a class="reference internal" href="drivers.html"><em>drivers</em></a>
+documentation for information on using GridFS with your driver.</li>
+<li>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> command-line tool in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell. See <a class="reference internal" href="../reference/mongofiles.html"><em>mongofiles</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="gridfs-collections">
+<span id="index-2"></span><span id="id2"></span><h2>GridFS Collections<a class="headerlink" href="#gridfs-collections" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> stores files in two collections:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">chunks</span></tt> stores the binary chunks. For details, see
+<a class="reference internal" href="#gridfs-chunks-collection"><em>The chunks Collection</em></a>.</li>
+<li><tt class="docutils literal"><span class="pre">files</span></tt> stores the file&#8217;s metadata. For details, see
+<a class="reference internal" href="#gridfs-files-collection"><em>The files Collection</em></a>.</li>
+</ul>
+<p>GridFS places the collections in a common bucket by prefixing each
+with the bucket name. By default, GridFS uses two collections with
+names prefixed by <tt class="docutils literal"><span class="pre">fs</span></tt> bucket:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">fs.files</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fs.chunks</span></tt></li>
+</ul>
+<p>You can choose a different bucket name than <tt class="docutils literal"><span class="pre">fs</span></tt>, and create
+multiple buckets in a single database.</p>
+<div class="section" id="the-chunks-collection">
+<span id="gridfs-chunks-collection"></span><span id="index-3"></span><h3>The <tt class="docutils literal"><span class="pre">chunks</span></tt> Collection<a class="headerlink" href="#the-chunks-collection" title="Permalink to this headline">¶</a></h3>
+<p>Each document in the <tt class="docutils literal"><span class="pre">chunks</span></tt> collection represents a distinct chunk
+of a file as represented in the <a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> store. The following is a
+prototype document from the <tt class="docutils literal"><span class="pre">chunks</span></tt> collection.:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;files_id&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;data&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">binary</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A document from the <tt class="docutils literal"><span class="pre">chunks</span></tt> collection contains the following fields:</p>
+<dl class="data">
+<dt id="chunks._id">
+<tt class="descclassname">chunks.</tt><tt class="descname">_id</tt><a class="headerlink" href="#chunks._id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unique <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectID</em></a> of the chunk.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="chunks.files_id">
+<tt class="descclassname">chunks.</tt><tt class="descname">files_id</tt><a class="headerlink" href="#chunks.files_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">_id</span></tt> of the &#8220;parent&#8221; document, as specified in the <tt class="docutils literal"><span class="pre">files</span></tt>
+collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="chunks.n">
+<tt class="descclassname">chunks.</tt><tt class="descname">n</tt><a class="headerlink" href="#chunks.n" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sequence number of the chunk. GridFS numbers all chunks,
+starting with 0.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="chunks.data">
+<tt class="descclassname">chunks.</tt><tt class="descname">data</tt><a class="headerlink" href="#chunks.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The chunk&#8217;s payload as a <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> binary type.</p>
+</dd></dl>
+
+<p>The <tt class="docutils literal"><span class="pre">chunks</span></tt> collection uses a <a class="reference internal" href="../reference/glossary.html#term-compound-index"><em class="xref std std-term">compound index</em></a> on
+<tt class="docutils literal"><span class="pre">files_id</span></tt> and <tt class="docutils literal"><span class="pre">n</span></tt>, as described in <a class="reference internal" href="#gridfs-index"><em>GridFS Index</em></a>.</p>
+</div>
+<div class="section" id="the-files-collection">
+<span id="gridfs-files-collection"></span><span id="index-4"></span><h3>The <tt class="docutils literal"><span class="pre">files</span></tt> Collection<a class="headerlink" href="#the-files-collection" title="Permalink to this headline">¶</a></h3>
+<p>Each document in the <tt class="docutils literal"><span class="pre">files</span></tt> collection represents a file in the
+term:<cite>GridFS</cite> store. Consider the following prototype of a document in
+the <tt class="docutils literal"><span class="pre">files</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">ObjectID</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;length&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;chunkSize&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+  <span class="s2">&quot;uploadDate&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">timestamp</span><span class="o">&gt;</span>
+  <span class="s2">&quot;md5&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">hash</span><span class="o">&gt;</span>
+
+  <span class="s2">&quot;filename&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;contentType&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">string</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;aliases&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">string</span> <span class="nx">array</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;metadata&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">dataObject</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Documents in the <tt class="docutils literal"><span class="pre">files</span></tt> collection contain some or all of the
+following fields. Applications may create additional arbitrary fields:</p>
+<dl class="data">
+<dt id="files._id">
+<tt class="descclassname">files.</tt><tt class="descname">_id</tt><a class="headerlink" href="#files._id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unique ID for this document. The <tt class="docutils literal"><span class="pre">_id</span></tt> is of the data type you
+chose for the original document. The default type for MongoDB
+documents is <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> <a class="reference internal" href="../reference/glossary.html#term-objectid"><em class="xref std std-term">ObjectID</em></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.length">
+<tt class="descclassname">files.</tt><tt class="descname">length</tt><a class="headerlink" href="#files.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the document in bytes.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.chunkSize">
+<tt class="descclassname">files.</tt><tt class="descname">chunkSize</tt><a class="headerlink" href="#files.chunkSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of each chunk. GridFS divides the document into chunks of
+the size specified here. The default size is 256 kilobytes.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.uploadDate">
+<tt class="descclassname">files.</tt><tt class="descname">uploadDate</tt><a class="headerlink" href="#files.uploadDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The date the document was first stored by GridFS. This value has the
+<tt class="docutils literal"><span class="pre">Date</span></tt> type.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.md5">
+<tt class="descclassname">files.</tt><tt class="descname">md5</tt><a class="headerlink" href="#files.md5" title="Permalink to this definition">¶</a></dt>
+<dd><p>An MD5 hash returned from the filemd5 API. This value has the <tt class="docutils literal"><span class="pre">String</span></tt>
+type.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.filename">
+<tt class="descclassname">files.</tt><tt class="descname">filename</tt><a class="headerlink" href="#files.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional. A human-readable name for the document.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.contentType">
+<tt class="descclassname">files.</tt><tt class="descname">contentType</tt><a class="headerlink" href="#files.contentType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional. A valid MIME type for the document.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.aliases">
+<tt class="descclassname">files.</tt><tt class="descname">aliases</tt><a class="headerlink" href="#files.aliases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional. An array of alias strings.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="files.metadata">
+<tt class="descclassname">files.</tt><tt class="descname">metadata</tt><a class="headerlink" href="#files.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional. Any additional information you want to store.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="gridfs-index">
+<span id="index-5"></span><span id="id3"></span><h2>GridFS Index<a class="headerlink" href="#gridfs-index" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> uses a <a class="reference internal" href="../reference/glossary.html#term-unique-index"><em class="xref std std-term">unique</em></a>, <a class="reference internal" href="../reference/glossary.html#term-compound-index"><em class="xref std std-term">compound</em></a> index on the <tt class="docutils literal"><span class="pre">chunks</span></tt> collection for <tt class="docutils literal"><span class="pre">files_id</span></tt>
+and <tt class="docutils literal"><span class="pre">n</span></tt>. The index allows efficient retrieval of chunks using the
+<tt class="docutils literal"><span class="pre">files_id</span></tt> and <tt class="docutils literal"><span class="pre">n</span></tt> values, as shown in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cursor</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">fs</span><span class="p">.</span><span class="nx">chunks</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">files_id</span><span class="o">:</span> <span class="nx">myFileID</span><span class="p">}).</span><span class="nx">sort</span><span class="p">({</span><span class="nx">n</span><span class="o">:</span><span class="mi">1</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>See the relevant <a class="reference internal" href="drivers.html"><em>driver</em></a> documentation
+for the specific behavior of your GridFS application. If your driver
+does not create this index, issue the following operation using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">fs</span><span class="p">.</span><span class="nx">chunks</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">files_id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">unique</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-interface">
+<h2>Example Interface<a class="headerlink" href="#example-interface" title="Permalink to this headline">¶</a></h2>
+<p>The following is an example of the GridFS interface in Java. The example
+is for demonstration purposes only. For API specifics, see the relevant
+<a class="reference internal" href="drivers.html"><em>driver</em></a> documentation.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * default root collection usage - must be supported</span>
+<span class="cm"> */</span>
+<span class="n">GridFS</span> <span class="n">myFS</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GridFS</span><span class="o">(</span><span class="n">myDatabase</span><span class="o">);</span>            <span class="c1">// returns a default GridFS (e.g. &quot;fs&quot; bucket collection)</span>
+<span class="n">myFS</span><span class="o">.</span><span class="na">storeFile</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/tmp/largething.mpg&quot;</span><span class="o">));</span> <span class="c1">// saves the file into the &quot;fs&quot; GridFS store</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * specified root collection usage - optional</span>
+<span class="cm"> */</span>
+
+<span class="n">GridFS</span> <span class="n">myContracts</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GridFS</span><span class="o">(</span><span class="n">myDatabase</span><span class="o">,</span> <span class="s">&quot;contracts&quot;</span><span class="o">);</span>            <span class="c1">// returns a GridFS where  &quot;contracts&quot; is root</span>
+<span class="n">myFS</span><span class="o">.</span><span class="na">retrieveFile</span><span class="o">(</span><span class="s">&quot;smithco&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/tmp/smithco_20090105.pdf&quot;</span><span class="o">));</span> <span class="c1">// retrieves object whose filename is &quot;smithco&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="server-side-javascript.html" title="Previous Section: Server-side JavaScript">&lt; &nbsp; Server-side JavaScript</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="../core/object-id.html" title="Next Section: ObjectId">ObjectId &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

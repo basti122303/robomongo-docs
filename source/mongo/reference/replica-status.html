@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replica Set Status Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/replica-status" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Replica Set Configuration" href="replica-configuration.html" />
+<link rel="prev" title="Connection Pool Statistics Reference" href="connection-pool-stats.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replica-set-status-reference">
+<h1>Replica Set Status Reference<a class="headerlink" href="#replica-set-status-reference" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="replica-commands.html#replSetGetStatus" title="replSetGetStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetGetStatus</span></tt></a> provides an overview of the
+current status of a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. Issue the following command against
+the <a class="reference internal" href="glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a>, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">replSetGetStatus</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also use the following helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to
+access this functionality</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">status</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The value specified (e.g <tt class="docutils literal"><span class="pre">1</span></tt> above,) does not impact the output of
+the command. Data provided by this command derives from data included
+in heartbeats sent to the current instance by other members of the
+replica set: because of the frequency of heartbeats, these data can be
+several seconds out of date.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> must have replication enabled and be a member
+of a replica set for the for <a class="reference internal" href="replica-commands.html#replSetGetStatus" title="replSetGetStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetGetStatus</span></tt></a> to
+return successfully.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a>&#8221; shell helper function,
+&#8220;<a class="reference internal" href="../replication.html"><em>Replication</em></a>&#8221;.</p>
+</div>
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<dl class="status">
+<dt id="rs.status.set">
+<tt class="descclassname">rs.status.</tt><tt class="descname">set</tt><a class="headerlink" href="#rs.status.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">set</span></tt> value is the name of the replica set, configured in the
+<a class="reference internal" href="configuration-options.html#replSet" title="replSet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt></a> setting. This is the same value as <a class="reference internal" href="replica-configuration.html#rs.conf._id" title="rs.conf._id"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">_id</span></tt></a> in <a class="reference internal" href="replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="rs.status.date">
+<tt class="descclassname">rs.status.</tt><tt class="descname">date</tt><a class="headerlink" href="#rs.status.date" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <tt class="docutils literal"><span class="pre">date</span></tt> field is an <a class="reference internal" href="glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a> of the
+current time, according to the current server. Compare this to the
+value of the <a class="reference internal" href="#members.lastHeartbeat" title="members.lastHeartbeat"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">members.lastHeartbeat</span></tt></a> to find the
+operational lag between the current host and the other hosts in the
+set.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="rs.status.myState">
+<tt class="descclassname">rs.status.</tt><tt class="descname">myState</tt><a class="headerlink" href="#rs.status.myState" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of <a class="reference internal" href="#rs.status.myState" title="rs.status.myState"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">myState</span></tt></a> reflects state of the current
+replica set member. An integer between <tt class="docutils literal"><span class="pre">0</span></tt> and <tt class="docutils literal"><span class="pre">10</span></tt> represents
+the state of the member. These integers map to states, as described
+in the following table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Number</strong></td>
+<td><strong>State</strong></td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>Starting up, phase 1 (parsing configuration)</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>Primary</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>Secondary</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>Recovering (initial syncing, post-rollback, stale members)</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>Fatal error</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>Starting up, phase 2 (forking threads)</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>Unknown state (the set has never connected to the member)</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>Arbiter</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>Down</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>Rollback</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>Removed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="status">
+<dt id="rs.status.members">
+<tt class="descclassname">rs.status.</tt><tt class="descname">members</tt><a class="headerlink" href="#rs.status.members" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">members</span></tt> field holds an array that contains a document for
+every member in the replica set. See the &#8220;<a class="reference internal" href="#repl-set-member-statuses"><em>Member Statuses</em></a>&#8221; for an overview of the values included
+in these documents.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="rs.status.syncingTo">
+<tt class="descclassname">rs.status.</tt><tt class="descname">syncingTo</tt><a class="headerlink" href="#rs.status.syncingTo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">syncingTo</span></tt> field is only present on the output of
+<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> on <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> and recovering members,
+and holds the hostname of the member from which this instance is
+syncing.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="member-statuses">
+<span id="repl-set-member-statuses"></span><h2>Member Statuses<a class="headerlink" href="#member-statuses" title="Permalink to this headline">¶</a></h2>
+<dl class="status">
+<dt id="members.name">
+<tt class="descclassname">members.</tt><tt class="descname">name</tt><a class="headerlink" href="#members.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">name</span></tt> field holds the name of the server.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.self">
+<tt class="descclassname">members.</tt><tt class="descname">self</tt><a class="headerlink" href="#members.self" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">self</span></tt> field is only included in the document for the
+current <tt class="docutils literal"><span class="pre">mongod</span></tt> instance in the members array. It&#8217;s value is
+<tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.errmsg">
+<tt class="descclassname">members.</tt><tt class="descname">errmsg</tt><a class="headerlink" href="#members.errmsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>This field contains the most recent error or status message received from
+the member. This field may be empty (e.g. <tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>) in some cases.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.health">
+<tt class="descclassname">members.</tt><tt class="descname">health</tt><a class="headerlink" href="#members.health" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">health</span></tt> value is only present for the other members of the
+replica set (i.e. not the member that returns
+<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status</span></tt></a>.) This field conveys if the member is up
+(i.e. <tt class="docutils literal"><span class="pre">1</span></tt>) or down (i.e. <tt class="docutils literal"><span class="pre">0</span></tt>.)</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.state">
+<tt class="descclassname">members.</tt><tt class="descname">state</tt><a class="headerlink" href="#members.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value of the <a class="reference internal" href="#members.state" title="members.state"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">members.state</span></tt></a> reflects state of this
+replica set member. An integer between <tt class="docutils literal"><span class="pre">0</span></tt> and <tt class="docutils literal"><span class="pre">10</span></tt> represents
+the state of the member. These integers map to states, as described
+in the following table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Number</strong></td>
+<td><strong>State</strong></td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>Starting up, phase 1 (parsing configuration)</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>Primary</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>Secondary</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>Recovering (initial syncing, post-rollback, stale members)</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>Fatal error</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>Starting up, phase 2 (forking threads)</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td>Unknown state (the set has never connected to the member)</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td>Arbiter</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td>Down</td>
+</tr>
+<tr class="row-odd"><td>9</td>
+<td>Rollback</td>
+</tr>
+<tr class="row-even"><td>10</td>
+<td>Removed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.stateStr">
+<tt class="descclassname">members.</tt><tt class="descname">stateStr</tt><a class="headerlink" href="#members.stateStr" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string that describes <a class="reference internal" href="#members.state" title="members.state"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">members.state</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.uptime">
+<tt class="descclassname">members.</tt><tt class="descname">uptime</tt><a class="headerlink" href="#members.uptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#members.uptime" title="members.uptime"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">members.uptime</span></tt></a> field holds a value that reflects the number of
+seconds that this member has been online.</p>
+<p>This value does not appear for the member that returns the
+<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> data.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.optime">
+<tt class="descclassname">members.</tt><tt class="descname">optime</tt><a class="headerlink" href="#members.optime" title="Permalink to this definition">¶</a></dt>
+<dd><p>A document that contains information regarding the last operation
+from the operation log that this member has applied.</p>
+<dl class="status">
+<dt id="members.optime.t">
+<tt class="descclassname">members.optime.</tt><tt class="descname">t</tt><a class="headerlink" href="#members.optime.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>A 32-bit timestamp of the last operation applied to this member
+of the replica set from the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.optime.i">
+<tt class="descclassname">members.optime.</tt><tt class="descname">i</tt><a class="headerlink" href="#members.optime.i" title="Permalink to this definition">¶</a></dt>
+<dd><p>An incremented field, which reflects the number of operations in
+since the last time stamp. This value only increases if there
+is more than one operation per second.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="status">
+<dt id="members.optimeDate">
+<tt class="descclassname">members.</tt><tt class="descname">optimeDate</tt><a class="headerlink" href="#members.optimeDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>An <a class="reference internal" href="glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a> formatted date string that reflects the last
+entry from the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> that this member applied. If this
+differs significantly from <a class="reference internal" href="#members.lastHeartbeat" title="members.lastHeartbeat"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">members.lastHeartbeat</span></tt></a> this
+member is either experiencing &#8220;replication lag&#8221; <em>or</em> there have not
+been any new operations since the last update. Compare
+<tt class="docutils literal"><span class="pre">members.optimeDate</span></tt> between all of the members of the set.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.lastHeartbeat">
+<tt class="descclassname">members.</tt><tt class="descname">lastHeartbeat</tt><a class="headerlink" href="#members.lastHeartbeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">lastHeartbeat</span></tt> value provides an <a class="reference internal" href="glossary.html#term-isodate"><em class="xref std std-term">ISODate</em></a> formatted
+date of the last heartbeat received from this member. Compare this
+value to the value of the <a class="reference internal" href="#rs.status.date" title="rs.status.date"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">date</span></tt></a> field to track
+latency between these members.</p>
+<p>This value does not appear for the member that returns the
+<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> data.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="members.pingMS">
+<tt class="descclassname">members.</tt><tt class="descname">pingMS</tt><a class="headerlink" href="#members.pingMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">pingMS</span></tt> represents the number of milliseconds (ms) that a
+round-trip packet takes to travel between the remote member and the
+local instance.</p>
+<p>This value does not appear for the member that returns the
+<a class="reference internal" href="replica-commands.html#rs.status" title="rs.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.status()</span></tt></a> data.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="connection-pool-stats.html" title="Previous Section: Connection Pool Statistics Reference">&lt; &nbsp; Connection Pool Statistics Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="replica-configuration.html" title="Next Section: Replica Set Configuration">Replica Set Configuration &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

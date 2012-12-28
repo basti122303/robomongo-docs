@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Access the mongo Shell Help Information &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/access-mongo-shell-help" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="next" title="Write Scripts for the mongo Shell" href="write-scripts-for-the-mongo-shell.html" />
+<link rel="prev" title="Data Types in the mongo Shell" href="../core/shell-types.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="access-the-mongo-shell-help-information">
+<span id="mongo-shell-help"></span><h1>Access the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Help Information<a class="headerlink" href="#access-the-mongo-shell-help-information" title="Permalink to this headline">¶</a></h1>
+<p>In addition to the documentation in the <a class="reference internal" href="../contents.html"><em>MongoDB Manual</em></a>, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides some additional
+information in its &#8220;online&#8221; help system. This document provides an
+overview of accessing this help information.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../reference/mongo.html"><em>mongo Manual Page</em></a></li>
+<li><a class="reference internal" href="../mongo.html"><em>Using the mongo Shell</em></a> (<a class="reference internal" href="../contents.html"><em>MongoDB Manual</em></a> section on the shell.)</li>
+<li><a class="reference internal" href="../reference/mongo-shell-reference.html"><em>mongo Shell Quick Reference</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="command-line-help">
+<span id="mongo-shell-help-command-line"></span><h2>Command Line Help<a class="headerlink" href="#command-line-help" title="Permalink to this headline">¶</a></h2>
+<p>To see the list of options and help for starting the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell, use the <a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--help"><em class="xref std std-option">--help</em></a> option from the command line:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo --help
+</pre></div>
+</div>
+</div>
+<div class="section" id="shell-help">
+<h2>Shell Help<a class="headerlink" href="#shell-help" title="Permalink to this headline">¶</a></h2>
+<p>To see the list of help, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, type <tt class="docutils literal"><span class="pre">help</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">help</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="database-help">
+<span id="mongo-shell-help-db"></span><h2>Database Help<a class="headerlink" href="#database-help" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">To see the list of databases on the server, use the <tt class="docutils literal"><span class="pre">show</span> <span class="pre">dbs</span></tt>
+command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">dbs</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To see the list of help for methods you can use on the <tt class="docutils literal"><span class="pre">db</span></tt>
+object, call the <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.help()</span></tt> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">help</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To see the implementation of a method in the shell, type the
+<tt class="docutils literal"><span class="pre">db.&lt;method</span> <span class="pre">name&gt;</span></tt> without the parenthesis (<tt class="docutils literal"><span class="pre">()</span></tt>), as in the
+following example which will return the implementation of the method
+<a class="reference internal" href="../reference/method/db.addUser.html#db.addUser" title="db.addUser"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.addUser()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">addUser</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="collection-help">
+<span id="mongo-shell-help-collection"></span><h2>Collection Help<a class="headerlink" href="#collection-help" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">To see the list of collections in the current database, use the
+<tt class="docutils literal"><span class="pre">show</span> <span class="pre">collections</span></tt> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">collections</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To see the help for methods available on the collection objects
+(e.g. <tt class="docutils literal"><span class="pre">db.&lt;collection&gt;</span></tt>), use the <tt class="docutils literal"><span class="pre">db.&lt;collection&gt;.help()</span></tt>
+method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">help</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt> can be the name of a collection that exists,
+although you may specify a collection that doesn&#8217;t exist.</p>
+</li>
+<li><p class="first">To see the collection method implementation, type the
+<tt class="docutils literal"><span class="pre">db.&lt;collection&gt;.&lt;method&gt;</span></tt> name without the parenthesis (<tt class="docutils literal"><span class="pre">()</span></tt>),
+as in the following example which will return the implementation of
+the <a class="reference internal" href="../reference/method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">save()</span></tt></a> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">save</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="cursor-help">
+<span id="mongo-shell-help-cursor"></span><h2>Cursor Help<a class="headerlink" href="#cursor-help" title="Permalink to this headline">¶</a></h2>
+<p>When you perform <a class="reference internal" href="../core/read-operations.html#read-operations-queries"><em>read operations</em></a> with
+the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you can use various cursor methods to modify
+the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> behavior and various
+JavaScript methods to handle the cursor returned from the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method.</p>
+<ul>
+<li><p class="first">To list the available modifier and cursor handling methods, use the
+<tt class="docutils literal"><span class="pre">db.collection.find().help()</span></tt> command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">help</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt> can be the name of a collection that exists,
+although you may specify a collection that doesn&#8217;t exist.</p>
+</li>
+<li><p class="first">To see the implementation of the cursor method, type the
+<tt class="docutils literal"><span class="pre">db.&lt;collection&gt;.find().&lt;method&gt;</span></tt> name without the parenthesis
+(<tt class="docutils literal"><span class="pre">()</span></tt>), as in the following example which will return the
+implementation of the <tt class="docutils literal"><span class="pre">toArray()</span></tt> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">toArray</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Some useful methods for handling cursors are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/method/cursor.hasNext.html#cursor.hasNext" title="cursor.hasNext"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hasNext()</span></tt></a> which checks whether the
+cursor has more documents to return.</li>
+<li><a class="reference internal" href="../reference/method/cursor.next.html#cursor.next" title="cursor.next"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">next()</span></tt></a> which returns the next document and
+advances the cursor position forward by one.</li>
+<li><a class="reference internal" href="../reference/method/cursor.forEach.html#cursor.forEach" title="cursor.forEach"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">forEach(&lt;function&gt;)</span></tt></a> which iterates the
+whole cursor and applies the <tt class="docutils literal"><span class="pre">&lt;function&gt;</span></tt> to each document returned
+by the cursor. The <tt class="docutils literal"><span class="pre">&lt;function&gt;</span></tt> expects a single argument which
+corresponds to the document from each iteration.</li>
+</ul>
+<p>For examples on iterating a cursor and retrieving the documents from
+the cursor, see <a class="reference internal" href="../core/read-operations.html#read-operations-cursors"><em>cursor handling</em></a>. See
+also <a class="reference internal" href="../reference/javascript.html#js-query-cursor-methods"><em>Cursor Methods</em></a> for all available cursor methods.</p>
+</div>
+<div class="section" id="type-help">
+<span id="mongo-shell-type-help"></span><h2>Type Help<a class="headerlink" href="#type-help" title="Permalink to this headline">¶</a></h2>
+<p>To get a list of the wrapper classes available in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell, such as <tt class="docutils literal"><span class="pre">BinData()</span></tt>, type <tt class="docutils literal"><span class="pre">help</span> <span class="pre">misc</span></tt> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">help</span> <span class="nx">misc</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/shell-types.html" title="Previous Section: Data Types in the mongo Shell">&lt; &nbsp; Data Types in the mongo Shell</a></li>
+<li id="btnvup"><a href="../mongo.html" title="Parent Section: Using the mongo Shell" >&#47;&#92;&nbsp; Using the mongo Shell</a></li>
+<li id="btnvnx"><a href="write-scripts-for-the-mongo-shell.html" title="Next Section: Write Scripts for the mongo Shell">Write Scripts for the mongo Shell &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

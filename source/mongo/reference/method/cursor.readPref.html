@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.readPref() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.readPref" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.showDiskLoc()" href="cursor.showDiskLoc.html" />
+<link rel="prev" title="cursor.next()" href="cursor.next.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-readpref">
+<h1>cursor.readPref()<a class="headerlink" href="#cursor-readpref" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.readPref">
+<tt class="descclassname">cursor.</tt><tt class="descname">readPref</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.readPref" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mode</strong> (<em>string</em>) &#8211; Read preference mode</li>
+<li><strong>tagSet</strong> (<em>array</em>) &#8211; Optional. Array of tag set objects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Append the <a class="reference internal" href="#cursor.readPref" title="cursor.readPref"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">readPref()</span></tt></a> to a cursor to
+control how the client will route the query will route to members
+of the replica set.</p>
+<p>The <tt class="docutils literal"><span class="pre">mode</span></tt> string should be one of:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../../applications/replication.html#primary" title="primary"><tt class="xref mongodb mongodb-readmode docutils literal"><span class="pre">primary</span></tt></a></li>
+<li><a class="reference internal" href="../../applications/replication.html#primaryPreferred" title="primaryPreferred"><tt class="xref mongodb mongodb-readmode docutils literal"><span class="pre">primaryPreferred</span></tt></a></li>
+<li><a class="reference internal" href="../../applications/replication.html#secondary" title="secondary"><tt class="xref mongodb mongodb-readmode docutils literal"><span class="pre">secondary</span></tt></a></li>
+<li><a class="reference internal" href="../../applications/replication.html#secondaryPreferred" title="secondaryPreferred"><tt class="xref mongodb mongodb-readmode docutils literal"><span class="pre">secondaryPreferred</span></tt></a></li>
+<li><a class="reference internal" href="../../applications/replication.html#nearest" title="nearest"><tt class="xref mongodb mongodb-readmode docutils literal"><span class="pre">nearest</span></tt></a></li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">tagSet</span></tt> parameter, if given, should consist of an array of tag set
+objects for filtering secondary read operations. For example, a secondary
+member tagged <tt class="docutils literal"><span class="pre">{</span> <span class="pre">dc:</span> <span class="pre">'ny',</span> <span class="pre">rack:</span> <span class="pre">2,</span> <span class="pre">size:</span> <span class="pre">'large'</span> <span class="pre">}</span></tt> will match the tag set
+<tt class="docutils literal"><span class="pre">{</span> <span class="pre">dc:</span> <span class="pre">'ny',</span> <span class="pre">rack:</span> <span class="pre">2</span> <span class="pre">}</span></tt>. Clients match tag sets first in the
+order they appear in the read preference specification. You may
+specify an empty tag set <tt class="docutils literal"><span class="pre">{}</span></tt> as the last element to default to
+any available secondary. See the <a class="reference internal" href="../../applications/replication.html#replica-set-read-preference-tag-sets"><em>tag sets</em></a>
+documentation for more information.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must apply <a class="reference internal" href="#cursor.readPref" title="cursor.readPref"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.readPref()</span></tt></a> to the cursor before retrieving
+any documents from the database.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.next.html" title="Previous Section: cursor.next()">&lt; &nbsp; cursor.next()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.showDiskLoc.html" title="Next Section: cursor.showDiskLoc()">cursor.showDiskLoc() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

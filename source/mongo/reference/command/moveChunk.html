@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>moveChunk &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/moveChunk" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="movePrimary" href="movePrimary.html" />
+<link rel="prev" title="migrateClone (internal)" href="migrateClone.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="movechunk">
+<h1>moveChunk<a class="headerlink" href="#movechunk" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="moveChunk">
+<tt class="descname">moveChunk</tt><a class="headerlink" href="#moveChunk" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> is an internal administrative command that
+moves <a class="reference internal" href="../glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> between <a class="reference internal" href="../glossary.html#term-shard"><em class="xref std std-term">shards</em></a>.
+You must issue the
+<a class="reference internal" href="../commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a>
+command against the <a class="reference internal" href="../glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> in the form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">moveChunk</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">namespace</span><span class="o">&gt;</span> <span class="p">,</span>
+                 <span class="nx">find</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span> <span class="p">,</span>
+                 <span class="nx">to</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">destination</span><span class="o">&gt;</span><span class="p">,</span>
+                 <span class="o">&lt;</span><span class="nx">options</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>moveChunk</strong> &#8211; The name of the <a class="reference internal" href="../glossary.html#term-collection"><em class="xref std std-term">collection</em></a> where
+the <a class="reference internal" href="../glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a> exists. Specify the
+collection&#8217;s full namespace, including
+the database name.</li>
+<li><strong>find</strong> &#8211; A document including the <a class="reference internal" href="../glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>.</li>
+<li><strong>to</strong> &#8211; The identifier of the shard, that you want to migrate the
+chunk to.</li>
+<li><strong>_secondaryThrottle</strong> &#8211; Optional. Set to <tt class="docutils literal"><span class="pre">false</span></tt> by
+default. Provides <a class="reference internal" href="../../core/write-operations.html#write-concern"><em>write concern</em></a>
+support for chunk
+migrations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If you set <tt class="docutils literal"><span class="pre">_secondaryThrottle</span></tt> to <tt class="docutils literal"><span class="pre">true</span></tt>, during chunk
+migrations when a <a class="reference internal" href="../glossary.html#term-shard"><em class="xref std std-term">shard</em></a> hosted by a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>,
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will wait until the <a class="reference internal" href="../glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members
+replicate the migration operations continuing to migrate chunk
+data. You may also configure <tt class="docutils literal"><span class="pre">_secondaryThrottle</span></tt> in the balancer
+configuration.</p>
+<p>Use the <a class="reference internal" href="../method/sh.moveChunk.html#sh.moveChunk" title="sh.moveChunk"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.moveChunk()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell to migrate chunks manually.</p>
+<p>The <a class="reference internal" href="../../core/sharding-internals.html#sharding-chunk-migration"><em>chunk migration</em></a> section
+describes how chunks move between shards on MongoDB.</p>
+<p><a class="reference internal" href="../commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> will return the following if another cursor
+is using the chunk you are moving:</p>
+<div class="highlight-none"><div class="highlight"><pre>errmsg: &quot;The collection&#39;s metadata lock is already taken.&quot;
+</pre></div>
+</div>
+<p>These errors usually occur when there are too many open
+<a class="reference internal" href="../glossary.html#term-cursor"><em class="xref std std-term">cursors</em></a> accessing the chunk you are migrating. You
+can either wait until the cursors complete their operation or close
+the cursors manually.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only use the <a class="reference internal" href="../commands.html#moveChunk" title="moveChunk"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">moveChunk</span></tt></a> in special circumstances
+such as preparing your <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> for an initial
+ingestion of data, or a large bulk import operation. See
+<a class="reference internal" href="../../administration/sharding.html#sharding-administration-create-chunks"><em>Create Chunks (Pre-Splitting)</em></a> for more information.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="migrateClone.html" title="Previous Section: migrateClone (internal)">&lt; &nbsp; migrateClone (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="movePrimary.html" title="Next Section: movePrimary">movePrimary &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

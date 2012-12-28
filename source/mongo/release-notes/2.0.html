@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Release Notes for MongoDB 2.0 &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/2.0" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Release Notes for MongoDB 1.8" href="1.8.html" />
+<link rel="prev" title="Release Notes for MongoDB 2.2" href="2.2.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="release-notes-for-mongodb-2-0">
+<h1>Release Notes for MongoDB 2.0<a class="headerlink" href="#release-notes-for-mongodb-2-0" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="see-the-full-index-of-this-page-for-a-complete-list-of-changes-included-in-2-0">
+<p class="topic-title first">See the <a class="reference internal" href="2.0-changes.html"><em>full index of this page</em></a> for
+           a complete list of changes included in 2.0.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#upgrading" id="id1">Upgrading</a></li>
+<li><a class="reference internal" href="#changes" id="id2">Changes</a></li>
+<li><a class="reference internal" href="#resources" id="id3">Resources</a></li>
+</ul>
+</div>
+<div class="section" id="upgrading">
+<h2>Upgrading<a class="headerlink" href="#upgrading" title="Permalink to this headline">¶</a></h2>
+<p>Although the major version number has changed, MongoDB 2.0 is a
+standard, incremental production release and works as a drop-in
+replacement for MongoDB 1.8.</p>
+<div class="section" id="preparation">
+<h3>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h3>
+<p>Read through all release notes before upgrading, and ensure that no
+changes will affect your deployment.</p>
+<p>If you create new indexes in 2.0, then downgrading to 1.8 is possible
+but you must reindex the new collections.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> now correctly adhere to the CSV spec
+for handling CSV input/output. This may break existing import/export
+workflows that relied on the previous behavior. For more information see
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-1097">SERVER-1097</a>.</p>
+<p><a class="reference external" href="http://www.mongodb.org/display/DOCS/Journaling">Journaling</a> is <strong>enabled by default</strong> in 2.0 for 64-bit builds.
+If you still prefer to run without journaling, start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+with the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--nojournal"><em class="xref std std-option">--nojournal</em></a> run-time option.
+Otherwise, MongoDB creates journal files during startup. The first time you start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> with
+journaling, you will see a delay the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> creates new files.
+In addition, you may see reduced write throughput.</p>
+<p>2.0 <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances are interoperable with 1.8
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances; however, for best results, upgrade your
+deployments using the following procedures:</p>
+</div>
+<div class="section" id="upgrading-a-standalone-mongod">
+<span id="upgrade-standalone"></span><h3>Upgrading a Standalone <tt class="docutils literal"><span class="pre">mongod</span></tt><a class="headerlink" href="#upgrading-a-standalone-mongod" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download the v2.0.x binaries from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</li>
+<li>Shutdown your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. Replace the existing
+binary with the 2.0.x <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary and restart MongoDB.</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-replica-set">
+<span id="upgrade-replica-set"></span><h3>Upgrading a Replica Set<a class="headerlink" href="#upgrading-a-replica-set" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Upgrade the <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of the set one at a time by
+shutting down the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and replacing the 1.8 binary
+with the 2.0.x binary from the <a class="reference external" href="http://downloads.mongodb.org/">MongoDB Download Page</a>.</p>
+</li>
+<li><p class="first">To avoid losing the last few updates on failover you can
+temporarily halt your application (failover should take less than 10
+seconds), or you can set <a class="reference internal" href="../core/write-operations.html#write-concern"><em>write concern</em></a> in your application
+code to confirm that each update reaches multiple servers.</p>
+</li>
+<li><p class="first">Use the <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> to step down the primary to allow
+the normal <a class="reference internal" href="../core/replication.html#replica-set-failover"><em>failover</em></a> procedure.</p>
+<p><a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> and <a class="reference internal" href="../reference/command/replSetStepDown.html#replSetStepDown" title="replSetStepDown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetStepDown</span></tt></a> provide for
+shorter and more consistent failover procedures than simply
+shutting down the primary directly.</p>
+<p>When the primary has stepped down, shut down its instance and
+upgrade by replacing the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary with the 2.0.x
+binary.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="upgrading-a-sharded-cluster">
+<span id="upgrade-sharded-cluster"></span><span id="upgrade-shard-cluster"></span><h3>Upgrading a Sharded Cluster<a class="headerlink" href="#upgrading-a-sharded-cluster" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Upgrade all <a class="reference internal" href="../reference/glossary.html#term-config-database"><em class="xref std std-term">config server</em></a> instances
+<em>first</em>, in any order. Since config servers use two-phase commit,
+<a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> configuration metadata updates will halt until all are
+up and running.</li>
+<li>Upgrade <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> routers in any order.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="changes">
+<h2>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="compact-command">
+<h3>Compact Command<a class="headerlink" href="#compact-command" title="Permalink to this headline">¶</a></h3>
+<p>A <a class="reference internal" href="../reference/commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command is now available for compacting a single
+collection and its indexes. Previously, the only way to compact was to
+repair the entire database.</p>
+</div>
+<div class="section" id="concurrency-improvements">
+<h3>Concurrency Improvements<a class="headerlink" href="#concurrency-improvements" title="Permalink to this headline">¶</a></h3>
+<p>When going to disk, the server will yield the write lock when writing
+data that is not likely to be in memory. The initial
+implementation of this feature now exists:</p>
+<p>See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-2563">SERVER-2563</a> for more information.</p>
+<p>The specific operations yield in 2.0 are:</p>
+<ul class="simple">
+<li>Updates by <tt class="docutils literal"><span class="pre">_id</span></tt></li>
+<li>Removes</li>
+<li>Long cursor iterations</li>
+</ul>
+</div>
+<div class="section" id="default-stack-size">
+<h3>Default Stack Size<a class="headerlink" href="#default-stack-size" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB 2.0 reduces the default stack size. This change can reduce total memory
+usage when there are many (e.g., 1000+) client connections, as there is
+a thread per connection. While portions of a thread&#8217;s stack can be
+swapped out if unused, some operating systems do this slowly enough that
+it might be an issue. The default stack size is lesser of the
+system setting or 1MB.</p>
+</div>
+<div class="section" id="index-performance-enhancements">
+<span id="new-index-format"></span><h3>Index Performance Enhancements<a class="headerlink" href="#index-performance-enhancements" title="Permalink to this headline">¶</a></h3>
+<p>v2.0 includes significant improvements to the
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Index Versions">index structures</a>.
+Indexes are often 25% smaller and 25% faster (depends on the use case).
+When upgrading from previous versions, the benefits of the new index
+type are realized only if you create a new index or re-index an old one.</p>
+<p>Dates are now signed, and the max index key size has increased slightly
+from 819 to 1024 bytes.</p>
+<p>All operations that create a new index will result in a 2.0 index by
+default. For example:</p>
+<ul class="simple">
+<li>Reindexing results on an older-version index results in a 2.0 index.
+However, reindexing on a secondary does <em>not</em> work in versions prior
+to 2.0. Do not reindex on a secondary. For a workaround, see
+<a class="reference external" href="https://jira.mongodb.org/browse/SERVER-3866">SERVER-3866</a>.</li>
+<li>The <a class="reference internal" href="../reference/configuration-options.html#repair" title="repair"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">repair</span></tt></a> database command converts indexes to a 2.0
+indexes.</li>
+</ul>
+<p>To convert all indexes for a given collection to the <a class="reference internal" href="#new-index-format"><em>2.0 type</em></a>, invoke the <a class="reference internal" href="../reference/commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command.</p>
+<p>Once you create new indexes, downgrading to 1.8.x will require a
+re-index of any indexes created using 2.0. See
+<a class="reference internal" href="../tutorial/roll-back-to-v1.8-index.html"><em>Build Old Style Indexes</em></a>.</p>
+</div>
+<div class="section" id="sharding-authentication">
+<h3>Sharding Authentication<a class="headerlink" href="#sharding-authentication" title="Permalink to this headline">¶</a></h3>
+<p>Applications can now use authentication with <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>.</p>
+</div>
+<div class="section" id="replica-sets">
+<h3>Replica Sets<a class="headerlink" href="#replica-sets" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="hidden-nodes-in-sharded-clusters">
+<h4>Hidden Nodes in Sharded Clusters<a class="headerlink" href="#hidden-nodes-in-sharded-clusters" title="Permalink to this headline">¶</a></h4>
+<p>In 2.0, <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances can now determine when a member of
+a replica set becomes &#8220;hidden&#8221; without requiring a restart. In 1.8,
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> if you reconfigured a
+member as hidden, you <em>had</em> to restart <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to prevent
+queries from reaching the hidden member.</p>
+</div>
+<div class="section" id="priorities">
+<h4>Priorities<a class="headerlink" href="#priorities" title="Permalink to this headline">¶</a></h4>
+<p>Each <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> member can now have a priority value consisting
+of a floating-point from 0 to 1000, inclusive. Priorities let you
+control which member of the set you prefer to have as <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>
+the member with the highest priority that can see a majority of the set
+will be elected primary.</p>
+<p>For example, suppose you have a replica set with three members, <tt class="docutils literal"><span class="pre">A</span></tt>, <tt class="docutils literal"><span class="pre">B</span></tt>, and
+<tt class="docutils literal"><span class="pre">C</span></tt>, and suppose that their priorities are set as follows:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">A</span></tt>&#8216;s priority is <tt class="docutils literal"><span class="pre">2</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">B</span></tt>&#8216;s priority is <tt class="docutils literal"><span class="pre">3</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">C</span></tt>&#8216;s priority is <tt class="docutils literal"><span class="pre">1</span></tt>.</li>
+</ul>
+<p>During normal operation, the set will always chose <tt class="docutils literal"><span class="pre">B</span></tt> as
+primary. If <tt class="docutils literal"><span class="pre">B</span></tt> becomes unavailable, the set will elect <tt class="docutils literal"><span class="pre">A</span></tt> as primary.</p>
+<p>For more information, see the <a class="reference internal" href="../core/replication.html#replica-set-member-priority"><em>Member Priority</em></a> documentation.</p>
+</div>
+<div class="section" id="data-center-awareness">
+<h4>Data-Center Awareness<a class="headerlink" href="#data-center-awareness" title="Permalink to this headline">¶</a></h4>
+<p>You can now &#8220;tag&#8221; <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members to indicate their
+location. You can use these tags to design custom <a class="reference internal" href="../core/write-operations.html#write-concern"><em>write rules</em></a>
+across data centers, racks, specific servers, or any other architecture
+choice.</p>
+<p>For example, an administrator can define rules such as &#8220;very important write&#8221; or
+<tt class="docutils literal"><span class="pre">customerData</span></tt> or &#8220;audit-trail&#8221; to replicate to certain servers,
+racks, data centers, etc. Then in the application code, the developer
+would say:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">foo</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="p">{</span><span class="nx">w</span> <span class="o">:</span> <span class="s2">&quot;very important write&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>which would succeed if it fulfilled the conditions the DBA defined for
+&#8220;very important write&#8221;.</p>
+<p>For more information, see
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Data+Center+Awareness#DataCenterAwareness-Tagging%28version2.0%29">Tagging</a>.</p>
+<p>Drivers may also support tag-aware reads. Instead of
+specifying <tt class="docutils literal"><span class="pre">slaveOk</span></tt>, you specify <tt class="docutils literal"><span class="pre">slaveOk</span></tt> with tags indicating
+which data-centers to read from. For details, see the
+<a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a> documentation.</p>
+</div>
+<div class="section" id="w-majority">
+<h4><tt class="docutils literal"><span class="pre">w</span></tt> : <tt class="docutils literal"><span class="pre">majority</span></tt><a class="headerlink" href="#w-majority" title="Permalink to this headline">¶</a></h4>
+<p>You can also set <tt class="docutils literal"><span class="pre">w</span></tt> to <tt class="docutils literal"><span class="pre">majority</span></tt> to ensure that the write
+propagates to a majority of nodes, effectively committing it. The
+value for &#8220;majority&#8221; will automatically adjust as you add or
+remove nodes from the set.</p>
+<p>For more information, see <a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>Write Concern</em></a>.</p>
+</div>
+<div class="section" id="reconfiguration-with-a-minority-up">
+<h4>Reconfiguration with a Minority Up<a class="headerlink" href="#reconfiguration-with-a-minority-up" title="Permalink to this headline">¶</a></h4>
+<p>If the majority of servers in a set has been permanently lost, you can
+now force a reconfiguration of the set to bring it back online.</p>
+<p>For more information see <a class="reference internal" href="../tutorial/reconfigure-replica-set-with-unavailable-members.html"><em>Reconfigure a Replica Set with Unavailable Members</em></a>.</p>
+</div>
+<div class="section" id="primary-checks-for-a-caught-up-secondary-before-stepping-down">
+<h4>Primary Checks for a Caught up Secondary before Stepping Down<a class="headerlink" href="#primary-checks-for-a-caught-up-secondary-before-stepping-down" title="Permalink to this headline">¶</a></h4>
+<p>To minimize time without a <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, the <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a>
+method will now fail if the primary does not see a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>
+within 10 seconds of its latest optime. You can force the primary to
+step down anyway, but by default it will return an error message.</p>
+<p>See also <a class="reference internal" href="../tutorial/force-member-to-be-primary.html"><em>Force a Member to Become Primary</em></a>.</p>
+</div>
+<div class="section" id="extended-shutdown-on-the-primary-to-minimize-interruption">
+<h4>Extended Shutdown on the Primary to Minimize Interruption<a class="headerlink" href="#extended-shutdown-on-the-primary-to-minimize-interruption" title="Permalink to this headline">¶</a></h4>
+<p>When you call the <a class="reference internal" href="../reference/commands.html#shutdown" title="shutdown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shutdown</span></tt></a> command, the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a>
+will refuse to shut down unless there is a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> whose
+optime is within 10 seconds of the primary. If such a secondary isn&#8217;t
+available, the primary will step down and wait up to a minute for the
+secondary to be fully caught up before shutting down.</p>
+<p>Note that to get this behavior, you must issue the <a class="reference internal" href="../reference/commands.html#shutdown" title="shutdown"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">shutdown</span></tt></a>
+command explicitly; sending a signal to the process will not trigger
+this behavior.</p>
+<p>You can also force the primary to shut down, even without an up-to-date
+secondary available.</p>
+</div>
+<div class="section" id="maintenance-mode">
+<h4>Maintenance Mode<a class="headerlink" href="#maintenance-mode" title="Permalink to this headline">¶</a></h4>
+<p>When <a class="reference internal" href="../reference/configuration-options.html#repair" title="repair"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repair</span></tt></a> or <a class="reference internal" href="../reference/commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> runs on a <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a>, the
+secondary will automatically drop into &#8220;recovering&#8221; mode until the
+operation finishes. This prevents clients from trying to read from it
+while it&#8217;s busy.</p>
+</div>
+</div>
+<div class="section" id="geospatial-features">
+<h3>Geospatial Features<a class="headerlink" href="#geospatial-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="multi-location-documents">
+<h4>Multi-Location Documents<a class="headerlink" href="#multi-location-documents" title="Permalink to this headline">¶</a></h4>
+<p>Indexing is now supported on documents which have multiple location
+objects, embedded either inline or in nested sub-documents. Additional
+command options are also supported, allowing results to return with
+not only distance but the location used to generate the distance.</p>
+<p>For more information, see <a class="reference external" href="http://www.mongodb.org/display/DOCS/Geospatial+Indexing#GeospatialIndexing-MultilocationDocuments">Multi-location Documents</a>.</p>
+</div>
+<div class="section" id="polygon-searches">
+<h4>Polygon searches<a class="headerlink" href="#polygon-searches" title="Permalink to this headline">¶</a></h4>
+<p>Polygonal <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> queries are also now supported for simple polygon
+shapes. For details, see the <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator documentation.</p>
+</div>
+</div>
+<div class="section" id="journaling-enhancements">
+<h3>Journaling Enhancements<a class="headerlink" href="#journaling-enhancements" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Journaling is now enabled by default for 64-bit platforms. Use the
+<tt class="docutils literal"><span class="pre">--nojournal</span></tt> command line option to disable it.</li>
+<li>The journal is now compressed for faster commits to disk.</li>
+<li>A new <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--journalCommitInterval"><em class="xref std std-option">--journalCommitInterval</em></a> run-time option exists for
+specifying your own group commit interval. 100ms is the default (same as
+in 1.8).</li>
+<li>A new <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">{</span> <span class="pre">getLastError:</span> <span class="pre">{</span> <span class="pre">j:</span> <span class="pre">true</span> <span class="pre">}</span> <span class="pre">}</span></tt></a> option is
+available to wait for the group commit. The group commit will happen
+sooner when a client is waiting on <tt class="docutils literal"><span class="pre">{j:</span> <span class="pre">true}</span></tt>. If journaling is
+disabled, <tt class="docutils literal"><span class="pre">{j:</span> <span class="pre">true}</span></tt> is a no-op.</li>
+</ul>
+</div>
+<div class="section" id="new-continueonerror-option-for-bulk-insert">
+<h3>New <tt class="docutils literal"><span class="pre">ContinueOnError</span></tt> Option for Bulk Insert<a class="headerlink" href="#new-continueonerror-option-for-bulk-insert" title="Permalink to this headline">¶</a></h3>
+<p>Set the <tt class="docutils literal"><span class="pre">continueOnError</span></tt> option for bulk inserts, in the
+<a class="reference internal" href="../applications/drivers.html"><em>driver</em></a>, so that bulk insert will
+continue to insert any remaining documents even if an insert fails, as
+is the case with  duplicate key exceptions or network interruptions. The <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a>
+command will report whether any inserts have failed, not just the
+last one. If multiple errors occur, the client will only receive the
+most recent <a class="reference internal" href="../reference/commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> results.</p>
+<p>See <a class="reference external" href="http://www.mongodb.org/display/DOCS/Mongo+Wire+Protocol#MongoWireProtocol-OPINSERT">OP_INSERT</a>.</p>
+</div>
+<div class="section" id="map-reduce">
+<h3>Map Reduce<a class="headerlink" href="#map-reduce" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="output-to-a-sharded-collection">
+<h4>Output to a Sharded Collection<a class="headerlink" href="#output-to-a-sharded-collection" title="Permalink to this headline">¶</a></h4>
+<p>Using the new <tt class="docutils literal"><span class="pre">sharded</span></tt> flag, it is possible to send the result of a
+map/reduce to a sharded collection. Combined with the <tt class="docutils literal"><span class="pre">reduce</span></tt> or
+<tt class="docutils literal"><span class="pre">merge</span></tt> flags, it is possible to keep adding data to very large
+collections from map/reduce jobs.</p>
+<p>For more information, see <a class="reference external" href="http://www.mongodb.org/display/DOCS/MapReduce#MapReduce-Outputoptions">MapReduce Output Options</a>
+and <a class="reference internal" href="../reference/command/mapReduce.html"><em>mapReduce</em></a>.</p>
+</div>
+<div class="section" id="performance-improvements">
+<h4>Performance Improvements<a class="headerlink" href="#performance-improvements" title="Permalink to this headline">¶</a></h4>
+<p>Map/reduce performance will benefit from the following:</p>
+<ul class="simple">
+<li>Larger in-memory buffer sizes, reducing the amount of disk I/O needed
+during a job</li>
+<li>Larger javascript heap size, allowing for larger objects
+and less GC</li>
+<li>Supports pure JavaScript execution with the <tt class="docutils literal"><span class="pre">jsMode</span></tt> flag. See <a class="reference internal" href="../reference/command/mapReduce.html"><em>mapReduce</em></a>.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="new-querying-features">
+<h3>New Querying Features<a class="headerlink" href="#new-querying-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="additional-regex-options-s">
+<h4>Additional regex options: <tt class="docutils literal"><span class="pre">s</span></tt><a class="headerlink" href="#additional-regex-options-s" title="Permalink to this headline">¶</a></h4>
+<p>Allows the dot (<tt class="docutils literal"><span class="pre">.</span></tt>) to match all characters including new lines. This is
+in addition to the currently supported <tt class="docutils literal"><span class="pre">i</span></tt>, <tt class="docutils literal"><span class="pre">m</span></tt> and <tt class="docutils literal"><span class="pre">x</span></tt>. See
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-RegularExpressions">Regular Expressions</a> and <a class="reference internal" href="../reference/operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a>.</p>
+</div>
+<div class="section" id="and">
+<h4>$and<a class="headerlink" href="#and" title="Permalink to this headline">¶</a></h4>
+<p>A special boolean <a class="reference internal" href="../reference/operators.html#_S_and" title="$and"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$and</span></tt></a> query operator is now available.</p>
+</div>
+</div>
+<div class="section" id="command-output-changes">
+<h3>Command Output Changes<a class="headerlink" href="#command-output-changes" title="Permalink to this headline">¶</a></h3>
+<p>The output of the <a class="reference internal" href="../reference/commands.html#validate" title="validate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">validate</span></tt></a> command and the documents in the
+<tt class="docutils literal"><span class="pre">system.profile</span></tt> collection have both been enhanced to return
+information as BSON objects with keys for each value rather than as
+free-form strings.</p>
+</div>
+<div class="section" id="shell-features">
+<h3>Shell Features<a class="headerlink" href="#shell-features" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="custom-prompt">
+<h4>Custom Prompt<a class="headerlink" href="#custom-prompt" title="Permalink to this headline">¶</a></h4>
+<p>You can define a custom prompt for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. You can
+change the prompt at any time by setting the prompt variable to a string
+or a custom JavaScript function returning a string. For examples, see
+<a class="reference external" href="http://www.mongodb.org/display/DOCS/Overview+-+The+MongoDB+Interactive+Shell#Overview-TheMongoDBInteractiveShell-CustomPrompt">Custom Prompt</a>.</p>
+</div>
+<div class="section" id="default-shell-init-script">
+<h4>Default Shell Init Script<a class="headerlink" href="#default-shell-init-script" title="Permalink to this headline">¶</a></h4>
+<p>On startup, the shell will check for a <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file in the
+user&#8217;s home directory. The shell will execute this file after connecting
+to the database and before displaying the prompt.</p>
+<p>If you would like the shell not to run the <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file
+automatically, start the shell with <a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--norc"><em class="xref std std-option">--norc</em></a>.</p>
+<p>For more information, see <a class="reference internal" href="../reference/mongo.html"><em>mongo</em></a>.</p>
+</div>
+</div>
+<div class="section" id="most-commands-require-authentication">
+<h3>Most Commands Require Authentication<a class="headerlink" href="#most-commands-require-authentication" title="Permalink to this headline">¶</a></h3>
+<p>In 2.0, when running with authentication (e.g. <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>) <em>all</em>
+database commands require authentication, <em>except</em> the following
+commands.</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/replica-commands.html#isMaster" title="isMaster"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">isMaster</span></tt></a></li>
+<li><a class="reference internal" href="../reference/commands.html#authenticate" title="authenticate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">authenticate</span></tt></a></li>
+<li><a class="reference internal" href="../reference/commands.html#getnonce" title="getnonce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getnonce</span></tt></a></li>
+<li><a class="reference internal" href="../reference/commands.html#buildInfo" title="buildInfo"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">buildInfo</span></tt></a></li>
+<li><a class="reference internal" href="../reference/commands.html#ping" title="ping"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">ping</span></tt></a></li>
+<li><a class="reference internal" href="../reference/commands.html#isdbgrid" title="isdbgrid"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">isdbgrid</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://mongodb.org/downloads">MongoDB Downloads</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/secure/IssueNavigator.jspa?mode=hide&amp;requestId=11002">All JIRA Issues resolved in 2.0</a></li>
+<li><a class="reference external" href="https://jira.mongodb.org/secure/IssueNavigator.jspa?requestId=11023">All Backward Incompatible Changes</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="2.2.html" title="Previous Section: Release Notes for MongoDB 2.2">&lt; &nbsp; Release Notes for MongoDB 2.2</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="1.8.html" title="Next Section: Release Notes for MongoDB 1.8">Release Notes for MongoDB 1.8 &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

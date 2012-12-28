@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Database References &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/database-references" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Server-side JavaScript" href="server-side-javascript.html" />
+<link rel="prev" title="Optimization Strategies for MongoDB Applications" href="optimization.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <span class="target" id="index-0"></span><span class="target" id="index-1"></span><div class="section" id="database-references">
+<span id="index-2"></span><span id="id1"></span><h1>Database References<a class="headerlink" href="#database-references" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB does not support joins. In MongoDB some data is
+&#8220;denormalized,&#8221; or stored with related data in <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> to remove the need for joins. However, in some cases it
+makes sense to store related information in separate documents,
+typically in different collections or databases.</p>
+<p>MongoDB applications use one of two methods for relating documents:</p>
+<ol class="arabic">
+<li><p class="first"><a class="reference internal" href="#document-references"><em>Manual references</em></a> where you save the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field of one document in another document as a reference.
+Then your application can run a second query to return the embedded
+data. These references are simple and sufficient for most use
+cases.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#dbref"><em>DBRefs</em></a> are references from one document to another
+using the value of the first document&#8217;s <tt class="docutils literal"><span class="pre">_id</span></tt> field collection,
+and optional database name. To resolve DBRefs, your application
+must perform additional queries to return the referenced
+documents. Many <a class="reference internal" href="drivers.html"><em>drivers</em></a> have helper
+methods that form the query for the DBRef automatically. The
+drivers <a class="footnote-reference" href="#official-driver" id="id2">[1]</a> do not <em>automatically</em> resolve DBRefs
+into documents.</p>
+<p>Use a DBRef when you need to embed documents from multiple
+collections in documents from one collection. DBRefs also provide a
+common format and type to represent these relationships among
+documents. The DBRef format provides common semantics for representing
+links between documents if your database must interact with
+multiple frameworks and tools.</p>
+</li>
+</ol>
+<p>Unless you have a compelling reason for using a DBRef, use manual
+references.</p>
+<table class="docutils footnote" frame="void" id="official-driver" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>Some community supported drivers may have
+alternate behavior and may resolve a DBRef into a document
+automatically.</td></tr>
+</tbody>
+</table>
+<div class="section" id="manual-references">
+<span id="document-references"></span><h2>Manual References<a class="headerlink" href="#manual-references" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="background">
+<h3>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h3>
+<p>Manual references refers to the practice of including one
+<a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document&#8217;s</em></a> <tt class="docutils literal"><span class="pre">_id</span></tt> field in another document. The
+application can then issue a second query to resolve the referenced
+fields as needed.</p>
+</div>
+<div class="section" id="process">
+<h3>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h3>
+<p>Consider the following operation to insert two documents, using the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field of the first document as a reference in the second
+document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">original_id</span> <span class="o">=</span> <span class="nx">ObjectId</span><span class="p">()</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+    <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="nx">original_id</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Broadway Center&quot;</span>
+    <span class="s2">&quot;url&quot;</span><span class="o">:</span> <span class="s2">&quot;bc.example.net&quot;</span>
+<span class="p">})</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Erin&quot;</span>
+    <span class="s2">&quot;places_id&quot;</span><span class="o">:</span> <span class="nx">original_id</span>
+    <span class="s2">&quot;url&quot;</span><span class="o">:</span>  <span class="s2">&quot;bc.example.net/Erin&quot;</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Then, when a query returns the document from the <tt class="docutils literal"><span class="pre">people</span></tt> collection
+you can, if needed, make a second query for the document referenced by
+the <tt class="docutils literal"><span class="pre">places_id</span></tt> field in the <tt class="docutils literal"><span class="pre">places</span></tt> collection.</p>
+</div>
+<div class="section" id="use">
+<h3>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h3>
+<p>For nearly every case where you want to store a relationship between
+two documents, use <a class="reference internal" href="#document-references"><em>manual references</em></a>. The
+references are simple to create and your application can resolve
+references as needed.</p>
+<p>The only limitation of manual linking is that these references do not
+convey the database and collection name. If you have documents in a
+single collection that relate to documents in more than one
+collection, you may need to consider using <a class="reference internal" href="#dbref"><em>DBRefs</em></a>.</p>
+</div>
+</div>
+<div class="section" id="dbrefs">
+<span id="dbref"></span><h2>DBRefs<a class="headerlink" href="#dbrefs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>Background<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>DBRefs are a convention for representing a <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a>, rather
+than a specific reference &#8220;type.&#8221; They include the name of the
+collection, and in some cases the database, in addition to the
+value from the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</div>
+<div class="section" id="format">
+<h3>Format<a class="headerlink" href="#format" title="Permalink to this headline">¶</a></h3>
+<p>DBRefs have the following fields:</p>
+<dl class="describe">
+<dt>
+<tt class="descname">$ref</tt></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">$ref</span></tt> field holds the name of the collection where the
+referenced document resides.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">$id</tt></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">$id</span></tt> field contains the value of the <tt class="docutils literal"><span class="pre">_id</span></tt> field in the
+referenced document.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">$db</tt></dt>
+<dd><p><em>Optional.</em></p>
+<p>Contains the name of the database where the referenced document
+resides.</p>
+<p>Only some drivers support <tt class="docutils literal"><span class="pre">$db</span></tt> references.</p>
+</dd></dl>
+
+<p>Thus a DBRef document would resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">$ref</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">$id</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">$db</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The order of fields in the DBRef matters, and you must use the above
+sequence when using a DBRef.</p>
+</div>
+</div>
+<div class="section" id="support">
+<h3>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>C++</strong></dt>
+<dd>The C++ driver contains no support for DBRefs. You can transverse
+references manually.</dd>
+<dt><strong>C#</strong></dt>
+<dd>The C# driver provides access to DBRef objects with the
+<a class="reference external" href="http://api.mongodb.org/csharp/current/html/46c356d3-ed06-a6f8-42fa-e0909ab64ce2.htm">MongoDBRef Class</a>
+and supplies the <a class="reference external" href="http://api.mongodb.org/csharp/current/html/1b0b8f48-ba98-1367-0a7d-6e01c8df436f.htm">FetchDBRef Method</a>
+for accessing these objects.</dd>
+<dt><strong>Java</strong></dt>
+<dd>The <a class="reference external" href="http://api.mongodb.org/java/current/com/mongodb/DBRef.html">DBRef</a> class
+provides supports for DBRefs from Java.</dd>
+<dt><strong>JavaScript</strong></dt>
+<dd>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell&#8217;s <a class="reference internal" href="../reference/javascript.html"><em>JavaScript</em></a>
+interface provides a DBRef.</dd>
+<dt><strong>Perl</strong></dt>
+<dd>The Perl driver contains no support for DBRefs.  You can transverse
+references manually or use the <a class="reference external" href="http://search.cpan.org/dist/MongoDBx-AutoDeref/">MongoDBx::AutoDeref</a> CPAN module.</dd>
+<dt><strong>PHP</strong></dt>
+<dd>The PHP driver does support DBRefs, including the optional <tt class="docutils literal"><span class="pre">$db</span></tt> reference, through
+<a class="reference external" href="http://www.php.net/manual/en/class.mongodbref.php/">The MongoDBRef class</a>.</dd>
+<dt><strong>Python</strong></dt>
+<dd>The Python driver provides the <a class="reference external" href="http://api.mongodb.org/python/current/api/bson/dbref.html">DBRef class</a>,
+and the <a class="reference external" href="http://api.mongodb.org//python/current/api/pymongo/database.html#pymongo.database.Database.dereference">dereference method</a>
+for interacting with DBRefs.</dd>
+<dt><strong>Ruby</strong></dt>
+<dd>The Ruby Driver supports DBRefs using the <a class="reference external" href="http://api.mongodb.org//ruby/current/BSON/DBRef.html">DBRef class</a>
+and the <a class="reference external" href="http://api.mongodb.org//ruby/current/Mongo/DB.html#dereference">deference method</a>.</dd>
+</dl>
+</div>
+<div class="section" id="id4">
+<h3>Use<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>In most cases you should use the <a class="reference internal" href="#document-references"><em>manual reference</em></a> method for connecting two or more related
+documents. However, if you need to reference documents from multiple
+collections, consider a DBRef.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="optimization.html" title="Previous Section: Optimization Strategies for MongoDB Applications">&lt; &nbsp; Optimization Strategies for MongoDB Applications</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="server-side-javascript.html" title="Next Section: Server-side JavaScript">Server-side JavaScript &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Importing and Exporting MongoDB Data &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/import-export" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Backup and Restoration Strategies" href="backups.html" />
+<link rel="prev" title="Monitoring Database Systems" href="monitoring.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="importing-and-exporting-mongodb-data">
+<h1>Importing and Exporting MongoDB Data<a class="headerlink" href="#importing-and-exporting-mongodb-data" title="Permalink to this headline">¶</a></h1>
+<p>Full <a class="reference internal" href="backups.html"><em>database instance backups</em></a> are
+useful for disaster recovery protection and routine database backup
+operation; however, some cases require additional import and export
+functionality.</p>
+<p>This document provides an overview of the import and export programs
+included in the MongoDB distribution. These tools are useful when you
+want to backup or export a portion of your data without capturing the
+state of the entire database, or for simple data ingestion cases. For
+more complex data migration tasks, you may want to write your own
+import and export scripts using a client <a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> to interact
+with the database itself.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Because these tools primarily operate by interacting with a running
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance, they can impact the performance of your
+running database.</p>
+<p>Not only do these backup processes create traffic for a running
+database instance, they also force the database to read all data
+through memory. When MongoDB reads infrequently used data, it can
+supplant more frequently accessed data, causing a deterioration in
+performance for the database&#8217;s regular workload.</p>
+<p class="last"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> do not reliably
+preserve all rich <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> data types, because <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> is
+a superset of <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a>. Thus, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> cannot represent <a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> data
+accurately in <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a>. As a result data exported or imported
+with these tools may lose some measure of fidelity. See the
+&#8220;<a class="reference external" href="http://www.mongodb.org/display/DOCS/Mongo+Extended+JSON">MongoDB Extended JSON</a>&#8221; wiki page for
+more information about Use with care.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>See the &#8220;<a class="reference internal" href="backups.html"><em>Backup and Restoration Strategies</em></a>&#8221; document for
+more information on backing up MongoDB instances. Additionally,
+consider the following references for commands addressed in this
+document:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/mongoexport.html"><em>mongoexport</em></a></li>
+<li><a class="reference internal" href="../reference/mongorestore.html"><em>mongorestore</em></a></li>
+<li><a class="reference internal" href="../reference/mongodump.html"><em>mongodump</em></a></li>
+</ul>
+<p>If you want to transform and process data once you&#8217;ve imported it
+in MongoDB consider the topics in <a class="reference internal" href="../aggregation.html"><em>Aggregation</em></a>, including:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../applications/map-reduce.html"><em>Map-Reduce</em></a> and</li>
+<li><a class="reference internal" href="../applications/aggregation.html"><em>Aggregation Framework</em></a>.</li>
+</ul>
+</div>
+<div class="section" id="data-type-fidelity">
+<span id="bson-json-type-conversion-fidelity"></span><h2>Data Type Fidelity<a class="headerlink" href="#data-type-fidelity" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a> does not have the following data types that exist in
+<a class="reference internal" href="../reference/glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> documents: <tt class="docutils literal"><span class="pre">data_binary</span></tt>, <tt class="docutils literal"><span class="pre">data_date</span></tt>,
+<tt class="docutils literal"><span class="pre">data_timestamp</span></tt>, <tt class="docutils literal"><span class="pre">data_regex</span></tt>, <tt class="docutils literal"><span class="pre">data_oid</span></tt> and <tt class="docutils literal"><span class="pre">data_ref</span></tt>. As
+a result using any tool that decodes BSON <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a>
+into JSON will suffer some loss of fidelity.</p>
+<p>If maintaining type fidelity is important, consider writing a data
+import and export system that does not force BSON documents into JSON
+form as part of the process. The following list of types contain
+examples for how MongoDB will represent how BSON documents render in
+JSON.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_binary</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;$binary&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;bindata&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;$type&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;t&gt;&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;bindata&gt;</span></tt> is the base64 representation of a binary string. <tt class="docutils literal"><span class="pre">&lt;t&gt;</span></tt>
+is the hexadecimal representation of a single byte indicating the
+data type.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_date</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nb">Date</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">date</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;date&gt;</span></tt> is the JSON representation of a 64-bit signed integer for
+milliseconds since epoch.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_timestamp</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">Timestamp</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">t</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">i</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;t&gt;</span></tt> is the JSON representation of a 32-bit unsigned integer for
+milliseconds since epoch. <tt class="docutils literal"><span class="pre">&lt;i&gt;</span></tt> is a 32-bit unsigned integer for
+the increment.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_regex</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="sr">/&lt;jRegex&gt;/</span><span class="o">&lt;</span><span class="nx">jOptions</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;jRegex&gt;</span></tt> is a string that may contain valid JSON characters and
+unescaped double quote (i.e. <tt class="docutils literal"><span class="pre">&quot;</span></tt>) characters, but may not contain
+unescaped forward slash (i.e. <tt class="docutils literal"><span class="pre">/</span></tt>) characters. <tt class="docutils literal"><span class="pre">&lt;jOptions&gt;</span></tt> is a
+string that may contain only the characters <tt class="docutils literal"><span class="pre">g</span></tt>, <tt class="docutils literal"><span class="pre">i</span></tt>,
+<tt class="docutils literal"><span class="pre">m</span></tt>, and <tt class="docutils literal"><span class="pre">s</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_oid</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">ObjectId</span><span class="p">(</span> <span class="s2">&quot;&lt;id&gt;&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;id&gt;</span></tt> is a 24 character hexadecimal string. These representations
+require that <tt class="docutils literal"><span class="pre">data_oid</span></tt> values have an associated field named
+&#8220;<a class="reference internal" href="../reference/glossary.html#term-id"><em class="xref std std-term">_id</em></a>.&#8221;</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">data_ref</span></tt></p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">DBRef</span><span class="p">(</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;id&gt;&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">&lt;name&gt;</span></tt> is a string of valid JSON characters. <tt class="docutils literal"><span class="pre">&lt;id&gt;</span></tt> is a 24
+character hexadecimal string.</p>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference external" href="http://www.mongodb.org/display/DOCS/Mongo+Extended+JSON">MongoDB Extended JSON</a>&#8221; wiki page.</p>
+</div>
+</div>
+<div class="section" id="data-import-and-export-and-backups-operations">
+<h2>Data Import and Export and Backups Operations<a class="headerlink" href="#data-import-and-export-and-backups-operations" title="Permalink to this headline">¶</a></h2>
+<p>For resilient and non-disruptive backups,
+use a file system or block-level disk snapshot function, such as the
+methods described in the &#8220;<a class="reference internal" href="backups.html"><em>Backup and Restoration Strategies</em></a>&#8221; document. The
+tools and operations discussed provide functionality that&#8217;s useful in
+the context of providing some kinds of backups.</p>
+<p>By contrast, use import and export tools to backup a small subset of
+your data or to move data to or from a 3rd party system. These backups may
+capture a small crucial set of data or a frequently modified section of
+data, for extra insurance, or for ease of access. No matter how you
+decide to import or export your data, consider the following guidelines:</p>
+<ul class="simple">
+<li>Label files so that you can identify what point in time the
+export or backup reflects.</li>
+<li>Labeling should describe the contents of the backup, and reflect the
+subset of the data corpus, captured in the backup or export.</li>
+<li>Do not create or apply exports if the backup process itself will
+have an adverse effect on a production system.</li>
+<li>Make sure that they reflect a consistent data state. Export or backup
+processes can impact data integrity (i.e. type fidelity) and
+consistency if updates continue during the backup process.</li>
+<li>Test backups and exports by restoring and importing to ensure that
+the backups are useful.</li>
+</ul>
+</div>
+<div class="section" id="human-intelligible-import-export-formats">
+<h2>Human Intelligible Import/Export Formats<a class="headerlink" href="#human-intelligible-import-export-formats" title="Permalink to this headline">¶</a></h2>
+<p>This section describes a process to import/export your database, or a
+portion thereof, to a file in a <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a> or <a class="reference internal" href="../reference/glossary.html#term-csv"><em class="xref std std-term">CSV</em></a> format.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The <a class="reference internal" href="../reference/mongoimport.html"><em>mongoimport</em></a> and
+<a class="reference internal" href="../reference/mongoexport.html"><em>mongoexport</em></a> documents contain complete
+documentation of these tools. If you have questions about the
+function and parameters of these tools not covered here, please
+refer to these documents.</p>
+<p class="last">If you want to simply copy a database or collection from one
+instance to another, consider using the <a class="reference internal" href="../reference/commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a>,
+<a class="reference internal" href="../reference/commands.html#clone" title="clone"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">clone</span></tt></a>, or <a class="reference internal" href="../reference/commands.html#cloneCollection" title="cloneCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">cloneCollection</span></tt></a> commands, which
+may be more suited to this task. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+provides the <a class="reference internal" href="../reference/method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase()</span></tt></a> method.</p>
+</div>
+<p>These tools may also be useful for importing data into a MongoDB database
+from third party applications.</p>
+<div class="section" id="collection-export-with-mongoexport">
+<h3>Collection Export with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt><a class="headerlink" href="#collection-export-with-mongoexport" title="Permalink to this headline">¶</a></h3>
+<p>With the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> utility you can create a backup
+file. In the most simple invocation, the command takes the following
+form:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --collection collection --out collection.json
+</pre></div>
+</div>
+<p>This will export all documents in the collection named
+<tt class="docutils literal"><span class="pre">collection</span></tt> into the file <tt class="docutils literal"><span class="pre">collection.json</span></tt>. Without the
+output specification (i.e. &#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--out"><em class="xref std std-option">--out collection.json</em></a>&#8221;,) <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> writes output to
+standard output (i.e. &#8220;stdout.&#8221;) You can further narrow the results by
+supplying a query filter using the &#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--query"><em class="xref std std-option">--query</em></a>&#8221;
+and limit results to a single database using the
+&#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--db"><em class="xref std std-option">--db</em></a>&#8221; option. For instance:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --db sales --collection contacts --query <span class="s1">&#39;{&quot;field&quot;: 1}&#39;</span>
+</pre></div>
+</div>
+<p>This command returns all documents in the <tt class="docutils literal"><span class="pre">sales</span></tt> database&#8217;s
+<tt class="docutils literal"><span class="pre">contacts</span></tt> collection, with a field named <tt class="docutils literal"><span class="pre">field</span></tt> with a value
+of <tt class="docutils literal"><span class="pre">1</span></tt>. Enclose the query in single quotes (e.g. <tt class="docutils literal"><span class="pre">'</span></tt>) to ensure
+that it does not interact with your shell environment. The resulting
+documents will return on standard output.</p>
+<p>By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> returns one <a class="reference internal" href="../reference/glossary.html#term-json-document"><em class="xref std std-term">JSON document</em></a>
+per MongoDB document. Specify the
+&#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--jsonArray"><em class="xref std std-option">--jsonArray</em></a>&#8221; argument to return
+the export as a single <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a> array. Use the &#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--csv"><em class="xref std std-option">--csv</em></a>&#8221; file to return the result in CSV (comma
+separated values) format.</p>
+<p>If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance is not running, you can use the
+&#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--dbpath"><em class="xref std std-option">--dbpath</em></a>&#8221; option to specify the
+location to your MongoDB instance&#8217;s database files. See the following
+example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --db sales --collection contacts --dbpath /srv/MongoDB/
+</pre></div>
+</div>
+<p>This reads the data files directly. This locks the data directory to
+prevent conflicting writes. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process must <em>not</em> be
+running or attached to these data files when you run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>
+in this configuration.</p>
+<p>The &#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--host"><em class="xref std std-option">--host</em></a>&#8221; and &#8220;<a class="reference internal" href="../reference/mongoexport.html#cmdoption-mongoexport--port"><em class="xref std std-option">--port</em></a>&#8221; options allow you to specify a non-local host
+to connect to capture the export. Consider the following example:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --host mongodb1.example.net --port 37017 --username user --password pass --collection contacts --file mdb1-examplenet.json
+</pre></div>
+</div>
+<p>On any <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> command you may, as above specify username and
+password credentials as above.</p>
+</div>
+<div class="section" id="collection-import-with-mongoimport">
+<h3>Collection Import with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt><a class="headerlink" href="#collection-import-with-mongoimport" title="Permalink to this headline">¶</a></h3>
+<p>To restore a backup taken with <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>. Most of the
+arguments to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> also exist for
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt>. Consider the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoimport --collection collection --file collection.json
+</pre></div>
+</div>
+<p>This imports the contents of the file <tt class="docutils literal"><span class="pre">collection.json</span></tt> into the
+collection named <tt class="docutils literal"><span class="pre">collection</span></tt>. If you do not specify a file with
+the &#8220;<a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--file"><em class="xref std std-option">--file</em></a>&#8221; option,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> accepts input over standard input
+(e.g. &#8220;stdin.&#8221;)</p>
+<p>If you specify the &#8220;<a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--upsert"><em class="xref std std-option">--upsert</em></a>&#8221; option,
+all of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> operations will attempt to update
+existing documents in the database and insert other documents. This
+option will cause some performance impact depending on your
+configuration.</p>
+<p>You can specify the database option &#8220;<em class="xref std std-option">--db</em>&#8221; to import these documents to a particular database. If your
+MongoDB instance is not running, use the &#8220;<a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--dbpath"><em class="xref std std-option">--dbpath</em></a>&#8221; option to specify the location of your
+MongoDB instance&#8217;s database files. Consider using the
+&#8220;<a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--journal"><em class="xref std std-option">--journal</em></a>&#8221; option to ensure that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> records its operations in the journal. The
+<tt class="docutils literal"><span class="pre">mongod</span></tt> process must <em>not</em> be running or attached to these data
+files when you run <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> in this configuration.</p>
+<p>Use the &#8220;<a class="reference internal" href="../reference/mongoimport.html#cmdoption-mongoimport--ignoreBlanks"><em class="xref std std-option">--ignoreBlanks</em></a>&#8221; option
+to ignore blank fields. For <a class="reference internal" href="../reference/glossary.html#term-csv"><em class="xref std std-term">CSV</em></a> and <a class="reference internal" href="../reference/glossary.html#term-tsv"><em class="xref std std-term">TSV</em></a> imports, this
+option provides the desired functionality in most cases: it avoids
+inserting blank fields in MongoDB documents.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="monitoring.html" title="Previous Section: Monitoring Database Systems">&lt; &nbsp; Monitoring Database Systems</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="backups.html" title="Next Section: Backup and Restoration Strategies">Backup and Restoration Strategies &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

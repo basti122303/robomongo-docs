@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Changes in MongoDB 2.0 &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/release-notes/2.0-changes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="changes-in-mongodb-2-0">
+<h1>Changes in MongoDB 2.0<a class="headerlink" href="#changes-in-mongodb-2-0" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="2.0.html">Release Notes for MongoDB 2.0</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="2.0.html#upgrading">Upgrading</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#preparation">Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#upgrading-a-standalone-mongod">Upgrading a Standalone <tt class="docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#upgrading-a-replica-set">Upgrading a Replica Set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#upgrading-a-sharded-cluster">Upgrading a Sharded Cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.0.html#changes">Changes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#compact-command">Compact Command</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#concurrency-improvements">Concurrency Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#default-stack-size">Default Stack Size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#index-performance-enhancements">Index Performance Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#sharding-authentication">Sharding Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#replica-sets">Replica Sets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#hidden-nodes-in-sharded-clusters">Hidden Nodes in Sharded Clusters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#priorities">Priorities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#data-center-awareness">Data-Center Awareness</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#w-majority"><tt class="docutils literal"><span class="pre">w</span></tt> : <tt class="docutils literal"><span class="pre">majority</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#reconfiguration-with-a-minority-up">Reconfiguration with a Minority Up</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#primary-checks-for-a-caught-up-secondary-before-stepping-down">Primary Checks for a Caught up Secondary before Stepping Down</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#extended-shutdown-on-the-primary-to-minimize-interruption">Extended Shutdown on the Primary to Minimize Interruption</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#maintenance-mode">Maintenance Mode</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#geospatial-features">Geospatial Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#multi-location-documents">Multi-Location Documents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#polygon-searches">Polygon searches</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#journaling-enhancements">Journaling Enhancements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#new-continueonerror-option-for-bulk-insert">New <tt class="docutils literal"><span class="pre">ContinueOnError</span></tt> Option for Bulk Insert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#map-reduce">Map Reduce</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#output-to-a-sharded-collection">Output to a Sharded Collection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#performance-improvements">Performance Improvements</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#new-querying-features">New Querying Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#additional-regex-options-s">Additional regex options: <tt class="docutils literal"><span class="pre">s</span></tt></a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#and">$and</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#command-output-changes">Command Output Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#shell-features">Shell Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#custom-prompt">Custom Prompt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="2.0.html#default-shell-init-script">Default Shell Init Script</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="2.0.html#most-commands-require-authentication">Most Commands Require Authentication</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.0.html#resources">Resources</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

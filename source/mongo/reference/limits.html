@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MongoDB Limits and Thresholds &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/limits" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="MongoDB Extended JSON" href="mongodb-extended-json.html" />
+<link rel="prev" title="System Collections" href="system-collections.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodb-limits-and-thresholds">
+<h1>MongoDB Limits and Thresholds<a class="headerlink" href="#mongodb-limits-and-thresholds" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This document provides a collection of hard and soft limitations of
+the MongoDB system.</p>
+</div>
+<div class="section" id="limits">
+<h2>Limits<a class="headerlink" href="#limits" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bson-documents">
+<h3>BSON Documents<a class="headerlink" href="#bson-documents" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="limit-bson-document-size"></span><dl class="limit">
+<dt id="BSON Document Size">
+<tt class="descname">BSON Document Size</tt><a class="headerlink" href="#BSON Document Size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum BSON document size is 16 megabytes.</p>
+<p>The maximum document size helps ensure that a single document cannot
+use excessive amount of RAM or, during transmission, excessive amount
+of bandwidth. To store documents larger than the maximum size, MongoDB
+provides the GridFS API. See <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> and the
+documentation for your <a class="reference internal" href="../applications/drivers.html"><em>driver</em></a> for more
+information about GridFS.</p>
+</dd></dl>
+
+<span class="target" id="limit-nested-depth"></span><dl class="limit">
+<dt id="Nested Depth for BSON Documents">
+<tt class="descname">Nested Depth for BSON Documents</tt><a class="headerlink" href="#Nested Depth for BSON Documents" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2.</span></p>
+<p>MongoDB supports no more than 100 levels of nesting for <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">BSON
+documents</em></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="namespaces">
+<h3>Namespaces<a class="headerlink" href="#namespaces" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="limit-namespace-length"></span><dl class="limit">
+<dt id="Namespace Length">
+<tt class="descname">Namespace Length</tt><a class="headerlink" href="#Namespace Length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each namespace, including database and collection name, must be
+shorter than 123 bytes.</p>
+</dd></dl>
+
+<span class="target" id="limit-number-of-namespaces"></span><dl class="limit">
+<dt id="Number of Namespaces">
+<tt class="descname">Number of Namespaces</tt><a class="headerlink" href="#Number of Namespaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>The limitation on the number of namespaces is the size of the
+namespace file divided by 628.</p>
+<p>A 16 megabyte namespace file can support approximately 24,000
+namespaces. Each index also counts as a namespace.</p>
+</dd></dl>
+
+<span class="target" id="limit-size-of-namespace-file"></span><dl class="limit">
+<dt id="Size of Namespace File">
+<tt class="descname">Size of Namespace File</tt><a class="headerlink" href="#Size of Namespace File" title="Permalink to this definition">¶</a></dt>
+<dd><p>Namespace files can be no larger than 2047 megabytes.</p>
+<p>By default namespace files are 16 megabytes. You can configure the
+size using the <a class="reference internal" href="configuration-options.html#nssize" title="nssize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">nssize</span></tt></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="indexes">
+<h3>Indexes<a class="headerlink" href="#indexes" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="limit-index-size"></span><dl class="limit">
+<dt id="Index Size">
+<tt class="descname">Index Size</tt><a class="headerlink" href="#Index Size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indexed items can be <em>no larger</em> than 1024 bytes. This value is the
+indexed content (i.e. the field value, or compound field value.)</p>
+</dd></dl>
+
+<span class="target" id="limit-number-of-indexes-per-collection"></span><dl class="limit">
+<dt id="Number of Indexes per Collection">
+<tt class="descname">Number of Indexes per Collection</tt><a class="headerlink" href="#Number of Indexes per Collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A single collection can have <em>no more</em> than 64 indexes.</p>
+</dd></dl>
+
+<span class="target" id="limit-index-name-length"></span><dl class="limit">
+<dt id="Index Name Length">
+<tt class="descname">Index Name Length</tt><a class="headerlink" href="#Index Name Length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The names of indexes, including their namespace (i.e database and
+collection name) cannot be longer than 128 characters. The default
+index name is the concatenation of the field names and index
+directions.</p>
+<p>You can explicitly specific a name to the
+<a class="reference internal" href="method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a>
+helper if the default index name is too long.</p>
+</dd></dl>
+
+<span class="target" id="limit-sharding-unique-indexes"></span><dl class="limit">
+<dt id="Unique Indexes in Sharded Collections">
+<tt class="descname">Unique Indexes in Sharded Collections</tt><a class="headerlink" href="#Unique Indexes in Sharded Collections" title="Permalink to this definition">¶</a></dt>
+<dd><p>MongoDB does not support unique indexes across shards, except when
+the unique index contains the full shard key as a prefix of the
+index. In these situations MongoDB will enforce uniqueness across
+the full key, not a single field.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last"><a class="reference internal" href="../tutorial/enforce-unique-keys-for-sharded-collections.html"><em>Enforce Unique Keys for Sharded Collections</em></a>
+for an alternate approach.</p>
+</div>
+</dd></dl>
+
+<dl class="limit">
+<dt id="Number of Indexed Fields in a Compound Index">
+<tt class="descname">Number of Indexed Fields in a Compound Index</tt><a class="headerlink" href="#Number of Indexed Fields in a Compound Index" title="Permalink to this definition">¶</a></dt>
+<dd><p>There can be no more than 31 fields in a compound index.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="replica-sets">
+<h3>Replica Sets<a class="headerlink" href="#replica-sets" title="Permalink to this headline">¶</a></h3>
+<dl class="limit">
+<dt id="Number of Members of a Replica Set">
+<tt class="descname">Number of Members of a Replica Set</tt><a class="headerlink" href="#Number of Members of a Replica Set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replica sets can have no more than 12 members.</p>
+</dd></dl>
+
+<dl class="limit">
+<dt id="Number of Voting Members of a Replica Set">
+<tt class="descname">Number of Voting Members of a Replica Set</tt><a class="headerlink" href="#Number of Voting Members of a Replica Set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only 7 members of a replica set can have votes at any given
+time. See can vote <a class="reference internal" href="../administration/replica-sets.html#replica-set-non-voting-members"><em>Non-Voting Members</em></a> for more information</p>
+</dd></dl>
+
+</div>
+<div class="section" id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="limit-sort"></span><dl class="limit">
+<dt id="Sorted Documents">
+<tt class="descname">Sorted Documents</tt><a class="headerlink" href="#Sorted Documents" title="Permalink to this definition">¶</a></dt>
+<dd><p>MongoDB will only return sorted results on fields without an index
+<em>if</em> the sort operation uses less than 32 megabytes of memory.</p>
+</dd></dl>
+
+<span class="target" id="limit-sharding-limitations"></span><dl class="limit">
+<dt id="Operations Unavailable in Sharded Environments">
+<tt class="descname">Operations Unavailable in Sharded Environments</tt><a class="headerlink" href="#Operations Unavailable in Sharded Environments" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> does not work with sharding. Use
+<a class="reference internal" href="commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> or <a class="reference internal" href="commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> instead.</p>
+<p><a class="reference internal" href="method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> is incompatible with sharded collections. You may
+use <a class="reference internal" href="method/db.eval.html#db.eval" title="db.eval"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.eval()</span></tt></a> with un-sharded collections in a shard
+cluster.</p>
+<p><a class="reference internal" href="operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> does not permit references to the <tt class="docutils literal"><span class="pre">db</span></tt> object
+from the <a class="reference internal" href="operators.html#_S_where" title="$where"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$where</span></tt></a> function. This is uncommon in
+un-sharded collections.</p>
+<p>The <a class="reference internal" href="operators.html#_S_atomic" title="$atomic"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$atomic</span></tt></a> update modifier does not work in sharded
+environments.</p>
+<p><a class="reference internal" href="operator/snapshot.html#_S_snapshot" title="$snapshot"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$snapshot</span></tt></a> queries do not work in sharded environments.</p>
+</dd></dl>
+
+<dl class="limit">
+<dt id="2d Geospatial queries cannot use the _S_or operator">
+<tt class="descname">2d Geospatial queries cannot use the $or operator</tt><a class="headerlink" href="#2d Geospatial queries cannot use the _S_or operator" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last"><a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> and <a class="reference internal" href="../core/geospatial-indexes.html"><em>2d Geospatial Indexes</em></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="naming-restrictions">
+<h3>Naming Restrictions<a class="headerlink" href="#naming-restrictions" title="Permalink to this headline">¶</a></h3>
+<dl class="limit">
+<dt id="Restrictions on Database Names">
+<tt class="descname">Restrictions on Database Names</tt><a class="headerlink" href="#Restrictions on Database Names" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dot (i.e. <tt class="docutils literal"><span class="pre">.</span></tt>) character is not permissible in database
+names.</p>
+<p>Database names are case sensitive even if the underlying file
+system is case insensitive.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>For MongoDB instances running on Windows.<p>In 2.2 the following characters are not permissible in database names:</p>
+<div class="highlight-none"><div class="highlight"><pre>/\. &quot;*&lt;&gt;:|?
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../release-notes/2.2.html#rn-2-2-database-name-restriction-windows"><em>Restrictions on Database Names for Windows</em></a> for more
+information.</p>
+</p>
+</dd></dl>
+
+<dl class="limit">
+<dt id="Restriction on Collection Names">
+<tt class="descname">Restriction on Collection Names</tt><a class="headerlink" href="#Restriction on Collection Names" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Collection names should begin with an underscore or a letter
+character, and <em>cannot</em>:</p>
+<ul class="simple">
+<li>contain the <tt class="docutils literal"><span class="pre">$</span></tt>.</li>
+<li>be an empty string (e.g. <tt class="docutils literal"><span class="pre">&quot;&quot;</span></tt>).</li>
+<li>contain the null character.</li>
+<li>begin with the <tt class="docutils literal"><span class="pre">system.</span></tt> prefix. (Reserved for internal use.)</li>
+</ul>
+<p>See <a class="reference internal" href="../faq/developers.html#faq-restrictions-on-collection-names"><em>Are there any restrictions on the names of Collections?</em></a> and
+<a class="reference internal" href="../release-notes/2.2.html#rn-2-2-collection-name-restriction"><em>Restrictions on Collection Names</em></a> for more information.</p>
+</dd></dl>
+
+<span class="target" id="limit-restrictions-on-field-names"></span><dl class="limit">
+<dt id="Restrictions on Field Names">
+<tt class="descname">Restrictions on Field Names</tt><a class="headerlink" href="#Restrictions on Field Names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Field names cannot contain dots (i.e. <tt class="docutils literal"><span class="pre">.</span></tt>), dollar signs
+(i.e. <tt class="docutils literal"><span class="pre">$</span></tt>), or null characters. See
+<a class="reference internal" href="../faq/developers.html#faq-dollar-sign-escaping"><em>Dollar Sign Operator Escaping</em></a> for an alternate approach.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="system-collections.html" title="Previous Section: System Collections">&lt; &nbsp; System Collections</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongodb-extended-json.html" title="Next Section: MongoDB Extended JSON">MongoDB Extended JSON &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

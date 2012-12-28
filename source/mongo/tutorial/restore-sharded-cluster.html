@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Restore Sharded Clusters &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/restore-sharded-cluster" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Schedule Backup Window for Sharded Clusters" href="schedule-backup-window-for-sharded-clusters.html" />
+<link rel="prev" title="Restore a Single Shard" href="restore-single-shard.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="restore-sharded-clusters">
+<h1>Restore Sharded Clusters<a class="headerlink" href="#restore-sharded-clusters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The procedure outlined in this document addresses how to restore an
+entire sharded cluster. For information on related backup procedures
+consider the following tutorials describe backup procedures in detail:</p>
+<ul class="simple">
+<li><a class="reference internal" href="backup-sharded-cluster-with-filesystem-snapshots.html"><em>Create Backup of a Sharded Cluster with Filesystem Snapshots</em></a></li>
+<li><a class="reference internal" href="backup-sharded-cluster-with-database-dumps.html"><em>Create Backup of a Sharded Cluster with Database Dumps</em></a></li>
+</ul>
+<p>The exact procedure used to restore a database depends on the method
+used to capture the backup. See the <a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a>
+document for an overview of backups with MongoDB, as well as
+<a class="reference internal" href="../administration/backups.html#sharded-cluster-backups"><em>Sharded Cluster Backup Considerations</em></a> which provides an overview of the high
+level concepts important for backing up sharded clusters.</p>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Stop all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> processes.</p>
+</li>
+<li><p class="first">If shard hostnames have changed, you must manually update the
+<tt class="docutils literal"><span class="pre">shards</span></tt> collection in the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a> to use the new
+hostnames. Do the following:</p>
+<ol class="loweralpha">
+<li><p class="first">Start the three <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config servers</em></a> by
+issuing commands similar to the following, using values appropriate
+to your configuration:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --configsvr --dbpath /data/configdb --port 27018
+</pre></div>
+</div>
+</li>
+<li><p class="first">Restore the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a> on each config server.</p>
+</li>
+<li><p class="first">Start one <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+</li>
+<li><p class="first">Update the <a class="reference internal" href="../reference/config-database.html#config-database"><em>Config Database Contents</em></a> collection named <tt class="docutils literal"><span class="pre">shards</span></tt> to reflect the
+new hostnames.</p>
+</li>
+</ol>
+</li>
+<li><p class="first">Restore the following:</p>
+<ul class="simple">
+<li>Data files for each server in each <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a>. Because replica
+sets provide each production shard, restore all the members of
+the replica set or use the other standard approaches for
+restoring a replica set from backup. See the
+<a class="reference internal" href="../administration/backups.html#backup-restore-snapshot"><em>Restore Snapshot</em></a> and <a class="reference internal" href="../administration/backups.html#backup-restore-dump"><em>Restore Database from Binary Dump with mongorestore</em></a>
+sections for details on these procedures:</li>
+<li>Data files for each <a class="reference internal" href="../core/sharding.html#sharding-config-server"><em>config server</em></a>,
+if you have not already done so in the previous step.</li>
+</ul>
+</li>
+<li><p class="first">Restart the all the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+</li>
+<li><p class="first">Restart all the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances.</p>
+</li>
+<li><p class="first">Connect to a <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance from a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+and run use the <a class="reference internal" href="../reference/method/db.printShardingStatus.html#db.printShardingStatus" title="db.printShardingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printShardingStatus()</span></tt></a> method to ensure
+that the cluster is operational, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">printShardingStatus</span><span class="p">()</span>
+<span class="nx">show</span> <span class="nx">collections</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="restore-single-shard.html" title="Previous Section: Restore a Single Shard">&lt; &nbsp; Restore a Single Shard</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="schedule-backup-window-for-sharded-clusters.html" title="Next Section: Schedule Backup Window for Sharded Clusters">Schedule Backup Window for Sharded Clusters &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

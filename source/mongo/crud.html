@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>CRUD &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/crud" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Read Operations" href="core/read-operations.html" />
+<link rel="prev" title="Control Access to MongoDB Instances with Authentication" href="tutorial/control-access-to-mongodb-with-authentication.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="crud">
+<h1>CRUD<a class="headerlink" href="#crud" title="Permalink to this headline">¶</a></h1>
+<p>CRUD stands for <em>create</em>, <em>read</em>, <em>update</em>, and
+<em>delete</em>, which are the four core database operations used in
+database driven application development. The <a class="reference internal" href="#crud-operations"><em>CRUD Operations</em></a>
+section provides introduction to each class of operation along with
+complete examples of each operation. The documents in the
+<a class="reference internal" href="#crud-read-and-write"><em>Read and Write Operations</em></a> section provide a higher level overview of
+the behavior and available functionality of these operations.</p>
+<div class="section" id="read-and-write-operations">
+<span id="crud-read-and-write"></span><h2>Read and Write Operations<a class="headerlink" href="#read-and-write-operations" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="core/read-operations.html"><em>Read Operations</em></a> and <a class="reference internal" href="core/write-operations.html"><em>Write Operations</em></a>
+documents provide higher level introductions and description of the
+behavior and operations of read and write operations for MongoDB
+deployments. The <a class="reference internal" href="core/document.html"><em>BSON Documents</em></a> provides an overview of
+<a class="reference internal" href="reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> and document-orientation in MongoDB.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/read-operations.html">Read Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/read-operations.html#queries-in-mongodb">Queries in MongoDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/read-operations.html#indexes">Indexes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/read-operations.html#cursors">Cursors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/read-operations.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/write-operations.html">Write Operations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#write-operators">Write Operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#write-concern">Write Concern</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#bulk-inserts">Bulk Inserts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#indexing">Indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#isolation">Isolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/write-operations.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/document.html">BSON Documents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/document.html#structure">Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/document.html#document-types-in-mongodb">Document Types in MongoDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/document.html#bson-type-considerations">BSON Type Considerations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="crud-operations">
+<span id="crud-documents"></span><span id="id1"></span><h2>CRUD Operations<a class="headerlink" href="#crud-operations" title="Permalink to this headline">¶</a></h2>
+<p>These documents provide an overview and examples of CRUD operations in
+MongoDB.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="applications/create.html">Create</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/create.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/create.html#insert">Insert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/create.html#create-with-save">Create with Save</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/create.html#create-with-upsert">Create with Upsert</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/read.html">Read</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/read.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/read.html#find">Find</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/read.html#find-one">Find One</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/update.html">Update</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/update.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/update.html#crud-update-update">Update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/update.html#save">Save</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/delete.html">Delete</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/delete.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/delete.html#remove">Remove</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/control-access-to-mongodb-with-authentication.html" title="Previous Section: Control Access to MongoDB Instances with Authentication">&lt; &nbsp; Control Access to MongoDB Instances with Authentication</a></li>
+<li id="btnvnx"><a href="core/read-operations.html" title="Next Section: Read Operations">Read Operations &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Inventory Management &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/use-cases/inventory-management" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Use Cases" href="../use-cases.html" />
+<link rel="next" title="Category Hierarchy" href="category-hierarchy.html" />
+<link rel="prev" title="Product Catalog" href="product-catalog.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="inventory-management">
+<h1>Inventory Management<a class="headerlink" href="#inventory-management" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This case study provides an overview of practices and patterns for
+designing and developing the inventory management portions of an
+E-commerce application.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="product-catalog.html"><em>Product Catalog</em></a>.&#8221;</p>
+</div>
+<div class="section" id="problem">
+<h3>Problem<a class="headerlink" href="#problem" title="Permalink to this headline">¶</a></h3>
+<p>Customers in e-commerce stores regularly add and remove items from
+their &#8220;shopping cart,&#8221; change quantities multiple times, abandon the
+cart at any point, and sometimes have problems during and after
+checkout that require a hold or canceled order. These activities make
+it difficult to maintain inventory systems and counts and ensure that
+customers cannot &#8220;buy&#8221; items that are unavailable while they shop in
+your store.</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>This solution keeps the traditional metaphor of the shopping cart, but
+the shopping cart will <em>age</em>. After a shopping cart has been inactive
+for a certain period of time, all items in the cart re-enter the
+available inventory and the cart is empty. The state transition
+diagram for a shopping cart is below:</p>
+<div class="figure align-center">
+<img alt="The state transition diagram for a shopping cart is below." src="../_images/inventory1.png" />
+</div>
+</div>
+<div class="section" id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<p>Inventory collections must maintain counts of the current available
+inventory of each stock-keeping unit (SKU; or item) as well as a list
+of items in carts that may return to the available inventory if they
+are in a shopping cart that times out. In the following example, the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field stores the SKU:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nx">_id</span><span class="o">:</span> <span class="s1">&#39;00e8da9b&#39;</span><span class="p">,</span>
+    <span class="nx">qty</span><span class="o">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="nx">carted</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">cart_id</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span>
+          <span class="nx">timestamp</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-03-09T20:55:36Z&quot;</span><span class="p">),</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">cart_id</span><span class="o">:</span> <span class="mi">43</span><span class="p">,</span>
+          <span class="nx">timestamp</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-03-09T21:55:36Z&quot;</span><span class="p">),</span> <span class="p">},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These examples use a simplified schema.  In a production
+implementation, you may choose to merge this schema with the
+product catalog schema described in the
+&#8220;<a class="reference internal" href="product-catalog.html"><em>Product Catalog</em></a>&#8221; document.</p>
+</div>
+<p>The SKU above has 16 items in stock, 1 item a cart, and 2 items in a
+second cart.  This leaves a total of 19 unsold items of merchandise.</p>
+<p>To model the shopping cart objects, you need to maintain <tt class="docutils literal"><span class="pre">sku</span></tt>,
+<tt class="docutils literal"><span class="pre">quantity</span></tt>, fields embedded in a shopping cart <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nx">_id</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span>
+    <span class="nx">last_modified</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-03-09T20:55:36Z&quot;</span><span class="p">),</span>
+    <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;active&#39;</span><span class="p">,</span>
+    <span class="nx">items</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s1">&#39;00e8da9b&#39;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">item_details</span><span class="o">:</span> <span class="p">{...}</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s1">&#39;0ab42f88&#39;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nx">item_details</span><span class="o">:</span> <span class="p">{...}</span> <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">item_details</span></tt> field in each line item allows your
+application to display the cart contents to the user without
+requiring a second query to fetch details from the catalog
+collection.</p>
+</div>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>This section introduces operations that you may use to support an
+e-commerce site. All examples in this document use the Python
+programming language and the <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a>
+<a class="reference internal" href="../reference/glossary.html#term-driver"><em class="xref std std-term">driver</em></a> for MongoDB, but you can implement this system using
+any language you choose.</p>
+<div class="section" id="add-an-item-to-a-shopping-cart">
+<h3>Add an Item to a Shopping Cart<a class="headerlink" href="#add-an-item-to-a-shopping-cart" title="Permalink to this headline">¶</a></h3>
+<p>Moving an item from the available inventory to a cart is a fundamental
+requirement for a shopping cart system. The most important requirement
+is to ensure that your application will never move an unavailable item
+from the inventory to the cart.</p>
+<p>Ensure that inventory is only updated if there is sufficient inventory
+to satisfy the request with the following <tt class="docutils literal"><span class="pre">add_item_to_cart</span></tt>
+function operation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">add_item_to_cart</span><span class="p">(</span><span class="n">cart_id</span><span class="p">,</span> <span class="n">sku</span><span class="p">,</span> <span class="n">qty</span><span class="p">,</span> <span class="n">details</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+    <span class="c"># Make sure the cart is still active and add the line item</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;active&#39;</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">now</span> <span class="p">},</span>
+          <span class="s">&#39;$push&#39;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;sku&#39;</span><span class="p">:</span> <span class="n">sku</span><span class="p">,</span> <span class="s">&#39;qty&#39;</span><span class="p">:</span><span class="n">qty</span><span class="p">,</span> <span class="s">&#39;details&#39;</span><span class="p">:</span> <span class="n">details</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;updatedExisting&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">CartInactive</span><span class="p">()</span>
+
+    <span class="c"># Update the inventory</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="n">sku</span><span class="p">,</span> <span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$gte&#39;</span><span class="p">:</span> <span class="n">qty</span><span class="p">}},</span>
+        <span class="p">{</span><span class="s">&#39;$inc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">qty</span><span class="p">},</span>
+         <span class="s">&#39;$push&#39;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s">&#39;carted&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="n">qty</span><span class="p">,</span> <span class="s">&#39;cart_id&#39;</span><span class="p">:</span><span class="n">cart_id</span><span class="p">,</span>
+                         <span class="s">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">now</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;updatedExisting&#39;</span><span class="p">]:</span>
+        <span class="c"># Roll back our cart update</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s">&#39;$pull&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;sku&#39;</span><span class="p">:</span> <span class="n">sku</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+        <span class="k">raise</span> <span class="n">InadequateInventory</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-the-system-does-not-trust-that-the-available-inventory-can-satisfy-a-request admonition">
+<p class="first admonition-title">The system does not trust that the available inventory can satisfy a request</p>
+<p>First this operation checks to make sure that the cart is
+&#8220;active&#8221; before adding a item. Then, it verifies that the available
+inventory to satisfy the request before decrementing inventory.</p>
+<p class="last">If there is not adequate inventory, the system removes the cart
+update: by specifying <tt class="docutils literal"><span class="pre">w=1</span></tt> and checking the result allows
+the application to report an error if the cart is inactive or
+available quantity is insufficient to satisfy the request.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operation requires no <a class="reference internal" href="../reference/glossary.html#term-index"><em class="xref std std-term">indexes</em></a> beyond the
+default index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</div>
+</div>
+<div class="section" id="modifying-the-quantity-in-the-cart">
+<h3>Modifying the Quantity in the Cart<a class="headerlink" href="#modifying-the-quantity-in-the-cart" title="Permalink to this headline">¶</a></h3>
+<p>The following process underlies adjusting the quantity of items in a
+users cart. The application must ensure that when a user increases the
+quantity of an item, in addition to updating the <tt class="docutils literal"><span class="pre">carted</span></tt> entry for
+the user&#8217;s cart, that the inventory exists to cover the modification.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">update_quantity</span><span class="p">(</span><span class="n">cart_id</span><span class="p">,</span> <span class="n">sku</span><span class="p">,</span> <span class="n">old_qty</span><span class="p">,</span> <span class="n">new_qty</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="n">delta_qty</span> <span class="o">=</span> <span class="n">new_qty</span> <span class="o">-</span> <span class="n">old_qty</span>
+
+    <span class="c"># Make sure the cart is still active and add the line item</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;active&#39;</span><span class="p">,</span> <span class="s">&#39;items.sku&#39;</span><span class="p">:</span> <span class="n">sku</span> <span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">now</span><span class="p">,</span>
+             <span class="s">&#39;items.$.qty&#39;</span><span class="p">:</span> <span class="n">new_qty</span> <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;updatedExisting&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">CartInactive</span><span class="p">()</span>
+
+    <span class="c"># Update the inventory</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="n">sku</span><span class="p">,</span>
+         <span class="s">&#39;carted.cart_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span>
+         <span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$gte&#39;</span><span class="p">:</span> <span class="n">delta_qty</span><span class="p">}</span> <span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$inc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">delta_qty</span> <span class="p">},</span>
+         <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;carted.$.qty&#39;</span><span class="p">:</span> <span class="n">new_qty</span><span class="p">,</span> <span class="s">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">now</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="n">w</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s">&#39;updatedExisting&#39;</span><span class="p">]:</span>
+        <span class="c"># Roll back our cart update</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span> <span class="s">&#39;items.sku&#39;</span><span class="p">:</span> <span class="n">sku</span> <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;items.$.qty&#39;</span><span class="p">:</span> <span class="n">old_qty</span> <span class="p">}</span> <span class="p">})</span>
+        <span class="k">raise</span> <span class="n">InadequateInventory</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>That the positional operator <tt class="docutils literal"><span class="pre">$</span></tt> updates the particular
+<tt class="docutils literal"><span class="pre">carted</span></tt> entry and item that matched the query.</p>
+<p class="last">This allows the application to update the inventory and keep track
+of the data needed to &#8220;rollback&#8221; the cart in a single atomic
+operation. The code also ensures that the cart is active.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operation requires no <a class="reference internal" href="../reference/glossary.html#term-index"><em class="xref std std-term">indexes</em></a> beyond the
+default index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</div>
+</div>
+<div class="section" id="checking-out">
+<h3>Checking Out<a class="headerlink" href="#checking-out" title="Permalink to this headline">¶</a></h3>
+<p>The checkout operation must: validate the method of payment and remove
+the <tt class="docutils literal"><span class="pre">carted</span></tt> items after the transaction succeeds. Consider the
+following procedure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">checkout</span><span class="p">(</span><span class="n">cart_id</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+    <span class="c"># Make sure the cart is still active and set to &#39;pending&#39;. Also</span>
+    <span class="c">#     fetch the cart details so we can calculate the checkout price</span>
+    <span class="n">cart</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">find_and_modify</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;active&#39;</span> <span class="p">},</span>
+        <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;pending&#39;</span><span class="p">,</span><span class="s">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">now</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">cart</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CartInactive</span><span class="p">()</span>
+
+    <span class="c"># Validate payment details; collect payment</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">collect_payment</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span> <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;complete&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;carted.cart_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;$pull&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;cart_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">}</span> <span class="p">},</span>
+            <span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span> <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;active&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="k">raise</span>
+</pre></div>
+</div>
+<p>Begin by &#8220;locking&#8221; the cart by setting its status to &#8220;pending&#8221; Then
+the system will verify that the cart is still active and collect
+payment data. Then, the <a class="reference internal" href="../reference/commands.html#findAndModify" title="findAndModify"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">findAndModify</span></tt></a> <a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">command</em></a> makes it possible to update the cart atomically
+and return its details to capture payment information. Then:</p>
+<ul class="simple">
+<li>If the payment is successful, then the application will remove the
+<tt class="docutils literal"><span class="pre">carted</span></tt> items from the inventory documents and set the cart to
+<tt class="docutils literal"><span class="pre">complete</span></tt>.</li>
+<li>If payment is unsuccessful, the application will unlock the cart by
+setting its status to <tt class="docutils literal"><span class="pre">active</span></tt> and report a payment error.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This operation requires no <a class="reference internal" href="../reference/glossary.html#term-index"><em class="xref std std-term">indexes</em></a> beyond the
+default index on the <tt class="docutils literal"><span class="pre">_id</span></tt> field.</p>
+</div>
+</div>
+<div class="section" id="returning-inventory-from-timed-out-carts">
+<h3>Returning Inventory from Timed-Out Carts<a class="headerlink" href="#returning-inventory-from-timed-out-carts" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="process">
+<h4>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h4>
+<p>Periodically, your application must &#8220;expire&#8221; inactive carts and return
+their items to available inventory. In the example that follows the
+variable <tt class="docutils literal"><span class="pre">timeout</span></tt> controls the length of time before a cart
+expires:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">expire_carts</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="c"># Lock and find all the expiring carts</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;active&#39;</span><span class="p">,</span> <span class="s">&#39;last_modified&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">threshold</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;expiring&#39;</span> <span class="p">}</span> <span class="p">},</span>
+        <span class="n">multi</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span>
+
+    <span class="c"># Actually expire each cart</span>
+    <span class="k">for</span> <span class="n">cart</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;expiring&#39;</span><span class="p">}):</span>
+
+        <span class="c"># Return all line items to inventory</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">cart</span><span class="p">[</span><span class="s">&#39;items&#39;</span><span class="p">]:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;sku&#39;</span><span class="p">],</span>
+                  <span class="s">&#39;carted.cart_id&#39;</span><span class="p">:</span> <span class="n">cart</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span>
+                  <span class="s">&#39;carted.qty&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;qty&#39;</span><span class="p">]</span>
+                <span class="p">},</span>
+                <span class="p">{</span><span class="s">&#39;$inc&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;qty&#39;</span><span class="p">]</span> <span class="p">},</span>
+                 <span class="s">&#39;$pull&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;carted&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;cart_id&#39;</span><span class="p">:</span> <span class="n">cart</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+
+        <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">cart</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="n">status</span><span class="s">&#39;: &#39;</span><span class="n">expired</span><span class="s">&#39; })</span>
+</pre></div>
+</div>
+<p>This procedure:</p>
+<ol class="arabic simple">
+<li>finds all carts that are older than the <tt class="docutils literal"><span class="pre">threshold</span></tt> and are due
+for expiration.</li>
+<li>for each &#8220;expiring&#8221; cart, return all items to the available
+inventory.</li>
+<li>once the items return to the available inventory, set the
+<tt class="docutils literal"><span class="pre">status</span></tt> field to <tt class="docutils literal"><span class="pre">expired</span></tt>.</li>
+</ol>
+</div>
+<div class="section" id="indexing">
+<h4>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h4>
+<p>To support returning inventory from timed-out cart, create an index to
+support queries on
+their <tt class="docutils literal"><span class="pre">status</span></tt> and <tt class="docutils literal"><span class="pre">last_modified</span></tt> fields. Use the following
+operations in the Python/PyMongo shell:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">([(</span><span class="s">&#39;status&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;last_modified&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="error-handling">
+<h3>Error Handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h3>
+<p>The above operations do not account for one possible failure
+situation: if an exception occurs after updating the shopping cart but
+before updating the inventory collection. This would result in a
+shopping cart that may be absent or expired but items have not
+returned to available inventory.</p>
+<p>To account for this case, your application will need a periodic
+cleanup operation that finds inventory items that have <tt class="docutils literal"><span class="pre">carted</span></tt>
+items and check that to ensure that they exist in a user&#8217;s cart, and
+return them to available inventory if they do not.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">cleanup_inventory</span><span class="p">(</span><span class="n">timeout</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="c"># Find all the expiring carted items</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+        <span class="p">{</span><span class="s">&#39;carted.timestamp&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">threshold</span> <span class="p">}}):</span>
+
+        <span class="c"># Find all the carted items that matched</span>
+        <span class="n">carted</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                  <span class="p">(</span><span class="n">carted_item</span><span class="p">[</span><span class="s">&#39;cart_id&#39;</span><span class="p">],</span> <span class="n">carted_item</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">carted_item</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;carted&#39;</span><span class="p">]</span>
+                  <span class="k">if</span> <span class="n">carted_item</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">)</span>
+
+        <span class="c"># First Pass: Find any carts that are active and refresh the carted items</span>
+        <span class="k">for</span> <span class="n">cart</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;$in&#39;</span><span class="p">:</span> <span class="n">carted</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">},</span>
+            <span class="s">&#39;status&#39;</span><span class="p">:</span><span class="s">&#39;active&#39;</span><span class="p">}):</span>
+            <span class="n">cart</span> <span class="o">=</span> <span class="n">carted</span><span class="p">[</span><span class="n">cart</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">]]</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">],</span>
+                  <span class="s">&#39;carted.cart_id&#39;</span><span class="p">:</span> <span class="n">cart</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">]</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;carted.$.timestamp&#39;</span><span class="p">:</span> <span class="n">now</span> <span class="p">}</span> <span class="p">})</span>
+            <span class="k">del</span> <span class="n">carted</span><span class="p">[</span><span class="n">cart</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">]]</span>
+
+        <span class="c"># Second Pass: All the carted items left in the dict need to now be</span>
+        <span class="c">#    returned to inventory</span>
+        <span class="k">for</span> <span class="n">cart_id</span><span class="p">,</span> <span class="n">carted_item</span> <span class="ow">in</span> <span class="n">carted</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">inventory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s">&#39;_id&#39;</span><span class="p">],</span>
+                  <span class="s">&#39;carted.cart_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span>
+                  <span class="s">&#39;carted.qty&#39;</span><span class="p">:</span> <span class="n">carted_item</span><span class="p">[</span><span class="s">&#39;qty&#39;</span><span class="p">]</span> <span class="p">},</span>
+                <span class="p">{</span> <span class="s">&#39;$inc&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;qty&#39;</span><span class="p">:</span> <span class="n">carted_item</span><span class="p">[</span><span class="s">&#39;qty&#39;</span><span class="p">]</span> <span class="p">},</span>
+                  <span class="s">&#39;$pull&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;carted&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;cart_id&#39;</span><span class="p">:</span> <span class="n">cart_id</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>To summarize: This operation finds all &#8220;carted&#8221; items that have time
+stamps older than the threshold. Then, the process makes two passes
+over these items:</p>
+<ol class="arabic simple">
+<li>Of the items with time stamps older than the threshold, if the cart
+is still active, it resets the time stamp to maintain the carts.</li>
+<li>Of the stale items that remain in inactive carts, the operation
+returns these items to the inventory.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The function above is safe for use because it checks to ensure that
+the cart has expired before returning items from the cart to
+inventory. However, it could be long-running and slow other updates
+and queries.</p>
+<p class="last">Use judiciously.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sharding">
+<h2>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h2>
+<p>If you need to <a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> the data for this system, the <tt class="docutils literal"><span class="pre">_id</span></tt>
+field is an ideal <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> for both carts and products
+because most update operations use the <tt class="docutils literal"><span class="pre">_id</span></tt> field. This allows
+<a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> to route all updates that select on <tt class="docutils literal"><span class="pre">_id</span></tt> to a
+single <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process.</p>
+<p>There are two drawbacks for using <tt class="docutils literal"><span class="pre">_id</span></tt> as a shard key:</p>
+<ul>
+<li><p class="first">If the cart collection&#8217;s <tt class="docutils literal"><span class="pre">_id</span></tt> is an incrementing value, all new
+carts end up on a single shard.</p>
+<p>You can mitigate this effect by choosing a random value upon the
+creation of a cart, such as a hash (i.e. MD5 or SHA-1) of an
+ObjectID, as the <tt class="docutils literal"><span class="pre">_id</span></tt>. The process for this operation would
+resemble the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">bson</span>
+
+<span class="n">cart_id</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">ObjectId</span><span class="p">()</span>
+<span class="n">cart_id_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cart_id</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+<span class="n">cart</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;_id&quot;</span><span class="p">:</span> <span class="n">cart_id</span><span class="p">,</span> <span class="s">&quot;cart_hash&quot;</span><span class="p">:</span> <span class="n">cart_id_hash</span> <span class="p">}</span>
+<span class="n">db</span><span class="o">.</span><span class="n">cart</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Cart expiration and inventory adjustment requires update operations
+and queries to broadcast to all shards when using <tt class="docutils literal"><span class="pre">_id</span></tt> as a shard
+key.</p>
+<p>This may be less relevant as the expiration functions run relatively
+infrequently and you can queue them or artificially slow them down
+(as with judicious use of <tt class="xref py py-meth docutils literal"><span class="pre">sleep()</span></tt>)
+to minimize server load.</p>
+</li>
+</ul>
+<p>Use the following commands in the Python/PyMongo console to shard the
+cart and inventory collections:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;inventory&#39;</span>
+<span class="gp">... </span>           <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="go">{ &quot;collectionsharded&quot; : &quot;inventory&quot;, &quot;ok&quot; : 1 }</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;cart&#39;</span><span class="p">)</span>
+<span class="gp">... </span>           <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="go">{ &quot;collectionsharded&quot; : &quot;cart&quot;, &quot;ok&quot; : 1 }</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="product-catalog.html" title="Previous Section: Product Catalog">&lt; &nbsp; Product Catalog</a></li>
+<li id="btnvup"><a href="../use-cases.html" title="Parent Section: Use Cases" >&#47;&#92;&nbsp; Use Cases</a></li>
+<li id="btnvnx"><a href="category-hierarchy.html" title="Next Section: Category Hierarchy">Category Hierarchy &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

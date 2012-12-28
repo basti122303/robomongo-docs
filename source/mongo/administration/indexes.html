@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Indexing Operations &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration/indexes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Indexes" href="../indexes.html" />
+<link rel="next" title="Indexing Strategies" href="../applications/indexes.html" />
+<link rel="prev" title="Indexing Overview" href="../core/indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="indexing-operations">
+<h1>Indexing Operations<a class="headerlink" href="#indexing-operations" title="Permalink to this headline">¶</a></h1>
+<p>This document provides operational guidelines and procedures for
+indexing data in MongoDB collections. For the fundamentals of MongoDB
+indexing, see the <a class="reference internal" href="../core/indexes.html"><em>Indexing Overview</em></a> document. For strategies and
+practical approaches, see the <a class="reference internal" href="../applications/indexes.html"><em>Indexing Strategies</em></a> document.</p>
+<p>Indexes allow MongoDB to process and fulfill queries quickly by creating
+small and efficient representations of the documents in a collection.</p>
+<div class="section" id="create-an-index">
+<span id="index-create-index"></span><span id="index-0"></span><h2>Create an Index<a class="headerlink" href="#create-an-index" title="Permalink to this headline">¶</a></h2>
+<p>To create an index, use <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a> or a similar
+<a class="reference external" href="http://api.mongodb.org/">method from your driver</a>. For example
+the following creates an index on the <tt class="docutils literal"><span class="pre">phone-number</span></tt> field
+of the <tt class="docutils literal"><span class="pre">people</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;phone-number&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> only creates an
+index if an index of the same specification does not already exist.</p>
+<p>All indexes support and optimize the performance for queries that select
+on this field. For queries that cannot use an index, MongoDB must scan
+all documents in a collection for documents that match the query.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>If you create an index on the <tt class="docutils literal"><span class="pre">user_id</span></tt> field in the <tt class="docutils literal"><span class="pre">records</span></tt>,
+this index is, the index will support the following query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">user_id</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>However, the following query, on the <tt class="docutils literal"><span class="pre">profile_url</span></tt> field is not
+supported by this index:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">profile_url</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>If your collection holds a large amount of data, consider building the index in the
+background, as described in <a class="reference internal" href="../core/indexes.html#index-creation-background"><em>Background Construction</em></a>. To build
+indexes on replica sets, see the <a class="reference internal" href="#index-build-on-replica-sets"><em>Build Indexes on Replica Sets</em></a>
+section for more information.</p>
+<span class="target" id="index-1"></span></div>
+<div class="section" id="create-a-compound-index">
+<span id="index-create-compound-index"></span><span id="index-2"></span><h2>Create a Compound Index<a class="headerlink" href="#create-a-compound-index" title="Permalink to this headline">¶</a></h2>
+<p>To create a <a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound index</em></a> use an
+operation that resembles the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">c</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, the following operation will create an index on the
+<tt class="docutils literal"><span class="pre">item</span></tt>, <tt class="docutils literal"><span class="pre">category</span></tt>, and <tt class="docutils literal"><span class="pre">price</span></tt> fields of the <tt class="docutils literal"><span class="pre">products</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">category</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">price</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Some drivers may specify indexes, using <tt class="docutils literal"><span class="pre">NumberLong(1)</span></tt> rather than
+<tt class="docutils literal"><span class="pre">1</span></tt> as the specification. This does not have any affect on the
+resulting index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To build or rebuild indexes for a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> see
+<a class="reference internal" href="#index-building-replica-sets"><em>Build Indexes on Replica Sets</em></a>.</p>
+</div>
+<p id="index-special-creation-options"><span id="index-3"></span>If your collection is large, build the index in the background, as
+described in <a class="reference internal" href="../core/indexes.html#index-creation-background"><em>Background Construction</em></a>. If you build in the
+background on a live replica set, see also
+<a class="reference internal" href="#index-build-on-replica-sets"><em>Build Indexes on Replica Sets</em></a>.</p>
+</div>
+<div class="section" id="special-creation-options">
+<h2>Special Creation Options<a class="headerlink" href="#special-creation-options" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">TTL collections use a special <tt class="docutils literal"><span class="pre">expire</span></tt> index option. See
+<a class="reference internal" href="../tutorial/expire-data.html"><em>Expire Data from Collections by Setting TTL</em></a> for more information.</p>
+</div>
+<div class="section" id="sparse-indexes">
+<span id="index-sparse-index"></span><span id="index-4"></span><h3>Sparse Indexes<a class="headerlink" href="#sparse-indexes" title="Permalink to this headline">¶</a></h3>
+<p>To create a <a class="reference internal" href="../core/indexes.html#index-type-sparse"><em>sparse index</em></a> on a field, use an
+operation that resembles the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sparse</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following example creates a sparse index on the <tt class="docutils literal"><span class="pre">users</span></tt>
+table that <em>only</em> indexes the <tt class="docutils literal"><span class="pre">twitter_name</span></tt> <em>if</em> a document has
+this field. This index will not include documents in this collection
+without the <tt class="docutils literal"><span class="pre">twitter_name</span></tt> field.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">twitter_name</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sparse</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Sparse indexes can affect the results returned by the query,
+particularly with respect to sorts on fields <em>not</em> included in the
+index. See the <a class="reference internal" href="../core/indexes.html#index-type-sparse"><em>sparse index</em></a> section for
+more information.</p>
+</div>
+</div>
+<div class="section" id="unique-indexes">
+<span id="index-unique-index"></span><span id="index-5"></span><h3>Unique Indexes<a class="headerlink" href="#unique-indexes" title="Permalink to this headline">¶</a></h3>
+<p>To create a <a class="reference internal" href="../core/indexes.html#index-type-unique"><em>unique indexes</em></a>, consider the
+following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">unique</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, you may want to create a unique index on the <tt class="docutils literal"><span class="pre">&quot;tax-id&quot;:</span></tt>
+of the <tt class="docutils literal"><span class="pre">accounts</span></tt> collection to prevent storing multiple account
+records for the same legal entity:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;tax-id&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">unique</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../core/indexes.html#index-type-id"><em>_id index</em></a> is a unique index. In some
+situations you may consider using <tt class="docutils literal"><span class="pre">_id</span></tt> field itself for this kind
+of data rather than using a unique index on another field.</p>
+<p>In many situations you will want to combine the <tt class="docutils literal"><span class="pre">unique</span></tt> constraint
+with the <tt class="docutils literal"><span class="pre">sparse</span></tt> option. When MongoDB indexes a field, if a
+document does not have a value for a field, the index entry for that
+item will be <tt class="docutils literal"><span class="pre">null</span></tt>. Since unique indexes cannot have duplicate
+values for a field, without the <tt class="docutils literal"><span class="pre">sparse</span></tt> option, MongoDB will reject
+the second document and all subsequent documents without the indexed
+field. Consider the following prototype.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">unique</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">sparse</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also enforce a unique constraint on <a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound indexes</em></a>, as in the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">unique</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>These indexes enforce uniqueness for the <em>combination</em> of index keys
+and <em>not</em> for either key individually.</p>
+</div>
+<div class="section" id="create-in-background">
+<span id="index-create-in-background"></span><span id="index-6"></span><h3>Create in Background<a class="headerlink" href="#create-in-background" title="Permalink to this headline">¶</a></h3>
+<p>To create an index in the background you can specify <a class="reference internal" href="../core/indexes.html#index-creation-background"><em>background
+construction</em></a>. Consider the following
+prototype invocation of <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">background</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the section on <a class="reference internal" href="../core/indexes.html#index-creation-background"><em>background index construction</em></a> for more information about these indexes
+and their implications.</p>
+<span class="target" id="index-7"></span></div>
+<div class="section" id="drop-duplicates">
+<span id="index-drop-duplicates"></span><span id="index-8"></span><h3>Drop Duplicates<a class="headerlink" href="#drop-duplicates" title="Permalink to this headline">¶</a></h3>
+<p>To force the creation of a <a class="reference internal" href="../core/indexes.html#index-type-unique"><em>unique index</em></a>
+index on a collection with duplicate values in the field you are
+indexing you can use the <tt class="docutils literal"><span class="pre">dropDups</span></tt> option. This will force MongoDB
+to create a <em>unique</em> index by deleting documents with duplicate values
+when building the index. Consider the following prototype invocation
+of <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">dropDups</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>See the full documentation of <a class="reference internal" href="../core/indexes.html#index-creation-duplicate-dropping"><em>duplicate dropping</em></a> for more information.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Specifying <tt class="docutils literal"><span class="pre">{</span> <span class="pre">dropDups:</span> <span class="pre">true</span> <span class="pre">}</span></tt> may delete data from your
+database. Use with extreme caution.</p>
+</div>
+<p>Refer to the <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a>
+documentation for additional index creation options.</p>
+</div>
+</div>
+<div class="section" id="information-about-indexes">
+<h2>Information about Indexes<a class="headerlink" href="#information-about-indexes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="list-all-indexes-on-a-collection">
+<span id="index-list-indexes-for-collection"></span><span id="index-9"></span><h3>List all Indexes on a Collection<a class="headerlink" href="#list-all-indexes-on-a-collection" title="Permalink to this headline">¶</a></h3>
+<p>To return a list of all indexes on a collection, use the, use the
+<a class="reference internal" href="../reference/method/db.collection.getIndexes.html#db.collection.getIndexes" title="db.collection.getIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.getIndexes()</span></tt></a> method or a similar
+<a class="reference external" href="http://api.mongodb.org/">method for your driver</a>.</p>
+<p>For example, to view all indexes on the <tt class="docutils literal"><span class="pre">people</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">getIndexes</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-all-indexes-for-a-database">
+<span id="index-list-indexes-for-database"></span><span id="index-10"></span><h3>List all Indexes for a Database<a class="headerlink" href="#list-all-indexes-for-a-database" title="Permalink to this headline">¶</a></h3>
+<p>To return a list of all indexes on all collections in a database, use
+the following operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">system</span><span class="p">.</span><span class="nx">indexes</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="measure-index-use">
+<span id="indexes-measuring-use"></span><span id="index-measure-index-use"></span><span id="index-11"></span><h3>Measure Index Use<a class="headerlink" href="#measure-index-use" title="Permalink to this headline">¶</a></h3>
+<p>Query performance is a good general indicator of index use;
+however, for more precise insight into index use, MongoDB provides the
+following tools:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a></p>
+<p>Append the <a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> method to any cursor
+(e.g. query) to return a document with statistics about the query
+process, including the index used, the number of documents scanned,
+and the time the query takes to process in milliseconds.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.hint()</span></tt></a></p>
+<p>Append the <a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> to any cursor (e.g.
+query) with the index as the argument to <em>force</em> MongoDB
+to use a specific index to fulfill the query. Consider the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span> <span class="nx">zipcode</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">63000</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">hint</span><span class="p">(</span> <span class="p">{</span> <span class="nx">zipcode</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can use <a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> and <a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> in conjunction with each other to compare the
+effectiveness of a specific index. Specify the <tt class="docutils literal"><span class="pre">$natural</span></tt> operator
+to the <a class="reference internal" href="../reference/method/cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> method to prevent MongoDB from
+using <em>any</em> index:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">people</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John Doe&quot;</span><span class="p">,</span> <span class="nx">zipcode</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">63000</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">hint</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$natural</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><a class="reference internal" href="../reference/server-status.html#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a></p>
+<p>Use the <a class="reference internal" href="../reference/server-status.html#indexCounters" title="indexCounters"><tt class="xref mongodb mongodb-status docutils literal"><span class="pre">indexCounters</span></tt></a> data in the output of
+<a class="reference internal" href="../reference/commands.html#serverStatus" title="serverStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">serverStatus</span></tt></a> for insight into database-wise index
+utilization.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="remove-indexes">
+<span id="index-remove-index"></span><span id="index-12"></span><h2>Remove Indexes<a class="headerlink" href="#remove-indexes" title="Permalink to this headline">¶</a></h2>
+<p>To remove an index, use the <a class="reference internal" href="../reference/method/db.collection.dropIndex.html#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> method,
+as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">dropIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;tax-id&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This will remove the index on the <tt class="docutils literal"><span class="pre">&quot;tax-id&quot;</span></tt> field in the <tt class="docutils literal"><span class="pre">accounts</span></tt>
+collection. The shell provides the following document after completing
+the operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;nIndexesWas&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where the value of <tt class="docutils literal"><span class="pre">nIndexesWas</span></tt> reflects the number of indexes
+<em>before</em> removing this index. You can also use the
+<a class="reference internal" href="../reference/method/db.collection.dropIndexes.html#db.collection.dropIndexes" title="db.collection.dropIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndexes()</span></tt></a> to remove <em>all</em> indexes, except
+for the <a class="reference internal" href="../core/indexes.html#index-type-id"><em>_id index</em></a> from a collection.</p>
+<p>These shell helpers provide wrappers around the
+<a class="reference internal" href="../reference/commands.html#dropIndexes" title="dropIndexes"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">dropIndexes</span></tt></a> <a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>. Your <a class="reference internal" href="../applications/drivers.html"><em>client
+library</em></a> may have a different or additional
+interface for these operations.</p>
+</div>
+<div class="section" id="rebuild-indexes">
+<span id="index-rebuild-index"></span><span id="index-13"></span><h2>Rebuild Indexes<a class="headerlink" href="#rebuild-indexes" title="Permalink to this headline">¶</a></h2>
+<p>If you need to rebuild indexes for a collection you can use the
+<a class="reference internal" href="../reference/method/db.collection.reIndex.html#db.collection.reIndex" title="db.collection.reIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.reIndex()</span></tt></a> method. This will drop all indexes,
+including the <a class="reference internal" href="../core/indexes.html#index-type-id"><em>_id index</em></a>, and then rebuild
+all indexes. The operation takes the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">accounts</span><span class="p">.</span><span class="nx">reIndex</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>MongoDB will return the following document when the operation
+completes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+        <span class="s2">&quot;nIndexesWas&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;msg&quot;</span> <span class="o">:</span> <span class="s2">&quot;indexes dropped for collection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nIndexes&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;indexes&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                        <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="s2">&quot;tax-id&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;records.accounts&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;_id_&quot;</span>
+                <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This shell helper provides a wrapper around the <a class="reference internal" href="../reference/commands.html#reIndex" title="reIndex"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">reIndex</span></tt></a>
+<a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>. Your <a class="reference internal" href="../applications/drivers.html"><em>client library</em></a>
+may have a different or additional interface for this operation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To build or rebuild indexes for a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> see
+<a class="reference internal" href="#index-building-replica-sets"><em>Build Indexes on Replica Sets</em></a>.</p>
+</div>
+<span class="target" id="index-14"></span></div>
+<div class="section" id="build-indexes-on-replica-sets">
+<span id="index-building-replica-sets"></span><span id="index-build-on-replica-sets"></span><span id="index-15"></span><h2>Build Indexes on Replica Sets<a class="headerlink" href="#build-indexes-on-replica-sets" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="../core/indexes.html#index-creation-background"><em>Background index creation operations</em></a> become <em>foreground</em> indexing operations
+on <a class="reference internal" href="../reference/glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> members of replica sets. The foreground index
+building process blocks all replication and read operations on the
+secondaries while they build the index.</p>
+<p>Secondaries will begin building indexes <em>after</em> the
+<a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> finishes building the index. In <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>, the <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> will send <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> to the primary members of the replica
+set for each shard, which then replicate to the secondaries after the
+primary finishes building the index.</p>
+<p>To minimize the impact of building an index on your replica set, use
+the following procedure to build indexes on secondaries:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you need to build an index in a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, repeat
+the following procedure for each replica set that provides each
+<a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a>.</p>
+</div>
+<ol class="arabic simple">
+<li>Stop the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process on one secondary. Restart the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process <em>without</em> the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a>
+option and running on a different port. <a class="footnote-reference" href="#different-port" id="id1">[1]</a> This
+instance is now in &#8220;standalone&#8221; mode.</li>
+<li>Create the new index or rebuild the index on this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance.</li>
+<li>Restart the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">--replSet</em></a> option. Allow replication
+to catch up on this member.</li>
+<li>Repeat this operation on all of the remaining secondaries.</li>
+<li>Run <a class="reference internal" href="../reference/replica-commands.html#rs.stepDown" title="rs.stepDown"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.stepDown()</span></tt></a> on the <a class="reference internal" href="../reference/glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member of the
+set, and then repeat this procedure on the former primary.</li>
+</ol>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Ensure that your <a class="reference internal" href="../reference/glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> is large enough to permit the
+indexing or re-indexing operation to complete without falling
+too far behind to catch up. See the &#8220;<a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>oplog sizing</em></a>&#8221; documentation for additional
+information.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This procedure <em>does</em> take one member out of the replica set at a
+time. However, this procedure will only affect one member of the
+set at a time rather than <em>all</em> secondaries at the same time.</p>
+</div>
+<table class="docutils footnote" frame="void" id="different-port" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>By running the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on a different
+port, you ensure that the other members of the replica set and all
+clients will not contact the member while you are building the
+index.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="monitor-and-control-index-building">
+<span id="indexes-admin-stop-in-progress-build"></span><span id="index-monitor-index-building"></span><span id="index-16"></span><h2>Monitor and Control Index Building<a class="headerlink" href="#monitor-and-control-index-building" title="Permalink to this headline">¶</a></h2>
+<p>To see the status of the indexing processes, you can use the
+<a class="reference internal" href="../reference/method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. The value
+of the <tt class="docutils literal"><span class="pre">query</span></tt> field and the <tt class="docutils literal"><span class="pre">msg</span></tt> field will indicate if the
+operation is an index build. The <tt class="docutils literal"><span class="pre">msg</span></tt> field also indicates the
+percent of the build that is complete.</p>
+<p>You can only terminate a background index build. If you need to
+terminate an ongoing index build, You can use the
+<a class="reference internal" href="../reference/method/db.killOp.html#db.killOp" title="db.killOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.killOp()</span></tt></a> method in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../core/indexes.html" title="Previous Section: Indexing Overview">&lt; &nbsp; Indexing Overview</a></li>
+<li id="btnvup"><a href="../indexes.html" title="Parent Section: Indexes" >&#47;&#92;&nbsp; Indexes</a></li>
+<li id="btnvnx"><a href="../applications/indexes.html" title="Next Section: Indexing Strategies">Indexing Strategies &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

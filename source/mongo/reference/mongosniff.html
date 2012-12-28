@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongosniff &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongosniff" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongofiles" href="mongofiles.html" />
+<link rel="prev" title="mongotop" href="mongotop.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongosniff">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongosniff</span></tt><a class="headerlink" href="#mongosniff" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> provides a low-level operation tracing/sniffing view
+into database activity in real time. Think of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> as a
+MongoDB-specific analogue of <tt class="docutils literal"><span class="pre">tcpdump</span></tt> for TCP/IP network
+traffic. Typically, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> is most frequently used in driver
+development.</p>
+<div class="admonition note" id="mongosniff-libcap">
+<p class="first admonition-title">Note</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> requires <tt class="docutils literal"><span class="pre">libpcap</span></tt> and is only available for
+Unix-like systems. Furthermore, the version distributed with the
+MongoDB binaries is dynamically linked against aversion 0.9 of
+<tt class="docutils literal"><span class="pre">libpcap</span></tt>. If your system has a different version of <tt class="docutils literal"><span class="pre">libpcap</span></tt>, you
+will need to compile <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> yourself or create a
+symbolic link pointing to <tt class="docutils literal"><span class="pre">libpcap.so.0.9</span></tt> to your local version
+of <tt class="docutils literal"><span class="pre">libpcap</span></tt>. Use an operation that resembles the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>ln -s /usr/lib/libpcap.so.1.1.1 /usr/lib/libpcap.so.0.9
+</pre></div>
+</div>
+<p class="last">Change the path&#8217;s and name of the shared library as needed.</p>
+</div>
+<p>As an alliterative to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>, Wireshark, a popular
+network sniffing tool is capable of inspecting and parsing the MongoDB
+wire protocol.</p>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongosniff</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongosniff--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongosniff--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongosniff--forward">
+<tt class="descname">--forward</tt><tt class="descclassname"> &lt;host&gt;:&lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongosniff--forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Declares a host to forward all parsed requests that the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> intercepts to another <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance and issue those operations on that database instance.</p>
+<p>Specify the target host name and port in the <tt class="docutils literal"><span class="pre">&lt;host&gt;:&lt;port&gt;</span></tt>
+format.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongosniff--source">
+<tt class="descname">--source</tt><tt class="descclassname"> &lt;NET [interface]&gt;, &lt;FILE [filename]&gt;, &lt;DIAGLOG [filename]&gt;</tt><a class="headerlink" href="#cmdoption-mongosniff--source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies source material to inspect. Use <tt class="docutils literal"><span class="pre">--source</span> <span class="pre">NET</span>
+<span class="pre">[interface]</span></tt> to inspect traffic from a network interface
+(e.g. <tt class="docutils literal"><span class="pre">eth0</span></tt> or <tt class="docutils literal"><span class="pre">lo</span></tt>.) Use <tt class="docutils literal"><span class="pre">--source</span> <span class="pre">FILE</span> <span class="pre">[filename]</span></tt> to
+read captured packets in <a class="reference internal" href="glossary.html#term-pcap"><em class="xref std std-term">pcap</em></a> format.</p>
+<p>You may use the <tt class="docutils literal"><span class="pre">--source</span> <span class="pre">DIAGLOG</span> <span class="pre">[filename]</span></tt> option to read
+the output files produced by the <a class="reference internal" href="mongod.html#cmdoption-mongod--diaglog"><em class="xref std std-option">--diaglog</em></a>
+option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongosniff--objcheck">
+<tt class="descname">--objcheck</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongosniff--objcheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the behavior to <em>only</em> display invalid BSON objects and
+nothing else. Use this option for troubleshooting driver
+development. This option has some performance impact on the
+performance of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">&lt;port&gt;</tt></dt>
+<dd><p>Specifies alternate ports to sniff for traffic. By default,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> watches for MongoDB traffic on port 27017. Append
+multiple port numbers to the end of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> to monitor
+traffic on multiple ports.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Use the following command to connect to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> running on port 27017 <em>and</em> 27018 on the localhost
+interface:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongosniff --source NET lo 27017 27018
+</pre></div>
+</div>
+<p>Use the following command to only log invalid <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> objects for
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> running on the localhost
+interface and port 27018, for driver development and troubleshooting:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongosniff --objcheck --source NET lo 27018
+</pre></div>
+</div>
+</div>
+<div class="section" id="build-mongosniff">
+<h2>Build <tt class="docutils literal"><span class="pre">mongosniff</span></tt><a class="headerlink" href="#build-mongosniff" title="Permalink to this headline">¶</a></h2>
+<p>To build <tt class="docutils literal"><span class="pre">mongosniff</span></tt> yourself, Linux users can use the following
+procedure:</p>
+<ol class="arabic">
+<li><p class="first">Obtain prerequisites using your operating
+systems package management software. Dependencies include:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">libpcap</span></tt> - to capture network packets.</li>
+<li><tt class="docutils literal"><span class="pre">git</span></tt> - to download the MongoDB source code.</li>
+<li><tt class="docutils literal"><span class="pre">scons</span></tt> and a C++ compiler - to build <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>.</li>
+</ul>
+</li>
+<li><p class="first">Download a copy of the MongoDB source code using <tt class="docutils literal"><span class="pre">git</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>git clone git://github.com/mongodb/mongo.git
+</pre></div>
+</div>
+</li>
+<li><p class="first">Issue the following sequence of commands to change to the
+<tt class="docutils literal"><span class="pre">mongo/</span></tt> directory and build <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">cd </span>mongo
+scons mongosniff
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongotop.html" title="Previous Section: mongotop">&lt; &nbsp; mongotop</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongofiles.html" title="Next Section: mongofiles">mongofiles &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

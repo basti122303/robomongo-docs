@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>cursor.min() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/cursor.min" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="cursor.next()" href="cursor.next.html" />
+<link rel="prev" title="cursor.max()" href="cursor.max.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="cursor-min">
+<h1>cursor.min()<a class="headerlink" href="#cursor-min" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="cursor.min">
+<tt class="descclassname">cursor.</tt><tt class="descname">min</tt><big>(</big><big>)</big><a class="headerlink" href="#cursor.min" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> method specifies the <em>inclusive</em>
+lower bound for a specific index in order to constrain the results
+of <a class="reference internal" href="db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>. <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> provides a way to specify lower bounds on compound
+key indexes.</p>
+<p><a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> takes the following parameter:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>indexbounds</strong> (<em>document</em>) &#8211; <p>Specifies the inclusive lower bound for the index keys. The
+<tt class="docutils literal"><span class="pre">indexbounds</span></tt> parameter has the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">field2</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">min</span> <span class="nx">value2</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">fieldN</span><span class="o">:&lt;</span><span class="nx">min</span> <span class="nx">valueN</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The fields correspond to <em>all</em> the keys of a particular index
+<em>in order</em>. You can explicitly specify the particular index
+with the <a class="reference internal" href="cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> method. Otherwise,
+MongoDB selects the index using the fields in the
+<tt class="docutils literal"><span class="pre">indexbounds</span></tt>; however, if multiple indexes exist on same
+fields with different sort orders, the selection of the index
+may be ambiguous.</p>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="cursor.max.html#cursor.max" title="cursor.max"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">max()</span></tt></a>.</p>
+</div>
+<p>Consider the following example of <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a>,
+which assumes a collection named <tt class="docutils literal"><span class="pre">products</span></tt> that holds the
+following documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;cortland&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;fuji&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;honey crisp&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonagold&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonathan&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;mcintosh&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;cara cara&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">2.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;navel&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.39</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;satsuma&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;valencia&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">0.99</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The collection has the following indexes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">Using the ordering of <tt class="docutils literal"><span class="pre">{</span> <span class="pre">item:</span> <span class="pre">1,</span> <span class="pre">type:</span> <span class="pre">1</span> <span class="pre">}</span></tt> index,
+<a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> limits the query to the documents
+that are at or above the index key bound of <tt class="docutils literal"><span class="pre">item</span></tt> equal to
+<tt class="docutils literal"><span class="pre">apple</span></tt> and <tt class="docutils literal"><span class="pre">type</span></tt> equal to <tt class="docutils literal"><span class="pre">jonagold</span></tt>, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;jonagold&#39;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">hint</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The query returns the following documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonagold&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonathan&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;mcintosh&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;cara cara&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">2.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;navel&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.39</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;satsuma&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;valencia&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">0.99</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>If the query did not explicitly specify the index with the
+<a class="reference internal" href="cursor.hint.html#cursor.hint" title="cursor.hint"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">hint()</span></tt></a> method, it is ambiguous as to
+whether <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> would select the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">item:</span> <span class="pre">1,</span> <span class="pre">type:</span> <span class="pre">1</span>
+<span class="pre">}</span></tt> index ordering or the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">item:</span> <span class="pre">1,</span> <span class="pre">type:</span> <span class="pre">-1</span> <span class="pre">}</span></tt> index ordering.</p>
+</li>
+<li><p class="first">Using the ordering of the index <tt class="docutils literal"><span class="pre">{</span> <span class="pre">price:</span> <span class="pre">1</span> <span class="pre">}</span></tt>, <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> limits the query to the documents that are at or
+above the index key bound of <tt class="docutils literal"><span class="pre">price</span></tt> equal to <tt class="docutils literal"><span class="pre">1.39</span></tt> and
+<a class="reference internal" href="cursor.max.html#cursor.max" title="cursor.max"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">max()</span></tt></a> limits the query to the documents
+that are below the index key bound of <tt class="docutils literal"><span class="pre">price</span></tt> equal to <tt class="docutils literal"><span class="pre">1.99</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.39</span> <span class="p">}</span> <span class="p">).</span><span class="nx">max</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.99</span> <span class="p">}</span> <span class="p">).</span><span class="nx">hint</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The query returns the following documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;cortland&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonathan&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;mcintosh&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;apple&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;jonagold&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.29</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span> <span class="o">:</span> <span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span> <span class="o">:</span> <span class="s2">&quot;navel&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span> <span class="o">:</span> <span class="mf">1.39</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><p class="first">Because <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> requires an index on a
+field, and forces the query to use this index, you may prefer
+the <a class="reference internal" href="../operators.html#_S_gte" title="$gte"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$gte</span></tt></a> operator for the query if
+possible. Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">7</span> <span class="p">}</span> <span class="p">).</span><span class="nx">min</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.39</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The query will use the index on the <tt class="docutils literal"><span class="pre">price</span></tt> field, even if
+the index on <tt class="docutils literal"><span class="pre">_id</span></tt> may be better.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> exists primarily to support the
+<a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> (sharding) process.</p>
+</li>
+<li><p class="first">If you use <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> with <a class="reference internal" href="cursor.max.html#cursor.max" title="cursor.max"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">max()</span></tt></a> to specify a range, the index bounds specified
+in <a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> and <a class="reference internal" href="cursor.max.html#cursor.max" title="cursor.max"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">max()</span></tt></a> must both refer to the keys of the same index.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#cursor.min" title="cursor.min"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">min()</span></tt></a> is a shell wrapper around the
+special operator <a class="reference internal" href="../operator/min.html#_S_min" title="$min"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$min</span></tt></a>.</p>
+</li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="cursor.max.html" title="Previous Section: cursor.max()">&lt; &nbsp; cursor.max()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="cursor.next.html" title="Next Section: cursor.next()">cursor.next() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

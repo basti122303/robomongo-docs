@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$project (aggregation) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/aggregation/project" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$push (aggregation)" href="push.html" />
+<link rel="prev" title="$or (aggregation)" href="or.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="project-aggregation">
+<h1>$project (aggregation)<a class="headerlink" href="#project-aggregation" title="Permalink to this headline">¶</a></h1>
+<dl class="pipeline">
+<dt id="_S_project">
+<tt class="descname">$project</tt><a class="headerlink" href="#_S_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reshapes a document stream by renaming, adding, or removing
+fields. Also use <a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to create computed values or
+sub-objects. Use <a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to:</p>
+<ul class="simple">
+<li>Include fields from the original document.</li>
+<li>Insert computed fields.</li>
+<li>Rename fields.</li>
+<li>Create and populate fields that hold sub-documents.</li>
+</ul>
+<p>Use <a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to quickly select the fields that you
+want to include or exclude from the response. Consider the
+following aggregation framework operation.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+    <span class="p">}}</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation includes the <tt class="docutils literal"><span class="pre">title</span></tt> field and the <tt class="docutils literal"><span class="pre">author</span></tt>
+field in the document that returns from the aggregation
+<a class="reference internal" href="../glossary.html#term-pipeline"><em class="xref std std-term">pipeline</em></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <tt class="docutils literal"><span class="pre">_id</span></tt> field is always included by default. You may
+explicitly exclude <tt class="docutils literal"><span class="pre">_id</span></tt> as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">,</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">Here, the projection excludes the <tt class="docutils literal"><span class="pre">_id</span></tt> field but includes the
+<tt class="docutils literal"><span class="pre">title</span></tt> and <tt class="docutils literal"><span class="pre">author</span></tt> fields.</p>
+</div>
+<p>Projections can also add computed fields to the document stream
+passing through the pipeline. A computed field can use any of the
+<a class="reference internal" href="../aggregation.html#aggregation-expression-operators"><em>expression operators</em></a>.
+Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nx">doctoredPageViews</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$add</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, the field <tt class="docutils literal"><span class="pre">doctoredPageViews</span></tt> represents the value of the
+<tt class="docutils literal"><span class="pre">pageViews</span></tt> field after adding 10 to the original field using the
+<a class="reference internal" href="add.html#_S_add" title="$add"><tt class="xref agg agg-expression docutils literal"><span class="pre">$add</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must enclose the expression that defines the computed field
+in braces, so that the expression is a valid object.</p>
+</div>
+<p>You may also use <a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to rename fields. Consider
+the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">page_views</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span> <span class="p">,</span>
+        <span class="nx">bar</span> <span class="o">:</span> <span class="s2">&quot;$other.foo&quot;</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This operation renames the <tt class="docutils literal"><span class="pre">pageViews</span></tt> field to <tt class="docutils literal"><span class="pre">page_views</span></tt>,
+and renames the <tt class="docutils literal"><span class="pre">foo</span></tt> field in the <tt class="docutils literal"><span class="pre">other</span></tt> sub-document as
+the top-level field <tt class="docutils literal"><span class="pre">bar</span></tt>. The field references used for
+renaming fields are direct expressions and do not use an operator
+or surrounding braces. All aggregation field references can use
+dotted paths to refer to fields in nested documents.</p>
+<p>Finally, you can use the <a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> to create and
+populate new sub-documents. Consider the following example that
+creates a new object-valued field named <tt class="docutils literal"><span class="pre">stats</span></tt> that holds a number
+of values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">title</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">,</span>
+        <span class="nx">stats</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="nx">pv</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span>
+            <span class="nx">foo</span> <span class="o">:</span> <span class="s2">&quot;$other.foo&quot;</span><span class="p">,</span>
+            <span class="nx">dpv</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$add</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$pageViews&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This projection includes the <tt class="docutils literal"><span class="pre">title</span></tt> field and places
+<a class="reference internal" href="#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> into &#8220;inclusive&#8221; mode. Then, it creates the
+<tt class="docutils literal"><span class="pre">stats</span></tt> documents with the following fields:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">pv</span></tt> which includes and renames the <tt class="docutils literal"><span class="pre">pageViews</span></tt> from the
+top level of the original documents.</li>
+<li><tt class="docutils literal"><span class="pre">foo</span></tt> which includes the value of <tt class="docutils literal"><span class="pre">other.foo</span></tt> from the
+original documents.</li>
+<li><tt class="docutils literal"><span class="pre">dpv</span></tt> which is a computed field that adds 10 to the value of
+the <tt class="docutils literal"><span class="pre">pageViews</span></tt> field in the original document using the
+<a class="reference internal" href="add.html#_S_add" title="$add"><tt class="xref agg agg-expression docutils literal"><span class="pre">$add</span></tt></a> aggregation expression.</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="or.html" title="Previous Section: $or (aggregation)">&lt; &nbsp; $or (aggregation)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="push.html" title="Next Section: $push (aggregation)">$push (aggregation) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

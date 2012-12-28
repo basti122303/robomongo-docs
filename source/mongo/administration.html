@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Administration &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/administration" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Run-time Database Configuration" href="administration/configuration.html" />
+<link rel="prev" title="Schedule Backup Window for Sharded Clusters" href="tutorial/schedule-backup-window-for-sharded-clusters.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="administration">
+<h1>Administration<a class="headerlink" href="#administration" title="Permalink to this headline">¶</a></h1>
+<p>This page lists the core administrative documentation and the
+administration tutorials, and includes links to administrative
+documentation for replica sets, sharding, and indexing.</p>
+<div class="section" id="operational-background">
+<h2>Operational Background<a class="headerlink" href="#operational-background" title="Permalink to this headline">¶</a></h2>
+<p>The following documents comprise the overview of core topics in
+MongoDB administration:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="administration/configuration.html">Run-time Database Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/configuration.html#starting-stopping-and-running-the-database">Starting, Stopping, and Running the Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/configuration.html#security-considerations">Security Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/configuration.html#replication-and-sharding-configuration">Replication and Sharding Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/configuration.html#running-multiple-database-instances-on-the-same-system">Running Multiple Database Instances on the Same System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/configuration.html#diagnostic-configurations">Diagnostic Configurations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/journaling.html">Journaling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/journaling.html#procedures">Procedures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/journaling.html#journaling-internals">Journaling Internals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/ssl.html">Using MongoDB with SSL Connections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/ssl.html#mongod-and-mongos-ssl-configuration"><tt class="docutils literal"><span class="pre">mongod</span></tt> and <tt class="docutils literal"><span class="pre">mongos</span></tt> SSL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/ssl.html#clients">Clients</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/monitoring.html">Monitoring Database Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/monitoring.html#monitoring-tools">Monitoring Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/monitoring.html#process-logging">Process Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/monitoring.html#diagnosing-performance-issues">Diagnosing Performance Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/monitoring.html#replication-and-monitoring">Replication and Monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/monitoring.html#sharding-and-monitoring">Sharding and Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/import-export.html">Importing and Exporting MongoDB Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/import-export.html#data-type-fidelity">Data Type Fidelity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/import-export.html#data-import-and-export-and-backups-operations">Data Import and Export and Backups Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/import-export.html#human-intelligible-import-export-formats">Human Intelligible Import/Export Formats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/backups.html">Backup and Restoration Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/backups.html#backup-overview">Backup Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/backups.html#production-considerations-for-backup-strategies">Production Considerations for Backup Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/backups.html#using-block-level-backup-methods">Using Block Level Backup Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/backups.html#using-binary-database-dumps-for-backups">Using Binary Database Dumps for Backups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/backups.html#sharded-cluster-and-replica-set-backups">Sharded Cluster and Replica Set Backups</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/ulimit.html">Linux <tt class="docutils literal"><span class="pre">ulimit</span></tt> Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/ulimit.html#resource-utilization">Resource Utilization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/ulimit.html#review-and-set-resource-limits">Review and Set Resource Limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/ulimit.html#recommended-settings">Recommended Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/production-notes.html">Production Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#backups">Backups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#networking">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#mongodb-on-linux">MongoDB on Linux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#readahead">Readahead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#mongodb-on-virtual-environments">MongoDB on Virtual Environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#disk-and-storage-systems">Disk and Storage Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#hardware-requirements-and-limitations">Hardware Requirements and Limitations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/production-notes.html#performance-monitoring">Performance Monitoring</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="administration/replica-sets.html"><em>Replica Set Administration</em></a></li>
+<li><a class="reference internal" href="administration/replication-architectures.html"><em>Replication Architectures</em></a></li>
+<li><a class="reference internal" href="administration/sharding.html"><em>Sharded Cluster Administration</em></a></li>
+<li><a class="reference internal" href="administration/sharding-architectures.html"><em>Sharded Cluster Architectures</em></a></li>
+<li><a class="reference internal" href="core/indexes.html"><em>Indexing Overview</em></a></li>
+<li><a class="reference internal" href="administration/indexes.html"><em>Indexing Operations</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="tutorial">
+<span id="administration-tutorials"></span><span id="index-0"></span><h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h2>
+<p>The following tutorials describe basic administrative procedures for
+MongoDB deployments:</p>
+<div class="section" id="replica-sets">
+<h3>Replica Sets<a class="headerlink" href="#replica-sets" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="tutorial/deploy-replica-set.html"><em>Deploy a Replica Set</em></a></li>
+<li><a class="reference internal" href="tutorial/convert-standalone-to-replica-set.html"><em>Convert a Standalone to a Replica Set</em></a></li>
+<li><a class="reference internal" href="tutorial/expand-replica-set.html"><em>Add Members to a Replica Set</em></a></li>
+<li><a class="reference internal" href="tutorial/deploy-geographically-distributed-replica-set.html"><em>Deploy a Geographically Distributed Replica Set</em></a></li>
+<li><a class="reference internal" href="tutorial/change-oplog-size.html"><em>Change the Size of the Oplog</em></a></li>
+<li><a class="reference internal" href="tutorial/force-member-to-be-primary.html"><em>Force a Member to Become Primary</em></a></li>
+<li><a class="reference internal" href="tutorial/change-hostnames-in-a-replica-set.html"><em>Change Hostnames in a Replica Set</em></a></li>
+<li><a class="reference internal" href="tutorial/convert-secondary-into-arbiter.html"><em>Convert a Secondary to an Arbiter</em></a></li>
+<li><a class="reference internal" href="tutorial/reconfigure-replica-set-with-unavailable-members.html"><em>Reconfigure a Replica Set with Unavailable Members</em></a></li>
+</ul>
+</div>
+<div class="section" id="sharding">
+<h3>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="tutorial/deploy-shard-cluster.html"><em>Deploy a Sharded Cluster</em></a></li>
+<li><a class="reference internal" href="tutorial/convert-replica-set-to-replicated-shard-cluster.html"><em>Convert a Replica Set to a Replicated Sharded Cluster</em></a></li>
+<li><a class="reference internal" href="tutorial/add-shards-to-shard-cluster.html"><em>Add Shards to an Existing Cluster</em></a></li>
+<li><a class="reference internal" href="tutorial/remove-shards-from-cluster.html"><em>Remove Shards from an Existing Sharded Cluster</em></a></li>
+<li><a class="reference internal" href="tutorial/backup-small-sharded-cluster-with-mongodump.html"><em>Backup a Small Sharded Cluster with mongodump</em></a></li>
+<li><a class="reference internal" href="tutorial/backup-sharded-cluster-with-filesystem-snapshots.html"><em>Create Backup of a Sharded Cluster with Filesystem Snapshots</em></a></li>
+<li><a class="reference internal" href="tutorial/backup-sharded-cluster-with-database-dumps.html"><em>Create Backup of a Sharded Cluster with Database Dumps</em></a></li>
+<li><a class="reference internal" href="tutorial/restore-single-shard.html"><em>Restore a Single Shard</em></a></li>
+<li><a class="reference internal" href="tutorial/restore-sharded-cluster.html"><em>Restore Sharded Clusters</em></a></li>
+<li><a class="reference internal" href="tutorial/schedule-backup-window-for-sharded-clusters.html"><em>Schedule Backup Window for Sharded Clusters</em></a></li>
+</ul>
+</div>
+<div class="section" id="basic-operations">
+<h3>Basic Operations<a class="headerlink" href="#basic-operations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="tutorial/recover-data-following-unexpected-shutdown.html"><em>Recover MongoDB Data following Unexpected Shutdown</em></a></li>
+<li><a class="reference internal" href="tutorial/copy-databases-between-instances.html"><em>Copy Databases Between Instances</em></a></li>
+<li><a class="reference internal" href="tutorial/expire-data.html"><em>Expire Data from Collections by Setting TTL</em></a></li>
+<li><a class="reference internal" href="tutorial/manage-the-database-profiler.html"><em>Analyze Performance of Database Operations</em></a></li>
+<li><a class="reference internal" href="tutorial/rotate-log-files.html"><em>Rotate Log Files</em></a></li>
+<li><a class="reference internal" href="tutorial/roll-back-to-v1.8-index.html"><em>Build Old Style Indexes</em></a></li>
+</ul>
+</div>
+<div class="section" id="security">
+<h3>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="tutorial/configure-linux-iptables-firewall.html"><em>Configure Linux iptables Firewall for MongoDB</em></a></li>
+<li><a class="reference internal" href="tutorial/configure-windows-netsh-firewall.html"><em>Configure Windows netsh Firewall for MongoDB</em></a></li>
+<li><a class="reference internal" href="tutorial/control-access-to-mongodb-with-authentication.html"><em>Control Access to MongoDB Instances with Authentication</em></a></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/schedule-backup-window-for-sharded-clusters.html" title="Previous Section: Schedule Backup Window for Sharded Clusters">&lt; &nbsp; Schedule Backup Window for Sharded Clusters</a></li>
+<li id="btnvnx"><a href="administration/configuration.html" title="Next Section: Run-time Database Configuration">Run-time Database Configuration &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

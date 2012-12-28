@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Getting Started with the MongoDB JavaScript Shell &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/getting-started" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Installing MongoDB" href="../installation.html" />
+<link rel="next" title="Replication" href="../replication.html" />
+<link rel="prev" title="Install MongoDB on Windows" href="install-mongodb-on-windows.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="getting-started-with-the-mongodb-javascript-shell">
+<h1>Getting Started with the MongoDB JavaScript Shell<a class="headerlink" href="#getting-started-with-the-mongodb-javascript-shell" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial provides an introduction to basic database operations
+using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> is a part of the
+standard MongoDB distribution and provides a full JavaScript
+environment with a complete access to the JavaScript language
+and all standard functions as well as a full database interface for
+MongoDB. See the <a class="reference external" href="http://api.mongodb.org/js">mongo JavaScript API</a> documentation and
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell <a class="reference internal" href="../reference/javascript.html"><em>JavaScript Method Reference</em></a>.</p>
+<p>The tutorial assumes that you&#8217;re running MongoDB on a Linux or OS X
+operating system and that you have a running database server; MongoDB
+does support Windows and provides a Windows distribution with
+identical operation. For instructions on installing MongoDB and
+starting the database server see the appropriate <a class="reference internal" href="../installation.html"><em>installation</em></a> document.</p>
+<div class="contents local topic" id="this-tutorial-addresses-the-following-aspects-of-mongodb-use">
+<p class="topic-title first">This tutorial addresses the following aspects of MongoDB use:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#connect-to-a-database" id="id1">Connect to a Database</a><ul>
+<li><a class="reference internal" href="#connect-to-a-mongod" id="id2">Connect to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li><a class="reference internal" href="#select-a-database" id="id3">Select a Database</a></li>
+<li><a class="reference internal" href="#display-mongo-help" id="id4">Display <tt class="docutils literal"><span class="pre">mongo</span></tt> Help</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-a-collection-and-insert-documents" id="id5">Create a Collection and Insert Documents</a><ul>
+<li><a class="reference internal" href="#insert-individual-documents" id="id6">Insert Individual Documents</a></li>
+<li><a class="reference internal" href="#insert-multiple-documents-using-a-for-loop" id="id7">Insert Multiple Documents Using a For Loop</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#working-with-the-cursor" id="id8">Working with the Cursor</a><ul>
+<li><a class="reference internal" href="#iterate-over-the-cursor-with-a-loop" id="id9">Iterate over the Cursor with a Loop</a></li>
+<li><a class="reference internal" href="#use-array-operations-with-the-cursor" id="id10">Use Array Operations with the Cursor</a></li>
+<li><a class="reference internal" href="#query-for-specific-documents" id="id11">Query for Specific Documents</a></li>
+<li><a class="reference internal" href="#return-a-single-document-from-a-collection" id="id12">Return a Single Document from a Collection</a></li>
+<li><a class="reference internal" href="#limit-the-number-of-documents-in-the-result-set" id="id13">Limit the Number of Documents in the Result Set</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#next-steps-with-mongodb" id="id14">Next Steps with MongoDB</a></li>
+</ul>
+</div>
+<div class="section" id="connect-to-a-database">
+<h2>Connect to a Database<a class="headerlink" href="#connect-to-a-database" title="Permalink to this headline">¶</a></h2>
+<p>In this section you connect to the database server, which runs as
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, and begin using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to
+select a logical database within the database instance and access the
+help text in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<div class="section" id="connect-to-a-mongod">
+<h3>Connect to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt><a class="headerlink" href="#connect-to-a-mongod" title="Permalink to this headline">¶</a></h3>
+<p>From a system prompt, start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> by issuing the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> command, as follows:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo
+</pre></div>
+</div>
+<p>By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> looks for a database server listening on
+port <tt class="docutils literal"><span class="pre">27017</span></tt> on the <tt class="docutils literal"><span class="pre">localhost</span></tt> interface. To connect to a server
+on a different port or interface, use the
+<a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--port"><em class="xref std std-option">--port</em></a> and <a class="reference internal" href="../reference/mongo.html#cmdoption-mongo--host"><em class="xref std std-option">--host</em></a>
+options.</p>
+</div>
+<div class="section" id="select-a-database">
+<h3>Select a Database<a class="headerlink" href="#select-a-database" title="Permalink to this headline">¶</a></h3>
+<p>After starting the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell your session will use the
+<tt class="docutils literal"><span class="pre">test</span></tt> database for context, by default. At any time issue the
+following operation at the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> to report the current
+database:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">db</span></tt> returns the name of the current database.</p>
+<ol class="arabic">
+<li><p class="first">From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, display the list of
+databases with the following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">dbs</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Switch to a new database named <tt class="docutils literal"><span class="pre">mydb</span></tt> with the following
+operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">mydb</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Confirm that your session has the <tt class="docutils literal"><span class="pre">mydb</span></tt> database as context,
+using the <tt class="docutils literal"><span class="pre">db</span></tt> operation, which returns the name of the current
+database as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>At this point, if you issue the <tt class="docutils literal"><span class="pre">show</span> <span class="pre">dbs</span></tt> operation again, it will
+not include <tt class="docutils literal"><span class="pre">mydb</span></tt>, because MongoDB will not create a database until
+you insert data into that database. The
+<a class="reference internal" href="#getting-started-create-documents"><em>Create a Collection and Insert Documents</em></a> section describes the process
+for inserting data.</p>
+</div>
+<div class="section" id="display-mongo-help">
+<h3>Display <tt class="docutils literal"><span class="pre">mongo</span></tt> Help<a class="headerlink" href="#display-mongo-help" title="Permalink to this headline">¶</a></h3>
+<p>At any point you can access help for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell using
+the following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">help</span>
+</pre></div>
+</div>
+<p>Furthermore, you can append the <tt class="docutils literal"><span class="pre">.help()</span></tt> method to some JavaScript
+methods, any cursor object, as well as the <tt class="docutils literal"><span class="pre">db</span></tt> and
+<tt class="docutils literal"><span class="pre">db.collection</span></tt> objects to return additional help information.</p>
+</div>
+</div>
+<div class="section" id="create-a-collection-and-insert-documents">
+<span id="getting-started-create-documents"></span><h2>Create a Collection and Insert Documents<a class="headerlink" href="#create-a-collection-and-insert-documents" title="Permalink to this headline">¶</a></h2>
+<p>In this section, you insert documents into a new <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a>
+named <tt class="docutils literal"><span class="pre">things</span></tt> within the new <a class="reference internal" href="../reference/glossary.html#term-database"><em class="xref std std-term">database</em></a> named
+<tt class="docutils literal"><span class="pre">mydb</span></tt>.</p>
+<p>MongoDB will create collections and databases implicitly upon their
+first use: you do not need to create the database or collection before
+inserting data. Furthermore, because MongoDB uses <a class="reference internal" href="../faq/fundamentals.html#faq-schema-free"><em>dynamic
+schemas</em></a>, you do not need to specify the structure
+of your documents before inserting them into the collection.</p>
+<div class="section" id="insert-individual-documents">
+<h3>Insert Individual Documents<a class="headerlink" href="#insert-individual-documents" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, confirm that the current context
+is the <tt class="docutils literal"><span class="pre">mydb</span></tt> database with the following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">If <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> does not return <tt class="docutils literal"><span class="pre">mydb</span></tt> for the previous
+operation, set the context to the <tt class="docutils literal"><span class="pre">mydb</span></tt> database with the
+following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">mydb</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Create two documents, named <tt class="docutils literal"><span class="pre">j</span></tt> and <tt class="docutils literal"><span class="pre">k</span></tt>, with the following
+sequence of JavaScript operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">j</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+<span class="nx">k</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">x</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Insert the <tt class="docutils literal"><span class="pre">j</span></tt> and <tt class="docutils literal"><span class="pre">k</span></tt> documents into the collection
+<tt class="docutils literal"><span class="pre">things</span></tt> with the following sequence of operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="nx">j</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="nx">k</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>When you insert the first document, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will
+create both the <tt class="docutils literal"><span class="pre">mydb</span></tt> database and the <tt class="docutils literal"><span class="pre">things</span></tt> collection.</p>
+</li>
+<li><p class="first">Confirm that the collection named <tt class="docutils literal"><span class="pre">things</span></tt> exists using
+the following operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">show</span> <span class="nx">collections</span>
+</pre></div>
+</div>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell will return the list of the collections
+in the current (i.e. <tt class="docutils literal"><span class="pre">mydb</span></tt>) database. At this point, the only
+collection is <tt class="docutils literal"><span class="pre">things</span></tt>. All <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> databases also have
+a <a class="reference internal" href="../reference/system-collections.html#&lt;database&gt;.system.indexes" title="&lt;database&gt;.system.indexes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">system.indexes</span></tt></a> collection.</p>
+</li>
+<li><p class="first">Confirm that the documents exist in the collection <tt class="docutils literal"><span class="pre">things</span></tt> by
+issuing query on the <tt class="docutils literal"><span class="pre">things</span></tt> collection. Using the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method in an operation that
+resembles the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This operation returns the following results. The <a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> values will be unique:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209f9f3924d31102bd84a&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209fef3924d31102bd84b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>All MongoDB documents must have an <tt class="docutils literal"><span class="pre">_id</span></tt> field with a unique
+value.  These operations do not explicitly specify a value for the
+<tt class="docutils literal"><span class="pre">_id</span></tt> field, so <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> creates a unique <a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> value for the field before inserting it into the
+collection.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="insert-multiple-documents-using-a-for-loop">
+<h3>Insert Multiple Documents Using a For Loop<a class="headerlink" href="#insert-multiple-documents-using-a-for-loop" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, add more documents to the <tt class="docutils literal"><span class="pre">things</span></tt>
+collection using the following <tt class="docutils literal"><span class="pre">for</span></tt> loop:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">x</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">,</span> <span class="nx">j</span> <span class="o">:</span> <span class="nx">i</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Query the collection by issuing the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell displays the first 20 documents in the
+collection. Your <a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> values will be
+different:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209f9f3924d31102bd84a&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209fef3924d31102bd84b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd856&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd857&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd858&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd859&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85a&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">6</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85c&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">7</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85d&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85e&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">9</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85f&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd860&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">11</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd861&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">12</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd862&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">13</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd863&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">14</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd864&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd865&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">16</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd866&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">17</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd867&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<ol class="arabic" id="getting-started-cursor-exhaustion">
+<li><p class="first">The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> returns a cursor. To iterate
+the cursor and return more documents use the <tt class="docutils literal"><span class="pre">it</span></tt> operation in
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell will exhaust
+the cursor, and return the following documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd868&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">19</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd869&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">20</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>For more information on inserting new documents, see the
+<a class="reference internal" href="../applications/create.html#crud-create-insert"><em>Insert</em></a> documentation.</p>
+</div>
+</div>
+<div class="section" id="working-with-the-cursor">
+<h2>Working with the Cursor<a class="headerlink" href="#working-with-the-cursor" title="Permalink to this headline">¶</a></h2>
+<p>When you query a <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a>, MongoDB returns a &#8220;cursor&#8221; object
+that contains the results of the query. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+then iterates over the cursor to display the results. Rather than
+returning all results at once, the shell iterates over the cursor 20
+times to display the first 20 results and then waits for a request to
+iterate over the remaining results. This prevents <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+from displaying thousands or millions of results at once.</p>
+<p>The <tt class="docutils literal"><span class="pre">it</span></tt> operation allows you to iterate over the next 20 results in
+the shell the next 20 results. In the <a class="reference internal" href="#getting-started-cursor-exhaustion"><em>previous procedure</em></a>, the cursor only contained two
+more documents, and so only two more documents displayed.</p>
+<p>The procedures in this section show other ways to work with a cursor.
+For comprehensive documentation on cursors, see
+<a class="reference internal" href="../applications/read.html#crud-read-cursor"><em>Cursor</em></a>.</p>
+<div class="section" id="iterate-over-the-cursor-with-a-loop">
+<h3>Iterate over the Cursor with a Loop<a class="headerlink" href="#iterate-over-the-cursor-with-a-loop" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">In the MongoDB JavaScript shell, query the <tt class="docutils literal"><span class="pre">things</span></tt> collection
+and assign the resulting cursor object to the <tt class="docutils literal"><span class="pre">c</span></tt> variable:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Print the full result set by using a <tt class="docutils literal"><span class="pre">while</span></tt> loop to iterate over
+the <tt class="docutils literal"><span class="pre">c</span></tt> variable:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">while</span> <span class="p">(</span> <span class="nx">c</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">()</span> <span class="p">)</span> <span class="nx">printjson</span><span class="p">(</span> <span class="nx">c</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">hasNext()</span></tt> function returns true if the cursor has documents.
+The <tt class="docutils literal"><span class="pre">next()</span></tt> method returns the next document. The
+<tt class="docutils literal"><span class="pre">printjson()</span></tt> method renders the document in a JSON-like format.</p>
+<p>The result of this operation follows, although if the
+<a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> values will be unique:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209f9f3924d31102bd84a&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209fef3924d31102bd84b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd856&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd857&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd858&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd859&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85a&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">6</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85c&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">7</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85d&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85e&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">9</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85f&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd860&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">11</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd861&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">12</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd862&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">13</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd863&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">14</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd864&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd865&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">16</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd866&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">17</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd867&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd868&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">19</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd869&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">20</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="use-array-operations-with-the-cursor">
+<h3>Use Array Operations with the Cursor<a class="headerlink" href="#use-array-operations-with-the-cursor" title="Permalink to this headline">¶</a></h3>
+<p>You can manipulate a cursor object as if it were an array. Consider
+the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, query the <tt class="docutils literal"><span class="pre">things</span></tt> collection
+and assign the resulting cursor object to the <tt class="docutils literal"><span class="pre">c</span></tt> variable:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To find the document at the array index <tt class="docutils literal"><span class="pre">4</span></tt>, use the following
+operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">printjson</span><span class="p">(</span> <span class="nx">c</span> <span class="p">[</span> <span class="mi">4</span> <span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB returns the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd858&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>When you access documents in a cursor using the array index
+notation, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> first calls the <tt class="docutils literal"><span class="pre">cursor.toArray()</span></tt>
+method and loads into RAM all documents returned by the cursor. The
+index is then applied to the resulting array. This operation
+iterates the cursor completely and exhausts the cursor.</p>
+<p>For very large result sets, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> may run out of
+available memory.</p>
+</li>
+</ol>
+<p>For more information on the cursor, see <a class="reference internal" href="../applications/read.html#crud-read-cursor"><em>Cursor</em></a>.</p>
+</div>
+<div class="section" id="query-for-specific-documents">
+<h3>Query for Specific Documents<a class="headerlink" href="#query-for-specific-documents" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB has a rich query system that allows you to select and filter
+the documents in a collection along specific fields and values. See
+<a class="reference internal" href="../core/read-operations.html#read-operations-query-document"><em>Query Document</em></a> and <a class="reference internal" href="../applications/read.html"><em>Read</em></a>
+for a full account of queries in MongoDB.</p>
+<p>In this procedure, you query for specific documents in the <tt class="docutils literal"><span class="pre">things</span></tt>
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> by passing a &#8220;query document&#8221; as a parameter to the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method. A query document
+specifies the criteria the query must match to return a document.</p>
+<p>To query for specific documents, do the following:</p>
+<ol class="arabic">
+<li><p class="first">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, query for all documents where the
+<tt class="docutils literal"><span class="pre">name</span></tt> field has a value of <tt class="docutils literal"><span class="pre">mongo</span></tt> by passing the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">name</span> <span class="pre">:</span>
+<span class="pre">&quot;mongo&quot;</span> <span class="pre">}</span></tt> query document as a parameter to the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB returns one document that fits this criteria. The
+<a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> value will be different:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209f9f3924d31102bd84a&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Query for all documents where <tt class="docutils literal"><span class="pre">x</span></tt> has a value of <tt class="docutils literal"><span class="pre">4</span></tt> by passing
+the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">x</span> <span class="pre">:</span> <span class="pre">4</span> <span class="pre">}</span></tt> query document as a parameter to <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">x</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB returns the following result set:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd856&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd857&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd858&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd859&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85a&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">6</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85c&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">7</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85d&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85e&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">9</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85f&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd860&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">11</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd861&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">12</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd862&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">13</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd863&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">14</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd864&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd865&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">16</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd866&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">17</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd867&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd868&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">19</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd869&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">20</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> values are always unique.</p>
+</li>
+<li><p class="first">Query for all documents where <tt class="docutils literal"><span class="pre">x</span></tt> has a value of <tt class="docutils literal"><span class="pre">4</span></tt>, as in the
+previous query, but only return only the value of <tt class="docutils literal"><span class="pre">j</span></tt>.  MongoDB
+will also return the <tt class="docutils literal"><span class="pre">_id</span></tt> field, unless explicitly excluded. To
+do this, you add the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">j</span> <span class="pre">:</span> <span class="pre">1</span> <span class="pre">}</span></tt> document as the
+<a class="reference internal" href="../reference/glossary.html#term-projection"><em class="xref std std-term">projection</em></a> in the second parameter to <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>. This operation would resemble the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">x</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">,</span> <span class="p">{</span> <span class="nx">j</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB returns the following results:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd856&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd857&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd858&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd859&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">4</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85a&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">5</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85b&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">6</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85c&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">7</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85d&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85e&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">9</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd85f&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd860&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">11</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd861&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">12</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd862&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">13</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd863&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">14</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd864&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">15</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd865&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">16</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd866&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">17</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd867&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd868&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">19</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd869&quot;</span><span class="p">),</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">20</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="return-a-single-document-from-a-collection">
+<h3>Return a Single Document from a Collection<a class="headerlink" href="#return-a-single-document-from-a-collection" title="Permalink to this headline">¶</a></h3>
+<p>With the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.findOne()</span></tt></a> method you can return a
+single <em>document</em> from a MongoDB collection. The <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method takes the same parameters as
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>, but returns a document rather
+than a cursor.</p>
+<p>To retrieve one document from the <tt class="docutils literal"><span class="pre">things</span></tt> collection, issue the
+following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">findOne</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For more information on querying for documents, see the
+<a class="reference internal" href="../applications/read.html"><em>Read</em></a> and <a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a> documentation.</p>
+</div>
+<div class="section" id="limit-the-number-of-documents-in-the-result-set">
+<h3>Limit the Number of Documents in the Result Set<a class="headerlink" href="#limit-the-number-of-documents-in-the-result-set" title="Permalink to this headline">¶</a></h3>
+<p>You can constrain the size of the result set to increase performance by
+limiting the amount of data your application must receive over the
+network.</p>
+<p>To specify the maximum number of documents in the result set, call the
+<a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method on a cursor, as in the
+following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">things</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">limit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB will return the following result, with different
+<a class="reference internal" href="../core/object-id.html"><em>ObjectId</em></a> values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209f9f3924d31102bd84a&quot;</span><span class="p">),</span> <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongo&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c2209fef3924d31102bd84b&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">3</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;4c220a42f3924d31102bd856&quot;</span><span class="p">),</span> <span class="s2">&quot;x&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="next-steps-with-mongodb">
+<h2>Next Steps with MongoDB<a class="headerlink" href="#next-steps-with-mongodb" title="Permalink to this headline">¶</a></h2>
+<p>For more information on manipulating the documents in a database as
+you continue to learn MongoDB, consider the following resources:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../crud.html#crud-operations"><em>CRUD Operations</em></a></li>
+<li><a class="reference internal" href="../reference/sql-comparison.html"><em>SQL to MongoDB Mapping Chart</em></a></li>
+<li><a class="reference internal" href="../applications/drivers.html"><em>Drivers</em></a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="install-mongodb-on-windows.html" title="Previous Section: Install MongoDB on Windows">&lt; &nbsp; Install MongoDB on Windows</a></li>
+<li id="btnvup"><a href="../installation.html" title="Parent Section: Installing MongoDB" >&#47;&#92;&nbsp; Installing MongoDB</a></li>
+<li id="btnvnx"><a href="../replication.html" title="Next Section: Replication">Replication &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$inc &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/inc" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$lt" href="lt.html" />
+<link rel="prev" title="$in" href="in.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="inc">
+<h1>$inc<a class="headerlink" href="#inc" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_inc">
+<tt class="descname">$inc</tt><a class="headerlink" href="#_S_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../operators.html#_S_inc" title="$inc"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$inc</span></tt></a> operator increments a value by a specified
+amount if field is present in the document. If the field does not
+exist, <a class="reference internal" href="../operators.html#_S_inc" title="$inc"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$inc</span></tt></a> sets field to the number value. For
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$inc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field1</span><span class="o">:</span> <span class="nx">amount</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>In this example, for documents in <tt class="docutils literal"><span class="pre">collection</span></tt> where
+<tt class="docutils literal"><span class="pre">field</span></tt> has the value <tt class="docutils literal"><span class="pre">value</span></tt>, the value of <tt class="docutils literal"><span class="pre">field1</span></tt>
+increments by the value of <tt class="docutils literal"><span class="pre">amount</span></tt>. The above operation only
+increments the <em>first</em> matching document <em>unless</em> you specify
+multi-update:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">20</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$inc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$inc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>In the first example all documents that have an <tt class="docutils literal"><span class="pre">age</span></tt> field with
+the value of <tt class="docutils literal"><span class="pre">20</span></tt>, the operation increases <tt class="docutils literal"><span class="pre">age</span></tt> field by
+one. In the second example, in all documents where the <tt class="docutils literal"><span class="pre">name</span></tt>
+field has a value of <tt class="docutils literal"><span class="pre">John</span></tt> the operation increases the value
+of the <tt class="docutils literal"><span class="pre">age</span></tt> field by one.</p>
+<p><a class="reference internal" href="../operators.html#_S_inc" title="$inc"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$inc</span></tt></a> accepts positive and negative incremental amounts.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="in.html" title="Previous Section: $in">&lt; &nbsp; $in</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="lt.html" title="Next Section: $lt">$lt &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

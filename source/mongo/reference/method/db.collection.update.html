@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.collection.update() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.collection.update" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.collection.validate()" href="db.collection.validate.html" />
+<link rel="prev" title="db.collection.totalIndexSize()" href="db.collection.totalIndexSize.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-collection-update">
+<h1>db.collection.update()<a class="headerlink" href="#db-collection-update" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.collection.update">
+<tt class="descclassname">db.collection.</tt><tt class="descname">update</tt><big>(</big><em>query</em>, <em>update</em><span class="optional">[</span>, <em>options</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#db.collection.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method modifies an
+existing document or documents in a collection. By default the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method updates a single
+document. To update all documents in the collection that match the
+update query criteria, specify the <tt class="docutils literal"><span class="pre">multi</span></tt> option. To insert a
+document if no document matches the update query criteria, specify
+the <tt class="docutils literal"><span class="pre">upsert</span></tt> option.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides an updated interface that
+accepts the options parameter in a document format to specify
+<tt class="docutils literal"><span class="pre">multi</span></tt> and <tt class="docutils literal"><span class="pre">upsert</span></tt> options.</p>
+<p>Prior to version 2.2, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, <tt class="docutils literal"><span class="pre">upsert</span></tt> and
+<tt class="docutils literal"><span class="pre">multi</span></tt> were positional boolean options:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">query</span><span class="p">,</span> <span class="nx">update</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">upsert</span><span class="p">,</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="nx">multi</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method takes the following
+parameters:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>query</strong> (<em>document</em>) &#8211; Specifies the selection criteria for the
+update. The <tt class="docutils literal"><span class="pre">query</span></tt> parameter employs the same <a class="reference internal" href="../operators.html#query-selectors"><em>query
+selectors</em></a> as used in the
+<a class="reference internal" href="db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a> method.</li>
+<li><strong>update</strong> (<em>document</em>) &#8211; <p>Specifies the modifications to apply.</p>
+<p><strong>If</strong> the <tt class="docutils literal"><span class="pre">update</span></tt> parameter contains any <a class="reference internal" href="../operators.html#update-operators"><em>update
+operators</em></a> expressions such as the
+<a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a> operator expression, then:</p>
+<ul>
+<li>the <tt class="docutils literal"><span class="pre">update</span></tt> parameter must contain only <tt class="docutils literal"><span class="pre">update</span>
+<span class="pre">operators</span></tt> expressions.</li>
+<li>the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method updates only
+the corresponding fields in the document.</li>
+</ul>
+<p><strong>If</strong> the <tt class="docutils literal"><span class="pre">update</span></tt> parameter consists only of <tt class="docutils literal"><span class="pre">field:</span>
+<span class="pre">value</span></tt> expressions, then:</p>
+<ul>
+<li>the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method
+<em>replaces</em> the document with the <tt class="docutils literal"><span class="pre">updates</span></tt> document. If
+the <tt class="docutils literal"><span class="pre">updates</span></tt> document is missing the <a class="reference internal" href="../glossary.html#term-id"><em class="xref std std-term">_id</em></a> field,
+MongoDB will add the <tt class="docutils literal"><span class="pre">_id</span></tt> field and assign to it a
+unique <a class="reference internal" href="../glossary.html#term-objectid"><em class="xref std std-term">objectid</em></a> .</li>
+<li>the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method updates cannot
+update multiple documents.</li>
+</ul>
+</li>
+<li><strong>options</strong> (<em>document</em>) &#8211; <p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Optional. Specifies whether to perform an <a class="reference internal" href="../glossary.html#term-upsert"><em class="xref std std-term">upsert</em></a>
+and/or a multiple update. Use the <tt class="docutils literal"><span class="pre">options</span></tt> parameter
+instead of the individual <tt class="docutils literal"><span class="pre">upsert</span></tt> and <tt class="docutils literal"><span class="pre">multi</span></tt>
+parameters.</p>
+</li>
+<li><strong>upsert</strong> (<em>boolean</em>) &#8211; <p>Optional. Specifies an <a class="reference internal" href="../glossary.html#term-upsert"><em class="xref std std-term">upsert</em></a> operation</p>
+<p>The default value is <tt class="docutils literal"><span class="pre">false</span></tt>. When <tt class="docutils literal"><span class="pre">true</span></tt>, the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method will
+update an existing document that matches the <tt class="docutils literal"><span class="pre">query</span></tt>
+selection criteria <strong>or</strong> if no document matches the
+criteria, insert a new document with the fields and values of
+the <tt class="docutils literal"><span class="pre">update</span></tt> parameter and if the <tt class="docutils literal"><span class="pre">update</span></tt> included only
+<tt class="docutils literal"><span class="pre">update</span> <span class="pre">operators</span></tt>, the <tt class="docutils literal"><span class="pre">query</span></tt> parameter as well .</p>
+<p>In version 2.2 of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you may also
+specify <tt class="docutils literal"><span class="pre">upsert</span></tt> in the <tt class="docutils literal"><span class="pre">options</span></tt> parameter.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An upsert operation affects only <em>one</em> document, and
+cannot update multiple documents.</p>
+</div>
+</li>
+<li><strong>multi</strong> (<em>boolean</em>) &#8211; <p>Optional. Specifies whether to update multiple
+documents that meet the query criteria.</p>
+<p>When not specified, the default value is <tt class="docutils literal"><span class="pre">false</span></tt> and the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method updates a single
+document that meet the <tt class="docutils literal"><span class="pre">query</span></tt> criteria.</p>
+<p>When <tt class="docutils literal"><span class="pre">true</span></tt>, the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method
+updates all documents that meet the <tt class="docutils literal"><span class="pre">query</span></tt> criteria.</p>
+<p>In version 2.2 of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you may also
+specify <tt class="docutils literal"><span class="pre">multi</span></tt> in the <tt class="docutils literal"><span class="pre">options</span></tt> parameter.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">multi</span></tt> update operation may interleave with other
+write operations. For unsharded
+collections, you can override this behavior
+with the <a class="reference internal" href="../operators.html#_S_atomic" title="$atomic"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$atomic</span></tt></a> isolation operator, which
+isolates the update operation and blocks
+other write operations during the update. See the
+<a class="reference internal" href="../operator/atomic.html"><em>isolation operator</em></a>.</p>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Although the update operation may apply mostly to updating the
+values of the fields, the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method can also modify the name of the
+<tt class="docutils literal"><span class="pre">field</span></tt> in a document using the <a class="reference internal" href="../operators.html#_S_rename" title="$rename"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$rename</span></tt></a> operator.</p>
+<p>Consider the following examples of the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method. These examples all use the 2.2
+interface to specify options in the document form.</p>
+<ul>
+<li><p class="first">To update specific fields in a document, call the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method with an
+<tt class="docutils literal"><span class="pre">update</span></tt> parameter using <tt class="docutils literal"><span class="pre">field:</span> <span class="pre">value</span></tt> pairs and expressions
+using <a class="reference internal" href="../operators.html#update-operators"><em>update operators</em></a> as in the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s2">&quot;book&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">6</span> <span class="p">},</span> <span class="nx">$inc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">5</span><span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation updates a document in the <tt class="docutils literal"><span class="pre">products</span></tt>
+collection that matches the query criteria and sets the value of
+the field <tt class="docutils literal"><span class="pre">x</span></tt> to <tt class="docutils literal"><span class="pre">6</span></tt>, and increment the value of the field
+<tt class="docutils literal"><span class="pre">y</span></tt> by <tt class="docutils literal"><span class="pre">5</span></tt>. All other fields of the document remain the same.</p>
+</li>
+<li><p class="first">To replace all the fields in a document with the document as
+specified in the <tt class="docutils literal"><span class="pre">update</span></tt> parameter, call the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method with an <tt class="docutils literal"><span class="pre">update</span></tt> parameter
+that consists of <em>only</em> <tt class="docutils literal"><span class="pre">key:</span> <span class="pre">value</span></tt> expressions, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s2">&quot;book&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation selects a document from the <tt class="docutils literal"><span class="pre">products</span></tt>
+collection that matches the query criteria sets the value of the
+field <tt class="docutils literal"><span class="pre">x</span></tt> to <tt class="docutils literal"><span class="pre">6</span></tt> and the value of the field <tt class="docutils literal"><span class="pre">y</span></tt> to
+<tt class="docutils literal"><span class="pre">15</span></tt>. All other fields of the matched document are <em>removed</em>,
+except the <a class="reference internal" href="../glossary.html#term-id"><em class="xref std std-term">_id</em></a> field.</p>
+</li>
+<li><p class="first">To update multiple documents, call the <a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method and specify the <tt class="docutils literal"><span class="pre">multi</span></tt> option
+in the <tt class="docutils literal"><span class="pre">options</span></tt> argument, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s2">&quot;book&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">multi</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation updates <em>all</em> documents in the <tt class="docutils literal"><span class="pre">products</span></tt>
+collection that match the query criteria by setting the value of
+the field <tt class="docutils literal"><span class="pre">x</span></tt> to <tt class="docutils literal"><span class="pre">6</span></tt> and the value of the field <tt class="docutils literal"><span class="pre">y</span></tt> to
+<tt class="docutils literal"><span class="pre">15</span></tt>. This operation does not affect any other fields in
+documents in the <tt class="docutils literal"><span class="pre">products</span></tt> collection.</p>
+<p>You can perform the same operation by calling the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> method with the <tt class="docutils literal"><span class="pre">multi</span></tt>
+parameter:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s2">&quot;book&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">15</span> <span class="p">}</span> <span class="p">},</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">true</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To update a document or to insert a new document if no
+document matches the query criteria, call the
+<a class="reference internal" href="#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> and specify the
+<tt class="docutils literal"><span class="pre">upsert</span></tt> option in the <tt class="docutils literal"><span class="pre">options</span></tt> argument, as in the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">item</span><span class="o">:</span> <span class="s2">&quot;magazine&quot;</span><span class="p">,</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">25</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">50</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">upsert</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation, will:</p>
+<ul class="simple">
+<li>update a single document in the <tt class="docutils literal"><span class="pre">products</span></tt> collection that
+matches the query criteria, setting the value of the field
+<tt class="docutils literal"><span class="pre">x</span></tt> to <tt class="docutils literal"><span class="pre">25</span></tt> and the value of the field <tt class="docutils literal"><span class="pre">y</span></tt> to <tt class="docutils literal"><span class="pre">50</span></tt>, <em>or</em></li>
+<li>if no matching document exists, insert a document in the
+<tt class="docutils literal"><span class="pre">products</span></tt> collection, with the field <tt class="docutils literal"><span class="pre">item</span></tt> set to
+<tt class="docutils literal"><span class="pre">magazine</span></tt>, the field <tt class="docutils literal"><span class="pre">x</span></tt> set to <tt class="docutils literal"><span class="pre">25</span></tt>, and the field <tt class="docutils literal"><span class="pre">y</span></tt>
+set to <tt class="docutils literal"><span class="pre">50</span></tt>.</li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.collection.totalIndexSize.html" title="Previous Section: db.collection.totalIndexSize()">&lt; &nbsp; db.collection.totalIndexSize()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.collection.validate.html" title="Next Section: db.collection.validate()">db.collection.validate() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

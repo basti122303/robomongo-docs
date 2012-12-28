@@ -1,0 +1,403 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Explain Output &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/explain" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Exit Codes and Statuses" href="exit-codes.html" />
+<link rel="prev" title="Database Profiler Output" href="database-profiler.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="explain-output">
+<h1>Explain Output<a class="headerlink" href="#explain-output" title="Permalink to this headline">¶</a></h1>
+<p>This document explains the output of the <a class="reference internal" href="operator/explain.html#_S_explain" title="$explain"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$explain</span></tt></a> operator
+and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell method <a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a>.</p>
+<div class="section" id="id1">
+<h2>Explain Output<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#explain-output-fields-core"><em>Core Explain Output</em></a> fields display information for
+queries on non-sharded collections. For queries on sharded collections,
+<a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain</span></tt></a> returns this information for each
+shard the query accesses.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;cursor&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;Cursor Type and Index&gt;&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;isMultiKey&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nscannedObjects&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nscannedObjectsAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nscannedAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;scanAndOrder&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;indexOnly&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nYields&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;nChunkSkips&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;millis&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="s2">&quot;indexBounds&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">bounds</span><span class="o">&gt;</span> <span class="p">},</span>
+  <span class="s2">&quot;allPlans&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                 <span class="p">{</span> <span class="s2">&quot;cursor&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;Cursor Type and Index&gt;&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                   <span class="s2">&quot;nscannedObjects&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                   <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+                   <span class="s2">&quot;indexBounds&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">bounds</span><span class="o">&gt;</span> <span class="p">}</span>
+                 <span class="p">},</span>
+                  <span class="p">...</span>
+               <span class="p">],</span>
+  <span class="s2">&quot;oldPlan&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                <span class="s2">&quot;cursor&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;Cursor Type and Index&gt;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;indexBounds&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">bounds</span><span class="o">&gt;</span> <span class="p">}</span>
+              <span class="p">}</span>
+  <span class="s2">&quot;server&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;host:port&gt;&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="or-queries">
+<h2><tt class="docutils literal"><span class="pre">$or</span></tt> Queries<a class="headerlink" href="#or-queries" title="Permalink to this headline">¶</a></h2>
+<p>Queries with <a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator execute each clause of the
+<a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> expression in parallel and can use separate indexes on
+the individual clauses. If the query uses indexes on any or all of the
+query&#8217;s clause, <a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> contains
+<a class="reference internal" href="#explain-output-fields-core"><em>output</em></a> for each clause as well as
+the cumulative data for the entire query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;clauses&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                  <span class="p">{</span>
+                     <span class="o">&lt;</span><span class="nx">core</span> <span class="nx">explain</span> <span class="nx">output</span><span class="o">&gt;</span>
+                  <span class="p">},</span>
+                  <span class="p">{</span>
+                     <span class="o">&lt;</span><span class="nx">core</span> <span class="nx">explain</span> <span class="nx">output</span><span class="o">&gt;</span>
+                  <span class="p">},</span>
+                  <span class="p">...</span>
+               <span class="p">],</span>
+   <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedObjects&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedObjectsAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;millis&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;server&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;host:port&gt;&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sharded-collections">
+<h2>Sharded Collections<a class="headerlink" href="#sharded-collections" title="Permalink to this headline">¶</a></h2>
+<p>For queries on a sharded collection, the output contains the
+<a class="reference internal" href="#explain-output-fields-core"><em>Core Explain Output</em></a> for each accessed shard and
+<a class="reference internal" href="#explain-output-fields-sharded-collection"><em>cumulative shard information</em></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;clusteredType&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;Shard Access Type&gt;&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;shards&quot;</span> <span class="o">:</span> <span class="p">{</span>
+
+                <span class="s2">&quot;&lt;shard1&gt;&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                               <span class="p">{</span>
+                                 <span class="o">&lt;</span><span class="nx">core</span> <span class="nx">explain</span> <span class="nx">output</span><span class="o">&gt;</span>
+                               <span class="p">}</span>
+                             <span class="p">],</span>
+                <span class="s2">&quot;&lt;shard2&gt;&quot;</span> <span class="o">:</span> <span class="p">[</span>
+                               <span class="p">{</span>
+                                <span class="o">&lt;</span><span class="nx">core</span> <span class="nx">explain</span> <span class="nx">output</span><span class="o">&gt;</span>
+                               <span class="p">}</span>
+                             <span class="p">],</span>
+                <span class="p">...</span>
+              <span class="p">},</span>
+   <span class="s2">&quot;millisShardTotal&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;millisShardAvg&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;numQueries&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;numShards&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;cursor&quot;</span> <span class="o">:</span> <span class="s2">&quot;&lt;Cursor Type and Index&gt;&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nChunkSkips&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nYields&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedObjects&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;nscannedObjectsAllPlans&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span><span class="p">,</span>
+   <span class="s2">&quot;millis&quot;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">num</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fields">
+<h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="core-explain-output">
+<span id="explain-output-fields-core"></span><h3>Core Explain Output<a class="headerlink" href="#core-explain-output" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="cursor">
+<tt class="descname">cursor</tt><a class="headerlink" href="#cursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the type of cursor used in the query operation:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">BasicCursor</span></tt> indicates use of full collection scan.</li>
+<li><tt class="docutils literal"><span class="pre">BtreeCursor</span></tt> indicates use of an B-tree index. The cursor
+information includes the index name. With the use of an index, the
+<a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> output will include the
+<a class="reference internal" href="#indexBounds" title="indexBounds"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">indexBounds</span></tt></a> details.</li>
+<li><tt class="docutils literal"><span class="pre">GeoSearchCursor</span></tt> indicates use of a geospatial index.</li>
+</ul>
+</dd></dl>
+
+<dl class="data">
+<dt id="isMultiKey">
+<tt class="descname">isMultiKey</tt><a class="headerlink" href="#isMultiKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean, that specifies if the index used in this query is a
+<a class="reference internal" href="../core/indexes.html#index-type-multikey"><em>multikey index</em></a> on a field that holds
+an array.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="n">
+<tt class="descname">n</tt><a class="headerlink" href="#n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the number of documents that match the query selection
+criteria.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nscannedObjects">
+<tt class="descname">nscannedObjects</tt><a class="headerlink" href="#nscannedObjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the total number of documents scanned during the query.
+The <a class="reference internal" href="#nscannedObjects" title="nscannedObjects"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nscannedObjects</span></tt></a> may be lower than <a class="reference internal" href="#nscanned" title="nscanned"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nscanned</span></tt></a>, such
+as if the index is a covered index.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nscanned">
+<tt class="descname">nscanned</tt><a class="headerlink" href="#nscanned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the total number of documents or index entries scanned
+during the database operation. You want <a class="reference internal" href="#n" title="n"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">n</span></tt></a> and
+<a class="reference internal" href="#nscanned" title="nscanned"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nscanned</span></tt></a> to be close in value as possible. The
+<a class="reference internal" href="#nscanned" title="nscanned"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nscanned</span></tt></a> value may be higher than the
+<a class="reference internal" href="#nscannedObjects" title="nscannedObjects"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">nscannedObjects</span></tt></a> value, such as if the index is a covered
+index.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nscannedObjectsAllPlans">
+<tt class="descname">nscannedObjectsAllPlans</tt><a class="headerlink" href="#nscannedObjectsAllPlans" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Specifies the total number of documents scanned for all query plans
+during the database operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nscannedAllPlans">
+<tt class="descname">nscannedAllPlans</tt><a class="headerlink" href="#nscannedAllPlans" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Specifies the total number of documents or index entries scanned for
+all query plans during the database operation.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="scanAndOrder">
+<tt class="descname">scanAndOrder</tt><a class="headerlink" href="#scanAndOrder" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p><a class="reference internal" href="#scanAndOrder" title="scanAndOrder"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">scanAndOrder</span></tt></a> is a boolean value that returns <tt class="docutils literal"><span class="pre">true</span></tt> when
+the query cannot use the index for returning sorted results.</p>
+<p>When <tt class="docutils literal"><span class="pre">false</span></tt> MongoDB must sort documents retrieving the documents
+using either an index cursor or by cursor that scans the entire
+collection.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="indexOnly">
+<tt class="descname">indexOnly</tt><a class="headerlink" href="#indexOnly" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#indexOnly" title="indexOnly"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">indexOnly</span></tt></a> is a boolean value that returns <tt class="docutils literal"><span class="pre">true</span></tt> when the
+query is <a class="reference internal" href="../applications/indexes.html#indexes-covered-queries"><em>covered</em></a> by the index. In
+<em>covered</em> queries, the index contains all data that MongoDB needs
+to fulfill the query.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nYields">
+<tt class="descname">nYields</tt><a class="headerlink" href="#nYields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the number of times this query yielded the read lock to
+allow waiting writes execute.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="nChunkSkips">
+<tt class="descname">nChunkSkips</tt><a class="headerlink" href="#nChunkSkips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the number of documents skipped because of active chunk
+migrations in a sharded system. Typically this will be zero. A
+number greater than zero is ok, but indicates a little bit of
+inefficiency.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="millis">
+<tt class="descname">millis</tt><a class="headerlink" href="#millis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the number of milliseconds to complete the query.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="indexBounds">
+<tt class="descname">indexBounds</tt><a class="headerlink" href="#indexBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the lower and upper index key bounds. This field
+resembles one of the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;indexBounds&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;start&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">key1</span><span class="o">&gt;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...</span>  <span class="p">},</span>
+                    <span class="s2">&quot;end&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">index</span> <span class="nx">key1</span><span class="o">&gt;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span><span class="p">,</span> <span class="p">...</span> <span class="p">}</span>
+                <span class="p">},</span>
+</pre></div>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="s2">&quot;indexBounds&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;&lt;field&gt;&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="p">[</span> <span class="o">&lt;</span><span class="nx">lower</span> <span class="nx">bound</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">upper</span> <span class="nx">bound</span><span class="o">&gt;</span> <span class="p">]</span> <span class="p">],</span>
+                  <span class="p">...</span>
+                <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="allPlans">
+<tt class="descname">allPlans</tt><a class="headerlink" href="#allPlans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the list of plans the query optimizer runs in order to
+select the index for the query. Displays only when the <tt class="docutils literal"><span class="pre">&lt;verbose&gt;</span></tt>
+parameter to <a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> is
+<tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="oldPlan">
+<tt class="descname">oldPlan</tt><a class="headerlink" href="#oldPlan" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Specifies the previous plan selected by the query optimizer for the
+query. Displays only when the <tt class="docutils literal"><span class="pre">&lt;verbose&gt;</span></tt> parameter to
+<a class="reference internal" href="method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a> is <tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">1</span></tt>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="server">
+<tt class="descname">server</tt><a class="headerlink" href="#server" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Specifies the MongoDB server.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="or-query-output">
+<span id="explain-output-field-or-clauses"></span><h3><tt class="docutils literal"><span class="pre">$or</span></tt> Query Output<a class="headerlink" href="#or-query-output" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="clauses">
+<tt class="descname">clauses</tt><a class="headerlink" href="#clauses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the <a class="reference internal" href="#explain-output-fields-core"><em>Core Explain Output</em></a> information for each
+clause of the <a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> expression. <tt class="xref mongodb mongodb-data docutils literal"><span class="pre">classes</span></tt> is only
+included when the clauses in the <a class="reference internal" href="operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> expression use
+indexes.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sharded-collections-output">
+<span id="explain-output-fields-sharded-collection"></span><h3>Sharded Collections Output<a class="headerlink" href="#sharded-collections-output" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="clusteredType">
+<tt class="descname">clusteredType</tt><a class="headerlink" href="#clusteredType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Describes the access pattern for shards. The value is:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ParallelSort</span></tt>, if the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> queries shards in parallel.</li>
+<li><tt class="docutils literal"><span class="pre">SerialServer</span></tt>, if the <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> queries shards sequentially.</li>
+</ul>
+</dd></dl>
+
+<dl class="data">
+<dt id="shards">
+<tt class="descname">shards</tt><a class="headerlink" href="#shards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the shards accessed during the query and individual
+<a class="reference internal" href="#explain-output-fields-core"><em>Core Explain Output</em></a> for each shard.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="millisShardTotal">
+<tt class="descname">millisShardTotal</tt><a class="headerlink" href="#millisShardTotal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the total time in milliseconds for the query to run on the
+shards.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="millisShardAvg">
+<tt class="descname">millisShardAvg</tt><a class="headerlink" href="#millisShardAvg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the average time in millisecond for the query to run on
+each shard.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="numQueries">
+<tt class="descname">numQueries</tt><a class="headerlink" href="#numQueries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the total number of queries executed.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="numShards">
+<tt class="descname">numShards</tt><a class="headerlink" href="#numShards" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the total number of shards queried.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="database-profiler.html" title="Previous Section: Database Profiler Output">&lt; &nbsp; Database Profiler Output</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="exit-codes.html" title="Next Section: Exit Codes and Statuses">Exit Codes and Statuses &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

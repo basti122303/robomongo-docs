@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MongoDB Package Components &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/components" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="mongod" href="mongod.html" />
+<link rel="prev" title="SQL to Aggregation Framework Mapping Chart" href="sql-aggregation-comparison.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodb-package-components">
+<h1>MongoDB Package Components<a class="headerlink" href="#mongodb-package-components" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="core-processes">
+<h2>Core Processes<a class="headerlink" href="#core-processes" title="Permalink to this headline">¶</a></h2>
+<p>The core components in the MongoDB package are: <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>,
+the core database process; <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> the controller and query
+router for <a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>; and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> the interactive MongoDB Shell.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongod.html"><tt class="docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongos.html"><tt class="docutils literal"><span class="pre">mongos</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongo.html"><tt class="docutils literal"><span class="pre">mongo</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="windows-services">
+<h2>Windows Services<a class="headerlink" href="#windows-services" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> describe the
+options available for configuring MongoDB when running as a Windows
+Service. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod.exe</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos.exe</span></tt> binaries
+provide a superset of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+options.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongod.exe.html"><tt class="docutils literal"><span class="pre">mongod.exe</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongos.exe.html"><tt class="docutils literal"><span class="pre">mongos.exe</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="binary-import-and-export-tools">
+<h2>Binary Import and Export Tools<a class="headerlink" href="#binary-import-and-export-tools" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> provides a method for creating <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a>
+dump files from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances, while
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> makes it possible to restore these
+dumps. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">bsondump</span></tt> converts BSON dump files into
+<a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a>. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongooplog</span></tt> utility provides the ability
+to stream <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> entries outside of normal replication.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongodump.html"><tt class="docutils literal"><span class="pre">mongodump</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongorestore.html"><tt class="docutils literal"><span class="pre">mongorestore</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="bsondump.html"><tt class="docutils literal"><span class="pre">bsondump</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongooplog.html"><tt class="docutils literal"><span class="pre">mongooplog</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="data-import-and-export-tools">
+<h2>Data Import and Export Tools<a class="headerlink" href="#data-import-and-export-tools" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> provides a method for taking data in <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a>,
+<a class="reference internal" href="glossary.html#term-csv"><em class="xref std std-term">CSV</em></a>, or <a class="reference internal" href="glossary.html#term-tsv"><em class="xref std std-term">TSV</em></a> and importing it into a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> provides a method to export data from
+a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance into JSON, CSV, or TSV.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The conversion between BSON and other formats lacks full
+type fidelity. Therefore you cannot use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> for round-trip import and export operations.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongoimport.html"><tt class="docutils literal"><span class="pre">mongoimport</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongoexport.html"><tt class="docutils literal"><span class="pre">mongoexport</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="diagnostic-tools">
+<h2>Diagnostic Tools<a class="headerlink" href="#diagnostic-tools" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt>, and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>
+provide diagnostic information related to the current operation of a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt> depends on <a class="reference internal" href="glossary.html#term-pcap"><em class="xref std std-term">libpcap</em></a>, most distributions of MongoDB do <em>not</em> include
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongosniff</span></tt>.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongostat.html"><tt class="docutils literal"><span class="pre">mongostat</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongotop.html"><tt class="docutils literal"><span class="pre">mongotop</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mongosniff.html"><tt class="docutils literal"><span class="pre">mongosniff</span></tt></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="gridfs">
+<h2>GridFS<a class="headerlink" href="#gridfs" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> provides a command-line interact to a MongoDB
+<a class="reference internal" href="glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> storage system.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mongofiles.html"><tt class="docutils literal"><span class="pre">mongofiles</span></tt></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mongofiles.html#synopsis">Synopsis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mongofiles.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mongofiles.html#options">Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mongofiles.html#use">Use</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sql-aggregation-comparison.html" title="Previous Section: SQL to Aggregation Framework Mapping Chart">&lt; &nbsp; SQL to Aggregation Framework Mapping Chart</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongod.html" title="Next Section: mongod">mongod &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

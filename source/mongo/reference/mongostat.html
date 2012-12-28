@@ -1,0 +1,483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongostat &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongostat" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongotop" href="mongotop.html" />
+<link rel="prev" title="mongoexport" href="mongoexport.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongostat">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongostat</span></tt><a class="headerlink" href="#mongostat" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> utility provides a quick overview of the
+status of a currently running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+or <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+instance. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> is functionally similar to the
+UNIX/Linux file system utility <tt class="docutils literal"><span class="pre">vmstat</span></tt>, but provides data regarding
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>For more information about monitoring MongoDB, see
+<a class="reference internal" href="../administration/monitoring.html"><em>Monitoring Database Systems</em></a>.</p>
+<p>For more background on various other MongoDB status outputs see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="server-status.html"><em>Server Status Reference</em></a></li>
+<li><a class="reference internal" href="replica-status.html"><em>Replica Set Status Reference</em></a></li>
+<li><a class="reference internal" href="database-statistics.html"><em>Database Statistics Reference</em></a></li>
+<li><a class="reference internal" href="collection-statistics.html"><em>Collection Statistics Reference</em></a></li>
+</ul>
+<p class="last">For an additional utility that provides MongoDB metrics see
+&#8220;<a class="reference internal" href="mongotop.html"><em>mongotop</em></a>.&#8221;</p>
+</div>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> connects to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running
+on the local host interface on TCP port <tt class="docutils literal"><span class="pre">27017</span></tt>; however,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> can connect to any accessible remote <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instance.</p>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongostat</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including
+the option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> utility.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongostat--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> from which you
+want to export data. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> attempts to connect
+to a MongoDB instance running on the localhost port number <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongostat--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running on
+the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongostat--host"><em class="xref std std-option">mongostat --host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongostat--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if your
+database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongostat--password"><em class="xref std std-option">mongostat --password</em></a> option to supply a password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongostat--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongostat--username"><em class="xref std std-option">mongostat --username</em></a> option to
+supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongostat--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongostat--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> will
+prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--noheaders">
+<tt class="descname">--noheaders</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--noheaders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables the output of column or field names.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--rowcount">
+<tt class="descname">--rowcount</tt><tt class="descclassname"> &lt;number&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-n</tt><tt class="descclassname"> &lt;number&gt;</tt><a class="headerlink" href="#cmdoption-mongostat--rowcount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Controls the number of rows to output. Use in conjunction with
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> to control the duration of a
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> operation.</p>
+<p>Unless <a class="reference internal" href="#cmdoption-mongostat--rowcount"><em class="xref std std-option">--rowcount</em></a> is specified, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>
+will return an infinite number
+of rows (e.g. value of <tt class="docutils literal"><span class="pre">0</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--http">
+<tt class="descname">--http</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> to collect data using the HTTP interface
+rather than a raw database connection.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--discover">
+<tt class="descname">--discover</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--discover" title="Permalink to this definition">¶</a></dt>
+<dd><p>With this option <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> discovers and reports on
+statistics from all members of a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> or
+<a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>. When connected to any member of a replica
+set, <a class="reference internal" href="#cmdoption-mongostat--discover"><em class="xref std std-option">--discover</em></a> all non-<a class="reference internal" href="glossary.html#term-hidden-member"><em class="xref std std-term">hidden members</em></a> of the replica set. When connected to a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> will return data from all <a class="reference internal" href="glossary.html#term-shard"><em class="xref std std-term">shards</em></a> in the cluster. If a replica set provides a shard in the
+sharded cluster, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> will report on non-hidden
+members of that replica set.</p>
+<p>The <a class="reference internal" href="#cmdoption-mongostat--host"><em class="xref std std-option">mongostat --host</em></a> option is not required but
+potentially useful in this case.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongostat--all">
+<tt class="descname">--all</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongostat--all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> to return all optional <a class="reference internal" href="#mongostat-fields"><em>fields</em></a>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">&lt;sleeptime&gt;</tt></dt>
+<dd><p>The final argument is the length of time, in seconds, that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> waits in between calls. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>
+returns one call every second.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> returns values that reflect the operations
+over a 1 second period. For values of <tt class="docutils literal"><span class="pre">&lt;sleeptime&gt;</span></tt> greater
+than 1, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> averages data to reflect average
+operations per second.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="fields">
+<span id="mongostat-fields"></span><h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> returns values that reflect the operations over a
+1 second period. When <strong class="command">mongostat &lt;sleeptime&gt;</strong> has a value
+greater than 1, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> averages the statistics to reflect
+average operations per second.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> outputs the following fields:</p>
+<dl class="describe">
+<dt>
+<tt class="descname">inserts</tt></dt>
+<dd><p>The number of objects inserted into the database per second. If
+followed by an asterisk (e.g. <tt class="docutils literal"><span class="pre">*</span></tt>), the datum refers to a
+replicated operation.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">query</tt></dt>
+<dd><p>The number of query operations per second.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">update</tt></dt>
+<dd><p>The number of update operations per second.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">delete</tt></dt>
+<dd><p>The number of delete operations per second.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">getmore</tt></dt>
+<dd><p>The number of get more (i.e. cursor batch) operations per second.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">command</tt></dt>
+<dd><p>The number of commands per second. On <a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a> and
+<a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> systems, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> presents two values
+separated by a pipe character (e.g. <tt class="docutils literal"><span class="pre">|</span></tt>), in the form of
+<tt class="docutils literal"><span class="pre">local|replicated</span></tt> commands.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">flushes</tt></dt>
+<dd><p>The number of <a class="reference internal" href="glossary.html#term-fsync"><em class="xref std std-term">fsync</em></a> operations per second.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">mapped</tt></dt>
+<dd><p>The total amount of data mapped in megabytes. This is the total
+data size at the time of the last <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> call.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">size</tt></dt>
+<dd><p>The amount of (virtual) memory in megabytes used by the process at
+the time of the last <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> call.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">res</tt></dt>
+<dd><p>The amount of (resident) memory in megabytes used by the process at
+the time of the last <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> call.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">faults</tt></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">Changed in version 2.1.</span></p>
+<p>The number of page faults per second.</p>
+<p>Before version 2.1 this value was only provided for MongoDB
+instances running on Linux hosts.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">locked</tt></dt>
+<dd><p>The percent of time in a global write lock.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>The <tt class="docutils literal"><span class="pre">locked</span> <span class="pre">db</span></tt> field replaces the <tt class="docutils literal"><span class="pre">locked</span> <span class="pre">%</span></tt> field to
+more appropriate data regarding the database specific locks in
+version 2.2.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">locked db</tt></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>The percent of time in the per-database context-specific
+lock. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> will report the database that has spent
+the most time since the last <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> call with a write
+lock.</p>
+<p>This value represents the amount of time the database had a
+database specific lock <em>and</em> the time that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+spent in the global lock. Because of this, and the sampling method,
+you may see some values greater than 100%.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">idx miss</tt></dt>
+<dd><p>The percent of index access attempts that required a page fault
+to load a btree node. This is a sampled value.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">qr</tt></dt>
+<dd><p>The length of the queue of clients waiting to read data from the
+MongoDB instance.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">qw</tt></dt>
+<dd><p>The length of the queue of clients waiting to write data from the
+MongoDB instance.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">ar</tt></dt>
+<dd><p>The number of active clients performing read operations.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">aw</tt></dt>
+<dd><p>The number of active clients performing write operations.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">netIn</tt></dt>
+<dd><p>The amount of network traffic, in <em>bytes</em>, received by the MongoDB instance.</p>
+<p>This includes traffic from <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> itself.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">netOut</tt></dt>
+<dd><p>The amount of network traffic, in <em>bytes</em>, sent by the MongoDB instance.</p>
+<p>This includes traffic from <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> itself.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">conn</tt></dt>
+<dd><p>The total number of open connections.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">set</tt></dt>
+<dd><p>The name, if applicable, of the replica set.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt>
+<tt class="descname">repl</tt></dt>
+<dd><p>The replication status of the node.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Value</strong></td>
+<td><strong>Replication Type</strong></td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td><a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a></td>
+</tr>
+<tr class="row-odd"><td>SEC</td>
+<td><a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a></td>
+</tr>
+<tr class="row-even"><td>REC</td>
+<td>recovering</td>
+</tr>
+<tr class="row-odd"><td>UNK</td>
+<td>unknown</td>
+</tr>
+<tr class="row-even"><td>SLV</td>
+<td><a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>In the first example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> will return data every
+second for 20 seconds. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> collects data from the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the localhost interface on
+port 27017. All of the following invocations produce identical
+behavior:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongostat --rowcount 20 1
+mongostat --rowcount 20
+mongostat -n 20 1
+mongostat -n 20
+</pre></div>
+</div>
+<p>In the next example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> returns data every 5 minutes
+(or 300 seconds) for as long as the program runs. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt>
+collects data from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the
+localhost interface on port <tt class="docutils literal"><span class="pre">27017</span></tt>. Both of the following
+invocations produce identical behavior.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongostat --rowcount 0 300
+mongostat -n 0 300
+mongostat 300
+</pre></div>
+</div>
+<p>In the following example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> returns data every 5
+minutes for an hour (12 times.) <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt> collects data
+from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the localhost interface
+on port 27017. Both of the following invocations produce identical
+behavior.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongostat --rowcount 12 300
+mongostat -n 12 300
+</pre></div>
+</div>
+<p>In many cases, using the <a class="reference internal" href="#cmdoption-mongostat--discover"><em class="xref std std-option">--discover</em></a>
+will help provide a more complete snapshot of the state of an entire
+group of machines. If a <a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> process connected to a
+<a class="reference internal" href="glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a> is running on port <tt class="docutils literal"><span class="pre">27017</span></tt> of the local
+machine, you can use the following form to return statistics from all
+members of the cluster:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongostat --discover
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongoexport.html" title="Previous Section: mongoexport">&lt; &nbsp; mongoexport</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongotop.html" title="Next Section: mongotop">mongotop &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

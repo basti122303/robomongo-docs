@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Model Tree Structures in MongoDB &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/model-tree-structures" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="model-tree-structures-in-mongodb">
+<span id="data-modeling-trees"></span><h1>Model Tree Structures in MongoDB<a class="headerlink" href="#model-tree-structures-in-mongodb" title="Permalink to this headline">¶</a></h1>
+<p>To model hierarchical or nested data relationships, you can use
+references to implement tree-like structures. The following <em>Tree</em>
+pattern examples model book categories that have hierarchical
+relationships.</p>
+<div class="section" id="model-tree-structures-with-child-references">
+<h2>Model Tree Structures with Child References<a class="headerlink" href="#model-tree-structures-with-child-references" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="model-tree-structures-with-child-references.html"><em>link</em></a>)</p>
+<p>The <em>Child References</em> pattern stores each tree node in a document; in
+addition to the tree node, document stores in an array the id(s) of the
+node&#8217;s children.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Child References</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="s2">&quot;Postgres&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="s2">&quot;Languages&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The query to retrieve the immediate children of a node is fast and
+straightforward:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">children</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">children</span></tt> to enable fast
+search by the child nodes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">children</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can query for a node in the <tt class="docutils literal"><span class="pre">children</span></tt> field to find its parent
+node as well as its siblings:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">children</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <em>Child References</em> pattern provides a suitable solution to tree storage
+as long as no operations on subtrees are necessary. This pattern may
+also provide a suitable solution for storing graphs where a node may
+have multiple parents.</p>
+</div>
+<div class="section" id="model-tree-structures-with-parent-references">
+<h2>Model Tree Structures with Parent References<a class="headerlink" href="#model-tree-structures-with-parent-references" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="model-tree-structures-with-parent-references.html"><em>link</em></a>)</p>
+<p>The <em>Parent References</em> pattern stores each tree node in a document; in
+addition to the tree node, the document stores the id of the node&#8217;s
+parent.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Parent References</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="kc">null</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The query to retrieve the parent of a node is fast and
+straightforward:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">parent</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">parent</span></tt> to enable fast search
+by the parent node:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">parent</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can query by the <tt class="docutils literal"><span class="pre">parent</span></tt> field to find its immediate children
+nodes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <em>Parent Links</em> pattern provides a simple solution to tree storage,
+but requires multiple queries to retrieve subtrees.</p>
+</div>
+<div class="section" id="model-tree-structures-with-an-array-of-ancestors">
+<h2>Model Tree Structures with an Array of Ancestors<a class="headerlink" href="#model-tree-structures-with-an-array-of-ancestors" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="model-tree-structures-with-ancestors-array.html"><em>link</em></a>)</p>
+<p>The <em>Array of Ancestors</em> pattern stores each tree node in a document;
+in addition to the tree node, document stores in an array the id(s) of
+the node&#8217;s ancestors or path.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Array of Ancestors</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="kc">null</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The query to retrieve the ancestors or path of a node is fast and
+straightforward:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">ancestors</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">ancestors</span></tt> to enable fast
+search by the ancestors nodes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can query by the <tt class="docutils literal"><span class="pre">ancestors</span></tt> to find all its descendants:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <em>Array of Ancestors</em> pattern provides a fast and efficient solution
+to find the descendants and the ancestors of a node by creating an
+index on the elements of the ancestors field. This makes <em>Array of
+Ancestors</em> a good choice for working with subtrees.</p>
+<p>The <em>Array of Ancestors</em> pattern is slightly slower than the
+<em>Materialized Paths</em> pattern but is more straightforward to use.</p>
+</div>
+<div class="section" id="model-tree-structures-with-materialized-paths">
+<h2>Model Tree Structures with Materialized Paths<a class="headerlink" href="#model-tree-structures-with-materialized-paths" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="model-tree-structures-with-materialized-paths.html"><em>link</em></a>)</p>
+<p>The <em>Materialized Paths</em> pattern stores each tree node in a document;
+in addition to the tree node, document stores as a string the id(s) of
+the node&#8217;s ancestors or path. Although the <em>Materialized Paths</em> pattern
+requires additional steps of working with strings and regular
+expressions, the pattern also provides more flexibility in working with
+the path, such as finding nodes by partial paths.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Materialized Paths</em> ; the path string uses the comma <tt class="docutils literal"><span class="pre">,</span></tt> as a
+delimiter:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="kc">null</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;Books,&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;Books,Programming,&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;Books,Programming,&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;Books,Programming,Databases,&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">path</span><span class="o">:</span> <span class="s2">&quot;Books,Programming,Databases,&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">You can query to retrieve the whole tree, sorting by the <tt class="docutils literal"><span class="pre">path</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">path</span></tt> to enable fast search
+by the path:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can use regular expressions on the <tt class="docutils literal"><span class="pre">path</span></tt> field to find the
+descendants of <tt class="docutils literal"><span class="pre">Programming</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">path</span><span class="o">:</span> <span class="sr">/,Programming,/</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="model-tree-structures-with-nested-sets">
+<h2>Model Tree Structures with Nested Sets<a class="headerlink" href="#model-tree-structures-with-nested-sets" title="Permalink to this headline">¶</a></h2>
+<p>(<a class="reference internal" href="model-tree-structures-with-nested-sets.html"><em>link</em></a>)</p>
+<p>The <em>Nested Sets</em> pattern identifies each node in the tree as stops in
+a round-trip traversal of the tree. The application visits each node
+in the tree twice; first during the initial trip, and second during
+the return trip. The <em>Nested Sets</em> pattern stores each tree node in a
+document; in addition to the tree node, document stores the id of
+node&#8217;s parent, the node&#8217;s initial stop in the <tt class="docutils literal"><span class="pre">left</span></tt> field, and its
+return stop in the <tt class="docutils literal"><span class="pre">right</span></tt> field.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Nested Sets</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">12</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">11</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">4</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">10</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">7</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">left</span><span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="nx">right</span><span class="o">:</span> <span class="mi">9</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You can query to retrieve the descendants of a node:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">databaseCategory</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">v</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">left</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="nx">databaseCategory</span><span class="p">.</span><span class="nx">left</span> <span class="p">},</span> <span class="nx">right</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span> <span class="nx">databaseCategory</span><span class="p">.</span><span class="nx">right</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>The <em>Nested Sets</em> pattern provides a fast and efficient solution for
+finding subtrees but is inefficient for modifying the tree structure.
+As such, this pattern is best for static trees that do not change.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

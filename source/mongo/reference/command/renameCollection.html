@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>renameCollection &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/renameCollection" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="repairDatabase" href="repairDatabase.html" />
+<link rel="prev" title="removeShard" href="removeShard.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="renamecollection">
+<h1>renameCollection<a class="headerlink" href="#renamecollection" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="renameCollection">
+<tt class="descname">renameCollection</tt><a class="headerlink" href="#renameCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> command is an administrative
+command that changes the name of an existing collection. You
+specify collections to <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> in the form of
+a complete <a class="reference internal" href="../glossary.html#term-namespace"><em class="xref std std-term">namespace</em></a>, which includes the database name. To
+rename a collection, issue the <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a>
+command against the <a class="reference internal" href="../glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> in the form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">renameCollection</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">source</span><span class="o">-</span><span class="nx">namespace</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">target</span><span class="o">-</span><span class="nx">namespace</span><span class="o">&gt;</span><span class="p">[,</span> <span class="nx">dropTarget</span><span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">dropTarget</span></tt> argument is optional.</p>
+<p>If you specify a collection to the <tt class="docutils literal"><span class="pre">to</span></tt> argument in a different database, the
+<a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> command will copy the collection to the new
+database and then drop the source collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source-namespace</strong> &#8211; Specifies the complete namespace of the collection to rename.</li>
+<li><strong>to</strong> (<em>string</em>) &#8211; Specifies the new namespace of the collection.</li>
+<li><strong>dropTarget</strong> (<em>boolean</em>) &#8211; Optional. If <tt class="docutils literal"><span class="pre">true</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will drop the
+<tt class="docutils literal"><span class="pre">target</span></tt> of <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> prior to renaming
+the collection.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Exception:</th><td class="field-body"><ul class="first last simple">
+<li><strong>10026</strong> &#8211; Raised if the <tt class="docutils literal"><span class="pre">source</span></tt> namespace does not exist.</li>
+<li><strong>10027</strong> &#8211; Raised if the <tt class="docutils literal"><span class="pre">target</span></tt> namespace exists
+and <tt class="docutils literal"><span class="pre">dropTarget</span></tt> is either <tt class="docutils literal"><span class="pre">false</span></tt> or unspecified.</li>
+<li><strong>15967</strong> &#8211; Raised if the <tt class="docutils literal"><span class="pre">target</span></tt> namespace is an invalid
+collection name.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>You can use <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> in production
+environments; however:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> will block all database activity
+for the duration of the operation.</li>
+<li><a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> is incompatible with sharded
+collections.</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> will fail if
+<cite>target</cite> is the name of an existing collection
+and you do not specify <tt class="docutils literal"><span class="pre">dropTarget:</span> <span class="pre">true</span></tt>.</p>
+<p class="last">If the <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> operation does not complete
+the <tt class="docutils literal"><span class="pre">target</span></tt> collection and indexes will not be usable and
+will require manual intervention to clean up.</p>
+</div>
+<p>The shell helper <a class="reference internal" href="../method/db.collection.renameCollection.html#db.collection.renameCollection" title="db.collection.renameCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.renameCollection()</span></tt></a> provides a
+simpler interface to using this command within a database.
+The following is equivalent to the previous example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">source</span><span class="o">-</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">renameCollection</span><span class="p">(</span> <span class="s2">&quot;target&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You cannot use <a class="reference internal" href="../commands.html#renameCollection" title="renameCollection"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">renameCollection</span></tt></a> with
+sharded collections.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command obtains a global write lock and will block other
+operations until it has completed.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="removeShard.html" title="Previous Section: removeShard">&lt; &nbsp; removeShard</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="repairDatabase.html" title="Next Section: repairDatabase">repairDatabase &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>load() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/load" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="ls()" href="ls.html" />
+<link rel="prev" title="listFiles()" href="listFiles.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="load">
+<h1>load()<a class="headerlink" href="#load" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt>
+<tt class="descname">load</tt><big>(</big><em>&quot;file&quot;</em><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Para string file:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Specify a path and file name containing
+JavaScript.</td>
+</tr>
+</tbody>
+</table>
+<p>This native function loads and runs a JavaScript file into the
+current shell environment. To run JavaScript with the mongo shell,
+you can either:</p>
+<ul class="simple">
+<li>use the &#8220;<a class="reference internal" href="../mongo.html#cmdoption-mongo--eval"><em class="xref std std-option">--eval</em></a>&#8221; option when invoking
+the shell to evaluate a small amount of JavaScript code, or</li>
+<li>specify a file name with &#8220;<a class="reference internal" href="../mongo.html#mongo-shell-file"><em>mongo</em></a>&#8221;.
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will execute the script and then exit. Add the
+<a class="reference internal" href="../mongo.html#cmdoption-mongo--shell"><em class="xref std std-option">--shell</em></a> option to return to the shell after
+running the command.</li>
+</ul>
+<p>Specify files loaded with the <a class="reference internal" href="../javascript.html#load" title="load"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">load()</span></tt></a> function in relative terms
+to the current directory of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+session. Check the current directory using the &#8220;<a class="reference internal" href="../javascript.html#pwd" title="pwd"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">pwd()</span></tt></a>&#8221;
+function.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="listFiles.html" title="Previous Section: listFiles()">&lt; &nbsp; listFiles()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="ls.html" title="Next Section: ls()">ls() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

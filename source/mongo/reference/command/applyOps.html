@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>applyOps (internal) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/applyOps" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="authenticate" href="authenticate.html" />
+<link rel="prev" title="aggregate" href="aggregate.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="applyops-internal">
+<h1>applyOps (internal)<a class="headerlink" href="#applyops-internal" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="applyOps">
+<tt class="descname">applyOps</tt><a class="headerlink" href="#applyOps" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>operations</strong> (<em>array</em>) &#8211; an array of operations to perform.</li>
+<li><strong>preCondition</strong> (<em>array</em>) &#8211; Optional. Defines one or more conditions that the destination must meet
+applying the entries from the <tt class="docutils literal"><span class="pre">&lt;operations&gt;</span></tt> array.
+Use <tt class="docutils literal"><span class="pre">ns</span></tt> to
+specify a <a class="reference internal" href="../glossary.html#term-namespace"><em class="xref std std-term">namespace</em></a>, <tt class="docutils literal"><span class="pre">q</span></tt> to specify a <a class="reference internal" href="../glossary.html#term-query"><em class="xref std std-term">query</em></a> and
+<tt class="docutils literal"><span class="pre">res</span></tt> to specify the result that the query should match. You may
+specify zero, one, or many <tt class="docutils literal"><span class="pre">preCondition</span></tt> documents.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="../commands.html#applyOps" title="applyOps"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">applyOps</span></tt></a> provides a way to apply entries from an
+<a class="reference internal" href="../glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> created by <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> members and
+<a class="reference internal" href="../glossary.html#term-master"><em class="xref std std-term">master</em></a> instances in a master/<a class="reference internal" href="../glossary.html#term-slave"><em class="xref std std-term">slave</em></a>
+deployment. <a class="reference internal" href="../commands.html#applyOps" title="applyOps"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">applyOps</span></tt></a> is primarily an internal command
+to support sharding functionality, and has the following prototype
+form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">applyOps</span><span class="o">:</span> <span class="p">[</span> <span class="o">&lt;</span><span class="nx">operations</span><span class="o">&gt;</span> <span class="p">],</span> <span class="nx">preCondition</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">ns</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">namespace</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">q</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">res</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">result</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../commands.html#applyOps" title="applyOps"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">applyOps</span></tt></a> applies oplog entries from the
+<tt class="docutils literal"><span class="pre">&lt;operations&gt;</span></tt> array, to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance. The
+<tt class="docutils literal"><span class="pre">preCondition</span></tt> array provides the ability to specify conditions
+that must be true in order to apply the oplog entry.</p>
+<p>You can specify as many <tt class="docutils literal"><span class="pre">preCondition</span></tt> sets as needed. If you
+specify the <tt class="docutils literal"><span class="pre">ns</span></tt> option, <a class="reference internal" href="../commands.html#applyOps" title="applyOps"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">applyOps</span></tt></a> will only apply
+oplog entries for the <a class="reference internal" href="../glossary.html#term-collection"><em class="xref std std-term">collection</em></a> described by that
+namespace. You may also specify a query in the <tt class="docutils literal"><span class="pre">q</span></tt> field with a
+corresponding expected result in the <tt class="docutils literal"><span class="pre">res</span></tt> field that must match
+in order to apply the oplog entry.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This command obtains a global write lock and will block other
+operations until it has completed.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="aggregate.html" title="Previous Section: aggregate">&lt; &nbsp; aggregate</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="authenticate.html" title="Next Section: authenticate">authenticate &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

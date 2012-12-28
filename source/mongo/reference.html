@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Query, Update, Projection, and Aggregation Operators" href="reference/operator.html" />
+<link rel="prev" title="FAQ: Indexes" href="faq/indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mongodb-interface">
+<h2>MongoDB Interface<a class="headerlink" href="#mongodb-interface" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Reference<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/operator.html">Query, Update, Projection, and Aggregation Operators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/command.html">Database Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/method.html">JavaScript Methods</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="mongodb-and-sql-interface-comparisons">
+<h3>MongoDB and SQL Interface Comparisons<a class="headerlink" href="#mongodb-and-sql-interface-comparisons" title="Permalink to this headline">¶</a></h3>
+<p>The following documents provide mappings between MongoDB
+concepts and statements and SQL concepts and statements.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/sql-comparison.html">SQL to MongoDB Mapping Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/sql-aggregation-comparison.html">SQL to Aggregation Framework Mapping Chart</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="overviews">
+<h3>Overviews<a class="headerlink" href="#overviews" title="Permalink to this headline">¶</a></h3>
+<p>For this reference material in another form, consider the following
+interface overview pages:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/operators.html"><em>Operator Reference</em></a> for an overview of all query, update, and projection operators;</li>
+<li><a class="reference internal" href="reference/meta-query-operators.html"><em>Meta Query Operators</em></a> for all special &#8220;meta&#8221; query operators;</li>
+<li><a class="reference internal" href="reference/aggregation.html"><em>Aggregation Framework Reference</em></a> for all <a class="reference internal" href="aggregation.html"><em>aggregation</em></a> operators;</li>
+<li><a class="reference internal" href="reference/commands.html"><em>Command Reference</em></a> for an overview of all <a class="reference internal" href="reference/glossary.html#term-database-command"><em class="xref std std-term">database commands</em></a>; and</li>
+<li><a class="reference internal" href="reference/javascript.html"><em>JavaScript Interface</em></a> for all <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell methods and helpers.</li>
+<li><a class="reference internal" href="reference/mongo-shell-reference.html"><em>mongo Shell Quick Reference</em></a> for a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell quick reference.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="architecture-and-components">
+<span id="man-pages"></span><h2>Architecture and Components<a class="headerlink" href="#architecture-and-components" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/components.html">MongoDB Package Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#core-processes">Core Processes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongod.html"><tt class="docutils literal"><span class="pre">mongod</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongos.html"><tt class="docutils literal"><span class="pre">mongos</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongo.html"><tt class="docutils literal"><span class="pre">mongo</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#windows-services">Windows Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongod.exe.html"><tt class="docutils literal"><span class="pre">mongod.exe</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongos.exe.html"><tt class="docutils literal"><span class="pre">mongos.exe</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#binary-import-and-export-tools">Binary Import and Export Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongodump.html"><tt class="docutils literal"><span class="pre">mongodump</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongorestore.html"><tt class="docutils literal"><span class="pre">mongorestore</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/bsondump.html"><tt class="docutils literal"><span class="pre">bsondump</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongooplog.html"><tt class="docutils literal"><span class="pre">mongooplog</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#data-import-and-export-tools">Data Import and Export Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongoimport.html"><tt class="docutils literal"><span class="pre">mongoimport</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongoexport.html"><tt class="docutils literal"><span class="pre">mongoexport</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#diagnostic-tools">Diagnostic Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongostat.html"><tt class="docutils literal"><span class="pre">mongostat</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongotop.html"><tt class="docutils literal"><span class="pre">mongotop</span></tt></a></li>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongosniff.html"><tt class="docutils literal"><span class="pre">mongosniff</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="reference/components.html#gridfs">GridFS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="reference/mongofiles.html"><tt class="docutils literal"><span class="pre">mongofiles</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/configuration-options.html">Configuration File Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/connection-string.html">Connection String URI Format</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="status-and-reporting">
+<h2>Status and Reporting<a class="headerlink" href="#status-and-reporting" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/server-status-index.html">Server Status Output Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/server-status.html">Server Status Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/database-statistics.html">Database Statistics Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/collection-statistics.html">Collection Statistics Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/collection-validation.html">Collection Validation Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/connection-pool-stats.html">Connection Pool Statistics Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/replica-status.html">Replica Set Status Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/replica-configuration.html">Replica Set Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/replication-info.html">Replication Info Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/current-op.html">Current Operation Reporting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/database-profiler.html">Database Profiler Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/explain.html">Explain Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/exit-codes.html">Exit Codes and Statuses</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="internal-metadata">
+<h2>Internal Metadata<a class="headerlink" href="#internal-metadata" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/config-database.html">Config Database Contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/local-database.html">The <tt class="docutils literal"><span class="pre">local</span></tt> Database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/system-collections.html">System Collections</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="general-reference">
+<h2>General Reference<a class="headerlink" href="#general-reference" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/limits.html">MongoDB Limits and Thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/mongodb-extended-json.html">MongoDB Extended JSON</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/glossary.html">Glossary</a></li>
+</ul>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="genindex.html"><em>Index</em></a> may provide useful insight into the
+reference material in this manual.</p>
+</div>
+</div>
+<div class="section" id="release-notes">
+<h2>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
+<p>Always install the latest, stable version of MongoDB. See the
+following release notes for an account of the changes in major
+versions. Release notes also include instructions for upgrade.</p>
+<p>Current stable release (v2.2-series):</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/2.2.html">Release Notes for MongoDB 2.2</a></li>
+</ul>
+</div>
+<p>See <a class="reference internal" href="release-notes/2.2-changes.html"><em>Changes in MongoDB 2.2</em></a> for an overview of all changes
+in 2.2.</p>
+<p>Previous stable releases:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/2.0.html">Release Notes for MongoDB 2.0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/1.8.html">Release Notes for MongoDB 1.8</a></li>
+</ul>
+</div>
+<p>Current Development series:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/2.4.html">Release Notes for MongoDB 2.4 (2.3 Development Series)</a></li>
+</ul>
+</div>
+<p>Other MongoDB release notes:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="release-notes/drivers-write-concern.html">Default Write Concern Change</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="release-notes/drivers-write-concern.html#changes">Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-notes/drivers-write-concern.html#releases">Releases</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="faq/indexes.html" title="Previous Section: FAQ: Indexes">&lt; &nbsp; FAQ: Indexes</a></li>
+<li id="btnvnx"><a href="reference/operator.html" title="Next Section: Query, Update, Projection, and Aggregation Operators">Query, Update, Projection, and Aggregation Operators &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

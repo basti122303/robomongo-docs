@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongo Shell Quick Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongo-shell-reference" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="next" title="Use Cases" href="../use-cases.html" />
+<link rel="prev" title="Write Scripts for the mongo Shell" href="../tutorial/write-scripts-for-the-mongo-shell.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongo-shell-quick-reference">
+<h1><tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Quick Reference<a class="headerlink" href="#mongo-shell-quick-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mongo-shell-command-history">
+<h2><tt class="docutils literal"><span class="pre">mongo</span></tt> Shell Command History<a class="headerlink" href="#mongo-shell-command-history" title="Permalink to this headline">¶</a></h2>
+<p>You can retrieve previous commands issued in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+with the up and down arrow keys. Command history is stored in
+<tt class="docutils literal"><span class="pre">~/.dbshell</span></tt> file. See <a class="reference internal" href="mongo.html#mongo-dbshell-file"><em>.dbshell</em></a> for more
+information.</p>
+</div>
+<div class="section" id="command-line-options">
+<h2>Command Line Options<a class="headerlink" href="#command-line-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> executable can be started with numerous options.
+See <a class="reference internal" href="mongo.html"><em>mongo executable</em></a> page for details on all
+available options.</p>
+<p>The following table displays some common options for <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Option</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="mongo.html#cmdoption-mongo--help"><em class="xref std std-option">--help</em></a></td>
+<td>Show command line options</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="mongo.html#cmdoption-mongo--nodb"><em class="xref std std-option">--nodb</em></a></td>
+<td><p class="first">Start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell without connecting to a database.</p>
+<p class="last">To connect later, see <a class="reference internal" href="../tutorial/write-scripts-for-the-mongo-shell.html#mongo-shell-new-connections"><em>Opening New Connections</em></a>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="mongo.html#cmdoption-mongo--shell"><em class="xref std std-option">--shell</em></a></td>
+<td><p class="first">Used in conjunction with a JavaScript file (i.e.
+<a class="reference internal" href="mongo.html#mongo-shell-file"><em>&lt;file.js&gt;</em></a>) to continue in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell after running the JavaScript file.</p>
+<p class="last">See <a class="reference internal" href="../tutorial/write-scripts-for-the-mongo-shell.html#mongo-shell-javascript-file"><em>JavaScript file</em></a> for an
+example.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="command-helpers">
+<h2>Command Helpers<a class="headerlink" href="#command-helpers" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides various help. The following table
+displays some common help methods and commands:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Help Methods and Commands</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">help</span></tt></td>
+<td>Show help.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">db.help()</span></tt></td>
+<td>Show help for database methods.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">db.&lt;collection&gt;.help()</span></tt></td>
+<td>Show help on collection methods. The <tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt> can be the
+name of an existing collection or a non-existing collection.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">show</span> <span class="pre">dbs</span></tt></td>
+<td>Print a list of all databases on the server.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">use</span> <span class="pre">&lt;db&gt;</span></tt></td>
+<td>Switch current database to <tt class="docutils literal"><span class="pre">&lt;db&gt;</span></tt>. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+variable <tt class="docutils literal"><span class="pre">db</span></tt> is set to the current database.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">show</span> <span class="pre">collections</span></tt></td>
+<td>Print a list of all collections for current database</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">show</span> <span class="pre">users</span></tt></td>
+<td>Print a list of users for current database.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">show</span> <span class="pre">profile</span></tt></td>
+<td>Print the five most recent operations that took 1 millisecond or
+more. See documentation on the <a class="reference internal" href="../tutorial/manage-the-database-profiler.html"><em>database profiler</em></a> for more information.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="basic-shell-javascript-operations">
+<h2>Basic Shell Javascript Operations<a class="headerlink" href="#basic-shell-javascript-operations" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides numerous
+<a class="reference internal" href="javascript.html"><em>JavaScript Interface</em></a> methods for database operations.</p>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, <tt class="docutils literal"><span class="pre">db</span></tt> is the variable that references
+the current database. The variable is automatically set to the default
+database <tt class="docutils literal"><span class="pre">test</span></tt> or is set when you use the <tt class="docutils literal"><span class="pre">use</span> <span class="pre">&lt;db&gt;</span></tt> to switch
+current database.</p>
+<p>The following table displays some common JavaScript operations:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>JavaScript Database Operations</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="method/db.auth.html#db.auth" title="db.auth"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.auth()</span></tt></a></td>
+<td>If running in secure mode, authenticate the user.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">coll</span> <span class="pre">=</span> <span class="pre">db.&lt;collection&gt;</span></tt></td>
+<td><p class="first">Set a specific collection in the current database to a variable
+<tt class="docutils literal"><span class="pre">coll</span></tt>, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">myCollection</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>You can perform operations on the <tt class="docutils literal"><span class="pre">myCollection</span></tt> using the
+variable, as in the following example:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span><span class="p">.</span><span class="nx">find</span><span class="p">();</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a></td>
+<td><p class="first">Find all documents in the collection and returns a cursor.</p>
+<p>See the <a class="reference internal" href="../applications/read.html"><em>Read</em></a> and
+<a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a> for more information and examples.</p>
+<p class="last">See <a class="reference internal" href="../core/read-operations.html#read-operations-cursors"><em>Cursors</em></a> for additional information on
+cursor handling in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.collection.insert.html#db.collection.insert" title="db.collection.insert"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.insert()</span></tt></a></td>
+<td>Insert a new document into the collection.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.update()</span></tt></a></td>
+<td><p class="first">Update an existing document in the collection.</p>
+<p class="last">See <a class="reference internal" href="../applications/update.html"><em>Update</em></a> for more information.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.collection.save.html#db.collection.save" title="db.collection.save"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.save()</span></tt></a></td>
+<td><p class="first">Insert either a new document or update an existing document in
+the collection.</p>
+<p class="last">See <a class="reference internal" href="../applications/update.html"><em>Update</em></a> for more information.</p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.remove.html#db.collection.remove" title="db.collection.remove"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.remove()</span></tt></a></td>
+<td><p class="first">Delete documents from the collection.</p>
+<p class="last">See <a class="reference internal" href="../applications/delete.html"><em>Delete</em></a> for more information.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.collection.drop.html#db.collection.drop" title="db.collection.drop"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.drop()</span></tt></a></td>
+<td>Drops or removes completely the collection.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.ensureIndex()</span></tt></a></td>
+<td>Create a new index on the collection if the index does not
+exist; otherwise, the operation has no effect.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.getSiblingDB.html#db.getSiblingDB" title="db.getSiblingDB"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getSiblingDB()</span></tt></a> or <tt class="docutils literal"><span class="pre">db.getSisterDB()</span></tt></td>
+<td>Return a reference to another database using this same
+connection without explicitly switching the current database.
+This allows for cross database queries. See
+<a class="reference internal" href="../faq/mongo.html#mongo-shell-getsiblingdb"><em>How can I access to different databases temporarily?</em></a> for more information.</td>
+</tr>
+</tbody>
+</table>
+<p>For more information on performing operations in the shell, see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../applications/create.html"><em>Create</em></a></li>
+<li><a class="reference internal" href="../applications/read.html"><em>Read</em></a></li>
+<li><a class="reference internal" href="../applications/update.html"><em>Update</em></a></li>
+<li><a class="reference internal" href="../applications/delete.html"><em>Delete</em></a></li>
+<li><a class="reference internal" href="../administration/indexes.html"><em>Indexing Operations</em></a></li>
+<li><a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a></li>
+<li><a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a></li>
+<li><a class="reference internal" href="javascript.html"><em>JavaScript Interface</em></a></li>
+</ul>
+</div>
+<div class="section" id="queries">
+<h2>Queries<a class="headerlink" href="#queries" title="Permalink to this headline">¶</a></h2>
+<p>In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, perform read operations using the
+<a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a> and <a class="reference internal" href="method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.findOne()</span></tt></a>
+methods.</p>
+<p>The <a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a> method returns a cursor object
+which the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell iterates to print documents on
+screen. By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> prints the first 20. The
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell will prompt the user to &#8220;<tt class="docutils literal"><span class="pre">Type</span> <span class="pre">it</span></tt>&#8221; to continue
+iterating the next 20 results.</p>
+<p>The following table provides some common read operations in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Read Operations</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(&lt;query&gt;)</span></tt></a></td>
+<td><p class="first">Find the documents matching the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> criteria in the
+collection. If the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> criteria is not specified or is
+empty (i.e <tt class="docutils literal"><span class="pre">{}</span></tt> ), the read operation selects all documents in
+the collection.</p>
+<p>The following example selects the documents in the <tt class="docutils literal"><span class="pre">users</span></tt>
+collection with the <tt class="docutils literal"><span class="pre">name</span></tt> field equal to <tt class="docutils literal"><span class="pre">&quot;Joe&quot;</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+<span class="nx">coll</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Joe&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">For more information on specifying the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> criteria, see
+<a class="reference internal" href="../core/read-operations.html#read-operations-query-argument"><em>Query Document</em></a>.</p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(</span> <span class="pre">&lt;query&gt;,</span> <span class="pre">&lt;projection&gt;</span> <span class="pre">)</span></tt></a></td>
+<td><p class="first">Find documents matching the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> criteria and return just
+specific fields in the <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt>.</p>
+<p>The following example selects all documents from the collection
+but returns only the <tt class="docutils literal"><span class="pre">name</span></tt> field and the <tt class="docutils literal"><span class="pre">_id</span></tt> field. The
+<tt class="docutils literal"><span class="pre">_id</span></tt> is always returned unless explicitly specified to not
+return.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+<span class="nx">coll</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="p">},</span>
+           <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span>
+         <span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">For more information on specifying the <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt>, see
+<a class="reference internal" href="../core/read-operations.html#read-operations-projection"><em>Result Projections</em></a>.</p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find().sort(</span> <span class="pre">&lt;sort</span> <span class="pre">order&gt;</span> <span class="pre">)</span></tt></a></td>
+<td><p class="first">Return results in the specified <tt class="docutils literal"><span class="pre">&lt;sort</span> <span class="pre">order&gt;</span></tt>.</p>
+<p>The following example selects all documents from the collection
+and returns the results sorted by the <tt class="docutils literal"><span class="pre">name</span></tt> field in
+ascending order (<tt class="docutils literal"><span class="pre">1</span></tt>).  Use <tt class="docutils literal"><span class="pre">-1</span></tt> for descending order:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+<span class="nx">coll</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(</span> <span class="pre">&lt;query&gt;</span> <span class="pre">).sort(</span> <span class="pre">&lt;sort</span> <span class="pre">order&gt;</span> <span class="pre">)</span></tt></a></td>
+<td>Return the documents matching the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> criteria in the
+specified <tt class="docutils literal"><span class="pre">&lt;sort</span> <span class="pre">order&gt;</span></tt>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(</span> <span class="pre">...</span> <span class="pre">).limit(</span> <span class="pre">&lt;n&gt;</span> <span class="pre">)</span></tt></a></td>
+<td>Limit result to <tt class="docutils literal"><span class="pre">&lt;n&gt;</span></tt> rows. Highly recommended if you need only
+a certain number of rows for best performance.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(</span> <span class="pre">...</span> <span class="pre">).skip(</span> <span class="pre">&lt;n&gt;</span> <span class="pre">)</span></tt></a></td>
+<td>Skip <tt class="docutils literal"><span class="pre">&lt;n&gt;</span></tt> results.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.count.html#db.collection.count" title="db.collection.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.count()</span></tt></a></td>
+<td>Returns total number of documents in the collection.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/cursor.count.html#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find(</span> <span class="pre">&lt;query&gt;</span> <span class="pre">).count()</span></tt></a></td>
+<td><p class="first">Returns the total number of documents that match the query.</p>
+<p class="last">The <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">&lt;cursor.count()&gt;</span></tt> ignores <a class="reference internal" href="method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> and <a class="reference internal" href="method/cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">skip()</span></tt></a>. For
+example, if 100 records match but the limit is 10,
+<a class="reference internal" href="method/cursor.count.html#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">count()</span></tt></a> will return 100. This will be
+faster than iterating yourself, but still take time.</p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.findOne(</span> <span class="pre">&lt;query&gt;</span> <span class="pre">)</span></tt></a></td>
+<td><p class="first">Find and return a single document. Returns null if not found.</p>
+<blockquote>
+<div>The following example selects a single document in the
+<tt class="docutils literal"><span class="pre">users</span></tt> collection with the <tt class="docutils literal"><span class="pre">name</span></tt> field matches to
+<tt class="docutils literal"><span class="pre">&quot;Joe&quot;</span></tt>:</div></blockquote>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">coll</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">users</span><span class="p">;</span>
+<span class="nx">coll</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Joe&quot;</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p class="last">Internally, the <a class="reference internal" href="method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a>
+method is the <a class="reference internal" href="method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method
+with a <a class="reference internal" href="method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit(1)</span></tt></a>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See <a class="reference internal" href="../applications/read.html"><em>Read</em></a> and <a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a>
+documentation for more information and examples. See
+<a class="reference internal" href="operators.html"><em>Operator Reference</em></a> to specify other query operators.</p>
+</div>
+<div class="section" id="error-checking-methods">
+<h2>Error Checking Methods<a class="headerlink" href="#error-checking-methods" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell provides numerous <a class="reference internal" href="javascript.html#js-administrative-methods"><em>administrative
+database methods</em></a>, including error checking
+methods. These methods are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Error Checking Methods</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="method/db.getLastError.html#db.getLastError" title="db.getLastError"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getLastError()</span></tt></a></td>
+<td>Returns error message from the last operation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.getLastErrorObj.html#db.getLastErrorObj" title="db.getLastErrorObj"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getLastErrorObj()</span></tt></a></td>
+<td>Returns the error document from the last operation.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="administrative-command-helpers">
+<span id="mongo-shell-admin-helpers"></span><span id="mongo-dba-helpers"></span><h2>Administrative Command Helpers<a class="headerlink" href="#administrative-command-helpers" title="Permalink to this headline">¶</a></h2>
+<p>The following table lists some common methods to support database
+administration:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>JavaScript Database Administration Methods</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="method/db.cloneDatabase.html#db.cloneDatabase" title="db.cloneDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.cloneDatabase(&lt;host&gt;)</span></tt></a></td>
+<td>Clone the current database from the <tt class="docutils literal"><span class="pre">host</span></tt> specified. The
+<tt class="docutils literal"><span class="pre">host</span></tt> database instance must be in noauth mode.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.copyDatabase.html#db.copyDatabase" title="db.copyDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.copyDatabase(&lt;from&gt;,</span> <span class="pre">&lt;to&gt;,</span> <span class="pre">&lt;host&gt;)</span></tt></a></td>
+<td><p class="first">Copy the <tt class="docutils literal"><span class="pre">&lt;from&gt;</span></tt> database from the <tt class="docutils literal"><span class="pre">&lt;host&gt;</span></tt> to the <tt class="docutils literal"><span class="pre">&lt;to&gt;</span></tt>
+database on the current server.</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">&lt;host&gt;</span></tt> database instance must be in <tt class="docutils literal"><span class="pre">noauth</span></tt> mode.</p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.collection.renameCollection.html#db.collection.renameCollection" title="db.collection.renameCollection"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fromColl.renameCollection(&lt;toColl&gt;)</span></tt></a></td>
+<td>Rename collection from fromColl to toColl.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.repairDatabase.html#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a></td>
+<td>Repair and compact the current database. This operation can be
+very slow on large databases.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.addUser.html#db.addUser" title="db.addUser"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.addUser(</span> <span class="pre">&lt;user&gt;,</span> <span class="pre">&lt;pwd&gt;</span> <span class="pre">)</span></tt></a></td>
+<td>Add user to current database.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="method/db.getCollectionNames.html#db.getCollectionNames" title="db.getCollectionNames"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getCollectionNames()</span></tt></a></td>
+<td>Get the list of all collections in the current database.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="method/db.dropDatabase.html#db.dropDatabase" title="db.dropDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.dropDatabase()</span></tt></a></td>
+<td>Drops the current database.</td>
+</tr>
+</tbody>
+</table>
+<p>See also <a class="reference internal" href="javascript.html#js-administrative-methods"><em>administrative database methods</em></a> for a full list of methods.</p>
+</div>
+<div class="section" id="opening-additional-connections">
+<h2>Opening Additional Connections<a class="headerlink" href="#opening-additional-connections" title="Permalink to this headline">¶</a></h2>
+<p>You can create new connections within the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>The following table displays the methods to create the connections:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">JavaScript Connection Create Methods</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span> <span class="o">=</span> <span class="nx">connect</span><span class="p">(</span><span class="s2">&quot;&lt;host&gt;:&lt;port&gt;/&lt;dbname&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td>Open a new database connection.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last highlight-javascript"><div class="highlight"><pre><span class="nx">conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Mongo</span><span class="p">()</span>
+<span class="nx">db</span> <span class="o">=</span> <span class="nx">conn</span><span class="p">.</span><span class="nx">getDB</span><span class="p">(</span><span class="s2">&quot;dbname&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</td>
+<td><p class="first">Open a connection to a new server using <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Mongo()</span></tt>.</p>
+<p class="last">Use <tt class="docutils literal"><span class="pre">getDB()</span></tt> method of the connection to select a database.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>See also <a class="reference internal" href="../tutorial/write-scripts-for-the-mongo-shell.html#mongo-shell-new-connections"><em>Opening New Connections</em></a> for more information on the
+opening new connections from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<p>The following table displays some miscellaneous methods:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><strong>Method</strong></th>
+<th class="head"><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">Object.bsonsize(&lt;document&gt;)</span></tt></td>
+<td>Prints the <a class="reference internal" href="glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> size of an &lt;document&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>See the <a class="reference external" href="http://api.mongodb.org/js/index.html">MongoDB JavaScript API Documentation</a> for a full list of JavaScript
+methods .</p>
+</div>
+<div class="section" id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Permalink to this headline">¶</a></h2>
+<p>Consider the following reference material that addresses the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and its interface:</p>
+<ul class="simple">
+<li><a class="reference internal" href="mongo.html"><em>mongo</em></a></li>
+<li><a class="reference internal" href="javascript.html"><em>JavaScript Interface</em></a></li>
+<li><a class="reference internal" href="operators.html"><em>Operator Reference</em></a></li>
+<li><a class="reference internal" href="commands.html"><em>Command Reference</em></a></li>
+<li><a class="reference internal" href="aggregation.html"><em>Aggregation Framework Reference</em></a></li>
+<li><a class="reference internal" href="meta-query-operators.html"><em>Meta Query Operators</em></a></li>
+</ul>
+<p>Additionally, the MongoDB source code repository includes a <a class="reference external" href="https://github.com/mongodb/mongo/tree/master/jstests/">jstests
+directory</a>
+which contains numerous <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell scripts.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../tutorial/write-scripts-for-the-mongo-shell.html" title="Previous Section: Write Scripts for the mongo Shell">&lt; &nbsp; Write Scripts for the mongo Shell</a></li>
+<li id="btnvup"><a href="../mongo.html" title="Parent Section: Using the mongo Shell" >&#47;&#92;&nbsp; Using the mongo Shell</a></li>
+<li id="btnvnx"><a href="../use-cases.html" title="Next Section: Use Cases">Use Cases &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

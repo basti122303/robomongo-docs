@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>movePrimary &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/movePrimary" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="netstat (internal)" href="netstat.html" />
+<link rel="prev" title="moveChunk" href="moveChunk.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="moveprimary">
+<h1>movePrimary<a class="headerlink" href="#moveprimary" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="movePrimary">
+<tt class="descname">movePrimary</tt><a class="headerlink" href="#movePrimary" title="Permalink to this definition">¶</a></dt>
+<dd><p>In a <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, this command reassigns the database&#8217;s
+<a class="reference internal" href="../glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a>, which holds all un-sharded collections in
+the database. <a class="reference internal" href="../commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> is an administrative command
+that is only available for <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instances. Only use
+<a class="reference internal" href="../commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> when removing a shard from a sharded
+cluster.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p>Only use <a class="reference internal" href="../commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> when:</p>
+<ul class="simple">
+<li>the database does not contain any collections with data, <em>or</em></li>
+<li>you have drained all sharded collections using the
+<a class="reference internal" href="../commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command.</li>
+</ul>
+<p class="last">See <a class="reference internal" href="../../tutorial/remove-shards-from-cluster.html"><em>Remove Shards from an Existing Sharded Cluster</em></a> for a complete
+procedure.</p>
+</div>
+<p><a class="reference internal" href="../commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> changes the primary shard for this
+database in the cluster metadata, and migrates all un-sharded
+collections to the specified shard. Use the command with the
+following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">movePrimary</span> <span class="o">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="nx">to</span> <span class="o">:</span> <span class="s2">&quot;shard0001&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>When the command returns, the database&#8217;s primary location will
+shift to the designated <a class="reference internal" href="../glossary.html#term-shard"><em class="xref std std-term">shard</em></a>. To fully decommission a
+shard, use the <a class="reference internal" href="../commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="moveChunk.html" title="Previous Section: moveChunk">&lt; &nbsp; moveChunk</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="netstat.html" title="Next Section: netstat (internal)">netstat (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

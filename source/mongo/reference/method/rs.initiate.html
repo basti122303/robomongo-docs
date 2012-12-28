@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>rs.initiate() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/rs.initiate" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="rs.reconfig()" href="rs.reconfig.html" />
+<link rel="prev" title="rs.help()" href="rs.help.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="rs-initiate">
+<h1>rs.initiate()<a class="headerlink" href="#rs-initiate" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="rs.initiate">
+<tt class="descclassname">rs.</tt><tt class="descname">initiate</tt><big>(</big><em>configuration</em><big>)</big><a class="headerlink" href="#rs.initiate" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>configuration</strong> &#8211; Optional. A <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that specifies
+the configuration of a replica
+set. If not specified, MongoDB will
+use a default configuration.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Initiates a replica set. Optionally takes a configuration argument
+in the form of a <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that holds the configuration
+of a replica set. Consider the following model of the most basic
+configuration for a 3-member replica set:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nx">_id</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">setname</span><span class="o">&gt;</span><span class="p">,</span>
+     <span class="nx">members</span> <span class="o">:</span> <span class="p">[</span>
+         <span class="p">{</span><span class="nx">_id</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">host</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">host0</span><span class="o">&gt;</span><span class="p">},</span>
+         <span class="p">{</span><span class="nx">_id</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">host</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">host1</span><span class="o">&gt;</span><span class="p">},</span>
+         <span class="p">{</span><span class="nx">_id</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">host</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">host2</span><span class="o">&gt;</span><span class="p">},</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This function provides a wrapper around the
+&#8220;<a class="reference internal" href="../replica-commands.html#replSetInitiate" title="replSetInitiate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">replSetInitiate</span></tt></a>&#8221; <a class="reference internal" href="../glossary.html#term-database-command"><em class="xref std std-term">database command</em></a>.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="rs.help.html" title="Previous Section: rs.help()">&lt; &nbsp; rs.help()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="rs.reconfig.html" title="Next Section: rs.reconfig()">rs.reconfig() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

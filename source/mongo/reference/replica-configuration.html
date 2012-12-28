@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replica Set Configuration &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/replica-configuration" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Replication Info Reference" href="replication-info.html" />
+<link rel="prev" title="Replica Set Status Reference" href="replica-status.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replica-set-configuration">
+<h1>Replica Set Configuration<a class="headerlink" href="#replica-set-configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This reference provides an overview of all possible replica set
+configuration options and settings.</p>
+<p>Use <a class="reference internal" href="replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to retrieve this
+configuration. Note that default values are not explicitly displayed.</p>
+</div>
+<div class="section" id="configuration-variables">
+<span id="replica-set-configuration-variables"></span><h2>Configuration Variables<a class="headerlink" href="#configuration-variables" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="rs.conf._id">
+<tt class="descclassname">rs.conf.</tt><tt class="descname">_id</tt><a class="headerlink" href="#rs.conf._id" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Type</strong>: string</p>
+<p><strong>Value</strong>: &lt;setname&gt;</p>
+<p>An <tt class="docutils literal"><span class="pre">_id</span></tt> field holding the name of the replica set. This reflects
+the set name configured with <a class="reference internal" href="configuration-options.html#replSet" title="replSet"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">replSet</span></tt></a> or
+<a class="reference internal" href="mongod.html#cmdoption-mongod--replSet"><em class="xref std std-option">mongod --replSet</em></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="rs.conf.members">
+<tt class="descclassname">rs.conf.</tt><tt class="descname">members</tt><a class="headerlink" href="#rs.conf.members" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Type</strong>: array</p>
+<p>Contains an array holding an embedded <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> for each
+member of the replica set. The <tt class="docutils literal"><span class="pre">members</span></tt> document contains a
+number of fields that describe the configuration of each member of
+the replica set.</p>
+<p>The <a class="reference internal" href="#rs.conf.members" title="rs.conf.members"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members</span></tt></a> field in the replica set
+configuration document is a zero-indexed array.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n]._id">
+<tt class="descclassname">members[n].</tt><tt class="descname">_id</tt><a class="headerlink" href="#members[n]._id" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Type</strong>: ordinal</p>
+<p>Provides the zero-indexed identifier of every member in the replica
+set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When updating the replica configuration object, address all members
+of the set using the index value in the array. The array index
+begins with <tt class="docutils literal"><span class="pre">0</span></tt>. Do not confuse this index value with the value
+of the <a class="reference internal" href="#members[n]._id" title="members[n]._id"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">_id</span></tt></a> field in each document in the
+<a class="reference internal" href="#rs.conf.members" title="rs.conf.members"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members</span></tt></a> array.</p>
+<p class="last">The <a class="reference internal" href="#members[n]._id" title="members[n]._id"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">_id</span></tt></a> rarely corresponds to the array
+index.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].host">
+<tt class="descclassname">members[n].</tt><tt class="descname">host</tt><a class="headerlink" href="#members[n].host" title="Permalink to this definition">¶</a></dt>
+<dd><p><strong>Type</strong>: &lt;hostname&gt;:&lt;port&gt;</p>
+<p>Identifies the host name of the set member with a hostname and port
+number. This name must be resolvable for every host in the replica
+set.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><a class="reference internal" href="#members[n].host" title="members[n].host"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].host</span></tt></a> cannot hold a value that resolves to
+<tt class="docutils literal"><span class="pre">localhost</span></tt> or the local interface unless <em>all</em> members of the
+set are on hosts that resolve to localhost.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].arbiterOnly">
+<tt class="descclassname">members[n].</tt><tt class="descname">arbiterOnly</tt><a class="headerlink" href="#members[n].arbiterOnly" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: boolean</p>
+<p><strong>Default</strong>: false</p>
+<p>Identifies an arbiter. For arbiters, this value is <tt class="docutils literal"><span class="pre">true</span></tt>, and
+is automatically configured by <a class="reference internal" href="replica-commands.html#rs.addArb" title="rs.addArb"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.addArb()</span></tt></a>&#8221;.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].buildIndexes">
+<tt class="descclassname">members[n].</tt><tt class="descname">buildIndexes</tt><a class="headerlink" href="#members[n].buildIndexes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: boolean</p>
+<p><strong>Default</strong>: true</p>
+<p>Determines whether the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> builds <a class="reference internal" href="glossary.html#term-index"><em class="xref std std-term">indexes</em></a> on this member. Do not set to <tt class="docutils literal"><span class="pre">false</span></tt> if a replica set
+<em>can</em> become a master, or if any clients ever issue queries against
+this instance.</p>
+<p>Omitting index creation, and thus this setting, may be useful,
+<strong>if</strong>:</p>
+<ul class="simple">
+<li>You are only using this instance to perform backups using
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>,</li>
+<li>this instance will receive no queries, <em>and</em></li>
+<li>index creation and maintenance overburdens the host
+system.</li>
+</ul>
+<p>If set to <tt class="docutils literal"><span class="pre">false</span></tt>, secondaries configured with this option <em>do</em>
+build indexes on the <tt class="docutils literal"><span class="pre">_id</span></tt> field, to facilitate operations
+required for replication.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>You may only set this value when adding a member to a replica
+set. You may not reconfigure a replica set to change the value
+of the <a class="reference internal" href="#members[n].buildIndexes" title="members[n].buildIndexes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].buildIndexes</span></tt></a> field after adding the
+member to the set.</p>
+<p class="last">Furthermore, other secondaries cannot synchronize off of replica
+set members where <a class="reference internal" href="#members[n].buildIndexes" title="members[n].buildIndexes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].buildIndexes</span></tt></a> is false.</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].hidden">
+<tt class="descclassname">members[n].</tt><tt class="descname">hidden</tt><a class="headerlink" href="#members[n].hidden" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: boolean</p>
+<p><strong>Default</strong>: false</p>
+<p>When this value is <tt class="docutils literal"><span class="pre">true</span></tt>, the replica set hides this instance,
+and does not include the member in the output of
+<a class="reference internal" href="replica-commands.html#db.isMaster" title="db.isMaster"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.isMaster()</span></tt></a> or <a class="reference internal" href="replica-commands.html#isMaster" title="isMaster"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">isMaster</span></tt></a>. This
+prevents read operations (i.e. queries) from ever reaching this
+host by way of secondary <a class="reference internal" href="glossary.html#term-read-preference"><em class="xref std std-term">read preference</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../administration/replica-sets.html#replica-set-hidden-members"><em>Hidden Replica Set Members</em></a>&#8220;</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].priority">
+<tt class="descclassname">members[n].</tt><tt class="descname">priority</tt><a class="headerlink" href="#members[n].priority" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: Number, between 0 and 100.0 including decimals.</p>
+<p><strong>Default</strong>: 1</p>
+<p>Specify higher values to make a member <em>more</em> eligible to become
+<a class="reference internal" href="glossary.html#term-primary"><em class="xref std std-term">primary</em></a>, and lower values to make the member <em>less</em> eligible
+to become primary. Priorities are only used in comparison to each
+other, members of the set will veto elections from members when
+another eligible member has a higher absolute priority
+value. Changing the balance of priority in a replica set will cause
+an election.</p>
+<p>A <a class="reference internal" href="#members[n].priority" title="members[n].priority"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].priority</span></tt></a> of <tt class="docutils literal"><span class="pre">0</span></tt> makes it impossible for a
+member to become primary.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../core/replication.html#replica-set-node-priority"><em>Replica Set Member Priority</em></a>&#8221; and &#8220;<a class="reference internal" href="../core/replication.html#replica-set-elections"><em>Replica Set Elections</em></a>.&#8221;</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].tags">
+<tt class="descclassname">members[n].</tt><tt class="descname">tags</tt><a class="headerlink" href="#members[n].tags" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">MongoDB Document</em></a></p>
+<p><strong>Default</strong>: none</p>
+<p>Used to represent arbitrary values for describing or tagging members
+for the purposes of extending <a class="reference internal" href="glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a>
+to allow configurable data center
+awareness.</p>
+<p>Use in conjunction with <a class="reference internal" href="#settings.getLastErrorModes" title="settings.getLastErrorModes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">settings.getLastErrorModes</span></tt></a> and
+<a class="reference internal" href="#settings.getLastErrorDefaults" title="settings.getLastErrorDefaults"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">settings.getLastErrorDefaults</span></tt></a> and
+<a class="reference internal" href="method/db.getLastError.html#db.getLastError" title="db.getLastError"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getLastError()</span></tt></a>
+(i.e. <a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a>.)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].slaveDelay">
+<tt class="descclassname">members[n].</tt><tt class="descname">slaveDelay</tt><a class="headerlink" href="#members[n].slaveDelay" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: Integer. (seconds.)</p>
+<p><strong>Default</strong>: 0</p>
+<p>Describes the number of seconds &#8220;behind&#8221; the master that this
+replica set member should &#8220;lag.&#8221; Use this option to create
+<a class="reference internal" href="../administration/replica-sets.html#replica-set-delayed-members"><em>delayed members</em></a>, that
+maintain a copy of the data that reflects the state of the data set
+some amount of time (specified in seconds.) Typically these members
+help protect against human error, and provide some measure
+of insurance against the unforeseen consequences of changes and
+updates.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="members[n].votes">
+<tt class="descclassname">members[n].</tt><tt class="descname">votes</tt><a class="headerlink" href="#members[n].votes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: Integer</p>
+<p><strong>Default</strong>: 1</p>
+<p>Controls the number of votes a server has in a <a class="reference internal" href="../core/replication.html#replica-set-elections"><em>replica set
+election</em></a>. The number of votes each member
+has can be any non-negative integer, but it is highly recommended
+each member has 1 or 0 votes.</p>
+<p>If you need more than 7 members, use this setting to add additional
+non-voting members with a <a class="reference internal" href="#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].votes</span></tt></a> value of <tt class="docutils literal"><span class="pre">0</span></tt>.</p>
+<p>For most deployments and most members, use the default value,
+<tt class="docutils literal"><span class="pre">1</span></tt>, for <a class="reference internal" href="#members[n].votes" title="members[n].votes"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].votes</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="settings">
+<tt class="descname">settings</tt><a class="headerlink" href="#settings" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">MongoDB Document</em></a></p>
+<p>The setting document holds two optional fields, which affect the
+available <a class="reference internal" href="glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a> options and default configurations.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="settings.getLastErrorDefaults">
+<tt class="descclassname">settings.</tt><tt class="descname">getLastErrorDefaults</tt><a class="headerlink" href="#settings.getLastErrorDefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">MongoDB Document</em></a></p>
+<p>Specify arguments to the <a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> that
+members of this replica set will use when no arguments to
+<a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> has no arguments. If you specify <em>any</em>
+arguments, <a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> , ignores these defaults.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="settings.getLastErrorModes">
+<tt class="descclassname">settings.</tt><tt class="descname">getLastErrorModes</tt><a class="headerlink" href="#settings.getLastErrorModes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional</em>.</p>
+<p><strong>Type</strong>: <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">MongoDB Document</em></a></p>
+<p>Defines the names and combination of <a class="reference internal" href="#members[n].tags" title="members[n].tags"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">tags</span></tt></a> for use by the application layer to guarantee
+<a class="reference internal" href="glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a> to database using the
+<a class="reference internal" href="commands.html#getLastError" title="getLastError"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getLastError</span></tt></a> command to provide <a class="reference internal" href="glossary.html#term-data-center-awareness"><em class="xref std std-term">data-center
+awareness</em></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="example-document">
+<span id="replica-set-configuration-document"></span><h2>Example Document<a class="headerlink" href="#example-document" title="Permalink to this headline">¶</a></h2>
+<p>The following document provides a representation of a replica set
+configuration document. Angle brackets (e.g. <tt class="docutils literal"><span class="pre">&lt;</span></tt> and <tt class="docutils literal"><span class="pre">&gt;</span></tt>) enclose
+all optional fields.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">_id</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">setname</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">version</span><span class="o">:</span> <span class="o">&lt;</span><span class="kr">int</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">members</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nx">_id</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">ordinal</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="nx">host</span> <span class="o">:</span> <span class="nx">hostname</span><span class="o">&lt;:</span><span class="nx">port</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="o">&lt;</span><span class="nx">arbiterOnly</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">buildIndexes</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">hidden</span> <span class="o">:</span> <span class="o">&lt;</span><span class="kr">boolean</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">priority</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">priority</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">tags</span><span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nb">document</span><span class="o">&gt;</span> <span class="p">},</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">slaveDelay</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">votes</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">number</span><span class="o">&gt;&gt;</span>
+    <span class="p">}</span>
+    <span class="p">,</span> <span class="p">...</span>
+  <span class="p">],</span>
+  <span class="o">&lt;</span><span class="nx">settings</span><span class="o">:</span> <span class="p">{</span>
+    <span class="o">&lt;</span><span class="nx">getLastEerrorDefaults</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">lasterrdefaults</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">getLastErrorModes</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">modes</span><span class="o">&gt;&gt;</span>
+  <span class="p">}</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-reconfiguration-operations">
+<span id="replica-set-reconfiguration-usage"></span><h2>Example Reconfiguration Operations<a class="headerlink" href="#example-reconfiguration-operations" title="Permalink to this headline">¶</a></h2>
+<p>Most modifications of <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> configuration use the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. Consider the following reconfiguration
+operation:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Given the following replica set configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span>
+             <span class="p">}</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And the following reconfiguration operation:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">cfg</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="nx">cfg</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">priority</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation begins by saving the current replica set
+configuration to the local variable <tt class="docutils literal"><span class="pre">cfg</span></tt> using the
+<a class="reference internal" href="replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> method. Then it adds priority values to the
+<tt class="docutils literal"><span class="pre">cfg</span></tt> <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> where for the first three sub-documents in
+the <a class="reference internal" href="#rs.conf.members" title="rs.conf.members"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members</span></tt></a> array. Finally, it calls the
+<a class="reference internal" href="replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> method with the argument of <tt class="docutils literal"><span class="pre">cfg</span></tt> to
+initialize this new configuration. The replica set configuration
+after this operation will resemble the following:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;priority&quot;</span> <span class="o">:</span> <span class="mf">0.5</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;priority&quot;</span> <span class="o">:</span> <span class="mi">2</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;priority&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+             <span class="p">}</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>Using the &#8220;dot notation&#8221; demonstrated in the above example, you can
+modify any existing setting or specify any of optional <a class="reference internal" href="#replica-set-configuration-variables"><em>replica
+set configuration variables</em></a>. Until you run
+<tt class="docutils literal"><span class="pre">rs.reconfig(cfg)</span></tt> at the shell, no changes will take effect. You
+can issue <tt class="docutils literal"><span class="pre">cfg</span> <span class="pre">=</span> <span class="pre">rs.conf()</span></tt> at any time before using
+<a class="reference internal" href="replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> to undo your changes and start from the current
+configuration. If you issue <tt class="docutils literal"><span class="pre">cfg</span></tt> as an operation at any point, the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell at any point will output the complete
+<a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">document</em></a> with modifications for your review.</p>
+<p>The <a class="reference internal" href="replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> operation has a &#8220;force&#8221; option, to make it
+possible to reconfigure a replica set if a majority of the replica set
+is not visible, and there is no <a class="reference internal" href="glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member of the set.
+use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">,</span> <span class="p">{</span> <span class="nx">force</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Forcing a <a class="reference internal" href="replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> can lead to <a class="reference internal" href="glossary.html#term-rollback"><em class="xref std std-term">rollback</em></a>
+situations and other difficult to recover from situations. Exercise
+caution when using this option.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference internal" href="replica-commands.html#rs.reconfig" title="rs.reconfig"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.reconfig()</span></tt></a> shell method can force the current
+primary to step down and causes an election in some
+situations. When the primary steps down, all clients will
+disconnect. This is by design. While this typically takes 10-20
+seconds, attempt to make these changes during scheduled maintenance
+periods.</p>
+</div>
+<span class="target" id="index-1"></span><span class="target" id="index-2"></span></div>
+<div class="section" id="tag-sets">
+<span id="replica-set-configuration-tag-sets"></span><span id="index-3"></span><h2>Tag Sets<a class="headerlink" href="#tag-sets" title="Permalink to this headline">¶</a></h2>
+<p>Tag sets provide custom and configurable <a class="reference internal" href="glossary.html#term-write-concern"><em class="xref std std-term">write concern</em></a>
+and <a class="reference internal" href="glossary.html#term-read-preference"><em class="xref std std-term">read preferences</em></a>
+for a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. This section will outline the process
+for specifying tags for a replica set, for more information see the
+full documentation of the behavior of <a class="reference internal" href="../applications/replication.html#replica-set-write-concern"><em>tags sets write concern</em></a> and <a class="reference internal" href="../applications/replication.html#replica-set-read-preference-tag-sets"><em>tag sets for read preference</em></a>.</p>
+<p>Configure tag sets by adding fields and values to the document stored
+in the <a class="reference internal" href="#members[n].tags" title="members[n].tags"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">members[n].tags</span></tt></a>. Consider the following example:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Given the following replica set configuration:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span>
+             <span class="p">}</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You could add the tag sets, to the members of this replica set,
+with the following command sequence in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">conf</span> <span class="o">=</span> <span class="nx">rs</span><span class="p">.</span><span class="nx">conf</span><span class="p">()</span>
+<span class="nx">conf</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;dc&quot;</span><span class="o">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;production&quot;</span>  <span class="p">}</span>
+<span class="nx">conf</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;dc&quot;</span><span class="o">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span> <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;reporting&quot;</span>  <span class="p">}</span>
+<span class="nx">conf</span><span class="p">.</span><span class="nx">members</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="nx">tags</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;production&quot;</span>  <span class="p">}</span>
+<span class="nx">rs</span><span class="p">.</span><span class="nx">reconfig</span><span class="p">(</span><span class="nx">conf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After this operation the output of <a class="reference internal" href="replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a>, would
+resemble the following:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;rs0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;members&quot;</span> <span class="o">:</span> <span class="p">[</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb0.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;dc&quot;</span><span class="o">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;production&quot;</span>
+                     <span class="p">}</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;dc&quot;</span><span class="o">:</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;reporting&quot;</span>
+                     <span class="p">}</span>
+             <span class="p">},</span>
+             <span class="p">{</span>
+                     <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+                     <span class="s2">&quot;host&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb2.example.net:27017&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;tags&quot;</span> <span class="o">:</span> <span class="p">{</span>
+                             <span class="s2">&quot;use&quot;</span><span class="o">:</span> <span class="s2">&quot;production&quot;</span>
+                     <span class="p">}</span>
+             <span class="p">}</span>
+     <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="replica-status.html" title="Previous Section: Replica Set Status Reference">&lt; &nbsp; Replica Set Status Reference</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="replication-info.html" title="Next Section: Replication Info Reference">Replication Info Reference &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

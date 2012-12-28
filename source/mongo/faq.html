@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Frequently Asked Questions &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/faq" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="FAQ: MongoDB Fundamentals" href="faq/fundamentals.html" />
+<link rel="prev" title="Write a Tumblelog Application with Flask and MongoEngine" href="tutorial/write-a-tumblelog-application-with-flask-mongoengine.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faq/fundamentals.html">FAQ: MongoDB Fundamentals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#what-kind-of-database-is-mongodb">What kind of Database is MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#do-mongodb-databases-have-tables">Do MongoDB Databases Have Tables?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#do-mongodb-databases-have-schemas">Do MongoDB Databases have Schemas?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#what-languages-can-i-use-to-work-with-the-mongodb">What languages can I use to work with the MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#does-mongodb-support-sql">Does MongoDB support SQL?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#what-are-typical-uses-for-mongodb">What are typical uses for MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#does-mongodb-support-transactions">Does MongoDB support transactions?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#does-mongodb-require-a-lot-of-ram">Does MongoDB require a lot of RAM?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#how-do-i-configure-the-cache-size">How do I configure the cache size?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#are-writes-written-to-disk-immediately-or-lazily">Are writes written to disk immediately, or lazily?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#does-mongodb-require-a-separate-caching-layer-for-application-level-caching">Does MongoDB require a separate caching layer for application-level caching?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#does-mongodb-handle-caching">Does MongoDB handle caching?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#what-language-is-mongodb-written-in">What language is MongoDB written in?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/fundamentals.html#what-are-the-limitations-of-32-bit-versions-of-mongodb">What are the limitations of 32-bit versions of MongoDB?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/developers.html">FAQ: MongoDB for Application Developers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#what-is-a-namespace-in-mongodb">What is a namespace in MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-you-copy-all-objects-from-one-collection-to-another">How do you copy all objects from one collection to another?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#if-you-remove-a-document-does-mongodb-remove-it-from-disk">If you remove a document, does MongoDB remove it from disk?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#when-does-mongodb-write-updates-to-disk">When does MongoDB write updates to disk?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-i-do-transactions-and-locking-in-mongodb">How do I do transactions and locking in MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-you-aggregate-data-with-mongodb">How do you aggregate data with MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#why-does-mongodb-log-so-many-connection-accepted-events">Why does MongoDB log so many &#8220;Connection Accepted&#8221; events?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#does-mongodb-run-on-amazon-ebs">Does MongoDB run on Amazon EBS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#why-are-mongodb-s-data-files-so-large">Why are MongoDB&#8217;s data files so large?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-i-optimize-storage-use-for-small-documents">How do I optimize storage use for small documents?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#when-should-i-use-gridfs">When should I use GridFS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-does-mongodb-address-sql-or-query-injection">How does MongoDB address SQL or Query injection?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-does-mongodb-provide-concurrency">How does MongoDB provide concurrency?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#what-is-the-compare-order-for-bson-types">What is the compare order for BSON types?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-i-query-for-fields-that-have-null-values">How do I query for fields that have null values?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#are-there-any-restrictions-on-the-names-of-collections">Are there any restrictions on the names of Collections?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#how-do-i-isolate-cursors-from-intervening-write-operations">How do I isolate cursors from intervening write operations?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/developers.html#when-should-i-embed-documents-within-other-documents">When should I embed documents within other documents?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/mongo.html">FAQ: The <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/mongo.html#how-can-i-enter-multi-line-operations-in-the-mongo-shell">How can I enter multi-line operations in the <tt class="docutils literal"><span class="pre">mongo</span></tt> shell?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/mongo.html#how-can-i-access-to-different-databases-temporarily">How can I access to different databases temporarily?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/mongo.html#does-the-mongo-shell-support-tab-completion-and-other-keyboard-shortcuts">Does the <tt class="docutils literal"><span class="pre">mongo</span></tt> shell support tab completion and other keyboard shortcuts?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/mongo.html#how-can-i-customize-the-mongo-shell-prompt">How can I customize the <tt class="docutils literal"><span class="pre">mongo</span></tt> shell prompt?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/mongo.html#can-i-edit-long-shell-operations-with-an-external-text-editor">Can I edit long shell operations with an external text editor?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/concurrency.html">FAQ: Concurrency</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#what-type-of-locking-does-mongodb-use">What type of locking does MongoDB use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#how-granular-are-locks-in-mongodb">How granular are locks in MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#how-do-i-see-the-status-of-locks-on-my-mongod-instances">How do I see the status of locks on my <tt class="docutils literal"><span class="pre">mongod</span></tt> instances?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#does-a-read-or-write-operation-ever-yield-the-lock">Does a read or write operation ever yield the lock?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#which-operations-lock-the-database">Which operations lock the database?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#which-administrative-commands-lock-the-database">Which administrative commands lock the database?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#does-a-mongodb-operation-ever-lock-more-than-one-database">Does a MongoDB operation ever lock more than one database?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#how-does-sharding-affect-concurrency">How does sharding affect concurrency?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#how-does-concurrency-affect-a-replica-set-primary">How does concurrency affect a replica set primary?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#how-does-concurrency-affect-secondaries">How does concurrency affect secondaries?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/concurrency.html#what-kind-of-concurrency-does-mongodb-provide-for-javascript-operations">What kind of concurrency does MongoDB provide for JavaScript operations?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/sharding.html">FAQ: Sharding with MongoDB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#is-sharding-appropriate-for-a-new-deployment">Is sharding appropriate for a new deployment?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-does-sharding-work-with-replication">How does sharding work with replication?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#can-i-change-the-shard-key-after-sharding-a-collection">Can I change the shard key after sharding a collection?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-happens-to-unsharded-collections-in-sharded-databases">What happens to unsharded collections in sharded databases?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-does-mongodb-distribute-data-across-shards">How does MongoDB distribute data across shards?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-happens-if-a-client-updates-a-document-in-a-chunk-during-a-migration">What happens if a client updates a document in a chunk during a migration?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-happens-to-queries-if-a-shard-is-inaccessible-or-slow">What happens to queries if a shard is inaccessible or slow?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-does-mongodb-distribute-queries-among-shards">How does MongoDB distribute queries among shards?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-does-mongodb-sort-queries-in-sharded-environments">How does MongoDB sort queries in sharded environments?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-does-mongodb-ensure-unique-id-field-values-when-using-a-shard-key-other-than-id">How does MongoDB ensure unique <tt class="docutils literal"><span class="pre">_id</span></tt> field values when using a shard key <em>other</em> than <tt class="docutils literal"><span class="pre">_id</span></tt>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#i-ve-enabled-sharding-and-added-a-second-shard-but-all-the-data-is-still-on-one-server-why">I&#8217;ve enabled sharding and added a second shard, but all the data is still on one server. Why?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#is-it-safe-to-remove-old-files-in-the-movechunk-directory">Is it safe to remove old files in the <tt class="docutils literal"><span class="pre">moveChunk</span></tt> directory?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-many-connections-does-each-mongos-need">How many connections does each <tt class="docutils literal"><span class="pre">mongos</span></tt> need?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#why-does-mongos-hold-connections">Why does <tt class="docutils literal"><span class="pre">mongos</span></tt> hold connections?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#where-does-mongodb-report-on-connections-used-by-mongos">Where does MongoDB report on connections used by <tt class="docutils literal"><span class="pre">mongos</span></tt>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-does-writebacklisten-in-the-log-mean">What does <tt class="docutils literal"><span class="pre">writebacklisten</span></tt> in the log mean?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-should-administrators-deal-with-failed-migrations">How should administrators deal with failed migrations?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-is-the-process-for-moving-renaming-or-changing-the-number-of-config-servers">What is the process for moving, renaming, or changing the number of config servers?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#when-do-the-mongos-servers-detect-config-server-changes">When do the <tt class="docutils literal"><span class="pre">mongos</span></tt> servers detect config server changes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#is-it-possible-to-quickly-update-mongos-servers-after-updating-a-replica-set-configuration">Is it possible to quickly update <tt class="docutils literal"><span class="pre">mongos</span></tt> servers after updating a replica set configuration?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-does-the-maxconns-setting-on-mongos-do">What does the <tt class="docutils literal"><span class="pre">maxConns</span></tt> setting on <tt class="docutils literal"><span class="pre">mongos</span></tt> do?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#how-do-indexes-impact-queries-in-sharded-systems">How do indexes impact queries in sharded systems?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#can-shard-keys-be-randomly-generated">Can shard keys be randomly generated?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#can-shard-keys-have-a-non-uniform-distribution-of-values">Can shard keys have a non-uniform distribution of values?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#can-you-shard-on-the-id-field">Can you shard on the <tt class="docutils literal"><span class="pre">_id</span></tt> field?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#can-shard-key-be-in-ascending-order-like-dates-or-timestamps">Can shard key be in ascending order, like dates or timestamps?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/sharding.html#what-do-movechunk-commit-failed-errors-mean">What do <tt class="docutils literal"><span class="pre">moveChunk</span> <span class="pre">commit</span> <span class="pre">failed</span></tt> errors mean?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/replica-sets.html">FAQ: Replica Sets and Replication in MongoDB</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-kinds-of-replication-does-mongodb-support">What kinds of replication does MongoDB support?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-do-the-terms-primary-and-master-mean">What do the terms &#8220;primary&#8221; and &#8220;master&#8221; mean?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-do-the-terms-secondary-and-slave-mean">What do the terms &#8220;secondary&#8221; and &#8220;slave&#8221; mean?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#how-long-does-replica-set-failover-take">How long does replica set failover take?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#does-replication-work-over-the-internet-and-wan-connections">Does replication work over the Internet and WAN connections?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#can-mongodb-replicate-over-a-noisy-connection">Can MongoDB replicate over a &#8220;noisy&#8221; connection?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-is-the-preferred-replication-method-master-slave-or-replica-sets">What is the preferred replication method: master/slave or replica sets?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-is-the-preferred-replication-method-replica-sets-or-replica-pairs">What is the preferred replication method: replica sets or replica pairs?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#why-use-journaling-if-replication-already-provides-data-redundancy">Why use journaling if replication already provides data redundancy?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#are-write-operations-durable-if-write-concern-does-not-acknowledge-writes">Are write operations durable if write concern does not acknowledge writes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#how-many-arbiters-do-replica-sets-need">How many arbiters do replica sets need?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#what-information-do-arbiters-exchange-with-the-rest-of-the-replica-set">What information do arbiters exchange with the rest of the replica set?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#which-members-of-a-replica-set-vote-in-elections">Which members of a replica set vote in elections?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#do-hidden-members-vote-in-replica-set-elections">Do hidden members vote in replica set elections?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/replica-sets.html#is-it-normal-for-replica-set-members-to-use-different-amounts-of-disk-space">Is it normal for replica set members to use different amounts of disk space?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/storage.html">FAQ: MongoDB Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#what-are-memory-mapped-files">What are memory mapped files?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#how-do-memory-mapped-files-work">How do memory mapped files work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#how-does-mongodb-work-with-memory-mapped-files">How does MongoDB work with memory mapped files?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#what-are-page-faults">What are page faults?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#what-is-the-difference-between-soft-and-hard-page-faults">What is the difference between soft and hard page faults?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#what-tools-can-i-use-to-investigate-storage-use-in-mongodb">What tools can I use to investigate storage use in MongoDB?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/storage.html#what-is-the-working-set">What is the working set?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq/indexes.html">FAQ: Indexes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#should-you-run-ensureindex-after-every-insert">Should you run <tt class="docutils literal"><span class="pre">ensureIndex()</span></tt> after every insert?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-do-you-know-what-indexes-exist-in-a-collection">How do you know what indexes exist in a collection?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-do-you-determine-the-size-of-an-index">How do you determine the size of an index?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#what-happens-if-an-index-does-not-fit-into-ram">What happens if an index does not fit into RAM?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-do-you-know-what-index-a-query-used">How do you know what index a query used?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-do-you-determine-what-fields-to-index">How do you determine what fields to index?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-do-write-operations-affect-indexes">How do write operations affect indexes?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#will-building-a-large-index-affect-database-performance">Will building a large index affect database performance?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#can-i-use-index-keys-to-constrain-query-matches">Can I use index keys to constrain query matches?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#using-ne-and-nin-in-a-query-is-slow-why">Using <tt class="docutils literal"><span class="pre">$ne</span></tt> and <tt class="docutils literal"><span class="pre">$nin</span></tt> in a query is slow. Why?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#can-i-use-a-multi-key-index-to-support-a-query-for-a-whole-array">Can I use a multi-key index to support a query for a whole array?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq/indexes.html#how-can-i-effectively-use-indexes-strategy-for-attribute-lookups">How can I effectively use indexes strategy for attribute lookups?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/write-a-tumblelog-application-with-flask-mongoengine.html" title="Previous Section: Write a Tumblelog Application with Flask and MongoEngine">&lt; &nbsp; Write a Tumblelog Application with Flask and MongoEngine</a></li>
+<li id="btnvnx"><a href="faq/fundamentals.html" title="Next Section: FAQ: MongoDB Fundamentals">FAQ: MongoDB Fundamentals &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

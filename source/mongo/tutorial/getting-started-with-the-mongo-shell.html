@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Getting Started with the mongo Shell &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/getting-started-with-the-mongo-shell" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Using the mongo Shell" href="../mongo.html" />
+<link rel="next" title="Data Types in the mongo Shell" href="../core/shell-types.html" />
+<link rel="prev" title="Using the mongo Shell" href="../mongo.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="getting-started-with-the-mongo-shell">
+<h1>Getting Started with the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#getting-started-with-the-mongo-shell" title="Permalink to this headline">¶</a></h1>
+<p>This document provides a basic introduction to using the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. See <a class="reference internal" href="getting-started.html"><em>Getting Started with the MongoDB JavaScript Shell</em></a> for an
+introduction to basic MongoDB operations and use. See
+<a class="reference internal" href="../installation.html"><em>Installing MongoDB</em></a> for instructions on installing MongoDB for your
+system.</p>
+<div class="section" id="start-the-mongo-shell">
+<h2>Start the <tt class="docutils literal"><span class="pre">mongo</span></tt> Shell<a class="headerlink" href="#start-the-mongo-shell" title="Permalink to this headline">¶</a></h2>
+<p>To start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and connect to your <a class="reference internal" href="../reference/mongod.html"><em>MongoDB</em></a> instance running on <strong>localhost</strong> with <strong>default port</strong>:</p>
+<ol class="arabic">
+<li><p class="first">Go to your <tt class="docutils literal"><span class="pre">&lt;mongodb</span> <span class="pre">installation</span> <span class="pre">dir&gt;</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">cd</span> &lt;mongodb installation dir&gt;
+</pre></div>
+</div>
+</li>
+<li><p class="first">Type <tt class="docutils literal"><span class="pre">./bin/mongo</span></tt> to start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>./bin/mongo
+</pre></div>
+</div>
+<p>If you have added the <tt class="docutils literal"><span class="pre">&lt;mongodb</span> <span class="pre">installation</span> <span class="pre">dir&gt;/bin</span></tt> to the
+<tt class="docutils literal"><span class="pre">PATH</span></tt> environment variable, you can just type <tt class="docutils literal"><span class="pre">mongo</span></tt> instead
+of <tt class="docutils literal"><span class="pre">./bin/mongo</span></tt>.</p>
+</li>
+<li><p class="first">To display the database you are using, type <tt class="docutils literal"><span class="pre">db</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>db
+</pre></div>
+</div>
+<p>The command should return <tt class="docutils literal"><span class="pre">test</span></tt>, which is the default database.
+To switch databases, issue the <tt class="docutils literal"><span class="pre">use</span> <span class="pre">&lt;db&gt;</span></tt> command, as in the
+following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="o">&lt;</span><span class="nx">database</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>To list the available databases, use the command <tt class="docutils literal"><span class="pre">show</span> <span class="pre">dbs</span></tt>. See
+also <a class="reference internal" href="../faq/mongo.html#mongo-shell-getsiblingdb"><em>How can I access to different databases temporarily?</em></a> to access a different database
+from the current database without switching your current database
+contentx (i.e. <tt class="docutils literal"><span class="pre">db.</span></tt>.)</p>
+</li>
+</ol>
+<p>To start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell with other options, see
+<a class="reference internal" href="../reference/mongo.html#mongo-usage-examples"><em>examples of starting up mongo</em></a> and
+<a class="reference internal" href="../reference/mongo.html"><em>mongo reference</em></a> which provides details on the
+available options.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When starting, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> checks the user&#8217;s <span class="target" id="index-0"></span><a class="reference internal" href="../reference/mongo.html#envvar-HOME"><tt class="xref std std-envvar docutils literal"><span class="pre">HOME</span></tt></a>
+directory for a JavaScript file named <a class="reference internal" href="../reference/mongo.html#mongo-mongorc-file"><em>.mongorc.js</em></a>. If found, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> interprets the
+content <tt class="file docutils literal"><span class="pre">.mongorc.js</span></tt> before displaying the prompt for
+the first time. If you use the shell to evaluate a JavaScript file
+or expression either on the command line with <em class="xref std std-option">--eval</em> or
+by specifying <a class="reference internal" href="../reference/mongo.html#mongo-shell-file"><em>a .js file to mongo</em></a>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> will read the <tt class="docutils literal"><span class="pre">.mongorc.js</span></tt> file <em>after</em> the
+JavaScript has finished processing.</p>
+</div>
+</div>
+<div class="section" id="executing-queries">
+<span id="mongo-shell-executing-queries"></span><h2>Executing Queries<a class="headerlink" href="#executing-queries" title="Permalink to this headline">¶</a></h2>
+<p>From the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you can use the <a class="reference internal" href="../reference/javascript.html"><em>shell methods</em></a> to run queries, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">db</span></tt> is a variable that refers to the current database.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt> is the name of the collection to query. See
+<a class="reference internal" href="access-mongo-shell-help.html#mongo-shell-help-collection"><em>Collection Help</em></a> to list the available collections.</p>
+<p>If the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell does not accept the name of the
+collection, for instance if the name contains a space or starts with
+a number, you can use an alternate syntax to refer to the
+collection, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">[</span><span class="s2">&quot;3test&quot;</span><span class="p">].</span><span class="nx">find</span><span class="p">()</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">getCollection</span><span class="p">(</span><span class="s2">&quot;3test&quot;</span><span class="p">).</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method is the JavaScript
+method to retrieve documents from <tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt>. The
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method returns a
+<a class="reference internal" href="../reference/glossary.html#term-cursor"><em class="xref std std-term">cursor</em></a> to the results; however, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell, if the returned cursor is not assigned to a variable, then the
+cursor is automatically iterated up to 20 times to print up to the
+first 20 documents that match the query. The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell
+will prompt <tt class="docutils literal"><span class="pre">Type</span> <span class="pre">it</span></tt> to iterate another 20 times.</p>
+<p>You can set the <tt class="docutils literal"><span class="pre">DBQuery.shellBatchSize</span></tt> variable to change the
+number of iteration from the default value <tt class="docutils literal"><span class="pre">20</span></tt>, as in the
+following example which sets it to <tt class="docutils literal"><span class="pre">10</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">DBQuery</span><span class="p">.</span><span class="nx">shellBatchSize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For more information and examples on cursor handling in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, see <a class="reference internal" href="../core/read-operations.html#read-operations-cursors"><em>Cursors</em></a>.</p>
+<p>See also <a class="reference internal" href="access-mongo-shell-help.html#mongo-shell-help-cursor"><em>Cursor Help</em></a> for list of
+cursor help in the in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+</li>
+</ul>
+<p>For more documentation of basic MongoDB operations in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="getting-started.html"><em>Getting Started with the MongoDB JavaScript Shell</em></a></li>
+<li><a class="reference internal" href="../reference/mongo-shell-reference.html"><em>mongo Shell Quick Reference</em></a></li>
+<li><a class="reference internal" href="../applications/create.html"><em>Create</em></a></li>
+<li><a class="reference internal" href="../applications/read.html"><em>Read</em></a></li>
+<li><a class="reference internal" href="../applications/update.html"><em>Update</em></a></li>
+<li><a class="reference internal" href="../applications/delete.html"><em>Delete</em></a></li>
+<li><a class="reference internal" href="../administration/indexes.html"><em>Indexing Operations</em></a></li>
+<li><a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a></li>
+<li><a class="reference internal" href="../core/write-operations.html"><em>Write Operations</em></a></li>
+</ul>
+</div>
+<div class="section" id="print">
+<span id="mongo-shell-print"></span><h2>Print<a class="headerlink" href="#print" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell automatically prints the results of the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method if the returned cursor
+is not assigned to a variable. To format the result, you can add the
+<tt class="docutils literal"><span class="pre">.pretty()</span></tt> to the operation, as in the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">pretty</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In addition, you can use the following explicit print methods in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">print()</span></tt> to print without formatting</li>
+<li><tt class="docutils literal"><span class="pre">print(tojson(&lt;obj&gt;))</span></tt> to print with <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a> formatting and
+equivalent to <tt class="docutils literal"><span class="pre">printjson()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">printjson()</span></tt> to print with <a class="reference internal" href="../reference/glossary.html#term-json"><em class="xref std std-term">JSON</em></a> formatting and equivalent
+to <tt class="docutils literal"><span class="pre">print(tojson(&lt;obj&gt;))</span></tt></li>
+</ul>
+</div>
+<div class="section" id="exit-the-shell">
+<span id="mongo-shell-exit"></span><h2>Exit the Shell<a class="headerlink" href="#exit-the-shell" title="Permalink to this headline">¶</a></h2>
+<p>To exit the shell, type <tt class="docutils literal"><span class="pre">quit()</span></tt> or use the <tt class="docutils literal"><span class="pre">&lt;Ctrl-c&gt;</span></tt> shortcut.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../mongo.html" title="Previous Section: Using the mongo Shell">&lt; &nbsp; Using the mongo Shell</a></li>
+<li id="btnvup"><a href="../mongo.html" title="Parent Section: Using the mongo Shell" >&#47;&#92;&nbsp; Using the mongo Shell</a></li>
+<li id="btnvnx"><a href="../core/shell-types.html" title="Next Section: Data Types in the mongo Shell">Data Types in the mongo Shell &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

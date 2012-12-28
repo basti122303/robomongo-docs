@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.printShardingStatus() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.printShardingStatus" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.printSlaveReplicationInfo()" href="db.printSlaveReplicationInfo.html" />
+<link rel="prev" title="db.printReplicationInfo()" href="db.printReplicationInfo.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-printshardingstatus">
+<h1>db.printShardingStatus()<a class="headerlink" href="#db-printshardingstatus" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.printShardingStatus">
+<tt class="descclassname">db.</tt><tt class="descname">printShardingStatus</tt><big>(</big><big>)</big><a class="headerlink" href="#db.printShardingStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a formatted report of the sharding configuration and the
+information regarding existing chunks in a <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>.</p>
+<p>Only use <a class="reference internal" href="#db.printShardingStatus" title="db.printShardingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.printShardingStatus()</span></tt></a> when connected to a
+<a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance.</p>
+<p>This method is a wrapper around the <a class="reference internal" href="../commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a>
+command.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a>, <a class="reference internal" href="../commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.printReplicationInfo.html" title="Previous Section: db.printReplicationInfo()">&lt; &nbsp; db.printReplicationInfo()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.printSlaveReplicationInfo.html" title="Next Section: db.printSlaveReplicationInfo()">db.printSlaveReplicationInfo() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

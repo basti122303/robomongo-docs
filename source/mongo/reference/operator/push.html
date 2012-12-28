@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$push &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/push" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$pushAll" href="pushAll.html" />
+<link rel="prev" title="$pullAll" href="pullAll.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="push">
+<h1>$push<a class="headerlink" href="#push" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_push">
+<tt class="descname">$push</tt><a class="headerlink" href="#_S_push" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a> operator appends a specified value to an array. For
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$push</span><span class="o">:</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">value1</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a> appends <tt class="docutils literal"><span class="pre">value1</span></tt> to the array identified by
+<tt class="docutils literal"><span class="pre">value</span></tt> in <tt class="docutils literal"><span class="pre">field</span></tt>. Be aware of the following behaviors:</p>
+<ul class="simple">
+<li>If the field specified in the <a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a> statement
+(e.g. <tt class="docutils literal"><span class="pre">{</span> <span class="pre">$push:</span> <span class="pre">{</span> <span class="pre">field:</span> <span class="pre">value1</span> <span class="pre">}</span> <span class="pre">}</span></tt>) does not exist in the
+matched document, the operation adds a new array with the
+specified field and value (e.g. <tt class="docutils literal"><span class="pre">value1</span></tt>) to the matched
+document.</li>
+<li>The operation will fail if the field specified in the
+<a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a> statement is <em>not</em> an array. <a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a>
+does not fail when pushing a value to a non-existent field.</li>
+<li>If <tt class="docutils literal"><span class="pre">value1</span></tt> is an array itself, <a class="reference internal" href="../operators.html#_S_push" title="$push"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$push</span></tt></a> appends the whole array as an
+element in the identified array. To add multiple items to an
+array, use <a class="reference internal" href="../operators.html#_S_pushAll" title="$pushAll"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$pushAll</span></tt></a>.</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="pullAll.html" title="Previous Section: $pullAll">&lt; &nbsp; $pullAll</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="pushAll.html" title="Next Section: $pushAll">$pushAll &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

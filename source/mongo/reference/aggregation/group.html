@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$group (aggregation) &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/aggregation/group" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$gt (aggregation)" href="gt.html" />
+<link rel="prev" title="$first (aggregation)" href="first.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="group-aggregation">
+<h1>$group (aggregation)<a class="headerlink" href="#group-aggregation" title="Permalink to this headline">¶</a></h1>
+<dl class="pipeline">
+<dt id="_S_group">
+<tt class="descname">$group</tt><a class="headerlink" href="#_S_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Groups documents together for the purpose of calculating aggregate
+values based on a collection of documents. Practically, group often
+supports tasks such as average page views for each page in a
+website on a daily basis.</p>
+<p>The output of <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> depends on how you define
+groups. Begin by specifying an identifier (i.e. a <tt class="docutils literal"><span class="pre">_id</span></tt> field)
+for the group you&#8217;re creating with this pipeline. You can specify a
+single field from the documents in the pipeline, a previously
+computed value, or an aggregate key made up from several incoming
+fields. Aggregate keys may resemble the following document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;$author&#39;</span><span class="p">,</span> <span class="nx">pageViews</span><span class="o">:</span> <span class="s1">&#39;$pageViews&#39;</span><span class="p">,</span> <span class="nx">posted</span><span class="o">:</span> <span class="s1">&#39;$posted&#39;</span> <span class="p">}</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>With the exception of the <tt class="docutils literal"><span class="pre">_id</span></tt> field, <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> cannot
+output nested documents.</p>
+<p>Every group expression must specify an <tt class="docutils literal"><span class="pre">_id</span></tt> field.
+You may specify the <tt class="docutils literal"><span class="pre">_id</span></tt> field as a dotted
+field path reference, a document with multiple fields enclosed in
+braces (i.e. <tt class="docutils literal"><span class="pre">{</span></tt> and <tt class="docutils literal"><span class="pre">}</span></tt>), or a constant value.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Use <a class="reference internal" href="project.html#_S_project" title="$project"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$project</span></tt></a> as needed to rename the grouped field
+after an <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> operation, if necessary.</p>
+</div>
+<p>Consider the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">$group</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;$author&quot;</span><span class="p">,</span>
+        <span class="nx">docsPerAuthor</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+        <span class="nx">viewsPerAuthor</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$sum</span> <span class="o">:</span> <span class="s2">&quot;$pageViews&quot;</span> <span class="p">}</span>
+    <span class="p">}}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This groups by the <tt class="docutils literal"><span class="pre">author</span></tt> field and computes two fields, the
+first <tt class="docutils literal"><span class="pre">docsPerAuthor</span></tt> is a counter field that adds one for
+each document with a given author field using the <a class="reference internal" href="sum.html#_S_sum" title="$sum"><tt class="xref agg agg-group docutils literal"><span class="pre">$sum</span></tt></a>
+function. The <tt class="docutils literal"><span class="pre">viewsPerAuthor</span></tt> field is the sum of
+all of the <tt class="docutils literal"><span class="pre">pageViews</span></tt> fields in the documents for each group.</p>
+<p>Each field defined for the <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> must use one of the group
+aggregation function listed below to generate its composite value:</p>
+<dl class="group">
+<dt id="_S_addToSet">
+<tt class="descname">$addToSet</tt><a class="headerlink" href="#_S_addToSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all the values found in the selected field
+among the documents in that group. <em>Every unique value only
+appears once</em> in the result set. There is no ordering guarantee
+for the output documents.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_first">
+<tt class="descname">$first</tt><a class="headerlink" href="#_S_first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the first value it encounters for its group .</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only use <a class="reference internal" href="#_S_first" title="$first"><tt class="xref agg agg-group docutils literal"><span class="pre">$first</span></tt></a> when the <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> follows
+an <a class="reference internal" href="sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operation. Otherwise, the result of this
+operation is unpredictable.</p>
+</div>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_last">
+<tt class="descname">$last</tt><a class="headerlink" href="#_S_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the last value it encounters for its group.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only use <a class="reference internal" href="last.html#_S_last" title="$last"><tt class="xref agg agg-group docutils literal"><span class="pre">$last</span></tt></a> when the <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a>
+follows an <a class="reference internal" href="sort.html#_S_sort" title="$sort"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$sort</span></tt></a> operation. Otherwise, the
+result of this operation is unpredictable.</p>
+</div>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_max">
+<tt class="descname">$max</tt><a class="headerlink" href="#_S_max" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the highest value among all values of the field in all
+documents selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_min">
+<tt class="descname">$min</tt><a class="headerlink" href="#_S_min" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lowest value among all values of the field in all
+documents selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_avg">
+<tt class="descname">$avg</tt><a class="headerlink" href="#_S_avg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the average of all the values of the field in all documents
+selected by this group.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_push">
+<tt class="descname">$push</tt><a class="headerlink" href="#_S_push" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all the values found in the selected field
+among the documents in that group. <em>A value may appear more than
+once</em> in the result set if more than one field in the grouped
+documents has that value.</p>
+</dd></dl>
+
+<dl class="group">
+<dt id="_S_sum">
+<tt class="descname">$sum</tt><a class="headerlink" href="#_S_sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sum of all the values for a specified
+field in the grouped documents, as in the second use above.</p>
+<p>Alternately, if you specify a value as an argument,
+<a class="reference internal" href="sum.html#_S_sum" title="$sum"><tt class="xref agg agg-group docutils literal"><span class="pre">$sum</span></tt></a> will increment this field by the specified value
+for every document in the grouping. Typically, as in the first
+use above, specify a value of <tt class="docutils literal"><span class="pre">1</span></tt> in order to count members of the
+group.</p>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The aggregation system currently stores <a class="reference internal" href="#_S_group" title="$group"><tt class="xref agg agg-pipeline docutils literal"><span class="pre">$group</span></tt></a> operations in
+memory, which may cause problems when processing a larger number
+of groups.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="first.html" title="Previous Section: $first (aggregation)">&lt; &nbsp; $first (aggregation)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="gt.html" title="Next Section: $gt (aggregation)">$gt (aggregation) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

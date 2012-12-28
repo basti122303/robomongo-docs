@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Remove Shards from an Existing Sharded Cluster &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/remove-shards-from-cluster" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Enforce Unique Keys for Sharded Collections" href="enforce-unique-keys-for-sharded-collections.html" />
+<link rel="prev" title="Add Shards to an Existing Cluster" href="add-shards-to-shard-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="remove-shards-from-an-existing-sharded-cluster">
+<h1>Remove Shards from an Existing Sharded Cluster<a class="headerlink" href="#remove-shards-from-an-existing-sharded-cluster" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This procedure describes the procedure for migrating data from a
+shard safely, when you need to decommission a shard. You may also need
+to remove shards as part of hardware reorganization and data
+migration.</p>
+<p><em>Do not</em> use this procedure to migrate an entire cluster to new
+hardware. To migrate an entire shard to new hardware, migrate
+individual shards as if they were independent replica sets.</p>
+<p>To remove a shard, you will:</p>
+<ul class="simple">
+<li>Move <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunks</em></a> off of the shard.</li>
+<li>Ensure that this shard is not the <a class="reference internal" href="../reference/glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a> for any databases
+in the cluster. If it is, move the &#8220;primary&#8221; status for these
+databases to other shards.</li>
+<li>Remove the shard from the cluster&#8217;s configuration.</li>
+</ul>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>Complete this procedure by connecting to any <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> in the
+cluster using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell.</p>
+<p>You can only remove a shard by its shard name. To discover or
+confirm the name of a shard, use the <a class="reference internal" href="../reference/commands.html#listShards" title="listShards"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">listShards</span></tt></a> command,
+<a class="reference internal" href="../reference/commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a> command, or <a class="reference internal" href="../reference/method/sh.status.html#sh.status" title="sh.status"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.status()</span></tt></a> shell helper.</p>
+<p>The example commands in this document remove a shard named <tt class="docutils literal"><span class="pre">mongodb0</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To successfully migrate data from a shard, the <a class="reference internal" href="../reference/glossary.html#term-balancer"><em class="xref std std-term">balancer</em></a>
+process <strong>must</strong> be active. Check the balancer state using the
+<a class="reference internal" href="../reference/method/sh.setBalancerState.html#sh.getBalancerState" title="sh.getBalancerState"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.getBalancerState()</span></tt></a> helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell. For more information, see the section on <a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>balancer operations</em></a>.</p>
+</div>
+<div class="section" id="remove-chunks-from-the-shard">
+<h3>Remove Chunks from the Shard<a class="headerlink" href="#remove-chunks-from-the-shard" title="Permalink to this headline">¶</a></h3>
+<p>Start by running the <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> command. This
+begins &#8220;draining&#8221; chunks from the shard you are removing.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeshard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation returns immediately, with the following response:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span> <span class="o">:</span> <span class="s2">&quot;draining started successfully&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;started&quot;</span> <span class="p">,</span> <span class="nx">shard</span> <span class="o">:</span><span class="s2">&quot;mongodb0&quot;</span> <span class="p">,</span> <span class="nx">ok</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Depending on your network capacity and the amount of data in your
+cluster, this operation can take from a few minutes to
+several days to complete.</p>
+</div>
+<div class="section" id="check-the-status-of-the-migration">
+<h3>Check the Status of the Migration<a class="headerlink" href="#check-the-status-of-the-migration" title="Permalink to this headline">¶</a></h3>
+<p>To check the progress of the migration,
+run <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> again at any stage of the
+process, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeshard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The output resembles the following document:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span><span class="o">:</span> <span class="s2">&quot;draining ongoing&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;ongoing&quot;</span> <span class="p">,</span> <span class="nx">remaining</span><span class="o">:</span> <span class="p">{</span> <span class="nx">chunks</span><span class="o">:</span> <span class="mi">42</span><span class="p">,</span> <span class="nx">dbs</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="nx">ok</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>In the <tt class="docutils literal"><span class="pre">remaining</span></tt> sub document, a counter displays the remaining number
+of chunks that MongoDB must migrate to other shards and the number of
+MongoDB databases that have &#8220;primary&#8221; status on this shard.</p>
+<p>Continue checking the status of the <cite>removeshard</cite> command until the
+number of chunks remaining is 0. Then proceed to the next step.</p>
+</div>
+<div class="section" id="move-unsharded-databases">
+<h3>Move Unsharded Databases<a class="headerlink" href="#move-unsharded-databases" title="Permalink to this headline">¶</a></h3>
+<p>Databases with non-sharded collections store those collections on a
+single shard known as the <a class="reference internal" href="../reference/glossary.html#term-primary-shard"><em class="xref std std-term">primary shard</em></a> for that database. The
+following step is necessary only when the shard to remove is
+also the primary shard for one or more databases.</p>
+<p>Issue the following command at the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">movePrimary</span><span class="o">:</span> <span class="s2">&quot;myapp&quot;</span><span class="p">,</span> <span class="nx">to</span><span class="o">:</span> <span class="s2">&quot;mongodb1&quot;</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>This command migrates all remaining non-sharded data in the
+database named <tt class="docutils literal"><span class="pre">myapp</span></tt> to the shard named <tt class="docutils literal"><span class="pre">mongodb1</span></tt>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Do not run the <a class="reference internal" href="../reference/commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> until you have <em>finished</em>
+draining the shard.</p>
+</div>
+<p>This command will not return until MongoDB completes moving all data,
+which may take a long time. The response from this command will
+resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;primary&quot;</span> <span class="o">:</span> <span class="s2">&quot;mongodb1&quot;</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="finalize-the-migration">
+<h3>Finalize the Migration<a class="headerlink" href="#finalize-the-migration" title="Permalink to this headline">¶</a></h3>
+<p>Run <a class="reference internal" href="../reference/commands.html#removeShard" title="removeShard"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">removeShard</span></tt></a> again to clean up all metadata
+information and finalize the removal, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">removeshard</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>A success message appears at completion:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span><span class="o">:</span> <span class="s2">&quot;remove shard completed successfully&quot;</span> <span class="p">,</span> <span class="nx">stage</span><span class="o">:</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="nx">host</span><span class="o">:</span> <span class="s2">&quot;mongodb0&quot;</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>When the value of &#8220;state&#8221; is &#8220;completed&#8221;, you may safely stop the
+<tt class="docutils literal"><span class="pre">mongodb0</span></tt> shard.</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="add-shards-to-shard-cluster.html" title="Previous Section: Add Shards to an Existing Cluster">&lt; &nbsp; Add Shards to an Existing Cluster</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="enforce-unique-keys-for-sharded-collections.html" title="Next Section: Enforce Unique Keys for Sharded Collections">Enforce Unique Keys for Sharded Collections &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

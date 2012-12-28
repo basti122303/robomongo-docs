@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>The MongoDB Manual &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org//" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="#" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="the-mongodb-manual">
+<h1>The MongoDB Manual<a class="headerlink" href="#the-mongodb-manual" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to the MongoDB Manual! The Manual begins by introducing
+MongoDB and continues to describe the query language, operational
+considerations and procedures, administration, among other topics in
+addition to a thorough reference.</p>
+<p>This manual is under constant development, and will soon replace the
+existing <a class="reference internal" href="#mongodb-wiki"><em>MongoDB Wiki</em></a>. See the &#8220;<a class="reference internal" href="about.html"><em>About MongoDB Documentation</em></a>&#8221;
+page for an overview of the MongoDB Documentation project.  For now,
+documentation resources coexist and link to one another. As you
+explore the manual, expect to move between documentation sites.</p>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB is an open-source, document-oriented database designed for
+ease of development and scalability, with particular emphasis on
+Internet applications and infrastructure.  If you&#8217;re new to
+MongoDB, begin with the following resources:</p>
+<ul class="simple">
+<li><a class="reference internal" href="installation.html"><em>Installing MongoDB</em></a></li>
+<li><a class="reference internal" href="tutorial/getting-started.html"><em>The MongoDB Tutorial</em></a></li>
+<li><a class="reference internal" href="faq/fundamentals.html"><em>Frequently Asked Questions</em></a></li>
+<li><a class="reference internal" href="release-notes.html"><em>Release Notes</em></a></li>
+</ul>
+<p>If you&#8217;re familiar with database systems that use SQL, consider the
+following documents, which compare common MongoDB conventions and
+operations with their SQL equivalents:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/sql-comparison.html"><em>SQL to MongoDB Mapping Chart</em></a></li>
+<li><a class="reference internal" href="reference/sql-aggregation-comparison.html"><em>SQL to Aggregation Framework Mapping Chart</em></a></li>
+</ul>
+<p>MongoDB has an <a class="reference external" href="http://www.mongodb.org/display/DOCS/community">active community</a>. You&#8217;ll get a
+quick response to any question posted to the <a class="reference external" href="https://groups.google.com/forum/?fromgroups#!forum/mongodb-user">MongoDB User Mailing List</a></p>
+</div>
+<div class="section" id="mongodb">
+<h2>MongoDB...<a class="headerlink" href="#mongodb" title="Permalink to this headline">¶</a></h2>
+<table class="hlist"><tr><td><ul>
+<li><p class="first"><strong>For Developers</strong></p>
+<p>If you&#8217;re new to MongoDB, consider the <a class="reference internal" href="installation.html"><em>Installing MongoDB</em></a>
+document, the <a class="reference internal" href="faq.html"><em>Frequently Asked Questions</em></a> section and particularly the
+<a class="reference internal" href="faq/developers.html"><em>developer FAQs</em></a>. <a class="reference internal" href="applications/drivers.html"><em>Drivers</em></a> page lists the
+client libraries which all provide basic introductory
+tutorials. Nevertheless, MongoDB users should have a basic
+understanding several core concepts, including:</p>
+<ul class="simple">
+<li><a class="reference internal" href="core/document.html"><em>BSON Documents</em></a></li>
+<li><a class="reference internal" href="core/read-operations.html"><em>Read Operations</em></a></li>
+<li><a class="reference internal" href="core/write-operations.html"><em>Write Operations</em></a></li>
+</ul>
+<p>Once you have selected a programming <a class="reference internal" href="applications/drivers.html"><em>language and driver</em></a>, become familiar with the core
+<a class="reference internal" href="crud.html"><em>CRUD</em></a> and <a class="reference internal" href="applications.html"><em>Application Development</em></a> documents, in particular:</p>
+<ul class="simple">
+<li><a class="reference internal" href="applications/create.html"><em>Create</em></a>,</li>
+<li><a class="reference internal" href="applications/read.html"><em>Read</em></a>,</li>
+<li><a class="reference internal" href="applications/update.html"><em>Update</em></a>, and</li>
+<li><a class="reference internal" href="applications/delete.html"><em>Delete</em></a>.</li>
+</ul>
+<p>As you use MongoDB more you should also be learn about
+<a class="reference internal" href="indexes.html"><em>Indexing</em></a>. Many users will also find MongoDB&#8217;s
+<a class="reference internal" href="aggregation.html"><em>data aggregation</em></a> useful. Finally, the
+<a class="reference internal" href="use-cases.html"><em>use case</em></a> and <a class="reference internal" href="tutorial.html"><em>tutorials</em></a>
+documents provide examples and outline common processes and
+practices.</p>
+</li>
+</ul>
+</td><td><ul>
+<li><p class="first"><strong>For Administrators</strong></p>
+<p>If you&#8217;re administering MongoDB, you&#8217;ll need to know at least the
+basics of <a class="reference internal" href="applications/read.html"><em>querying</em></a> MongoDB and <a class="reference external" href="http://www.mongodb.org/display/DOCS/Overview+-+The+MongoDB+Interactive+Shell">using
+the shell</a>. You can
+then the Manual&#8217;s <a class="reference internal" href="administration.html"><em>administration</em></a>
+section, beginning with the <a class="reference internal" href="administration/configuration.html"><em>configuration</em></a> document.</p>
+<p>Most deployments consist of a single replica set. Scaling the
+database horizontally on existing hardware usually involves
+sharding, consider the documentation of these deployment options:</p>
+<ul class="simple">
+<li><a class="reference internal" href="replication.html"><em>Replication</em></a></li>
+<li><a class="reference internal" href="sharding.html"><em>Sharding</em></a></li>
+</ul>
+<p>As you begin deploying MongoDB in production environments,
+familiarize yourself with the <a class="reference internal" href="tutorial.html#tutorials-administration"><em>Administration Tutorials</em></a> section and the following topics:</p>
+<ul class="simple">
+<li><a class="reference internal" href="security.html"><em>Security</em></a></li>
+<li><a class="reference internal" href="administration/backups.html"><em>Backups</em></a></li>
+<li><a class="reference internal" href="administration/monitoring.html"><em>Monitoring</em></a></li>
+<li><a class="reference internal" href="administration/production-notes.html"><em>Hardware and System Settings</em></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>This manual features a detailed reference, including: a JavaScript
+method reference, detailed documentation of all operators in the
+MongoDB query language, manual pages for all MongoDB tools and
+binaries, a reference of all database commands, and full glossary and
+topic index.</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/javascript.html"><em>JavaScript Interface</em></a></li>
+<li><a class="reference internal" href="reference/operators.html"><em>Operator Reference</em></a></li>
+<li><a class="reference internal" href="reference.html#man-pages"><em>MongoDB Manual Pages</em></a></li>
+<li><a class="reference internal" href="reference/commands.html"><em>Command Reference</em></a></li>
+<li><a class="reference internal" href="reference/glossary.html"><em>Glossary</em></a></li>
+<li><a class="reference internal" href="genindex.html"><em>MongoDB Manual Topic Index</em></a></li>
+</ul>
+<p>Also consider the full <a class="reference internal" href="contents.html"><em>outline of the MongoDB Manual</em></a>, and an index of all <a class="reference internal" href="tutorial.html"><em>MongoDB tutorials</em></a>.</p>
+</div>
+<div class="section" id="mongodb-wiki">
+<span id="id1"></span><h2>MongoDB Wiki<a class="headerlink" href="#mongodb-wiki" title="Permalink to this headline">¶</a></h2>
+<p>This manual will eventually replace the <a class="reference external" href="http://www.mongodb.org/display/DOCS/">MongoDB Wiki</a>. Until
+then, you&#8217;ll have to use both to get the best information on
+MongoDB. The following pages from the wiki are especially useful:</p>
+<table class="hlist"><tr><td><ul>
+<li><p class="first"><strong>Getting Started</strong></p>
+<table class="hlist"><tr><td><ul class="simple">
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Introduction">Introduction</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Developer+Zone">Developer Introduction</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/downloads">Downloads</a></li>
+</ul>
+</td></tr></table>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.mongodb.org/display/DOCS/Admin+Zone">Administrative Documentation</a></p>
+<table class="hlist"><tr><td><ul class="simple">
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Starting+and+Stopping+Mongo">Starting and Stopping MongoDB</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Windows">Windows</a></li>
+</ul>
+</td><td><ul class="simple">
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Troubleshooting">Troubleshooting</a></li>
+</ul>
+</td></tr></table>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.mongodb.org/display/DOCS/Community">Community</a></p>
+<table class="hlist"><tr><td><ul class="simple">
+<li><a class="reference external" href="http://10gen.com">10gen</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/events/">MongoDB Events</a></li>
+<li><a class="reference external" href="http://planet.mongodb..org/">Planet MongoDB</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/MongoDB+Masters">MongoDB Masters</a></li>
+<li><a class="reference external" href="http://www.10gen.com/presentations/">Slides and Video</a></li>
+</ul>
+</td><td><ul class="simple">
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Hosting+Center">Hosting Center</a></li>
+<li><a class="reference external" href="http://mms.10gen.com/">MongoDB Monitoring Service</a> (<a class="reference external" href="http://mms.10gen.com/help/">docs</a>)</li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/Admin+UIs">Administrative Interfaces</a></li>
+<li><a class="reference external" href="http://www.mongodb.org/display/DOCS/International+Docs">International Documentation</a></li>
+<li><a class="reference external" href="http://10gen.com/books/">MongoDB Books</a></li>
+</ul>
+</td></tr></table>
+</li>
+</ul>
+</td></tr></table>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

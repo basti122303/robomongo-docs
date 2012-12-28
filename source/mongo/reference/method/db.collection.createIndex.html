@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.collection.createIndex() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.collection.createIndex" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.collection.dataSize()" href="db.collection.dataSize.html" />
+<link rel="prev" title="db.collection.count()" href="db.collection.count.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-collection-createindex">
+<h1>db.collection.createIndex()<a class="headerlink" href="#db-collection-createindex" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.collection.createIndex">
+<tt class="descclassname">db.collection.</tt><tt class="descname">createIndex</tt><big>(</big><em>keys</em>, <em>options</em><big>)</big><a class="headerlink" href="#db.collection.createIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">Deprecated since version 1.8.</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>keys</strong> (<em>document</em>) &#8211; A <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that contains
+pairs with the name of the field or
+fields to index and order of the index. A
+<tt class="docutils literal"><span class="pre">1</span></tt> specifies ascending and a <tt class="docutils literal"><span class="pre">-1</span></tt>
+specifies descending.</li>
+<li><strong>options</strong> (<em>document</em>) &#8211; A <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> that controls the creation
+of the index. This argument is optional.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> method is the preferred
+way to create indexes on collections.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../../indexes.html"><em>Indexes</em></a>,
+<a class="reference internal" href="#db.collection.createIndex" title="db.collection.createIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.createIndex()</span></tt></a>,
+<a class="reference internal" href="db.collection.dropIndex.html#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a>,
+<a class="reference internal" href="db.collection.dropIndexes.html#db.collection.dropIndexes" title="db.collection.dropIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndexes()</span></tt></a>,
+<a class="reference internal" href="db.collection.getIndexes.html#db.collection.getIndexes" title="db.collection.getIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.getIndexes()</span></tt></a>,
+<a class="reference internal" href="db.collection.reIndex.html#db.collection.reIndex" title="db.collection.reIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.reIndex()</span></tt></a>, and
+<a class="reference internal" href="db.collection.totalIndexSize.html#db.collection.totalIndexSize" title="db.collection.totalIndexSize"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.totalIndexSize()</span></tt></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.collection.count.html" title="Previous Section: db.collection.count()">&lt; &nbsp; db.collection.count()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.collection.dataSize.html" title="Next Section: db.collection.dataSize()">db.collection.dataSize() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

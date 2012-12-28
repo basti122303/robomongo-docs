@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>profile &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/profile" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="reIndex" href="reIndex.html" />
+<link rel="prev" title="printShardingStatus" href="printShardingStatus.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="profile">
+<h1>profile<a class="headerlink" href="#profile" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">profile</tt></dt>
+<dd><p>Use the <a class="reference internal" href="../configuration-options.html#profile" title="profile"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">profile</span></tt></a> command to enable, disable, or change
+the query profiling level. This allows administrators to capture
+data regarding performance. The database profiling system can
+impact performance and can allow the server to write the contents
+of queries to the log, which might information security
+implications for your deployment. Consider the following prototype
+syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">profile</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">level</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The following profiling levels are available:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><strong>Level</strong></td>
+<td><strong>Setting</strong></td>
+</tr>
+<tr class="row-even"><td>0</td>
+<td>Off. No profiling.</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>On. Only includes slow operations.</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>On. Includes all operations.</td>
+</tr>
+</tbody>
+</table>
+<p>You may optionally set a threshold in milliseconds for profiling using
+the <tt class="docutils literal"><span class="pre">slowms</span></tt> option, as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">profile</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">slowms</span><span class="o">:</span> <span class="mi">200</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> writes the output of the database profiler to the
+<tt class="docutils literal"><span class="pre">system.profile</span></tt> collection.</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> records a record of queries that take longer than
+the <a class="reference internal" href="../configuration-options.html#slowms" title="slowms"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">slowms</span></tt></a> to the log even when the database profiler is
+not active.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Additional documentation regarding database profiling
+<a class="reference internal" href="../../administration/monitoring.html#database-profiling"><em>Database Profiling</em></a>.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../method/db.getProfilingStatus.html#db.getProfilingStatus" title="db.getProfilingStatus"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getProfilingStatus()</span></tt></a>&#8221; and
+&#8220;<a class="reference internal" href="../method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a>&#8221; provide wrappers
+around this functionality in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The database cannot be locked with <a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a> while profiling is enabled.
+You must disable profiling before locking the database with <a class="reference internal" href="../method/db.fsyncLock.html#db.fsyncLock" title="db.fsyncLock"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.fsyncLock()</span></tt></a>.
+Disable profiling using <a class="reference internal" href="../method/db.setProfilingLevel.html#db.setProfilingLevel" title="db.setProfilingLevel"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.setProfilingLevel()</span></tt></a> as follows in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell:</p>
+</div>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">setProfilingLevel</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command obtains a write lock on the affected database and will
+block other operations until it has completed; however the write
+lock is only in place while the enabling and disabling the
+profiler, which is typically a short operation.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="printShardingStatus.html" title="Previous Section: printShardingStatus">&lt; &nbsp; printShardingStatus</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="reIndex.html" title="Next Section: reIndex">reIndex &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

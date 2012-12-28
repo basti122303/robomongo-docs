@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Sharding &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/sharding" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Sharding Fundamentals" href="core/sharding.html" />
+<link rel="prev" title="Recover MongoDB Data following Unexpected Shutdown" href="tutorial/recover-data-following-unexpected-shutdown.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sharding">
+<h1>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h1>
+<p id="sharding-background">Sharding distributes a
+single logical database system across a cluster of machines. Sharding
+uses range-based portioning to distribute <a class="reference internal" href="reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a>
+based on a specific <a class="reference internal" href="reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a>.</p>
+<p>This page lists the documents, tutorials, and reference pages that
+describe sharding.</p>
+<p>For an overview, see <a class="reference internal" href="core/sharding.html"><em>Sharding Fundamentals</em></a>. To configure, maintain, and
+troubleshoot sharded clusters, see <a class="reference internal" href="administration/sharding.html"><em>Sharded Cluster Administration</em></a>.
+For deployment architectures, see <a class="reference internal" href="administration/sharding-architectures.html"><em>Sharded Cluster Architectures</em></a>.
+For details on the internal operations of sharding, see <a class="reference internal" href="core/sharding-internals.html"><em>Sharding Internals</em></a>.
+For procedures for performing certain sharding tasks, see the
+<a class="reference internal" href="#sharding-tutorials"><em>Tutorials</em></a> list.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The following is the outline of the main documentation:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/sharding.html">Sharding Fundamentals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#sharding-overview">Sharding Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#sharding-requirements">Sharding Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#shard-keys">Shard Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#config-servers">Config Servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#mongos-and-querying"><tt class="docutils literal"><span class="pre">mongos</span></tt> and Querying</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#balancing-and-distribution">Balancing and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding.html#security-considerations-for-sharded-clusters">Security Considerations for Sharded Clusters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/sharding.html">Sharded Cluster Administration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#set-up-a-sharded-cluster">Set up a Sharded Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#cluster-management">Cluster Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#chunk-management">Chunk Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#balancer-operations">Balancer Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#config-server-maintenance">Config Server Maintenance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="administration/sharding-architectures.html">Sharded Cluster Architectures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding-architectures.html#deploying-a-test-cluster">Deploying a Test Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding-architectures.html#deploying-a-production-cluster">Deploying a Production Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding-architectures.html#sharded-and-non-sharded-data">Sharded and Non-Sharded Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="administration/sharding-architectures.html#high-availability-and-mongodb">High Availability and MongoDB</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/sharding-internals.html">Sharding Internals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding-internals.html#shard-keys">Shard Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding-internals.html#cluster-balancer">Cluster Balancer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding-internals.html#config-database">Config Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/sharding-internals.html#sharding-gridfs-stores">Sharding GridFS Stores</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="tutorials">
+<span id="sharding-tutorials"></span><span id="index-0"></span><h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<p>The following tutorials describe specific sharding procedures:</p>
+<div class="section" id="deploying-sharded-clusters">
+<h3>Deploying Sharded Clusters<a class="headerlink" href="#deploying-sharded-clusters" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/deploy-shard-cluster.html">Deploy a Sharded Cluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/add-shards-to-shard-cluster.html">Add Shards to an Existing Cluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/remove-shards-from-cluster.html">Remove Shards from an Existing Sharded Cluster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/enforce-unique-keys-for-sharded-collections.html">Enforce Unique Keys for Sharded Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/convert-replica-set-to-replicated-shard-cluster.html">Convert a Replica Set to a Replicated Sharded Cluster</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="backups-for-sharded-clusters">
+<h3>Backups for Sharded Clusters<a class="headerlink" href="#backups-for-sharded-clusters" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/backup-small-sharded-cluster-with-mongodump.html">Backup a Small Sharded Cluster with <tt class="docutils literal"><span class="pre">mongodump</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/backup-sharded-cluster-with-filesystem-snapshots.html">Create Backup of a Sharded Cluster with Filesystem Snapshots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/backup-sharded-cluster-with-database-dumps.html">Create Backup of a Sharded Cluster with Database Dumps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/restore-single-shard.html">Restore a Single Shard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/restore-sharded-cluster.html">Restore Sharded Clusters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/schedule-backup-window-for-sharded-clusters.html">Schedule Backup Window for Sharded Clusters</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="reference">
+<span id="sharding-reference"></span><h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<p>The following reference section describes sharding commands:</p>
+<ul class="simple">
+<li><a class="reference internal" href="reference/commands.html#sharding-commands"><em>Sharding Commands</em></a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="tutorial/recover-data-following-unexpected-shutdown.html" title="Previous Section: Recover MongoDB Data following Unexpected Shutdown">&lt; &nbsp; Recover MongoDB Data following Unexpected Shutdown</a></li>
+<li id="btnvnx"><a href="core/sharding.html" title="Next Section: Sharding Fundamentals">Sharding Fundamentals &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

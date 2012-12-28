@@ -1,0 +1,612 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Read &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/read" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="CRUD" href="../crud.html" />
+<link rel="next" title="Update" href="update.html" />
+<link rel="prev" title="Create" href="create.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="read">
+<h1>Read<a class="headerlink" href="#read" title="Permalink to this headline">¶</a></h1>
+<p>Of the four basic database operations (i.e. CRUD), read operation are
+those that retrieve records or <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> from a
+<a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> in MongoDB. For general information about read
+operations and the factors that affect their performance, see
+<a class="reference internal" href="../core/read-operations.html"><em>Read Operations</em></a>; for documentation of the other CRUD
+operations, see the <a class="reference internal" href="../crud.html"><em>CRUD</em></a> page.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>You can retrieve documents from MongoDB using either of the following
+methods:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#crud-read-find"><em>find</em></a></li>
+<li><a class="reference internal" href="#crud-read-findone"><em>findOne</em></a></li>
+</ul>
+</div>
+<div class="section" id="find">
+<span id="crud-read-find"></span><h2>Find<a class="headerlink" href="#find" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method is the primary
+method to select documents from a collection. The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method returns a cursor that contains a number
+of documents. Most <a class="reference internal" href="drivers.html"><em>drivers</em></a> provide
+application developers with a native iterable interface for handling
+cursors and accessing documents.
+The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method has the following
+syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">projection</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-corresponding-operation-in-sql admonition">
+<p class="first admonition-title">Corresponding Operation in SQL</p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method is analogous to
+the <tt class="docutils literal"><span class="pre">SELECT</span></tt> statement, while:</p>
+<ul class="last simple">
+<li>the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument corresponds to the <tt class="docutils literal"><span class="pre">WHERE</span></tt> statement,
+and</li>
+<li>the <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> argument corresponds to the list of fields
+to select from the result set.</li>
+</ul>
+</div>
+<p>Consider the following examples that illustrate the use of the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method:</p>
+<blockquote class="pull-quote">
+<div><p>The examples refer to a collection named <tt class="docutils literal"><span class="pre">bios</span></tt>
+that contains documents with the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="p">{</span>
+             <span class="s2">&quot;first&quot;</span> <span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;last&quot;</span> <span class="o">:</span><span class="s2">&quot;Backus&quot;</span>
+           <span class="p">},</span>
+  <span class="s2">&quot;birth&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1924-12-03T05:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;death&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2007-03-17T04:00:00Z&quot;</span><span class="p">),</span>
+  <span class="s2">&quot;contribs&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Fortran&quot;</span><span class="p">,</span> <span class="s2">&quot;ALGOL&quot;</span><span class="p">,</span> <span class="s2">&quot;Backus-Naur Form&quot;</span><span class="p">,</span> <span class="s2">&quot;FP&quot;</span> <span class="p">],</span>
+  <span class="s2">&quot;awards&quot;</span> <span class="o">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;W.W. McDowellAward&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1967</span><span class="p">,</span>
+                <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;IEEE Computer Society&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Medal of Science&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1975</span><span class="p">,</span>
+                <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Science Foundation&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Turing Award&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1977</span><span class="p">,</span>
+                <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;ACM&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;award&quot;</span> <span class="o">:</span> <span class="s2">&quot;Draper Prize&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;year&quot;</span> <span class="o">:</span> <span class="mi">1993</span><span class="p">,</span>
+                <span class="s2">&quot;by&quot;</span> <span class="o">:</span> <span class="s2">&quot;National Academy of Engineering&quot;</span>
+              <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, you can format the output by adding
+<tt class="docutils literal"><span class="pre">.pretty()</span></tt> to the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method
+call.</p>
+</div>
+<ul>
+<li><p class="first">If there is no <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method selects all documents from a collection.</p>
+<ul>
+<li><p class="first">The following operation returns all documents (or more
+precisely, a cursor to all documents) in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">If there is a <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method selects all documents from a
+collection that satisfies the criteria of the query:</p>
+<ul>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the field <tt class="docutils literal"><span class="pre">_id</span></tt> equals <tt class="docutils literal"><span class="pre">5</span></tt> or
+<tt class="docutils literal"><span class="pre">ObjectId(&quot;507c35dd8fada716c89d0013&quot;)</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$in</span><span class="o">:</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span>  <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;507c35dd8fada716c89d0013&quot;</span><span class="p">)</span> <span class="p">]</span> <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the array field <tt class="docutils literal"><span class="pre">contribs</span></tt> contains the element
+<tt class="docutils literal"><span class="pre">'UNIX'</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">contribs</span><span class="o">:</span> <span class="s1">&#39;UNIX&#39;</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where <tt class="docutils literal"><span class="pre">awards</span></tt> array contains a subdocument element
+that contains the <tt class="docutils literal"><span class="pre">award</span></tt> field equal to <tt class="docutils literal"><span class="pre">'Turing</span> <span class="pre">Award'</span></tt> and the
+<tt class="docutils literal"><span class="pre">year</span></tt> field greater than 1980:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">awards</span><span class="o">:</span> <span class="p">{</span>
+               <span class="nx">$elemMatch</span><span class="o">:</span> <span class="p">{</span>
+                    <span class="nx">award</span><span class="o">:</span> <span class="s1">&#39;Turing Award&#39;</span><span class="p">,</span>
+                    <span class="nx">year</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="mi">1980</span> <span class="p">}</span>
+               <span class="p">}</span>
+     <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the subdocument <tt class="docutils literal"><span class="pre">name</span></tt> contains a field
+<tt class="docutils literal"><span class="pre">first</span></tt> with the value <tt class="docutils literal"><span class="pre">'Yukihiro'</span></tt> and a field <tt class="docutils literal"><span class="pre">last</span></tt> with
+the value <tt class="docutils literal"><span class="pre">'Matsumoto'</span></tt>; the query uses <a class="reference internal" href="../reference/glossary.html#term-dot-notation"><em class="xref std std-term">dot notation</em></a> to
+access fields in a subdocument:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="s1">&#39;name.first&#39;</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;name.last&#39;</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The query matches the document where the <tt class="docutils literal"><span class="pre">name</span></tt> field contains a
+subdocument with the field <tt class="docutils literal"><span class="pre">first</span></tt> with the value <tt class="docutils literal"><span class="pre">'Yukihiro'</span></tt>
+and a field <tt class="docutils literal"><span class="pre">last</span></tt> with the value <tt class="docutils literal"><span class="pre">'Matsumoto'</span></tt>. For instance,
+the query would match documents with <tt class="docutils literal"><span class="pre">name</span></tt> fields that
+held either of the following values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span><span class="p">,</span>
+  <span class="nx">aka</span><span class="o">:</span> <span class="s1">&#39;Matz&#39;</span><span class="p">,</span>
+  <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span>
+<span class="p">}</span>
+
+<span class="p">{</span>
+  <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span><span class="p">,</span>
+  <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the subdocument <tt class="docutils literal"><span class="pre">name</span></tt> is <em>exactly</em> <tt class="docutils literal"><span class="pre">{</span> <span class="pre">first:</span>
+<span class="pre">'Yukihiro',</span> <span class="pre">last:</span> <span class="pre">'Matsumoto'</span> <span class="pre">}</span></tt>, including the order:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="p">{</span>
+             <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span><span class="p">,</span>
+             <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span>
+     <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">name</span></tt> field must match the sub-document exactly, including
+order. For instance, the query would <strong>not</strong> match documents with
+<tt class="docutils literal"><span class="pre">name</span></tt> fields that held either of the following values:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span><span class="p">,</span>
+  <span class="nx">aka</span><span class="o">:</span> <span class="s1">&#39;Matz&#39;</span><span class="p">,</span>
+  <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span>
+<span class="p">}</span>
+
+<span class="p">{</span>
+  <span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Matsumoto&#39;</span><span class="p">,</span>
+  <span class="nx">first</span><span class="o">:</span> <span class="s1">&#39;Yukihiro&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where either the field <tt class="docutils literal"><span class="pre">first</span></tt> in the sub-document
+<tt class="docutils literal"><span class="pre">name</span></tt> starts with the letter <tt class="docutils literal"><span class="pre">G</span></tt> <strong>or</strong> where the field
+<tt class="docutils literal"><span class="pre">birth</span></tt> is less than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/1945')</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="s1">&#39;name.first&#39;</span> <span class="o">:</span> <span class="sr">/^G/</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="nx">birth</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/1945&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
+          <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the field <tt class="docutils literal"><span class="pre">first</span></tt> in the subdocument <tt class="docutils literal"><span class="pre">name</span></tt>
+starts with the letter <tt class="docutils literal"><span class="pre">K</span></tt> <strong>and</strong> the array field <tt class="docutils literal"><span class="pre">contribs</span></tt>
+contains the element <tt class="docutils literal"><span class="pre">UNIX</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="s1">&#39;name.first&#39;</span><span class="o">:</span> <span class="sr">/^K/</span><span class="p">,</span>
+     <span class="nx">contribs</span><span class="o">:</span> <span class="s1">&#39;UNIX&#39;</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>In this query, the parameters (i.e. the selections of both fields)
+combine using an implicit logical AND for criteria on different
+fields <tt class="docutils literal"><span class="pre">contribs</span></tt> and <tt class="docutils literal"><span class="pre">name.first</span></tt>. For multiple AND criteria
+on the same field, use the <a class="reference internal" href="../reference/operators.html#_S_and" title="$and"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$and</span></tt></a> operator.</p>
+</li>
+</ul>
+</li>
+<li><p class="first">If there is a <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method returns only those fields as specified
+in the <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> argument to include or exclude:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">_id</span></tt> field is implicitly included in the
+<tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> argument. In projections that explicitly include
+fields, <tt class="docutils literal"><span class="pre">_id</span></tt> is the only field that you can explicitly exclude.
+Otherwise, you cannot mix include field and exclude field
+specifications.</p>
+</div>
+<ul>
+<li><p class="first">The following operation finds all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection and returns only the <tt class="docutils literal"><span class="pre">name</span></tt> field, the <tt class="docutils literal"><span class="pre">contribs</span></tt>
+field, and the <tt class="docutils literal"><span class="pre">_id</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">contribs</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation finds all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection and returns only the <tt class="docutils literal"><span class="pre">name</span></tt> field and the <tt class="docutils literal"><span class="pre">contribs</span></tt>
+field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">contribs</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation finds the documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the <tt class="docutils literal"><span class="pre">contribs</span></tt> field contains the element
+<tt class="docutils literal"><span class="pre">'OOP'</span></tt> and returns all fields <em>except</em> the <tt class="docutils literal"><span class="pre">_id</span></tt> field, the
+<tt class="docutils literal"><span class="pre">first</span></tt> field in the <tt class="docutils literal"><span class="pre">name</span></tt> subdocument, and the <tt class="docutils literal"><span class="pre">birth</span></tt>
+field from the matching documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre> <span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+    <span class="p">{</span> <span class="nx">contribs</span><span class="o">:</span> <span class="s1">&#39;OOP&#39;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;name.first&#39;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">birth</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation finds all documents in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection and returns the the <tt class="docutils literal"><span class="pre">last</span></tt> field in the <tt class="docutils literal"><span class="pre">name</span></tt>
+subdocument and the first two elements in the <tt class="docutils literal"><span class="pre">contribs</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span>
+   <span class="p">{</span> <span class="p">},</span>
+   <span class="p">{</span>
+     <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+     <span class="s1">&#39;name.last&#39;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+     <span class="nx">contribs</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$slice</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="../reference/glossary.html#term-dot-notation"><em class="xref std std-term">dot notation</em></a> for information on &#8220;reaching into&#8221; embedded
+sub-documents.</li>
+<li><a class="reference internal" href="../core/read-operations.html#read-operations-arrays"><em>Arrays</em></a> for more examples on accessing arrays</li>
+<li><a class="reference internal" href="../core/read-operations.html#read-operations-subdocuments"><em>Subdocuments</em></a> for more examples on accessing
+subdocuments</li>
+</ul>
+</div>
+<div class="section" id="cursor">
+<span id="crud-read-cursor"></span><h3>Cursor<a class="headerlink" href="#cursor" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method returns a
+<a class="reference internal" href="../reference/glossary.html#term-cursor"><em class="xref std std-term">cursor</em></a> to the results; however, in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell,
+if the returned cursor is not assigned to a variable, then the cursor
+is automatically iterated up to 20 times <a class="footnote-reference" href="#setshellbatchsize" id="id1">[1]</a> to print
+up to the first 20 documents that match the query, as in the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>When you assign the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> to a
+variable:</p>
+<ul>
+<li><p class="first">you can type the name of the cursor variable to iterate up to 20
+times <a class="footnote-reference" href="#setshellbatchsize" id="id2">[1]</a> and print the matching documents, as in
+the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myCursor</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="nx">myCursor</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">you can use the cursor method <a class="reference internal" href="../reference/method/cursor.next.html#cursor.next" title="cursor.next"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">next()</span></tt></a> to
+access the documents, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myCursor</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">myDocument</span> <span class="o">=</span> <span class="nx">myCursor</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">()</span> <span class="o">?</span> <span class="nx">myCursor</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span> <span class="o">:</span> <span class="kc">null</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">myDocument</span><span class="p">)</span> <span class="p">{</span>
+
+   <span class="kd">var</span> <span class="nx">myName</span> <span class="o">=</span> <span class="nx">myDocument</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+
+   <span class="nx">print</span> <span class="p">(</span><span class="nx">tojson</span><span class="p">(</span><span class="nx">myName</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>To print, you can also use the <tt class="docutils literal"><span class="pre">printjson()</span></tt> method instead of
+<tt class="docutils literal"><span class="pre">print(tojson())</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nx">myDocument</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">myName</span> <span class="o">=</span> <span class="nx">myDocument</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+
+    <span class="nx">printjson</span><span class="p">(</span><span class="nx">myName</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">you can use the cursor method <a class="reference internal" href="../reference/method/cursor.forEach.html#cursor.forEach" title="cursor.forEach"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">forEach()</span></tt></a>
+to iterate the cursor and access the documents, as in the following
+example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myCursor</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+
+<span class="nx">myCursor</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">printjson</span><span class="p">);</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>For more information on cursor handling, see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/method/cursor.hasNext.html#cursor.hasNext" title="cursor.hasNext"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.hasNext()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/cursor.next.html#cursor.next" title="cursor.next"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.next()</span></tt></a></li>
+<li><a class="reference internal" href="../reference/method/cursor.forEach.html#cursor.forEach" title="cursor.forEach"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.forEach()</span></tt></a></li>
+<li><a class="reference internal" href="../core/read-operations.html#read-operations-cursors"><em>cursors</em></a></li>
+<li><a class="reference internal" href="../reference/javascript.html#js-query-cursor-methods"><em>JavaScript cursor methods</em></a></li>
+</ul>
+<table class="docutils footnote" frame="void" id="setshellbatchsize" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> You can use the <tt class="docutils literal"><span class="pre">DBQuery.shellBatchSize</span></tt> to
+change the number of iteration from the default value <tt class="docutils literal"><span class="pre">20</span></tt>. See
+<a class="reference internal" href="../core/read-operations.html#cursor-flags"><em>Cursor Flags</em></a> and <a class="reference internal" href="../core/read-operations.html#cursor-behaviors"><em>Cursor Behaviors</em></a> for more information.</td></tr>
+</tbody>
+</table>
+<div class="section" id="modify-cursor-behavior">
+<h4>Modify Cursor Behavior<a class="headerlink" href="#modify-cursor-behavior" title="Permalink to this headline">¶</a></h4>
+<p>In addition to the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> and the <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> arguments, the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell and the <a class="reference internal" href="drivers.html"><em>drivers</em></a>
+provide several cursor methods that you can call on the <em>cursor</em>
+returned by <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method to modify
+its behavior, such as:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort</span></tt></a>, which orders the documents in the
+result set according to the field or fields specified to the method.</p>
+<p>The following operation returns all documents (or more precisely, a
+cursor to all documents) in the <tt class="docutils literal"><span class="pre">bios</span></tt> collection ordered by the
+<tt class="docutils literal"><span class="pre">name</span></tt> field ascending:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> corresponds to the <tt class="docutils literal"><span class="pre">ORDER</span> <span class="pre">BY</span></tt>
+statement in SQL.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method limits the number of
+documents in the result set.</p>
+<p>The following operation returns at most <tt class="docutils literal"><span class="pre">5</span></tt> documents (or more
+precisely, a cursor to at most 5 documents) in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">limit</span><span class="p">(</span> <span class="mi">5</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> corresponds to the <tt class="docutils literal"><span class="pre">LIMIT</span></tt>
+statement in SQL.</p>
+</li>
+<li><p class="first">The <a class="reference internal" href="../reference/method/cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">skip()</span></tt></a> method controls the starting
+point of the results set.</p>
+<p>The following operation returns all documents, skipping the first
+<tt class="docutils literal"><span class="pre">5</span></tt> documents in the <tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">skip</span><span class="p">(</span> <span class="mi">5</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>You can chain these cursor methods, as in the following examples <a class="footnote-reference" href="#dbquery-server" id="id3">[2]</a>:</p>
+<blockquote>
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span> <span class="mi">5</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">limit</span><span class="p">(</span> <span class="mi">5</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>See the <a class="reference internal" href="../reference/javascript.html#js-query-cursor-methods"><em>JavaScript cursor methods</em></a>
+reference and your <a class="reference internal" href="drivers.html"><em>driver</em></a> documentation
+for additional references. See <a class="reference internal" href="../core/read-operations.html#read-operations-cursors"><em>Cursors</em></a> for
+more information regarding cursors.</p>
+<table class="docutils footnote" frame="void" id="dbquery-server" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Regardless of the order you chain the
+<a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> and the <a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a>, the request to the server has the following
+structure that treats the query and the <a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> modifier as a single object. Therefore, the
+<a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> operation method is always
+applied after the <a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> regardless of
+the specified order of the operations in the chain. See the
+<a class="reference internal" href="../reference/meta-query-operators.html"><em>meta query operators</em></a> for
+more information.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="find-one">
+<span id="crud-read-find-one"></span><span id="crud-read-findone"></span><h2>Find One<a class="headerlink" href="#find-one" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method selects and
+returns a single document from a collection and returns that
+document. <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> does <em>not</em>
+return a cursor.</p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method has the following
+syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">projection</span><span class="o">&gt;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Except for the return value, <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method is quite similar to the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method; in fact, internally,
+the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method is the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method with a limit of 1.</p>
+<p>Consider the following examples that illustrate the use of the
+<a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method:</p>
+<ul>
+<li><p class="first">If there is no <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method selects just one document from a
+collection.</p>
+<ul>
+<li><p class="first">The following operation returns a single document from the
+<tt class="docutils literal"><span class="pre">bios</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">findOne</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">If there is a <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument, the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method selects the first document from a
+collection that meets the <tt class="docutils literal"><span class="pre">&lt;query&gt;</span></tt> argument:</p>
+<ul>
+<li><p class="first">The following operation returns the first matching document from
+the <tt class="docutils literal"><span class="pre">bios</span></tt> collection where either the field <tt class="docutils literal"><span class="pre">first</span></tt> in the
+subdocument <tt class="docutils literal"><span class="pre">name</span></tt> starts with the letter <tt class="docutils literal"><span class="pre">G</span></tt> <strong>or</strong> where the
+field <tt class="docutils literal"><span class="pre">birth</span></tt> is less than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/1945')</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>
+   <span class="p">{</span>
+     <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="s1">&#39;name.first&#39;</span> <span class="o">:</span> <span class="sr">/^G/</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="nx">birth</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/1945&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
+          <span class="p">]</span>
+   <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">You can pass a <tt class="docutils literal"><span class="pre">&lt;projection&gt;</span></tt> argument to <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> to control the fields included in the
+result set:</p>
+<ul>
+<li><p class="first">The following operation finds a document in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection and returns only the <tt class="docutils literal"><span class="pre">name</span></tt> field, the <tt class="docutils literal"><span class="pre">contribs</span></tt>
+field, and the <tt class="docutils literal"><span class="pre">_id</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>
+   <span class="p">{</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">contribs</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following operation returns a document in the <tt class="docutils literal"><span class="pre">bios</span></tt>
+collection where the <tt class="docutils literal"><span class="pre">contribs</span></tt> field contains the element
+<tt class="docutils literal"><span class="pre">OOP</span></tt> and returns all fields <em>except</em> the <tt class="docutils literal"><span class="pre">_id</span></tt> field, the
+<tt class="docutils literal"><span class="pre">first</span></tt> field in the <tt class="docutils literal"><span class="pre">name</span></tt> subdocument, and the <tt class="docutils literal"><span class="pre">birth</span></tt>
+field from the matching documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span>
+   <span class="p">{</span> <span class="nx">contribs</span><span class="o">:</span> <span class="s1">&#39;OOP&#39;</span> <span class="p">},</span>
+   <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;name.first&#39;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">birth</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<p>Although similar to the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method,
+because the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method
+returns a document rather than a cursor, you cannot apply the cursor
+methods such as <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a>, <a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a>, and <a class="reference internal" href="../reference/method/cursor.skip.html#cursor.skip" title="cursor.skip"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">skip()</span></tt></a> to the result of
+the <a class="reference internal" href="../reference/method/db.collection.findOne.html#db.collection.findOne" title="db.collection.findOne"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">findOne()</span></tt></a> method. However, you
+can access the document directly, as in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">myDocument</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">bios</span><span class="p">.</span><span class="nx">findOne</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">myDocument</span><span class="p">)</span> <span class="p">{</span>
+   <span class="kd">var</span> <span class="nx">myName</span> <span class="o">=</span> <span class="nx">myDocument</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+
+   <span class="nx">print</span> <span class="p">(</span><span class="nx">tojson</span><span class="p">(</span><span class="nx">myName</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="create.html" title="Previous Section: Create">&lt; &nbsp; Create</a></li>
+<li id="btnvup"><a href="../crud.html" title="Parent Section: CRUD" >&#47;&#92;&nbsp; CRUD</a></li>
+<li id="btnvnx"><a href="update.html" title="Next Section: Update">Update &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

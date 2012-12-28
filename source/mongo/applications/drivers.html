@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Drivers &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/drivers" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Data Modeling Considerations for MongoDB Applications" href="../core/data-modeling.html" />
+<link rel="prev" title="Application Development" href="../applications.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="driver">
+<span id="drivers"></span><span id="id1"></span><h1>Drivers<a class="headerlink" href="#driver" title="Permalink to this headline">¶</a></h1>
+<p>Applications communicate with MongoDB by way of a client library or
+driver that handles all interaction with the database in language
+appropriate and sensible manner. See the following pages for more
+information about the MongoDB wiki <a class="reference external" href="http://www.mongodb.org/display/DOCS/Drivers">drivers</a> page:</p>
+<ul class="simple">
+<li>JavaScript (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Javascript+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/js/current">docs</a>)</li>
+<li>Python (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Python+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/python/current">docs</a>)</li>
+<li>Ruby (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Ruby+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/ruby/current">docs</a>)</li>
+<li>PHP (<a class="reference external" href="http://www.mongodb.org/display/DOCS/PHP+Language+Center">wiki</a>, <a class="reference external" href="http://php.net/mongo/">docs</a>)</li>
+<li>Perl (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Perl+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/perl/current/">docs</a>)</li>
+<li>Java (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Java+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/java/current">docs</a>)</li>
+<li>Scala (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Scala+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/scala/casbah/current/">docs</a>)</li>
+<li>C# (<a class="reference external" href="http://www.mongodb.org/display/DOCS/CSharp+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/csharp/current/">docs</a>)</li>
+<li>C (<a class="reference external" href="http://www.mongodb.org/display/DOCS/C+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/c/current/">docs</a>)</li>
+<li>C++ (<a class="reference external" href="http://mongodb.org/pages/viewpage.action?pageId=133409">wiki</a>, <a class="reference external" href="http://api.mongodb.org/cplusplus/current/">docs</a>)</li>
+<li>Haskell (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Haskell+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/haskell/mongodb">docs</a>)</li>
+<li>Erlang (<a class="reference external" href="http://www.mongodb.org/display/DOCS/Erlang+Language+Center">wiki</a>, <a class="reference external" href="http://api.mongodb.org/erlang/mongodb">docs</a>)</li>
+</ul>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../applications.html" title="Previous Section: Application Development">&lt; &nbsp; Application Development</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="../core/data-modeling.html" title="Next Section: Data Modeling Considerations for MongoDB Applications">Data Modeling Considerations for MongoDB Applications &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

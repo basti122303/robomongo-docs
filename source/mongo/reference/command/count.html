@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>count &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/count" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="create" href="create.html" />
+<link rel="prev" title="copydbgetnonce (internal)" href="copydbgetnonce.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="count">
+<h1>count<a class="headerlink" href="#count" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">count</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#count" title="count"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">count</span></tt></a> command counts the number of documents in a
+collection. The command returns a document that contains the count
+as well as the command status. The <a class="reference internal" href="../commands.html#count" title="count"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">count</span></tt></a> command takes
+the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">query</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">query</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">limit</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">limit</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">skip</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">skip</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The command fields are as follows:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Fields:</th><td class="field-body"><ul class="first last simple">
+<li><strong>count</strong> (<em>String</em>) &#8211; The name of the collection to count.</li>
+<li><strong>query</strong> (<em>document</em>) &#8211; Optional. Specifies the selection query to determine which
+documents in the collection to count.</li>
+<li><strong>limit</strong> (<em>integer</em>) &#8211; Optional. Specifies the limit for the documents matching the
+selection <tt class="docutils literal"><span class="pre">query</span></tt>.</li>
+<li><strong>skip</strong> (<em>integer</em>) &#8211; Optional. Specifies the number of matching documents to skip.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Consider the following examples of the <a class="reference internal" href="../commands.html#count" title="count"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">count</span></tt></a> command:</p>
+<ul>
+<li><p class="first">Count the number of all documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="s1">&#39;orders&#39;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the result, the <tt class="docutils literal"><span class="pre">n</span></tt>, which represents the count, is <tt class="docutils literal"><span class="pre">26</span></tt>
+and the command status <tt class="docutils literal"><span class="pre">ok</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="mi">26</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Count the number of the documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection
+with the field <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/2012')</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span><span class="s1">&#39;orders&#39;</span><span class="p">,</span>
+                 <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/2012&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">}</span>
+               <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the result, the <tt class="docutils literal"><span class="pre">n</span></tt>, which represents the count, is <tt class="docutils literal"><span class="pre">13</span></tt>
+and the command status <tt class="docutils literal"><span class="pre">ok</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Count the number of the documents in the <tt class="docutils literal"><span class="pre">orders</span></tt> collection
+with the field <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Date('01/01/2012')</span></tt>
+skipping the first <tt class="docutils literal"><span class="pre">10</span></tt> matching records:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span><span class="s1">&#39;orders&#39;</span><span class="p">,</span>
+                 <span class="nx">query</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="s1">&#39;01/01/2012&#39;</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                 <span class="nx">skip</span><span class="o">:</span> <span class="mi">10</span> <span class="p">}</span>  <span class="p">)</span>
+</pre></div>
+</div>
+<p>In the result, the <tt class="docutils literal"><span class="pre">n</span></tt>, which represents the count, is <tt class="docutils literal"><span class="pre">3</span></tt> and
+the command status <tt class="docutils literal"><span class="pre">ok</span></tt> is <tt class="docutils literal"><span class="pre">1</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;n&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">MongoDB also provides the <a class="reference internal" href="../method/cursor.count.html#cursor.count" title="cursor.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">cursor.count()</span></tt></a>
+method and the shell wrapper <a class="reference internal" href="../method/db.collection.count.html#db.collection.count" title="db.collection.count"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.count()</span></tt></a>
+method.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="copydbgetnonce.html" title="Previous Section: copydbgetnonce (internal)">&lt; &nbsp; copydbgetnonce (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="create.html" title="Next Section: create">create &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

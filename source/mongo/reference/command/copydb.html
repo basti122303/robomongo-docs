@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>copydb &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/copydb" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="copydbgetnonce (internal)" href="copydbgetnonce.html" />
+<link rel="prev" title="convertToCapped" href="convertToCapped.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="copydb">
+<h1>copydb<a class="headerlink" href="#copydb" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">copydb</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> command copies a database from a remote
+host to the current host. The command has the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">copydb</span><span class="o">:</span> <span class="mi">1</span><span class="o">:</span>
+  <span class="nx">fromhost</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">hostname</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">fromdb</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">db</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">todb</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">db</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">slaveOk</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">bool</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">username</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">username</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">password</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">password</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">nonce</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">nonce</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">key</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">key</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>All of the following arguments are optional:</p>
+<ul class="simple">
+<li>slaveOk</li>
+<li>username</li>
+<li>password</li>
+<li>nonce</li>
+<li>key</li>
+</ul>
+<p>You can omit the <tt class="docutils literal"><span class="pre">fromhost</span></tt> argument, to copy one database to
+another database within a single MongoDB instance.</p>
+<p>You must run this command on the destination, or the <tt class="docutils literal"><span class="pre">todb</span></tt>
+server.</p>
+<p>Be aware of the following behaviors:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> can run against a <a class="reference internal" href="../glossary.html#term-slave"><em class="xref std std-term">slave</em></a> or a
+non-<a class="reference internal" href="../glossary.html#term-primary"><em class="xref std std-term">primary</em></a> member of a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. In this case,
+you must set the <tt class="docutils literal"><span class="pre">slaveOk</span></tt> option to <tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> does not snapshot the database. If the state
+of the database changes at any point during the operation, the
+resulting database may be inconsistent.</p>
+</li>
+<li><p class="first">You must run <a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> on the <strong>destination server</strong>.</p>
+</li>
+<li><p class="first">The destination server is not locked for the duration of the
+<a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> operation. This means that
+<a class="reference internal" href="../commands.html#copydb" title="copydb"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydb</span></tt></a> will occasionally yield to allow other
+operations to complete.</p>
+</li>
+<li><p class="first">If the remote server has authentication enabled, then you must
+include a username and password. You must also include a nonce
+and a key. The nonce is a one-time password that you request from
+the remote server using the <a class="reference internal" href="../commands.html#copydbgetnonce" title="copydbgetnonce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">copydbgetnonce</span></tt></a>
+command. The <tt class="docutils literal"><span class="pre">key</span></tt> is a hash generated as follows:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">hex_md5</span><span class="p">(</span><span class="nx">nonce</span> <span class="o">+</span> <span class="nx">username</span> <span class="o">+</span> <span class="nx">hex_md5</span><span class="p">(</span><span class="nx">username</span> <span class="o">+</span> <span class="s2">&quot;:mongo:&quot;</span> <span class="o">+</span> <span class="nx">pass</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>If you need to copy a database and authenticate, it&#8217;s easiest to use the
+shell helper:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">copyDatabase</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">remote_db_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">local_db_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">from_host_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">username</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="nx">password</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="convertToCapped.html" title="Previous Section: convertToCapped">&lt; &nbsp; convertToCapped</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="copydbgetnonce.html" title="Next Section: copydbgetnonce (internal)">copydbgetnonce (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

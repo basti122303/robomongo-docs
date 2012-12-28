@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Install MongoDB on OS X &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/install-mongodb-on-os-x" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Installing MongoDB" href="../installation.html" />
+<link rel="next" title="Install MongoDB on Windows" href="install-mongodb-on-windows.html" />
+<link rel="prev" title="Install MongoDB on Linux" href="install-mongodb-on-linux.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="install-mongodb-on-os-x">
+<h1>Install MongoDB on OS X<a class="headerlink" href="#install-mongodb-on-os-x" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial outlines the basic installation process for deploying
+<a class="reference internal" href="../reference/glossary.html#term-mongodb"><em class="xref std std-term">MongoDB</em></a> on Macintosh OS X systems. This tutorial provides two
+main methods of installing the MongoDB server
+(i.e. &#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>&#8221;) and associated tools: first using the
+community package management tools, and second using builds of MongoDB
+provided by 10gen.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The documentation of following related processes and
+concepts.</p>
+<p>Other installation tutorials:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="install-mongodb-on-red-hat-centos-or-fedora-linux.html"><em>Install MongoDB on Red Hat Enterprise, CentOS, or Fedora Linux</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-ubuntu.html"><em>Install MongoDB on Ubuntu</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-debian.html"><em>Install MongoDB on Debian</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-linux.html"><em>Install MongoDB on Linux</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-windows.html"><em>Install MongoDB on Windows</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="installing-with-package-management">
+<h2>Installing with Package Management<a class="headerlink" href="#installing-with-package-management" title="Permalink to this headline">¶</a></h2>
+<p>Both community package management tools: <a class="reference external" href="http://mxcl.github.com/homebrew/">Homebrew</a> and <a class="reference external" href="http://www.macports.org/">MacPorts</a> require some initial setup and
+configuration. This configuration is beyond the scope of this
+document. You only need to use one of these tools.</p>
+<p>If you want to use package management, and do not already have a
+system installed, Homebrew is typically easier and simpler to use.</p>
+<div class="section" id="id1">
+<h3>Homebrew<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Homebrew installs binary packages based on published &#8220;formula.&#8221; Issue
+the following command at the system shell to update the <tt class="docutils literal"><span class="pre">brew</span></tt>
+package manager:</p>
+<div class="highlight-sh"><div class="highlight"><pre>brew update
+</pre></div>
+</div>
+<p>Use the following command to install the MongoDB package into your
+Homebrew system.</p>
+<div class="highlight-sh"><div class="highlight"><pre>brew install mongodb
+</pre></div>
+</div>
+<p>Later, if you need to upgrade MongoDB, you can issue the following
+sequence of commands to update the MongoDB installation on your
+system:</p>
+<div class="highlight-sh"><div class="highlight"><pre>brew update
+brew upgrade mongodb
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>MacPorts<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>MacPorts distributes build scripts that allow you to easily build
+packages and their dependencies on your own system. The compilation
+process can take significant period of time depending on your system&#8217;s
+capabilities and existing dependencies. Issue the following command in
+the system shell:</p>
+<div class="highlight-sh"><div class="highlight"><pre>port install mongodb
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-mongodb-from-homebrew-and-macports">
+<h3>Using MongoDB from Homebrew and MacPorts<a class="headerlink" href="#using-mongodb-from-homebrew-and-macports" title="Permalink to this headline">¶</a></h3>
+<p>The packages installed with Homebrew and MacPorts contain no
+<a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control scripts</em></a> or interaction with the
+system&#8217;s process manager.</p>
+<p>If you have configured Homebrew and MacPorts correctly, including
+setting your <tt class="docutils literal"><span class="pre">PATH</span></tt>, the MongoDB applications and utilities will be
+accessible from the system shell. Start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process
+in a terminal (for testing or development) or using a process
+management tool.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod
+</pre></div>
+</div>
+<p>Then open the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell by issuing the
+following command at the system prompt:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo
+</pre></div>
+</div>
+<p>This will connect to the database running on the localhost interface
+by default. At the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> prompt, issue the following two
+commands to insert a record in the &#8220;test&#8221; <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> of the
+(default) &#8220;test&#8221; database and then retrieve that record.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>&#8221; and &#8220;<a class="reference internal" href="../reference/javascript.html"><em>JavaScript Interface</em></a>&#8220;</p>
+</div>
+</div>
+</div>
+<div class="section" id="installing-from-10gen-builds">
+<h2>Installing from 10gen Builds<a class="headerlink" href="#installing-from-10gen-builds" title="Permalink to this headline">¶</a></h2>
+<p>10gen provides compiled binaries of all MongoDB software compiled for
+OS X, which may provide a more straightforward installation process.</p>
+<div class="section" id="download-mongodb">
+<h3>Download MongoDB<a class="headerlink" href="#download-mongodb" title="Permalink to this headline">¶</a></h3>
+<p>In a terminal session, begin by downloading the latest release. Use
+the following command at the system prompt:</p>
+<div class="highlight-sh"><div class="highlight"><pre>curl http://downloads.mongodb.org/osx/mongodb-osx-x86_64-2.2.2.tgz &gt; mongo.tgz
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process will not run on older Macintosh computers
+with PowerPC (i.e. non-Intel) processors.</p>
+</div>
+<p>Once you&#8217;ve downloaded the release, issue the following command to
+extract the files from the archive:</p>
+<div class="highlight-sh"><div class="highlight"><pre>tar -zxvf mongo.tgz
+</pre></div>
+</div>
+<div class="admonition-optional admonition">
+<p class="first admonition-title">Optional</p>
+<p>You may use the following command to move the extracted folder into
+a more generic location.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mv -n mongodb-osx-<span class="o">[</span>platform<span class="o">]</span>-<span class="o">[</span>version<span class="o">]</span>/ /path/to/new/location/
+</pre></div>
+</div>
+<p class="last">Replace <tt class="docutils literal"><span class="pre">[platform]</span></tt> with <tt class="docutils literal"><span class="pre">i386</span></tt> or <tt class="docutils literal"><span class="pre">x86_64</span></tt> depending on
+your system and the version you downloaded, and <tt class="docutils literal"><span class="pre">[version]</span></tt> with
+2.2.2 or the version of MongoDB that you are installing.</p>
+</div>
+<p>You can find the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary, and the binaries all of the
+associated MongoDB utilities, in the <tt class="docutils literal"><span class="pre">bin/</span></tt> directory within the
+archive.</p>
+</div>
+<div class="section" id="using-mongodb-from-10gen-builds">
+<h3>Using MongoDB from 10gen Builds<a class="headerlink" href="#using-mongodb-from-10gen-builds" title="Permalink to this headline">¶</a></h3>
+<p>Before you start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> for the first time, you will need
+to create the data directory. By default, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> writes
+data to the <tt class="docutils literal"><span class="pre">/data/db/</span></tt> directory. To create this directory, and set
+the appropriate permissions use the following commands:</p>
+<div class="highlight-sh"><div class="highlight"><pre>sudo mkdir -p /data/db
+sudo chown <span class="sb">`</span>id -u<span class="sb">`</span> /data/db
+</pre></div>
+</div>
+<p>You can specify an alternate path for data files using the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--dbpath"><em class="xref std std-option">--dbpath</em></a> option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+<p>The 10gen builds of MongoDB contain no <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control scripts</em></a> or method to control the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process. You may
+wish to create control scripts, modify your path, and/or create
+symbolic links to the MongoDB programs in your <tt class="docutils literal"><span class="pre">/usr/local/bin</span></tt>
+directory for easier use.</p>
+<p>For testing purposes, you can start a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> directly in
+the terminal without creating a control script:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --config /etc/mongod.conf
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This command assumes that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> binary is
+accessible via your system&#8217;s search path, and that you have created
+a default configuration file located at <tt class="docutils literal"><span class="pre">/etc/mongod.conf</span></tt>.</p>
+</div>
+<p>Among the tools included with this MongoDB distribution, is the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. You can use this shell to connect to your
+MongoDB instance by issuing the following command at the system
+prompt from inside of the directory where you extracted <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>./bin/mongo
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">./bin/mongo</span></tt> command assumes that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+binary is in the <tt class="docutils literal"><span class="pre">bin/</span></tt> sub-directory of the current
+directory. This is the directory into which you extracted the
+<tt class="docutils literal"><span class="pre">.tgz</span></tt> file.</p>
+</div>
+<p>This will connect to the database running on the localhost interface
+by default. At the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> prompt, issue the following two
+commands to insert a record in the &#8220;test&#8221; <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> of the
+(default) &#8220;test&#8221; database and then retrieve that record:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>&#8221; and &#8220;<a class="reference internal" href="../reference/javascript.html"><em>JavaScript Interface</em></a>&#8220;</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="install-mongodb-on-linux.html" title="Previous Section: Install MongoDB on Linux">&lt; &nbsp; Install MongoDB on Linux</a></li>
+<li id="btnvup"><a href="../installation.html" title="Parent Section: Installing MongoDB" >&#47;&#92;&nbsp; Installing MongoDB</a></li>
+<li id="btnvnx"><a href="install-mongodb-on-windows.html" title="Next Section: Install MongoDB on Windows">Install MongoDB on Windows &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

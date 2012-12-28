@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>removeShard &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/removeShard" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="renameCollection" href="renameCollection.html" />
+<link rel="prev" title="recvChunkStatus (internal)" href="recvChunkStatus.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="removeshard">
+<h1>removeShard<a class="headerlink" href="#removeshard" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="removeShard">
+<tt class="descname">removeShard</tt><a class="headerlink" href="#removeShard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the process of removing a shard from a <a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">cluster</em></a>. This
+is a multi-stage process. Begin by issuing the following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">removeShard</span> <span class="o">:</span> <span class="s2">&quot;[shardName]&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The balancer will then migrating chunks from the shard specified by
+<tt class="docutils literal"><span class="pre">[shardName]</span></tt>. This process happens slowly to avoid placing
+undue load on the overall cluster.</p>
+<p>The command returns immediately, with the following message:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span> <span class="o">:</span> <span class="s2">&quot;draining started successfully&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;started&quot;</span> <span class="p">,</span> <span class="nx">shard</span><span class="o">:</span> <span class="s2">&quot;shardName&quot;</span> <span class="p">,</span> <span class="nx">ok</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>If you run the command again, you&#8217;ll see the following progress
+output:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">msg</span><span class="o">:</span> <span class="s2">&quot;draining ongoing&quot;</span> <span class="p">,</span> <span class="nx">state</span><span class="o">:</span> <span class="s2">&quot;ongoing&quot;</span> <span class="p">,</span> <span class="nx">remaining</span><span class="o">:</span> <span class="p">{</span> <span class="nx">chunks</span><span class="o">:</span> <span class="mi">23</span> <span class="p">,</span> <span class="nx">dbs</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="nx">ok</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">remaining</span></tt> <a class="reference internal" href="../glossary.html#term-document"><em class="xref std std-term">document</em></a> specifies how many chunks and
+databases remain on the shard. Use <a class="reference internal" href="../commands.html#printShardingStatus" title="printShardingStatus"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">printShardingStatus</span></tt></a>
+to list the databases that you must move from the shard.</p>
+<p>Each database in a sharded cluster has a primary shard. If the
+shard you want to remove is also the primary of one the cluster&#8217;s
+databases, then you must manually move the database to a new
+shard. This can be only after the shard is empty. See the
+<a class="reference internal" href="../commands.html#movePrimary" title="movePrimary"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">movePrimary</span></tt></a> command for details.</p>
+<p>After removing all chunks and databases from the shard, you
+may issue the command again, to return:</p>
+<div class="highlight-javascript"><pre>{ msg: "remove shard completed successfully , stage: "completed", host: "shardName", ok : 1 }</pre>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="recvChunkStatus.html" title="Previous Section: recvChunkStatus (internal)">&lt; &nbsp; recvChunkStatus (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="renameCollection.html" title="Next Section: renameCollection">renameCollection &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>2d Geospatial Indexes &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/core/geospatial-indexes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Indexes" href="../indexes.html" />
+<link rel="next" title="Application Development" href="../applications.html" />
+<link rel="prev" title="Geospatial Queries with 2d Indexes" href="../applications/geospatial-indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="d-geospatial-indexes">
+<h1><tt class="docutils literal"><span class="pre">2d</span></tt> Geospatial Indexes<a class="headerlink" href="#d-geospatial-indexes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">2d</span></tt> geospatial indexes support efficient queries using
+location-based data in a document, and special geospatial query
+operators. You can store two-dimensional location coordinates in
+documents and with a geospatial index on this field, construct
+location-based queries. For example, you can query for documents based
+on proximity to another location or based on inclusion in a specified
+region.</p>
+<p>Additionally, geospatial indexes support queries on both the
+coordinate field <em>and</em> another field. For example, you might write a
+query to find restaurants a specific distance from a hotel or to find
+museums found within a certain defined neighborhood.</p>
+<p>This document describes how to include location data in your documents
+and how to create geospatial indexes. For information on querying data
+stored in geospatial indexes, see <a class="reference internal" href="../applications/geospatial-indexes.html"><em>Geospatial Queries with 2d Indexes</em></a>.</p>
+</div>
+<div class="section" id="store-location-data">
+<span id="geospatial-indexes-coordinates"></span><h2>Store Location Data<a class="headerlink" href="#store-location-data" title="Permalink to this headline">¶</a></h2>
+<p>To use <tt class="docutils literal"><span class="pre">2d</span></tt> geospatial indexes, you must model location data on a
+predetermined two-dimensional coordinate system, such as longitude
+and latitude. You store location data as two-dimensional coordinates
+in a field that holds either a two-dimensional array or an embedded
+document.  Consider the following two examples:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">loc</span> <span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span>
+
+<span class="nx">loc</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">2</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>All documents must store location data in the same order; however, if
+you use latitude and longitude as your coordinate system, always store
+longitude first. MongoDB&#8217;s <a class="reference internal" href="../applications/geospatial-indexes.html#geospatial-indexes-spherical"><em>2d spherical index operators</em></a> only recognize <tt class="docutils literal"><span class="pre">[</span> <span class="pre">longitude,</span> <span class="pre">latitude</span>
+<span class="pre">]</span></tt> ordering.</p>
+</div>
+<div class="section" id="create-a-geospatial-index">
+<span id="geospatial-indexes-create"></span><h2>Create a Geospatial Index<a class="headerlink" href="#create-a-geospatial-index" title="Permalink to this headline">¶</a></h2>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">MongoDB only supports <em>one</em> geospatial index per
+collection.</p>
+</div>
+<p>To create a geospatial index, use the <a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex</span></tt></a> method with the value <tt class="docutils literal"><span class="pre">2d</span></tt> for the
+location field of your collection. Consider the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;</span> <span class="o">:</span> <span class="s2">&quot;2d&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB&#8217;s special <a class="reference internal" href="../reference/operators.html#geospatial-query-operators"><em>geospatial operations</em></a> use this index when querying for location
+data.</p>
+<p>When you create the index, MongoDB converts location data to binary
+<a class="reference internal" href="../reference/glossary.html#term-geohash"><em class="xref std std-term">geohash</em></a> values, and calculates these values using the location
+data and the index&#8217;s location range, as described in
+<a class="reference internal" href="#geospatial-indexes-range"><em>Location Range</em></a>. The default range for <tt class="docutils literal"><span class="pre">2d</span></tt> indexes
+assumes longitude and latitude and uses the bounds -180 inclusive and
+180 non-inclusive.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">The default boundaries of <tt class="docutils literal"><span class="pre">2d</span></tt> indexes allow
+applications to insert documents with invalid latitudes greater
+than 90 or less than -90. The behavior of geospatial queries with
+such invalid points is not defined.</p>
+</div>
+<p>When creating a <tt class="docutils literal"><span class="pre">2d</span></tt> index, MongoDB provides the following options:</p>
+<div class="section" id="location-range">
+<span id="geospatial-indexes-range"></span><h3>Location Range<a class="headerlink" href="#location-range" title="Permalink to this headline">¶</a></h3>
+<p>All <tt class="docutils literal"><span class="pre">2d</span></tt> geospatial indexes have boundaries defined by a coordinate
+range. By default, <tt class="docutils literal"><span class="pre">2s</span></tt> geospatial indexes assume longitude and
+latitude have boundaries of -180 inclusive and 180 non-inclusive
+(i.e. <tt class="docutils literal"><span class="pre">[-180,</span> <span class="pre">180)</span></tt>). MongoDB returns an error and rejects documents
+with coordinate data outside of the specified range.</p>
+<p>To build an index with a different location range other than the
+default, use the <tt class="docutils literal"><span class="pre">min</span></tt> and <tt class="docutils literal"><span class="pre">max</span></tt> options with the
+<a class="reference internal" href="../reference/method/db.collection.ensureIndex.html#db.collection.ensureIndex" title="db.collection.ensureIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt></a> operation when
+creating a <tt class="docutils literal"><span class="pre">2d</span></tt> index, as in the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="s2">&quot;2d&quot;</span> <span class="p">}</span> <span class="p">,</span>
+                           <span class="p">{</span> <span class="nx">min</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">lower</span> <span class="nx">bound</span><span class="o">&gt;</span> <span class="p">,</span> <span class="nx">max</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">upper</span> <span class="nx">bound</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="location-precision">
+<span id="geospatial-indexes-precision"></span><h3>Location Precision<a class="headerlink" href="#location-precision" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">2d</span></tt> indexes use a <a class="reference internal" href="#geospatial-indexes-geohash"><em>geohash</em></a>
+representation of all coordinate data internally. Geohashes have a
+precision, determined by the number of bits in the hash. More bits
+allow the index to provide results with greater precision, while fewer
+bits only the index to provide results with more limited
+precision.</p>
+<p>Indexes with lower percussion have a lower processing overhead for
+insert operations and will consume less space; however, higher
+precision indexes means that queries will need to scan smaller
+portions of the index to return results. The actual stored values are
+always used in the final query processing, and index precision does
+not affect query accuracy.</p>
+<p>By default, geospatial indexes use 26 bits of precision, which is
+roughly equivalent to 2 feet or about 60 centimeters of precision
+using the default range of -180 to 180. You can configure <tt class="docutils literal"><span class="pre">2d</span></tt>
+geospatial indexes with up to 32 bits of precision.</p>
+<p>To configure a location precision other than the default, use the
+<tt class="docutils literal"><span class="pre">bits</span></tt> option in the <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt> method, as in the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span><span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="s2">&quot;2d&quot;</span><span class="p">}</span> <span class="p">,</span>
+                           <span class="p">{</span> <span class="nx">bits</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">bit</span> <span class="nx">precision</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For more information on the relationship between bits and precision,
+see <a class="reference internal" href="#geospatial-indexes-geohash"><em>Geohash Values</em></a>.</p>
+</div>
+<div class="section" id="compound-geospatial-indexes">
+<h3>Compound Geospatial Indexes<a class="headerlink" href="#compound-geospatial-indexes" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">2d</span></tt> geospatial indexes may be <a class="reference internal" href="indexes.html#index-type-compound"><em>compound</em></a>, if an only if the field with location data is
+the first field. A compound geospatial index makes it possible to
+construct queries that primarily select on a location-based field, but
+also select on a second criteria. For example, you could use this kind
+of index to support queries for carpet wholesalers within a specific
+region.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Geospatial queries will <em>only</em> use additional query
+parameters after applying the geospatial criteria. If your
+geospatial query criteria queries select a large number of
+documents, the additional query will only filter the result set,
+and <em>not</em> result in a more targeted query.</p>
+</div>
+<p>To create a geospatial index with two fields, specify the location field
+first, then the second field. For example, to create a compound index on
+the <tt class="docutils literal"><span class="pre">loc</span></tt> location field and on the <tt class="docutils literal"><span class="pre">product</span></tt> field (sorted in
+ascending order), you would issue the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">storeInfo</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">loc</span><span class="o">:</span> <span class="s2">&quot;2d&quot;</span><span class="p">,</span> <span class="nx">product</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>This creates an index that supports queries on the just location field
+(i.e. <tt class="docutils literal"><span class="pre">loc</span></tt>), as well as queries on both the <tt class="docutils literal"><span class="pre">loc</span></tt> and
+<tt class="docutils literal"><span class="pre">product</span></tt>.</p>
+</div>
+<div class="section" id="haystack-indexes">
+<span id="geospatial-indexes-haystack-index"></span><h3>Haystack Indexes<a class="headerlink" href="#haystack-indexes" title="Permalink to this headline">¶</a></h3>
+<p>Haystack indexes create &#8220;buckets&#8221; of documents from the same geographic
+area in order to improve performance for queries limited to that area.</p>
+<p>Each bucket in a haystack index contains all the documents within a
+specified proximity to a given longitude and latitude. Use the
+<tt class="docutils literal"><span class="pre">bucketSize</span></tt> parameter of <tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt> to determine proximity. A <tt class="docutils literal"><span class="pre">bucketSize</span></tt>
+of <tt class="docutils literal"><span class="pre">5</span></tt> creates an index that groups location values that are within
+5 units of the specified longitude and latitude.</p>
+<p><tt class="docutils literal"><span class="pre">bucketSize</span></tt> also determines the granularity of the index. You can
+tune the parameter to the distribution of your data so that in general
+you search only very small regions of a two-dimensional
+space. Furthermore, the areas defined by buckets can overlap: as a
+result a document can exist in multiple buckets.</p>
+<p>To build a haystack index, use the <tt class="docutils literal"><span class="pre">bucketSize</span></tt> parameter in the
+<tt class="xref mongodb mongodb-method docutils literal"><span class="pre">ensureIndex()</span></tt> method, as in the
+following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">({</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="s2">&quot;geoHaystack&quot;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+                          <span class="p">{</span> <span class="nx">bucketSize</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">bucket</span> <span class="nx">value</span><span class="o">&gt;</span> <span class="p">})</span>
+</pre></div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Consider a collection with documents that contain fields similar to
+the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">100</span><span class="p">,</span> <span class="nx">pos</span><span class="o">:</span> <span class="p">{</span> <span class="kr">long</span> <span class="o">:</span> <span class="mf">126.9</span><span class="p">,</span> <span class="nx">lat</span> <span class="o">:</span> <span class="mf">35.2</span> <span class="p">},</span> <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;restaurant&quot;</span><span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nx">pos</span><span class="o">:</span> <span class="p">{</span> <span class="kr">long</span> <span class="o">:</span> <span class="mf">127.5</span><span class="p">,</span> <span class="nx">lat</span> <span class="o">:</span> <span class="mf">36.1</span> <span class="p">},</span> <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;restaurant&quot;</span><span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="mi">300</span><span class="p">,</span> <span class="nx">pos</span><span class="o">:</span> <span class="p">{</span> <span class="kr">long</span> <span class="o">:</span> <span class="mf">128.0</span><span class="p">,</span> <span class="nx">lat</span> <span class="o">:</span> <span class="mf">36.7</span> <span class="p">},</span> <span class="nx">type</span> <span class="o">:</span> <span class="s2">&quot;national park&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The following operations creates a haystack index with buckets that
+store keys within 1 unit of longitude or latitude.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">pos</span> <span class="o">:</span> <span class="s2">&quot;geoHaystack&quot;</span><span class="p">,</span> <span class="nx">type</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">bucketSize</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Therefore, this index stores the document with an <tt class="docutils literal"><span class="pre">_id</span></tt> field
+that has the value <tt class="docutils literal"><span class="pre">200</span></tt> in two
+different buckets:</p>
+<ol class="last arabic simple">
+<li>in a bucket that includes the document  where the <tt class="docutils literal"><span class="pre">_id</span></tt> field
+has a value of <tt class="docutils literal"><span class="pre">100</span></tt>, and</li>
+<li>in a bucket that includes the document where the <tt class="docutils literal"><span class="pre">_id</span></tt> field
+has a value of <tt class="docutils literal"><span class="pre">300</span></tt>.</li>
+</ol>
+</div>
+<p>To query using a haystack index you use the <a class="reference internal" href="../reference/commands.html#geoSearch" title="geoSearch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoSearch</span></tt></a>
+command. For command details, see <a class="reference internal" href="../applications/geospatial-indexes.html#geospatial-indexes-haystack-queries"><em>Querying Haystack Indexes</em></a>.</p>
+<p>Haystack indexes are ideal for returning documents based on location
+<em>and</em> an exact match on a <em>single</em> additional criteria. These indexes
+are not necessarily suited to returning the closest documents to a
+particular location.</p>
+<p><a class="reference internal" href="../applications/geospatial-indexes.html#geospatial-indexes-spherical"><em>Spherical queries</em></a> are not
+supported by geospatial haystack indexes.</p>
+<p>By default, queries that use a haystack index return 50 documents.</p>
+</div>
+</div>
+<div class="section" id="distance-calculation">
+<span id="geospatial-indexes-distance-calculation"></span><h2>Distance Calculation<a class="headerlink" href="#distance-calculation" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB performs distance calculations before performing <tt class="docutils literal"><span class="pre">2d</span></tt>
+geospatial queries. By default, MongoDB uses flat geometry to
+calculate distances between points. MongoDB also supports distance
+calculations using spherical geometry, to provide accurate distances
+for geospatial information based on a sphere or earth.</p>
+<div class="admonition-spherical-queries-use-radians-for-distance admonition">
+<p class="first admonition-title">Spherical Queries Use Radians for Distance</p>
+<p>For spherical operators to function properly, you must convert
+distances to radians, and convert from radians to distances units
+for your application.</p>
+<p>To convert:</p>
+<ul class="simple">
+<li><em>distance to radians</em>: divide the distance by the radius of the
+sphere (e.g. the Earth) in the same units as the distance
+measurement.</li>
+<li><em>radians to distance</em>: multiply the rad ian measure by the radius
+of the sphere (e.g. the Earth) in the units system that you want to
+convert the distance to.</li>
+</ul>
+<p class="last">The radius of the Earth is approximately <tt class="docutils literal"><span class="pre">3963.192</span></tt> miles or
+<tt class="docutils literal"><span class="pre">6378.137</span></tt> kilometers.</p>
+</div>
+<p>The following query would return documents from the <tt class="docutils literal"><span class="pre">places</span></tt>
+collection, within the circle described by the center <tt class="docutils literal"><span class="pre">[</span> <span class="pre">-74,</span> <span class="pre">40.74</span> <span class="pre">]</span></tt>
+with a radius of <tt class="docutils literal"><span class="pre">100</span></tt> miles:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">loc</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$centerSphere</span><span class="o">:</span> <span class="p">[</span> <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span> <span class="p">]</span> <span class="p">,</span>
+                                        <span class="mi">100</span> <span class="o">/</span> <span class="mf">3963.192</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You may also use the <tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt> option to the
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> to convert radians in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+process, rather than in your application code. Please see the
+<a class="reference internal" href="../applications/geospatial-indexes.html#geospatial-indexes-distance-multiplier"><em>distance multiplier</em></a> section.</p>
+<p>The following spherical <tt class="docutils literal"><span class="pre">2d</span></tt> query, returns all documents in the
+collection <tt class="docutils literal"><span class="pre">places</span></tt> within <tt class="docutils literal"><span class="pre">100</span></tt> miles from the point <tt class="docutils literal"><span class="pre">[</span> <span class="pre">-74,</span>
+<span class="pre">40.74</span> <span class="pre">]</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;places&quot;</span><span class="p">,</span>
+                 <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span> <span class="p">],</span>
+                 <span class="nx">spherical</span><span class="o">:</span> <span class="kc">true</span>
+               <span class="p">}</span>  <span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of the above command would be:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="c1">// [ ... ]</span>
+   <span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+         <span class="s2">&quot;dis&quot;</span> <span class="o">:</span> <span class="mf">0.01853688938212826</span><span class="p">,</span>
+         <span class="s2">&quot;obj&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span> <span class="p">...</span> <span class="p">)</span>
+            <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="o">-</span><span class="mi">73</span><span class="p">,</span>
+               <span class="mi">40</span>
+            <span class="p">]</span>
+         <span class="p">}</span>
+      <span class="p">}</span>
+   <span class="p">],</span>
+   <span class="s2">&quot;stats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="c1">// [ ... ]</span>
+      <span class="s2">&quot;avgDistance&quot;</span> <span class="o">:</span> <span class="mf">0.01853688938212826</span><span class="p">,</span>
+      <span class="s2">&quot;maxDistance&quot;</span> <span class="o">:</span> <span class="mf">0.01853714811400047</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Spherical queries that wrap around the poles or at the transition
+from <tt class="docutils literal"><span class="pre">-180</span></tt> to <tt class="docutils literal"><span class="pre">180</span></tt> longitude raise an error.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While the default Earth-like bounds for geospatial indexes are
+between <tt class="docutils literal"><span class="pre">-180</span></tt> inclusive, and <tt class="docutils literal"><span class="pre">180</span></tt>, valid values for latitude
+are between <tt class="docutils literal"><span class="pre">-90</span></tt> and <tt class="docutils literal"><span class="pre">90</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="geohash-values">
+<span id="geospatial-indexes-geohash"></span><h2>Geohash Values<a class="headerlink" href="#geohash-values" title="Permalink to this headline">¶</a></h2>
+<p>To create a geospatial index, MongoDB computes the <a class="reference internal" href="../reference/glossary.html#term-geohash"><em class="xref std std-term">geohash</em></a>
+value for coordinate pairs within the specified <a class="reference internal" href="#geospatial-indexes-range"><em>range</em></a>, and indexes the geohash for that point .</p>
+<p>To calculate a geohash value, continuously divide a 2D map into
+quadrants. Then, assign each quadrant a two-bit value. For example, a
+two-bit representation of four quadrants would be:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="mi">01</span>  <span class="mi">11</span>
+
+<span class="mi">00</span>  <span class="mi">10</span>
+</pre></div>
+</div>
+<p>These two bit values, <tt class="docutils literal"><span class="pre">00</span></tt>, <tt class="docutils literal"><span class="pre">01</span></tt>, <tt class="docutils literal"><span class="pre">10</span></tt>, and <tt class="docutils literal"><span class="pre">11</span></tt>, represent each
+of the quadrants and all points within each quadrant. For a geohash with
+two bits of resolution, all points in the bottom left quadrant would
+have a geohash of <tt class="docutils literal"><span class="pre">00</span></tt>. The top left quadrant would have the geohash
+of <tt class="docutils literal"><span class="pre">01</span></tt>. The bottom right and top right would have a geohash of <tt class="docutils literal"><span class="pre">10</span></tt>
+and <tt class="docutils literal"><span class="pre">11</span></tt>, respectively.</p>
+<p>To provide additional precision, continue dividing each quadrant into
+sub-quadrants. Each sub-quadrant would have the geohash value of the
+containing quadrant concatenated with the value of the sub-quadrant. The
+geohash for the upper-right quadrant is <tt class="docutils literal"><span class="pre">11</span></tt>, and the geohash for the
+sub-quadrants would be (clockwise from the top left): <tt class="docutils literal"><span class="pre">1101</span></tt>,
+<tt class="docutils literal"><span class="pre">1111</span></tt>, <tt class="docutils literal"><span class="pre">1110</span></tt>, and <tt class="docutils literal"><span class="pre">1100</span></tt>, respectively.</p>
+<p>To calculate a more precise geohash, continue dividing the sub-quadrant
+and concatenate the two-bit identifier for each division. The more
+&#8220;bits&#8221; in the hash identifier for a given point, the smaller possible
+area that the hash can describe and the higher the resolution of the
+geospatial index.</p>
+</div>
+<div class="section" id="geospatial-indexes-and-sharding">
+<h2>Geospatial Indexes and Sharding<a class="headerlink" href="#geospatial-indexes-and-sharding" title="Permalink to this headline">¶</a></h2>
+<p>You <em>cannot</em> use a geospatial index as a <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> when
+sharding a collection. However, you <em>can</em> create and maintain a
+geospatial index on a sharded collection, using a different field as
+the shard key. Your application may query for geospatial data using
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> and <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a>; however, queries using
+<a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> are not supported for sharded collections.</p>
+</div>
+<div class="section" id="multi-location-documents">
+<span id="geospatial-indexes-multi-location"></span><h2>Multi-location Documents<a class="headerlink" href="#multi-location-documents" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 2.0: </span>Support for multiple locations in a document.</p>
+<p>While <tt class="docutils literal"><span class="pre">2d</span></tt> indexes do not support more than one set of coordinates in
+a document you can use a <a class="reference internal" href="indexes.html#index-type-multi-key"><em>multi-key indexes</em></a>,
+to store and index multiple coordinate pairs in a single document. In the
+simplest example, you may have a field (e.g. <tt class="docutils literal"><span class="pre">locs</span></tt>) that holds an
+array of coordinates, as in the following prototype data
+model:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+ <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(...),</span>
+ <span class="s2">&quot;locs&quot;</span><span class="o">:</span> <span class="p">[</span>
+           <span class="p">[</span> <span class="mf">55.5</span><span class="p">,</span> <span class="mf">42.3</span> <span class="p">],</span>
+           <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">44.74</span> <span class="p">],</span>
+           <span class="p">{</span> <span class="s2">&quot;lat&quot;</span><span class="o">:</span> <span class="mf">55.3</span><span class="p">,</span> <span class="s2">&quot;long&quot;</span><span class="o">:</span> <span class="mf">40.2</span> <span class="p">}</span>
+         <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The values of the array may either be arrays holding coordinates, as
+in <tt class="docutils literal"><span class="pre">[</span> <span class="pre">55.5,</span> <span class="pre">42.3</span> <span class="pre">]</span></tt> or embedded documents as in <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;lat&quot;:</span> <span class="pre">55.3,</span>
+<span class="pre">&quot;long&quot;:</span> <span class="pre">40.2</span> <span class="pre">}</span></tt>.</p>
+<p>You could then create a geospatial index on the <tt class="docutils literal"><span class="pre">locs</span></tt> field, as in
+the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;locs&quot;</span><span class="o">:</span> <span class="s2">&quot;2d&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>You may also model the location data as a field inside of a
+sub-document. In this case, the document would contain field
+(e.g. <tt class="docutils literal"><span class="pre">addresses</span></tt>) that held an array of documents where each
+document has a field (e.g. <tt class="docutils literal"><span class="pre">loc:</span></tt>) that holds location
+coordinates. Consider the following prototype data model:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+ <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(...),</span>
+ <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;addresses&quot;</span><span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                 <span class="s2">&quot;context&quot;</span><span class="o">:</span> <span class="s2">&quot;home&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="mf">55.5</span><span class="p">,</span> <span class="mf">42.3</span> <span class="p">]</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                 <span class="s2">&quot;context&quot;</span><span class="o">:</span> <span class="s2">&quot;home&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">44.74</span> <span class="p">]</span>
+                <span class="p">}</span>
+              <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Then, create the geospatial index on the <tt class="docutils literal"><span class="pre">addresses.loc</span></tt> field as
+in the following example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">records</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;addresses.loc&quot;</span><span class="o">:</span> <span class="s2">&quot;2d&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For documents with multiple coordinate values, queries may return the
+same document multiple times, if more than one indexed coordinate pair
+satisfies the query constraints. Use the <tt class="docutils literal"><span class="pre">uniqueDocs</span></tt> parameter to
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> or the <a class="reference internal" href="../reference/operators.html#_S_uniqueDocs" title="$uniqueDocs"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$uniqueDocs</span></tt></a> operator in
+conjunction with <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a>.</p>
+<p>To include the location field with the distance field in
+multi-location document queries, specify <tt class="docutils literal"><span class="pre">includeLocs:</span> <span class="pre">true</span></tt>
+in the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../applications/geospatial-indexes.html" title="Previous Section: Geospatial Queries with 2d Indexes">&lt; &nbsp; Geospatial Queries with 2d Indexes</a></li>
+<li id="btnvup"><a href="../indexes.html" title="Parent Section: Indexes" >&#47;&#92;&nbsp; Indexes</a></li>
+<li id="btnvnx"><a href="../applications.html" title="Next Section: Application Development">Application Development &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>compact &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/compact" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="connPoolStats" href="connPoolStats.html" />
+<link rel="prev" title="collStats" href="collStats.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="compact">
+<h1>compact<a class="headerlink" href="#compact" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">compact</tt></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.0.</span></p>
+<p>The <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command rewrites and defragments a single
+collection. Additionally, the command drops all indexes at the
+beginning of compaction and rebuilds the indexes at the end.
+<a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> is conceptually similar to
+<a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>, but works on a single collection rather
+than an entire database.</p>
+<p>The command has the following syntax:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">compact</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection</span> <span class="nx">name</span><span class="o">&gt;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>You may also specify the following options:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>force</strong> &#8211; <p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> blocks activities only
+for the database it is compacting.</p>
+<p>The <tt class="docutils literal"><span class="pre">force</span></tt> specifies whether the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command
+can run on the primary node in a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. Set to
+<tt class="docutils literal"><span class="pre">true</span></tt> to run the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command on the primary
+node in a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. Otherwise, the
+<a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command returns an error when invoked on a
+<a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> primary because the command blocks all other
+activity.</p>
+</li>
+<li><strong>paddingFactor</strong> &#8211; <p class="versionadded">
+<span class="versionmodified">New in version v2.2.</span></p>
+<p><em>Default:</em> <tt class="docutils literal"><span class="pre">1.0</span></tt></p>
+<p><em>Minimum:</em> <tt class="docutils literal"><span class="pre">1.0</span></tt> (no padding.)</p>
+<p><em>Maximum:</em> <tt class="docutils literal"><span class="pre">4.0</span></tt></p>
+<p>The <tt class="docutils literal"><span class="pre">paddingFactor</span></tt> describes the <a class="reference internal" href="../glossary.html#term-record-size"><em class="xref std std-term">record size</em></a>
+allocated for each document as a factor of the document
+size. If your updates increase the size of the documents,
+padding will increase the amount of space allocated to each
+document and avoid expensive document relocation operations
+within the data files.</p>
+<p>You can calculate the padding size by subtracting the document
+size from the record size or, in terms of the <tt class="docutils literal"><span class="pre">paddingFactor</span></tt>,
+by subtracting <tt class="docutils literal"><span class="pre">1</span></tt> from the <tt class="docutils literal"><span class="pre">paddingFactor</span></tt>:</p>
+<div class="highlight-none"><div class="highlight"><pre>padding size = (paddingFactor - 1) * &lt;document size&gt;.
+</pre></div>
+</div>
+<p>For example, a <tt class="docutils literal"><span class="pre">paddingFactor</span></tt> of <tt class="docutils literal"><span class="pre">1.0</span></tt> specifies a
+padding size of <tt class="docutils literal"><span class="pre">0</span></tt> whereas a <tt class="docutils literal"><span class="pre">paddingFactor</span></tt> of <tt class="docutils literal"><span class="pre">1.2</span></tt>
+specifies a padding size of <tt class="docutils literal"><span class="pre">0.2</span></tt> or 20 percent (20%) of
+the document size.</p>
+<p>With the following command, you can use the
+<tt class="docutils literal"><span class="pre">paddingFactor</span></tt> option of the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command
+to set the record size to <tt class="docutils literal"><span class="pre">1.1</span></tt> of the document size, or a
+padding factor of 10 percent (10%):</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span> <span class="p">(</span> <span class="p">{</span> <span class="nx">compact</span><span class="o">:</span> <span class="s1">&#39;&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="nx">paddingFactor</span><span class="o">:</span> <span class="mf">1.1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><strong>paddingBytes</strong> &#8211; <p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>The <tt class="docutils literal"><span class="pre">paddingBytes</span></tt> sets the padding as an absolute number
+of bytes. Specifying <tt class="docutils literal"><span class="pre">paddingBytes</span></tt> can be useful if your
+documents start small but then increase in size
+significantly.  For example,if your documents are initially
+40 bytes long and you grow them by 1KB, using
+<tt class="docutils literal"><span class="pre">paddingBytes:</span> <span class="pre">1024</span></tt> might be reasonable since using
+<tt class="docutils literal"><span class="pre">paddingFactor:</span> <span class="pre">4.0</span></tt> would specify a record size of 160
+bytes (<tt class="docutils literal"><span class="pre">4.0</span></tt> times the initial document size), which would
+only provide a padding of 120 bytes (i.e.  record size of
+160 bytes minus the document size).</p>
+<p>With the following command, you can use the <tt class="docutils literal"><span class="pre">paddingBytes</span></tt>
+option of the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command to set the
+padding size to <tt class="docutils literal"><span class="pre">100</span></tt> bytes on the collection named by
+<tt class="docutils literal"><span class="pre">&lt;collection&gt;</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span> <span class="p">(</span> <span class="p">{</span> <span class="nx">compact</span><span class="o">:</span> <span class="s1">&#39;&lt;collection&gt;&#39;</span><span class="p">,</span> <span class="nx">paddingBytes</span><span class="o">:</span> <span class="mi">100</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Always have an up-to-date backup before performing
+server maintenance such as the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> operation.</p>
+</div>
+<p>Note the following behaviors:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> blocks all other activity. In MongoDB 2.2,
+<a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> blocks activities only for its database. You
+may view the intermediate progress either by viewing the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> log file, or by running the
+<a class="reference internal" href="../method/db.currentOp.html#db.currentOp" title="db.currentOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.currentOp()</span></tt></a> in another shell instance.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> removes any <a class="reference internal" href="../glossary.html#term-padding-factor"><em class="xref std std-term">padding factor</em></a> in the
+collection when issued without either the
+<tt class="docutils literal"><span class="pre">paddingFactor</span></tt> option or the <tt class="docutils literal"><span class="pre">paddingBytes</span></tt> option. This may
+impact performance if the documents grow regularly. However,
+<a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> retains
+existing paddingFactor statistics for the collection that MongoDB
+will use to calculate the padding factor for future inserts.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> generally uses less disk space than
+<a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> and is faster. However,the
+<a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> command is still slow and does block other
+database use. Only use <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> during scheduled
+maintenance periods.</p>
+</li>
+<li><p class="first">If you terminate the operation with the
+<a class="reference internal" href="../method/db.killOp.html#db.killOp" title="db.killOp"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.killOp()</span></tt></a> method or restart the
+server before it has finished:</p>
+<ul class="simple">
+<li>If you have journaling enabled, the data remains consistent and
+usable, regardless of the state of the <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a>
+operation. You may have to manually rebuild the indexes.</li>
+<li>If you do not have journaling enabled and the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+or <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> terminates during the operation, it&#8217;s
+impossible to guarantee that the data is in a consistent
+state.</li>
+<li>In either case, much of the existing free space in the
+collection may become un-reusable. In this scenario, you should
+rerun the compaction to completion to restore the use of this free
+space.</li>
+</ul>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> may increase the total size and number of our
+data files, especially when run for the first time. However, this
+will not increase the total collection storage space since storage
+size is the amount of data allocated within the database files,
+and not the size/number of the files on the file system.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> requires a small amount of additional disk
+space while running but unlike <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> it does
+<em>not</em> free space on the file system.</p>
+</li>
+<li><p class="first">You may also wish to run the <a class="reference internal" href="../commands.html#collStats" title="collStats"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">collStats</span></tt></a> command before and
+after compaction to see how the storage space changes for the
+collection.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> commands do not replicate to secondaries in
+a <a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>:</p>
+<ul>
+<li><p class="first">Compact each member separately.</p>
+</li>
+<li><p class="first">Ideally, compaction runs on a secondary. See option
+<tt class="docutils literal"><span class="pre">force:true</span></tt> above for information regarding compacting the
+primary.</p>
+</li>
+<li><p class="first">If you run <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> on a secondary, the secondary
+will enter a &#8220;recovering&#8221; state to prevent clients from
+sending read operations during compaction. Once the compaction
+finishes the secondary will automatically return to secondary
+state.</p>
+<p>You may refer to the &#8220;<a class="reference external" href="https://github.com/mongodb/mongo-snippets/blob/master/js/compact-example.js">partial script for automating step down
+and compaction</a>&#8221;)
+for an example.</p>
+</li>
+</ul>
+</li>
+<li><p class="first"><a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> is a command issued to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.
+In a sharded environment, run <a class="reference internal" href="../commands.html#compact" title="compact"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">compact</span></tt></a> on each shard
+separately as a maintenance operation.</p>
+</li>
+<li><p class="first">It is not possible to compact <a class="reference internal" href="../glossary.html#term-capped-collection"><em class="xref std std-term">capped collections</em></a> because they don&#8217;t have padding, and documents cannot
+grow in these collections. However, the documents of a
+<a class="reference internal" href="../glossary.html#term-capped-collection"><em class="xref std std-term">capped collections</em></a> are not subject to
+fragmentation.</p>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a></p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="collStats.html" title="Previous Section: collStats">&lt; &nbsp; collStats</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="connPoolStats.html" title="Next Section: connPoolStats">connPoolStats &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

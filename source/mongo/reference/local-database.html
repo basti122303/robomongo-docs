@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>The local Database &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/local-database" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="System Collections" href="system-collections.html" />
+<link rel="prev" title="Config Database Contents" href="config-database.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="the-local-database">
+<span id="replica-set-local-database"></span><h1>The <tt class="docutils literal"><span class="pre">local</span></tt> Database<a class="headerlink" href="#the-local-database" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><div class="section" id="overview">
+<span id="index-3"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Every <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance has its own <tt class="docutils literal"><span class="pre">local</span></tt> database, which
+stores data used in the replication process, and other
+instance-specific data. The <tt class="docutils literal"><span class="pre">local</span></tt> database is invisible to
+replication: collections in the <tt class="docutils literal"><span class="pre">local</span></tt> database are not replicated.</p>
+<p>When running with authentication (i.e. <a class="reference internal" href="configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>), authenticating against the <tt class="docutils literal"><span class="pre">local</span></tt>
+database is equivalent to authenticating against the <tt class="docutils literal"><span class="pre">admin</span></tt>
+database. This authentication gives access to all databases.</p>
+<p>In replication, the <tt class="docutils literal"><span class="pre">local</span></tt> database store stores internal replication
+data for each member of a <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>. The <tt class="docutils literal"><span class="pre">local</span></tt> database contains the
+following collections used for replication:</p>
+</div>
+<div class="section" id="collections-on-replica-set-members">
+<h2>Collections on Replica Set Members<a class="headerlink" href="#collections-on-replica-set-members" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="local.system.replset">
+<tt class="descclassname">local.system.</tt><tt class="descname">replset</tt><a class="headerlink" href="#local.system.replset" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#local.system.replset" title="local.system.replset"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.system.replset</span></tt></a> holds the replica set&#8217;s configuration
+object as its single document. To view the object&#8217;s configuration
+information, issue <a class="reference internal" href="replica-commands.html#rs.conf" title="rs.conf"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">rs.conf()</span></tt></a> from the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>
+shell. You can also query this collection directly.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="local.oplog.rs">
+<tt class="descclassname">local.oplog.</tt><tt class="descname">rs</tt><a class="headerlink" href="#local.oplog.rs" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#local.oplog.rs" title="local.oplog.rs"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">local.oplog.rs</span></tt></a> is the capped collection that holds the
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. You set its size at creation using the
+<a class="reference internal" href="configuration-options.html#oplogSize" title="oplogSize"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">oplogSize</span></tt></a> setting. To resize the oplog after replica set
+initiation, use the <a class="reference internal" href="../tutorial/change-oplog-size.html"><em>Change the Size of the Oplog</em></a>
+procedure. For additional information, see the
+<a class="reference internal" href="../core/replication-internals.html#replica-set-internals-oplog"><em>Oplog Internals</em></a> topic in this document and the
+<a class="reference internal" href="../core/replication.html#replica-set-oplog-sizing"><em>Oplog</em></a> topic in the
+<a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a> document.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="local.replset.minvalid">
+<tt class="descclassname">local.replset.</tt><tt class="descname">minvalid</tt><a class="headerlink" href="#local.replset.minvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>This contains an object used internally by replica sets to track sync
+status.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="local.slaves">
+<tt class="descclassname">local.</tt><tt class="descname">slaves</tt><a class="headerlink" href="#local.slaves" title="Permalink to this definition">¶</a></dt>
+<dd><p>This contains information about each member of the set.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="collections-used-in-master-slave-replication">
+<h2>Collections used in Master/Slave Replication<a class="headerlink" href="#collections-used-in-master-slave-replication" title="Permalink to this headline">¶</a></h2>
+<p>In <a class="reference internal" href="glossary.html#term-master"><em class="xref std std-term">master</em></a>/<a class="reference internal" href="glossary.html#term-slave"><em class="xref std std-term">slave</em></a> replication, the <tt class="docutils literal"><span class="pre">local</span></tt> database contains
+the following collections:</p>
+<ul>
+<li><p class="first">On the master:</p>
+<dl class="data">
+<dt id="local.oplog._S_main">
+<tt class="descclassname">local.oplog.</tt><tt class="descname">$main</tt><a class="headerlink" href="#local.oplog._S_main" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the oplog for the master-slave configuration.</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descclassname">local.</tt><tt class="descname">slaves</tt></dt>
+<dd><p>This contains information about each slave.</p>
+</dd></dl>
+
+</li>
+<li><p class="first">On each slave:</p>
+<dl class="data">
+<dt id="local.sources">
+<tt class="descclassname">local.</tt><tt class="descname">sources</tt><a class="headerlink" href="#local.sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>This contains information about the slave&#8217;s master server.</p>
+</dd></dl>
+
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="config-database.html" title="Previous Section: Config Database Contents">&lt; &nbsp; Config Database Contents</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="system-collections.html" title="Next Section: System Collections">System Collections &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

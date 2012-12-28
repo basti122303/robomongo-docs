@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MongoDB Use Cases &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/meta/use-cases" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongodb-use-cases">
+<h1>MongoDB Use Cases<a class="headerlink" href="#mongodb-use-cases" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The use case documents provide introductions to the patterns, design,
+and operation used in application development with MongoDB. Each
+document provides more concrete examples and implementation details to
+support core MongoDB <a class="reference external" href="http://www.10gen.com/use-cases">use cases</a>. These documents highlight
+application design, and data modeling strategies (<em>i.e. schema
+design</em>) for MongoDB with special attention to pragmatic
+considerations including indexing, performance, sharding, and
+scaling. Each document is distinct and can stand alone; however, each
+section builds on a set of common topics.</p>
+<p>The <em>operational intelligence</em> case studies describe applications that
+collect machine generated data from logging systems, application
+output, and other systems. The <em>product data management</em> case studies
+address aspects of applications required for building product
+catalogs, and managing inventory in e-commerce systems. The <em>content
+management</em> case studies introduce basic patterns and techniques for
+building content management systems using MongoDB.</p>
+<p>Finally, the <a class="reference internal" href="../use-cases.html#applications-tutorials-python"><em>introductory application development tutorials
+with Python and MongoDB</em></a>,
+provides a complete and fully developed application that you can build
+using MongoDB and popular Python web development tool kits.</p>
+<div class="toctree-wrapper compound">
+</div>
+<blockquote>
+<div></div></blockquote>
+</div>
+<div class="section" id="operational-intelligence">
+<h2>Operational Intelligence<a class="headerlink" href="#operational-intelligence" title="Permalink to this headline">¶</a></h2>
+<p>As an introduction to the use of MongoDB for operational intelligence
+and real time analytics use, &#8220;<a class="reference internal" href="../use-cases/storing-log-data.html"><em>Storing Log Data</em></a>&#8221;
+document describes several ways and approaches to modeling and storing
+machine generated data with MongoDB. Then,
+&#8220;<a class="reference internal" href="../use-cases/pre-aggregated-reports.html"><em>Pre-Aggregated Reports</em></a>&#8221; describes methods and
+strategies for processing data to generate aggregated reports from raw
+event-data. Finally &#8220;<a class="reference internal" href="../use-cases/hierarchical-aggregation.html"><em>Hierarchical Aggregation</em></a>&#8221;
+presents a method for using MongoDB to process and store hierarchical
+reports (i.e. per-minute, per-hour, and per-day) from raw event data.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/storing-log-data.html">Storing Log Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-log-data.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-log-data.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-log-data.html#sharding">Sharding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-log-data.html#managing-event-data-growth">Managing Event Data Growth</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/pre-aggregated-reports.html">Pre-Aggregated Reports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/pre-aggregated-reports.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/pre-aggregated-reports.html#schema">Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/pre-aggregated-reports.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/pre-aggregated-reports.html#sharding">Sharding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/hierarchical-aggregation.html">Hierarchical Aggregation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/hierarchical-aggregation.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/hierarchical-aggregation.html#schema">Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/hierarchical-aggregation.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/hierarchical-aggregation.html#sharding">Sharding</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="product-data-management">
+<h2>Product Data Management<a class="headerlink" href="#product-data-management" title="Permalink to this headline">¶</a></h2>
+<p>MongoDB&#8217;s flexible schema makes it particularly well suited to storing
+information for product data management and e-commerce websites and
+solutions. The &#8220;<a class="reference internal" href="../use-cases/product-catalog.html"><em>Product Catalog</em></a>&#8221; document describes
+methods and practices for modeling and managing a product catalog
+using MongoDB, while the &#8220;<a class="reference internal" href="../use-cases/inventory-management.html"><em>Inventory Management</em></a>&#8221;
+document introduces a pattern for handling interactions between
+inventory and users&#8217; shopping carts. Finally the
+&#8220;<a class="reference internal" href="../use-cases/category-hierarchy.html"><em>Category Hierarchy</em></a>&#8221; document describes methods for
+interacting with category hierarchies in MongoDB.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/product-catalog.html">Product Catalog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/product-catalog.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/product-catalog.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/product-catalog.html#scaling">Scaling</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/inventory-management.html">Inventory Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/inventory-management.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/inventory-management.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/inventory-management.html#sharding">Sharding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/category-hierarchy.html">Category Hierarchy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/category-hierarchy.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/category-hierarchy.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/category-hierarchy.html#sharding">Sharding</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="content-management-systems">
+<h2>Content Management Systems<a class="headerlink" href="#content-management-systems" title="Permalink to this headline">¶</a></h2>
+<p>The content management use cases introduce fundamental MongoDB
+practices and approaches, using familiar problems and simple
+examples. The &#8220;<a class="reference internal" href="../use-cases/metadata-and-asset-management.html"><em>Metadata and Asset Management</em></a>&#8221;
+document introduces a model that you may use when designing a web site
+content management system, while &#8220;<a class="reference internal" href="../use-cases/storing-comments.html"><em>Storing Comments</em></a>&#8221;
+introduces the method for modeling user comments on content, like blog
+posts, and media, in MongoDB.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/metadata-and-asset-management.html">Metadata and Asset Management</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/metadata-and-asset-management.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/metadata-and-asset-management.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/metadata-and-asset-management.html#sharding">Sharding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../use-cases/storing-comments.html">Storing Comments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-comments.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-comments.html#one-document-per-comment">One Document per Comment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-comments.html#embedding-all-comments">Embedding All Comments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-comments.html#hybrid-schema-design">Hybrid Schema Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../use-cases/storing-comments.html#sharding">Sharding</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<blockquote>
+<div></div></blockquote>
+</div>
+<div class="section" id="python-application-development">
+<h2>Python Application Development<a class="headerlink" href="#python-application-development" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/write-a-tumblelog-application-with-django-mongodb-engine.html">Write a Tumblelog Application with Django MongoDB Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/write-a-tumblelog-application-with-flask-mongoengine.html">Write a Tumblelog Application with Flask and MongoEngine</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

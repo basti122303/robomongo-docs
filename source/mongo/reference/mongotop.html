@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongotop &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongotop" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongosniff" href="mongosniff.html" />
+<link rel="prev" title="mongostat" href="mongostat.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongotop">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongotop</span></tt><a class="headerlink" href="#mongotop" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> provides a method to track the amount of time a
+MongoDB instance spends reading and writing data. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt>
+provides statistics on a per-collection level. By default,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> returns values every second.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>For more information about monitoring MongoDB, see
+<a class="reference internal" href="../administration/monitoring.html"><em>Monitoring Database Systems</em></a>.</p>
+<p>For additional background on various other MongoDB status outputs
+see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="server-status.html"><em>Server Status Reference</em></a></li>
+<li><a class="reference internal" href="replica-status.html"><em>Replica Set Status Reference</em></a></li>
+<li><a class="reference internal" href="database-statistics.html"><em>Database Statistics Reference</em></a></li>
+<li><a class="reference internal" href="collection-statistics.html"><em>Collection Statistics Reference</em></a></li>
+</ul>
+<p class="last">For an additional utility that provides MongoDB metrics
+see &#8220;<a class="reference internal" href="mongostat.html"><em>mongostat</em></a>.&#8221;</p>
+</div>
+</div>
+<div class="section" id="options">
+<span id="mongotop-options"></span><h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongotop</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongotop--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongotop--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including the
+option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongotop--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> utility and exit.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongotop--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="docutils literal"><span class="pre">mongod</span></tt> from which you
+want to export data. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> attempts to
+connect to a MongoDB process running on the localhost port number
+<tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongotop--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running on
+the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongotop--host"><em class="xref std std-option">mongotop --host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongotop--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongotop--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if
+your database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongotop--password"><em class="xref std std-option">mongotop</em></a> option to supply a
+password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongotop--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongotop--username"><em class="xref std std-option">--username</em></a>
+option to supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongotop--username"><em class="xref std std-option">--username</em></a> without
+the <a class="reference internal" href="#cmdoption-mongotop--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> will prompt
+for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongotop--locks">
+<tt class="descname">--locks</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongotop--locks" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Toggles the mode of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> to report on use of
+per-database <a class="reference internal" href="server-status.html#locks"><em>locks</em></a>. These data are useful for
+measuring concurrent operations and lock percentage.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">&lt;sleeptime&gt;</tt></dt>
+<dd><p>The final argument is the length of time, in seconds, that
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> waits in between calls. By default
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> returns data every second.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="fields">
+<span id="mongotop-fields"></span><h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> returns time values specified in milliseconds
+(ms.)</p>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> only reports active namespaces or databases,
+depending on the <a class="reference internal" href="#cmdoption-mongotop--locks"><em class="xref std std-option">--locks</em></a> option. If you don&#8217;t see a database
+or collection, it has received no recent activity. You can issue a
+simple operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell to generate activity to
+affect the output of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt>.</p>
+<dl class="data">
+<dt id="ns">
+<tt class="descname">ns</tt><a class="headerlink" href="#ns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains the database namespace, which combines the database name
+and collection.</p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.2: </span>If you use the <a class="reference internal" href="#cmdoption-mongotop--locks"><em class="xref std std-option">--locks</em></a>, the <a class="reference internal" href="#ns" title="ns"><tt class="xref mongodb mongodb-data docutils literal"><span class="pre">ns</span></tt></a> field does not
+appear in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> output.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="db">
+<tt class="descname">db</tt><a class="headerlink" href="#db" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<p>Contains the name of the database. The database named <tt class="docutils literal"><span class="pre">.</span></tt> refers
+to the global lock, rather than a specific database.</p>
+<p>This field does not appear unless you have invoked
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> with the <a class="reference internal" href="#cmdoption-mongotop--locks"><em class="xref std std-option">--locks</em></a> option.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="total">
+<tt class="descname">total</tt><a class="headerlink" href="#total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the total amount of time that this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> spent
+operating on this namespace.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="read">
+<tt class="descname">read</tt><a class="headerlink" href="#read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the amount of time that this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> spent
+performing read operations on this namespace.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="write">
+<tt class="descname">write</tt><a class="headerlink" href="#write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the amount of time that this <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> spent
+performing write operations on this namespace.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="&lt;timestamp&gt;">
+<tt class="descname">&lt;timestamp&gt;</tt><a class="headerlink" href="#<timestamp>" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a time stamp for the returned data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="use">
+<h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<p>By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> connects to the MongoDB instance
+running on the localhost port <tt class="docutils literal"><span class="pre">27017</span></tt>. However, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> can optionally
+connect to remote <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+instances. See the <a class="reference internal" href="#mongotop-options"><em>mongotop options</em></a> for more
+information.</p>
+<p>To force <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> to return less frequently specify a number, in
+seconds at the end of the command. In this example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> will
+return every 15 seconds.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongotop 15
+</pre></div>
+</div>
+<p>This command produces the following output:</p>
+<div class="highlight-sh"><div class="highlight"><pre>connected to: 127.0.0.1
+
+                    ns       total        <span class="nb">read       </span>write           2012-08-13T15:45:40
+test.system.namespaces         0ms         0ms         0ms
+  local.system.replset         0ms         0ms         0ms
+  local.system.indexes         0ms         0ms         0ms
+  admin.system.indexes         0ms         0ms         0ms
+                admin.         0ms         0ms         0ms
+
+                    ns       total        <span class="nb">read       </span>write           2012-08-13T15:45:55
+test.system.namespaces         0ms         0ms         0ms
+  local.system.replset         0ms         0ms         0ms
+  local.system.indexes         0ms         0ms         0ms
+  admin.system.indexes         0ms         0ms         0ms
+                admin.         0ms         0ms         0ms
+</pre></div>
+</div>
+<p>To return a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt> report every 5 minutes, use the
+following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongotop 300
+</pre></div>
+</div>
+<p>To report the use of per-database locks, use <a class="reference internal" href="#cmdoption-mongotop--locks"><em class="xref std std-option">mongotop --locks</em></a>,
+which produces the following output:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nv">$ </span>mongotop --locks
+connected to: 127.0.0.1
+
+                  db       total        <span class="nb">read       </span>write          2012-08-13T16:33:34
+               <span class="nb">local         </span>0ms         0ms         0ms
+               admin         0ms         0ms         0ms
+                   .         0ms         0ms         0ms
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongostat.html" title="Previous Section: mongostat">&lt; &nbsp; mongostat</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongosniff.html" title="Next Section: mongosniff">mongosniff &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

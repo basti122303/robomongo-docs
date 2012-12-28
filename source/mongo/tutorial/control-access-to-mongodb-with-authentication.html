@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Control Access to MongoDB Instances with Authentication &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/control-access-to-mongodb-with-authentication" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Security" href="../security.html" />
+<link rel="next" title="CRUD" href="../crud.html" />
+<link rel="prev" title="Configure Windows netsh Firewall for MongoDB" href="configure-windows-netsh-firewall.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="control-access-to-mongodb-instances-with-authentication">
+<h1>Control Access to MongoDB Instances with Authentication<a class="headerlink" href="#control-access-to-mongodb-instances-with-authentication" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB provides a basic authentication system, that you can enable
+with the <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> and <a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a> configuration
+settings. <a class="footnote-reference" href="#cli-options" id="id1">[1]</a> See the <a class="reference internal" href="../administration/security.html#security-authentication"><em>authentication</em></a> section of the <a class="reference internal" href="../administration/security.html"><em>Security Practices and Management</em></a> document.</p>
+<p>This document contains an overview of all operations related to
+authentication and managing a MongoDB deployment with authentication.</p>
+<div class="admonition-see admonition seealso">
+<p class="first admonition-title">See</p>
+<p class="last">The <a class="reference internal" href="../administration/configuration.html#configuration-security"><em>Security Considerations</em></a> section of the
+<a class="reference internal" href="../administration/configuration.html"><em>Run-time Database Configuration</em></a> document for more information
+on configuring authentication.</p>
+</div>
+<table class="docutils footnote" frame="void" id="cli-options" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--auth"><em class="xref std std-option">--auth</em></a>
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--keyFile"><em class="xref std std-option">--keyFile</em></a> options on the command
+line.</td></tr>
+</tbody>
+</table>
+<div class="section" id="adding-users">
+<h2>Adding Users<a class="headerlink" href="#adding-users" title="Permalink to this headline">¶</a></h2>
+<p>When setting up authentication for the first time you must either:</p>
+<ol class="arabic simple">
+<li>add at least one user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database before starting
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>.</li>
+<li>add the first user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database when connected to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance from a <tt class="docutils literal"><span class="pre">localhost</span></tt>
+connection. <a class="footnote-reference" href="#sharded-localhost" id="id2">[2]</a></li>
+</ol>
+<p>Begin by setting up the first administrative user for the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance.</p>
+<table class="docutils footnote" frame="void" id="sharded-localhost" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Because of <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-6591">SERVER-6591</a>, you cannot
+add the first user to a sharded cluster using the <tt class="docutils literal"><span class="pre">localhost</span></tt>
+connection in 2.2. If you are running a 2.2 sharded cluster, and
+want to enable authentication, you must deploy the cluster and add
+the first user to the <tt class="docutils literal"><span class="pre">admin</span></tt> database before restarting the
+cluster to run with <a class="reference internal" href="../reference/configuration-options.html#keyFile" title="keyFile"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">keyFile</span></tt></a>.</td></tr>
+</tbody>
+</table>
+<div class="section" id="add-an-administrative-user">
+<h3>Add an Administrative User<a class="headerlink" href="#add-an-administrative-user" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-about-administrative-users admonition">
+<p class="first admonition-title">About administrative users</p>
+<p class="last">Administrative users are those users that have &#8220;normal&#8221; or read and
+write access to the <tt class="docutils literal"><span class="pre">admin</span></tt> database.</p>
+</div>
+<p>If this is the first administrative user,
+<a class="footnote-reference" href="#auth-disabled-maintenance" id="id3">[3]</a> connect to the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> on the
+<tt class="docutils literal"><span class="pre">localhost</span></tt> interface using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. Then, issue
+the following command sequence to switch to the <tt class="docutils literal"><span class="pre">admin</span></tt> database
+context and add the administrative user:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">addUser</span><span class="p">(</span><span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;username&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;password&gt;</span></tt> with the credentials for
+this administrative user.</p>
+<table class="docutils footnote" frame="void" id="auth-disabled-maintenance" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>You can also use this procedure if
+authentication is <em>not</em> enabled so that your databases has an
+administrative user when you enable <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="add-a-normal-user-to-a-database">
+<h3>Add a Normal User to a Database<a class="headerlink" href="#add-a-normal-user-to-a-database" title="Permalink to this headline">¶</a></h3>
+<p>To add a user with read and write access to a specific database, in
+this example the <tt class="docutils literal"><span class="pre">records</span></tt> database, connect to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and issue
+the following sequence of operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">records</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">addUser</span><span class="p">(</span><span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;username&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;password&gt;</span></tt> with the credentials for
+this user.</p>
+</div>
+<div class="section" id="add-a-read-only-user-to-a-database">
+<h3>Add a Read Only User to a Database<a class="headerlink" href="#add-a-read-only-user-to-a-database" title="Permalink to this headline">¶</a></h3>
+<p>To add a user with read only access to a specific database, in
+this example the <tt class="docutils literal"><span class="pre">records</span></tt> database, connect to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance using the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and issue
+the following sequence of operations:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">records</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">addUser</span><span class="p">(</span><span class="s2">&quot;&lt;username&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;password&gt;&quot;</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">&lt;username&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;password&gt;</span></tt> with the credentials for
+this user.</p>
+</div>
+</div>
+<div class="section" id="administrative-access-in-mongodb">
+<h2>Administrative Access in MongoDB<a class="headerlink" href="#administrative-access-in-mongodb" title="Permalink to this headline">¶</a></h2>
+<p>Although administrative accounts have access to all databases, these
+users must authenticate against the <tt class="docutils literal"><span class="pre">admin</span></tt> database before changing
+contexts to a second database, as in the following example:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Given the <tt class="docutils literal"><span class="pre">superAdmin</span></tt> user with the password <tt class="docutils literal"><span class="pre">Password123</span></tt>,
+and access to the <tt class="docutils literal"><span class="pre">admin</span></tt> database.</p>
+<p>The following operation in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell will succeed:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">admin</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">auth</span><span class="p">(</span><span class="s2">&quot;superAdmin&quot;</span><span class="p">,</span> <span class="s2">&quot;Password123&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, the following operation will fail:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">test</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">auth</span><span class="p">(</span><span class="s2">&quot;superAdmin&quot;</span><span class="p">,</span> <span class="s2">&quot;Password123&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you have authenticated to the <tt class="docutils literal"><span class="pre">admin</span></tt> database as normal, read
+and write, user; logging into a <em>different</em> database as a read only
+user will <em>not</em> invalidate the authentication to the <tt class="docutils literal"><span class="pre">admin</span></tt>
+database. In this situation, this client will be able to read and
+write data to this second database.</p>
+</div>
+</div>
+<div class="section" id="authentication-on-localhost">
+<h2>Authentication on Localhost<a class="headerlink" href="#authentication-on-localhost" title="Permalink to this headline">¶</a></h2>
+<p>The behavior of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> running with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a>, when
+connecting from a client over the localhost interface (i.e. a client
+running on the same system as the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>,) varies slightly
+between before and after version 2.2.</p>
+<p>In general if there are no users for the <tt class="docutils literal"><span class="pre">admin</span></tt> database, you may
+connect via the localhost interface. For sharded clusters running
+version 2.2, if <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is running with <a class="reference internal" href="../reference/configuration-options.html#auth" title="auth"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">auth</span></tt></a> then
+all users connecting over the localhost interface must authenticate,
+even if there aren&#8217;t any users in the <tt class="docutils literal"><span class="pre">admin</span></tt> database.</p>
+</div>
+<div class="section" id="password-hashing-insecurity">
+<h2>Password Hashing Insecurity<a class="headerlink" href="#password-hashing-insecurity" title="Permalink to this headline">¶</a></h2>
+<p>In version 2.2 and earlier:</p>
+<ul class="simple">
+<li>the <em>normal</em> users of a database all have access to the
+<tt class="docutils literal"><span class="pre">system.users</span></tt> collection, which contains the user names and a
+hash of all user&#8217;s passwords. <a class="footnote-reference" href="#read-and-write-system-users" id="id4">[4]</a></li>
+<li>if a user has the same password in multiple databases, the hash will
+be the same on all database. A malicious user could exploit this to
+gain access on a second database use a different users&#8217; credentials.</li>
+</ul>
+<p>As a result, always use unique username and password combinations on
+for each database.</p>
+<table class="docutils footnote" frame="void" id="read-and-write-system-users" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Read only users do not have access
+to the <tt class="docutils literal"><span class="pre">system.users</span></tt> database.</td></tr>
+</tbody>
+</table>
+<p>Thanks to Will Urbanski, from Dell SecureWorks, for identifying this issue.</p>
+</div>
+<div class="section" id="configuration-considerations-for-authentication">
+<h2>Configuration Considerations for Authentication<a class="headerlink" href="#configuration-considerations-for-authentication" title="Permalink to this headline">¶</a></h2>
+<p>The following sections, outline practices for enabling and managing
+authentication with specific MongoDB deployments:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../administration/replica-sets.html#replica-set-security"><em>Security Considerations for Replica Sets</em></a></li>
+<li><a class="reference internal" href="../core/sharding.html#sharding-security"><em>Security Considerations for Sharded Clusters</em></a></li>
+</ul>
+</div>
+<div class="section" id="generate-a-key-file">
+<h2>Generate a Key File<a class="headerlink" href="#generate-a-key-file" title="Permalink to this headline">¶</a></h2>
+<p>Use the following command at the system shell to generate pseudo-random
+content for a key file:</p>
+<div class="highlight-sh"><div class="highlight"><pre>openssl rand -base64 753
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Be aware that MongoDB strips whitespace characters (e.g. <tt class="docutils literal"><span class="pre">x0d</span></tt>,
+<tt class="docutils literal"><span class="pre">x09</span></tt>, and <tt class="docutils literal"><span class="pre">x20</span></tt>,) for cross-platform convenience. As a result,
+the following keys are identical:</p>
+<div class="last highlight-sh"><div class="highlight"><pre><span class="nb">echo</span> -e <span class="s2">&quot;my secret key&quot;</span> &gt; key1
+<span class="nb">echo</span> -e <span class="s2">&quot;my secret key\n&quot;</span> &gt; key2
+<span class="nb">echo</span> -e <span class="s2">&quot;my    secret    key&quot;</span> &gt; key3
+<span class="nb">echo</span> -e <span class="s2">&quot;my\r\nsecret\r\nkey\r\n&quot;</span> &gt; key4
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="configure-windows-netsh-firewall.html" title="Previous Section: Configure Windows netsh Firewall for MongoDB">&lt; &nbsp; Configure Windows netsh Firewall for MongoDB</a></li>
+<li id="btnvup"><a href="../security.html" title="Parent Section: Security" >&#47;&#92;&nbsp; Security</a></li>
+<li id="btnvnx"><a href="../crud.html" title="Next Section: CRUD">CRUD &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

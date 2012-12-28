@@ -1,0 +1,514 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Hierarchical Aggregation &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/use-cases/hierarchical-aggregation" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Use Cases" href="../use-cases.html" />
+<link rel="next" title="Product Catalog" href="product-catalog.html" />
+<link rel="prev" title="Pre-Aggregated Reports" href="pre-aggregated-reports.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="hierarchical-aggregation">
+<h1>Hierarchical Aggregation<a class="headerlink" href="#hierarchical-aggregation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="background">
+<h3>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h3>
+<p>If you collect a large amount of data, but do not <a class="reference internal" href="pre-aggregated-reports.html"><em>pre-aggregate</em></a>, and you want to have
+access to aggregated information and reports, then you need a method
+to aggregate these data into a usable form. This document provides an
+overview of these aggregation patterns and processes.</p>
+<p>For clarity, this case study assumes that the incoming event data
+resides in a collection named <tt class="docutils literal"><span class="pre">events</span></tt>. For details on how you might
+get the event data into the events collection, please see
+&#8220;<a class="reference internal" href="storing-log-data.html"><em>Storing Log Data</em></a>&#8221; document. This document
+continues using this example.</p>
+</div>
+<div class="section" id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<p>The first step in the aggregation process is to aggregate event data
+into the finest required granularity. Then use this aggregation to
+generate the next least specific level granularity and this repeat
+process until you have generated all required views.</p>
+<p>The solution uses several collections: the raw data (i.e. <tt class="docutils literal"><span class="pre">events</span></tt>)
+collection as well as collections for aggregated hourly, daily,
+weekly, monthly, and yearly statistics. All aggregations use the
+<a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> <a class="reference internal" href="../reference/glossary.html#term-database-command"><em class="xref std std-term">command</em></a>, in a
+hierarchical process. The following figure illustrates the input and
+output of each job:</p>
+<div class="figure align-center">
+<img alt="Hierarchy" src="../_images/hierarchy1.png" />
+<p class="caption">Hierarchy of data aggregation.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Aggregating raw events into an hourly collection is qualitatively
+different from the operation that aggregates hourly statistics into
+the daily collection.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/glossary.html#term-map-reduce"><em class="xref std std-term">Map-reduce</em></a> and the <a class="reference external" href="http://www.mongodb.org/display/DOCS/MapReduce">MapReduce</a> wiki page
+for more information on the Map-reduce data aggregation paradigm.</p>
+</div>
+</div>
+</div>
+<div class="section" id="schema">
+<h2>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h2>
+<p>When designing the schema for event storage, it&#8217;s important to track
+the events included in the aggregation and events that are not yet
+included.</p>
+<div class="admonition-relational-approach admonition">
+<p class="first admonition-title">Relational Approach</p>
+<p class="last">A simple tactic from relational database, uses an auto-incremented
+integer as the primary key. However, this introduces a significant
+performance penalty for event logging process because the
+aggregation process must fetch new keys one at a time.</p>
+</div>
+<p>If you can batch your inserts into the <tt class="docutils literal"><span class="pre">events</span></tt> collection, you can
+use an auto-increment primary key by using the
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_and_modify" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">find_and_modify</span></tt></a>
+command to generate the <tt class="docutils literal"><span class="pre">_id</span></tt> values, as in the following example:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">my_sequence</span><span class="o">.</span><span class="n">find_and_modify</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;_id&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;$inc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;inc&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}}</span>
+<span class="gp">... </span>    <span class="n">upsert</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">new</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">batch_of_ids</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s">&#39;inc&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="s">&#39;inc&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>However, in most cases you can simply include a timestamp with each
+event that you can use to distinguish processed events from
+unprocessed events.</p>
+<p>This example assumes that you are calculating average session length
+for logged-in users on a website. The events will have the following
+form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">&quot;userid&quot;</span><span class="o">:</span> <span class="s2">&quot;rick&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ts&quot;</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2010-10-10T14:17:22Z&#39;</span><span class="p">),</span>
+    <span class="s2">&quot;length&quot;</span><span class="o">:</span><span class="mi">95</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The operations described in the next session will calculate total and
+average session times for each user at the hour, day, week, month and
+year. For each aggregation you will want to store the number of
+sessions so that MongoDB can incrementally recompute the average
+session times. The aggregate document will resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="nx">_id</span><span class="o">:</span> <span class="p">{</span> <span class="nx">u</span><span class="o">:</span> <span class="s2">&quot;rick&quot;</span><span class="p">,</span> <span class="nx">d</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2010-10-10T14:00:00Z&quot;</span><span class="p">)</span> <span class="p">},</span>
+   <span class="nx">value</span><span class="o">:</span> <span class="p">{</span>
+       <span class="nx">ts</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s1">&#39;2010-10-10T15:01:00Z&#39;</span><span class="p">),</span>
+       <span class="nx">total</span><span class="o">:</span> <span class="mi">254</span><span class="p">,</span>
+       <span class="nx">count</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span>
+       <span class="nx">mean</span><span class="o">:</span> <span class="mf">25.4</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The timestamp value in the <tt class="docutils literal"><span class="pre">_id</span></tt> sub-document, which will allow
+you to incrementally update documents at various levels of the
+hierarchy.</p>
+</div>
+</div>
+<div class="section" id="operations">
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<p>This section assumes that all events exist in the <tt class="docutils literal"><span class="pre">events</span></tt>
+collection and have a timestamp. The operations, thus are to aggregate
+from the <tt class="docutils literal"><span class="pre">events</span></tt> collection into the smallest aggregate&#8211;hourly
+totals&#8211; and then aggregate from the hourly totals into coarser
+granularity levels. In all cases, these operations will store
+aggregation time as a <tt class="docutils literal"><span class="pre">last_run</span></tt> variable.</p>
+<div class="section" id="creating-hourly-views-from-event-collections">
+<h3>Creating Hourly Views from Event Collections<a class="headerlink" href="#creating-hourly-views-from-event-collections" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="aggregation">
+<h4>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this headline">¶</a></h4>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although this solution uses Python and <a class="reference external" href="http://api.mongodb.org/python/current">PyMongo</a> to connect with MongoDB, you must pass JavaScript
+functions (i.e. <tt class="docutils literal"><span class="pre">mapf</span></tt>, <tt class="docutils literal"><span class="pre">reducef</span></tt>, and <tt class="docutils literal"><span class="pre">finalizef</span></tt>) to the
+<a class="reference internal" href="../reference/commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a> command.</p>
+</div>
+<p>Begin by creating a map function, as below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapf_hour</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function() {</span>
+<span class="s">    var key = {</span>
+<span class="s">        u: this.userid,</span>
+<span class="s">        d: new Date(</span>
+<span class="s">            this.ts.getFullYear(),</span>
+<span class="s">            this.ts.getMonth(),</span>
+<span class="s">            this.ts.getDate(),</span>
+<span class="s">            this.ts.getHours(),</span>
+<span class="s">            0, 0, 0);</span>
+<span class="s">    emit(</span>
+<span class="s">        key,</span>
+<span class="s">        {</span>
+<span class="s">            total: this.length,</span>
+<span class="s">            count: 1,</span>
+<span class="s">            mean: 0,</span>
+<span class="s">            ts: new Date(); });</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, it emits key-value pairs that contain the data you want
+to aggregate as you&#8217;d expect. The function also emits a <tt class="docutils literal"><span class="pre">ts</span></tt> value
+that makes it possible to cascade aggregations to coarser grained
+aggregations (i.e. hour to day, etc.)</p>
+<p>Consider the following reduce function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reducef</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function(key, values) {</span>
+<span class="s">    var r = { total: 0, count: 0, mean: 0, ts: null };</span>
+<span class="s">    values.forEach(function(v) {</span>
+<span class="s">        r.total += v.total;</span>
+<span class="s">        r.count += v.count;</span>
+<span class="s">    });</span>
+<span class="s">    return r;</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The reduce function returns a document in the same format as the
+output of the map function. This pattern for map and reduce functions
+makes map-reduce processes easier to test and debug.</p>
+<p>While the reduce function ignores the <tt class="docutils literal"><span class="pre">mean</span></tt> and <tt class="docutils literal"><span class="pre">ts</span></tt> (timestamp)
+values, the finalize step, as follows, computes these data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">finalizef</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function(key, value) {</span>
+<span class="s">    if(value.count &gt; 0) {</span>
+<span class="s">       value.mean = value.total / value.count;</span>
+<span class="s">    }</span>
+<span class="s">    value.ts = new Date();</span>
+<span class="s">    return value;</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With the above function the <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.map_reduce" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">map_reduce</span></tt></a>
+operation itself will resemble the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cutoff</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;ts&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$gt&#39;</span><span class="p">:</span> <span class="n">last_run</span><span class="p">,</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">cutoff</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">db</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">map_reduce</span><span class="p">(</span>
+    <span class="nb">map</span><span class="o">=</span><span class="n">mapf_hour</span><span class="p">,</span>
+    <span class="nb">reduce</span><span class="o">=</span><span class="n">reducef</span><span class="p">,</span>
+    <span class="n">finalize</span><span class="o">=</span><span class="n">finalizef</span><span class="p">,</span>
+    <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+    <span class="n">out</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;reduce&#39;</span><span class="p">:</span> <span class="s">&#39;stats.hourly&#39;</span> <span class="p">})</span>
+
+<span class="n">last_run</span> <span class="o">=</span> <span class="n">cutoff</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">cutoff</span></tt> variable allows you to process all events that have
+occurred since the last run but before 1 minute ago. This allows for
+some delay in logging events. You can safely run this aggregation as
+often as you like, provided that you update the <tt class="docutils literal"><span class="pre">last_run</span></tt> variable
+each time.</p>
+</div>
+<div class="section" id="indexing">
+<h4>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h4>
+<p>Create an index on the timestamp (i.e. the <tt class="docutils literal"><span class="pre">ts</span></tt> field) to support
+the query selection of the <a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.map_reduce" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">map_reduce</span></tt></a> operation. Use the
+following operation at the Python/PyMongo console:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;ts&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="deriving-day-level-data">
+<h3>Deriving Day-Level Data<a class="headerlink" href="#deriving-day-level-data" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h4>Aggregation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>To calculate daily statistics, use the hourly statistics
+as input. Begin with the following map function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapf_day</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function() {</span>
+<span class="s">    var key = {</span>
+<span class="s">        u: this._id.u,</span>
+<span class="s">        d: new Date(</span>
+<span class="s">            this._id.d.getFullYear(),</span>
+<span class="s">            this._id.d.getMonth(),</span>
+<span class="s">            this._id.d.getDate(),</span>
+<span class="s">            0, 0, 0, 0) };</span>
+<span class="s">    emit(</span>
+<span class="s">        key,</span>
+<span class="s">        {</span>
+<span class="s">            total: this.value.total,</span>
+<span class="s">            count: this.value.count,</span>
+<span class="s">            mean: 0,</span>
+<span class="s">            ts: null });</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The map function for deriving day-level data differs from the initial
+aggregation above in the following ways:</p>
+<ul>
+<li><p class="first">the aggregation key is the (userid, date) rather than (userid, hour)
+to support daily aggregation.</p>
+</li>
+<li><p class="first">the keys and values emitted (i.e. <tt class="docutils literal"><span class="pre">emit()</span></tt>) are actually the total
+and count values from the hourly aggregates rather than properties
+from event documents.</p>
+<p>This is the case for all the higher-level aggregation operations.</p>
+</li>
+</ul>
+<p>Because the output of this map function is the same as the previous
+map function, you can use the same reduce and finalize functions.</p>
+<p>The actual code driving this level of aggregation is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cutoff</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;value.ts&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$gt&#39;</span><span class="p">:</span> <span class="n">last_run</span><span class="p">,</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">cutoff</span> <span class="p">}</span> <span class="p">}</span>
+
+<span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hourly</span><span class="o">.</span><span class="n">map_reduce</span><span class="p">(</span>
+    <span class="nb">map</span><span class="o">=</span><span class="n">mapf_day</span><span class="p">,</span>
+    <span class="nb">reduce</span><span class="o">=</span><span class="n">reducef</span><span class="p">,</span>
+    <span class="n">finalize</span><span class="o">=</span><span class="n">finalizef</span><span class="p">,</span>
+    <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+    <span class="n">out</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;reduce&#39;</span><span class="p">:</span> <span class="s">&#39;stats.daily&#39;</span> <span class="p">})</span>
+
+<span class="n">last_run</span> <span class="o">=</span> <span class="n">cutoff</span>
+</pre></div>
+</div>
+<p>There are a couple of things to note here. First of all, the query is
+not on <tt class="docutils literal"><span class="pre">ts</span></tt> now, but <tt class="docutils literal"><span class="pre">value.ts</span></tt>, the timestamp written during the
+finalization of the hourly aggregates. Also note that you are, in fact,
+aggregating from the <tt class="docutils literal"><span class="pre">stats.hourly</span></tt> collection into the <tt class="docutils literal"><span class="pre">stats.daily</span></tt>
+collection.</p>
+</div>
+<div class="section" id="id2">
+<h4>Indexing<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<p>Because you will run the query option regularly which finds on the
+<tt class="docutils literal"><span class="pre">value.ts</span></tt> field, you may wish to create an index to support
+this. Use the following operation in the Python/PyMongo shell to
+create this index:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hourly</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;value.ts&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="weekly-and-monthly-aggregation">
+<h3>Weekly and Monthly Aggregation<a class="headerlink" href="#weekly-and-monthly-aggregation" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h4>Aggregation<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>You can use the aggregated day-level data to generate weekly and
+monthly statistics. A map function for generating weekly data follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapf_week</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function() {</span>
+<span class="s">    var key = {</span>
+<span class="s">        u: this._id.u,</span>
+<span class="s">        d: new Date(</span>
+<span class="s">            this._id.d.valueOf()</span>
+<span class="s">            - dt.getDay()*24*60*60*1000) };</span>
+<span class="s">    emit(</span>
+<span class="s">        key,</span>
+<span class="s">        {</span>
+<span class="s">            total: this.value.total,</span>
+<span class="s">            count: this.value.count,</span>
+<span class="s">            mean: 0,</span>
+<span class="s">            ts: null });</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, to get the group key, the function takes the current and
+subtracts days until you get the beginning of the week. In the weekly
+map function, you&#8217;ll use the first day of the month as the group key,
+as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapf_month</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span><span class="s">&#39;&#39;&#39;function() {</span>
+<span class="s">        d: new Date(</span>
+<span class="s">            this._id.d.getFullYear(),</span>
+<span class="s">            this._id.d.getMonth(),</span>
+<span class="s">            1, 0, 0, 0, 0) };</span>
+<span class="s">    emit(</span>
+<span class="s">        key,</span>
+<span class="s">        {</span>
+<span class="s">            total: this.value.total,</span>
+<span class="s">            count: this.value.count,</span>
+<span class="s">            mean: 0,</span>
+<span class="s">            ts: null });</span>
+<span class="s">}&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These map functions are identical to each other except for the date
+calculation.</p>
+</div>
+<div class="section" id="id4">
+<h4>Indexing<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Create additional indexes to support the weekly and monthly
+aggregation options on the <tt class="docutils literal"><span class="pre">value.ts</span></tt> field. Use the following
+operation in the Python/PyMongo shell.</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">daily</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;value.ts&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">monthly</span><span class="o">.</span><span class="n">ensure_index</span><span class="p">(</span><span class="s">&#39;value.ts&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="refactor-map-functions">
+<h4>Refactor Map Functions<a class="headerlink" href="#refactor-map-functions" title="Permalink to this headline">¶</a></h4>
+<p>Use Python&#8217;s string interpolation to refactor the map
+function definitions as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mapf_hierarchical</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;function() {</span>
+<span class="s">    var key = {</span>
+<span class="s">        u: this._id.u,</span>
+<span class="s">        d: </span><span class="si">%s</span><span class="s"> };</span>
+<span class="s">    emit(</span>
+<span class="s">        key,</span>
+<span class="s">        {</span>
+<span class="s">            total: this.value.total,</span>
+<span class="s">            count: this.value.count,</span>
+<span class="s">            mean: 0,</span>
+<span class="s">            ts: null });</span>
+<span class="s">}&#39;&#39;&#39;</span>
+
+<span class="n">mapf_day</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span>
+    <span class="n">mapf_hierarchical</span> <span class="o">%</span> <span class="s">&#39;&#39;&#39;new Date(</span>
+<span class="s">            this._id.d.getFullYear(),</span>
+<span class="s">            this._id.d.getMonth(),</span>
+<span class="s">            this._id.d.getDate(),</span>
+<span class="s">            0, 0, 0, 0)&#39;&#39;&#39;</span><span class="p">)</span>
+
+<span class="n">mapf_week</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span>
+    <span class="n">mapf_hierarchical</span> <span class="o">%</span> <span class="s">&#39;&#39;&#39;new Date(</span>
+<span class="s">            this._id.d.valueOf()</span>
+<span class="s">            - dt.getDay()*24*60*60*1000)&#39;&#39;&#39;</span><span class="p">)</span>
+
+<span class="n">mapf_month</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span>
+    <span class="n">mapf_hierarchical</span> <span class="o">%</span> <span class="s">&#39;&#39;&#39;new Date(</span>
+<span class="s">            this._id.d.getFullYear(),</span>
+<span class="s">            this._id.d.getMonth(),</span>
+<span class="s">            1, 0, 0, 0, 0)&#39;&#39;&#39;</span><span class="p">)</span>
+
+<span class="n">mapf_year</span> <span class="o">=</span> <span class="n">bson</span><span class="o">.</span><span class="n">Code</span><span class="p">(</span>
+    <span class="n">mapf_hierarchical</span> <span class="o">%</span> <span class="s">&#39;&#39;&#39;new Date(</span>
+<span class="s">            this._id.d.getFullYear(),</span>
+<span class="s">            1, 1, 0, 0, 0, 0)&#39;&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can create a <tt class="docutils literal"><span class="pre">h_aggregate</span></tt> function to wrap the
+<a class="reference external" href="http://api.mongodb.org/python/current/api/pymongo/collection.html#pymongo.collection.Collection.map_reduce" title="(in PyMongo v2.4.1)"><tt class="xref py py-meth docutils literal"><span class="pre">map_reduce</span></tt></a>
+operation, as below, to reduce code duplication:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">h_aggregate</span><span class="p">(</span><span class="n">icollection</span><span class="p">,</span> <span class="n">ocollection</span><span class="p">,</span> <span class="n">mapf</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">):</span>
+     <span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;value.ts&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$gt&#39;</span><span class="p">:</span> <span class="n">last_run</span><span class="p">,</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">cutoff</span> <span class="p">}</span> <span class="p">}</span>
+     <span class="n">icollection</span><span class="o">.</span><span class="n">map_reduce</span><span class="p">(</span>
+         <span class="nb">map</span><span class="o">=</span><span class="n">mapf</span><span class="p">,</span>
+         <span class="nb">reduce</span><span class="o">=</span><span class="n">reducef</span><span class="p">,</span>
+         <span class="n">finalize</span><span class="o">=</span><span class="n">finalizef</span><span class="p">,</span>
+         <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+         <span class="n">out</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;reduce&#39;</span><span class="p">:</span> <span class="n">ocollection</span><span class="o">.</span><span class="n">name</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>With <tt class="docutils literal"><span class="pre">h_aggregate</span></tt> defined, you can perform all aggregation
+operations as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cutoff</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">h_aggregate</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">events</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hourly</span><span class="p">,</span> <span class="n">mapf_hour</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">)</span>
+<span class="n">h_aggregate</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hourly</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">daily</span><span class="p">,</span> <span class="n">mapf_day</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">)</span>
+<span class="n">h_aggregate</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">daily</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">weekly</span><span class="p">,</span> <span class="n">mapf_week</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">)</span>
+<span class="n">h_aggregate</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">daily</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">monthly</span><span class="p">,</span> <span class="n">mapf_month</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">)</span>
+<span class="n">h_aggregate</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">monthly</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">yearly</span><span class="p">,</span> <span class="n">mapf_year</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">)</span>
+
+<span class="n">last_run</span> <span class="o">=</span> <span class="n">cutoff</span>
+</pre></div>
+</div>
+<p>As long as you save and restore the <tt class="docutils literal"><span class="pre">last_run</span></tt> variable between
+aggregations, you can run these aggregations as often as you like
+since each aggregation operation is incremental.</p>
+</div>
+</div>
+</div>
+<div class="section" id="sharding">
+<h2>Sharding<a class="headerlink" href="#sharding" title="Permalink to this headline">¶</a></h2>
+<p>Ensure that you choose a <a class="reference internal" href="../reference/glossary.html#term-shard-key"><em class="xref std std-term">shard key</em></a> that is not the incoming
+timestamp, but rather something that varies significantly in the most
+recent documents. In the example above, consider using the <tt class="docutils literal"><span class="pre">userid</span></tt>
+as the most significant part of the shard key.</p>
+<p>To prevent a single, active user from creating a large, <a class="reference internal" href="../reference/glossary.html#term-chunk"><em class="xref std std-term">chunk</em></a>
+that MongoDB cannot split, use a compound shard key with (username,
+timestamp) on the events collection. Consider the following:</p>
+<div class="highlight-pycon"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span><span class="s">&#39;events&#39;</span><span class="p">,</span> <span class="p">{</span>
+<span class="gp">... </span><span class="s">&#39;key&#39;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&#39;userid&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;ts&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+<span class="go">{ &quot;collectionsharded&quot;: &quot;events&quot;, &quot;ok&quot; : 1 }</span>
+</pre></div>
+</div>
+<p>To shard the aggregated collections you must use the <tt class="docutils literal"><span class="pre">_id</span></tt> field, so you can
+issue the following group of shard operations in the Python/PyMongo shell:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;stats.daily&#39;</span><span class="p">,</span> <span class="p">{</span>
+     <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;stats.weekly&#39;</span><span class="p">,</span> <span class="p">{</span>
+     <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;stats.monthly&#39;</span><span class="p">,</span> <span class="p">{</span>
+     <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+<span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s">&#39;shardCollection&#39;</span><span class="p">,</span> <span class="s">&#39;stats.yearly&#39;</span><span class="p">,</span> <span class="p">{</span>
+     <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>You should also update the <tt class="docutils literal"><span class="pre">h_aggregate</span></tt>  map-reduce wrapper to
+support sharded output Add <tt class="docutils literal"><span class="pre">'sharded':True</span></tt> to the <tt class="docutils literal"><span class="pre">out</span></tt>
+argument. See the full sharded <tt class="docutils literal"><span class="pre">h_aggregate</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">h_aggregate</span><span class="p">(</span><span class="n">icollection</span><span class="p">,</span> <span class="n">ocollection</span><span class="p">,</span> <span class="n">mapf</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">last_run</span><span class="p">):</span>
+     <span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;value.ts&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;$gt&#39;</span><span class="p">:</span> <span class="n">last_run</span><span class="p">,</span> <span class="s">&#39;$lt&#39;</span><span class="p">:</span> <span class="n">cutoff</span> <span class="p">}</span> <span class="p">}</span>
+     <span class="n">icollection</span><span class="o">.</span><span class="n">map_reduce</span><span class="p">(</span>
+         <span class="nb">map</span><span class="o">=</span><span class="n">mapf</span><span class="p">,</span>
+         <span class="nb">reduce</span><span class="o">=</span><span class="n">reducef</span><span class="p">,</span>
+         <span class="n">finalize</span><span class="o">=</span><span class="n">finalizef</span><span class="p">,</span>
+         <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+         <span class="n">out</span><span class="o">=</span><span class="p">{</span> <span class="s">&#39;reduce&#39;</span><span class="p">:</span> <span class="n">ocollection</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;sharded&#39;</span><span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="pre-aggregated-reports.html" title="Previous Section: Pre-Aggregated Reports">&lt; &nbsp; Pre-Aggregated Reports</a></li>
+<li id="btnvup"><a href="../use-cases.html" title="Parent Section: Use Cases" >&#47;&#92;&nbsp; Use Cases</a></li>
+<li id="btnvnx"><a href="product-catalog.html" title="Next Section: Product Catalog">Product Catalog &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

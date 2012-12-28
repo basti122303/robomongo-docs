@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongoexport &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongoexport" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="mongostat" href="mongostat.html" />
+<link rel="prev" title="mongoimport" href="mongoimport.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongoexport">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongoexport</span></tt><a class="headerlink" href="#mongoexport" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> is a utility that produces a JSON or CSV export
+of data stored in a MongoDB instance. See the
+&#8220;<a class="reference internal" href="../administration/import-export.html"><em>Importing and Exporting MongoDB Data</em></a>&#8221; document for a more in depth
+usage overview, and the &#8220;<a class="reference internal" href="mongoimport.html"><em>mongoimport</em></a>&#8221; document for more
+information regarding the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> utility, which
+provides the inverse &#8220;importing&#8221; capability.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Do not use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> for
+full-scale backups because they may not reliably capture data type
+information. Use <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt> and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt> as
+described in &#8220;<a class="reference internal" href="../administration/backups.html"><em>Backup and Restoration Strategies</em></a>&#8221; for this kind of
+functionality.</p>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongoexport</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including
+the option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> utility.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> from which you
+want to export data. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> attempts to
+connect to a MongoDB process ruining on the localhost port number
+<tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>To connect to a replica set, you can specify the replica set seed
+name, and a seed list of set members, in the following format:</p>
+<div class="highlight-javascript"><pre>&lt;replica_set_name&gt;/&lt;hostname1&gt;&lt;:port&gt;,&lt;hostname2:&lt;port&gt;,...</pre>
+</div>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running on
+the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongoexport--host"><em class="xref std std-option">mongoexport --host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if your
+database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongoexport--password"><em class="xref std std-option">mongoexport --password</em></a> option to supply a password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongoexport--username"><em class="xref std std-option">--username</em></a>
+option to supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongoexport--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongoexport--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>
+will prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the directory of the MongoDB data files. If used, the
+<tt class="docutils literal"><span class="pre">--dbpath</span></tt> option enables <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to attach
+directly to local data files and insert the data without the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. To run with <tt class="docutils literal"><span class="pre">--dbpath</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>
+needs to lock access to the data directory: as a result, no
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can access the same path while the process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoexport--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the
+corresponding option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, which allows
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to export data into MongoDB instances that
+have every database&#8217;s files saved in discrete directories on the
+disk. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongoexport--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> operations to access the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> to ensure that the export is in a
+consistent state. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongoexport--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--db">
+<tt class="descname">--db</tt><tt class="descclassname"> &lt;db&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"> &lt;db&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoexport--db"><em class="xref std std-option">--db</em></a> option to specify the name of the database
+that contains the collection you want to export.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--collection">
+<tt class="descname">--collection</tt><tt class="descclassname"> &lt;collection&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-c</tt><tt class="descclassname"> &lt;collection&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongoexport--collection"><em class="xref std std-option">--collection</em></a> option to specify the collection
+that you want <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to export.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--fields">
+<tt class="descname">--fields</tt><tt class="descclassname"> &lt;field1[,field2]&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-f</tt><tt class="descclassname"> &lt;field1[,field2]&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a field or number fields to <em>include</em> in the export. All
+other fields will be <em>excluded</em> from the export. Comma separate a
+list of fields to limit the fields exported.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--fieldFile">
+<tt class="descname">--fieldFile</tt><tt class="descclassname"> &lt;file&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--fieldFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>As an alternative to &#8220;<a class="reference internal" href="#cmdoption-mongoexport--fields"><em class="xref std std-option">--fields</em></a>&#8221;
+the <a class="reference internal" href="#cmdoption-mongoexport--fieldFile"><em class="xref std std-option">--fieldFile</em></a> option allows you to specify a file
+(e.g. <tt class="docutils literal"><span class="pre">&lt;file&gt;`</span></tt>) to hold a list of field names to specify a list
+of fields to <em>include</em> in the export. All other fields will be
+<em>excluded</em> from the export. Place one field per line.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--query">
+<tt class="descname">--query</tt><tt class="descclassname"> &lt;JSON&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a <a class="reference internal" href="glossary.html#term-json-document"><em class="xref std std-term">JSON document</em></a> as a query that optionally limits
+the documents returned in the export.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--csv">
+<tt class="descname">--csv</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the export format to a comma separated values (CSV)
+format. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> writes data using one
+<a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> document for every MongoDB document.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--jsonArray">
+<tt class="descname">--jsonArray</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--jsonArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies the output of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to write the
+entire contents of the export as a single <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> array. By
+default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> writes data using one JSON document
+for every MongoDB document.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--slaveOk">
+<tt class="descname">--slaveOk</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-k</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongoexport--slaveOk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> to read data from secondary or slave
+nodes when using <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> with a replica set. This
+option is only available if connected to a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or
+<a class="reference internal" href="config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> and is not available when used with the
+&#8220;<a class="reference internal" href="#cmdoption-mongoexport--dbpath"><em class="xref std std-option">mongoexport --dbpath</em></a>&#8221; option.</p>
+<p>This is the default behavior.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongoexport--out">
+<tt class="descname">--out</tt><tt class="descclassname"> &lt;file&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-o</tt><tt class="descclassname"> &lt;file&gt;</tt><a class="headerlink" href="#cmdoption-mongoexport--out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify a file to write the export to. If you do not specify a file
+name, the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> writes data to standard output
+(e.g. <tt class="docutils literal"><span class="pre">stdout</span></tt>).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>In the following example, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt> exports the
+collection <tt class="docutils literal"><span class="pre">contacts</span></tt> from the <tt class="docutils literal"><span class="pre">users</span></tt> database from the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the localhost port
+number <tt class="docutils literal"><span class="pre">27017</span></tt>. This command writes the export data in <a class="reference internal" href="glossary.html#term-csv"><em class="xref std std-term">CSV</em></a>
+format into a file located at <tt class="docutils literal"><span class="pre">/opt/backups/contacts.csv</span></tt>.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --db users --collection contacts --csv --out /opt/backups/contacts.csv
+</pre></div>
+</div>
+<p>The next example creates an export of the collection <tt class="docutils literal"><span class="pre">contacts</span></tt>
+from the MongoDB instance running on the localhost port number <tt class="docutils literal"><span class="pre">27017</span></tt>,
+with journaling explicitly enabled. This writes the export to the
+<tt class="docutils literal"><span class="pre">contacts.json</span></tt> file in <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> format.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --db sales --collection contacts --out contacts.json --journal
+</pre></div>
+</div>
+<p>The following example exports the collection <tt class="docutils literal"><span class="pre">contacts</span></tt> from the
+<tt class="docutils literal"><span class="pre">sales</span></tt> database located in the MongoDB data files located at
+<tt class="docutils literal"><span class="pre">/srv/mongodb/</span></tt>. This operation writes the export to standard output
+in <a class="reference internal" href="glossary.html#term-json"><em class="xref std std-term">JSON</em></a> format.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --db sales --collection contacts --dbpath /srv/mongodb/
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The above example will only succeed if there is no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>
+connected to the data files located in the <tt class="docutils literal"><span class="pre">/srv/mongodb/</span></tt>
+directory.</p>
+</div>
+<p>The final example exports the collection <tt class="docutils literal"><span class="pre">contacts</span></tt> from the
+database <tt class="docutils literal"><span class="pre">marketing</span></tt> . This data resides on the MongoDB instance
+located on the host <tt class="docutils literal"><span class="pre">mongodb1.example.net</span></tt> running on port
+<tt class="docutils literal"><span class="pre">37017</span></tt>, which requires the username <tt class="docutils literal"><span class="pre">user</span></tt> and the password
+<tt class="docutils literal"><span class="pre">pass</span></tt>.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongoexport --host mongodb1.example.net --port 37017 --username user --password pass --collection contacts --db marketing --out mdb1-examplenet.json
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongoimport.html" title="Previous Section: mongoimport">&lt; &nbsp; mongoimport</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="mongostat.html" title="Next Section: mongostat">mongostat &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

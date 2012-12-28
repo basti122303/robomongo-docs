@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Replication Info Reference &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/replication-info" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Reference" href="../reference.html" />
+<link rel="next" title="Current Operation Reporting" href="current-op.html" />
+<link rel="prev" title="Replica Set Configuration" href="replica-configuration.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="replication-info-reference">
+<h1>Replication Info Reference<a class="headerlink" href="#replication-info-reference" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="method/db.getReplicationInfo.html#db.getReplicationInfo" title="db.getReplicationInfo"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getReplicationInfo()</span></tt></a> provides current status of the
+current replica status, using data polled from the
+&#8220;<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>&#8221;. Consider the values of this output when diagnosing
+issues with replication.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<a class="reference internal" href="../core/replication.html"><em>Replication Fundamentals</em></a>&#8221; for more information on
+replication.</p>
+</div>
+<div class="section" id="all-nodes">
+<h2>All Nodes<a class="headerlink" href="#all-nodes" title="Permalink to this headline">¶</a></h2>
+<p>The following fields are present in the output of
+<a class="reference internal" href="method/db.getReplicationInfo.html#db.getReplicationInfo" title="db.getReplicationInfo"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getReplicationInfo()</span></tt></a> for both <a class="reference internal" href="glossary.html#term-primary"><em class="xref std std-term">primary</em></a> and
+<a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> nodes.</p>
+<dl class="status">
+<dt id="logSizeMB">
+<tt class="descname">logSizeMB</tt><a class="headerlink" href="#logSizeMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total size of the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> in megabytes. This
+refers to the total amount of space allocated to the oplog rather
+than the current size of operations stored in the oplog.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="usedMB">
+<tt class="descname">usedMB</tt><a class="headerlink" href="#usedMB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total amount of space used by the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a> in
+megabytes. This refers to the total amount of space currently
+used by operations stored in the oplog rather than the total
+amount of space allocated.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="primary-nodes">
+<h2>Primary Nodes<a class="headerlink" href="#primary-nodes" title="Permalink to this headline">¶</a></h2>
+<p>The following fields appear in the output of
+<a class="reference internal" href="method/db.getReplicationInfo.html#db.getReplicationInfo" title="db.getReplicationInfo"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getReplicationInfo()</span></tt></a> for <a class="reference internal" href="glossary.html#term-primary"><em class="xref std std-term">primary</em></a> nodes.</p>
+<dl class="status">
+<dt id="errmsg">
+<tt class="descname">errmsg</tt><a class="headerlink" href="#errmsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the last error status.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="oplogMainRowCount">
+<tt class="descname">oplogMainRowCount</tt><a class="headerlink" href="#oplogMainRowCount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a counter of the number of items or rows
+(i.e. <a class="reference internal" href="glossary.html#term-document"><em class="xref std std-term">documents</em></a>) in the <a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="secondary-nodes">
+<h2>Secondary Nodes<a class="headerlink" href="#secondary-nodes" title="Permalink to this headline">¶</a></h2>
+<p>The following fields appear in the output of
+<a class="reference internal" href="method/db.getReplicationInfo.html#db.getReplicationInfo" title="db.getReplicationInfo"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.getReplicationInfo()</span></tt></a> for <a class="reference internal" href="glossary.html#term-secondary"><em class="xref std std-term">secondary</em></a> nodes.</p>
+<dl class="status">
+<dt id="timeDiff">
+<tt class="descname">timeDiff</tt><a class="headerlink" href="#timeDiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the difference between the first and last operation in the
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>, represented in seconds.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="timeDiffHours">
+<tt class="descname">timeDiffHours</tt><a class="headerlink" href="#timeDiffHours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the difference between the first and last operation in the
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>, rounded and represented in hours.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="tFirst">
+<tt class="descname">tFirst</tt><a class="headerlink" href="#tFirst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a time stamp for the first (i.e. earliest) operation in the
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. Compare this value to the last write operation
+issued against the server.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="tLast">
+<tt class="descname">tLast</tt><a class="headerlink" href="#tLast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a time stamp for the last (i.e. latest) operation in the
+<a class="reference internal" href="glossary.html#term-oplog"><em class="xref std std-term">oplog</em></a>. Compare this value to the last write operation
+issued against the server.</p>
+</dd></dl>
+
+<dl class="status">
+<dt id="now">
+<tt class="descname">now</tt><a class="headerlink" href="#now" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a time stamp reflecting the current time. The shell process
+generates this value, and the datum may differ slightly from the
+server time if you&#8217;re connecting from a remote host as a
+result. Equivalent to <a class="reference internal" href="method/Date.html#Date" title="Date"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">Date()</span></tt></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="replica-configuration.html" title="Previous Section: Replica Set Configuration">&lt; &nbsp; Replica Set Configuration</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="current-op.html" title="Next Section: Current Operation Reporting">Current Operation Reporting &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

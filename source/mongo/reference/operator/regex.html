@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$regex &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/regex" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$rename" href="rename.html" />
+<link rel="prev" title="$query" href="query.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="regex">
+<h1>$regex<a class="headerlink" href="#regex" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_regex">
+<tt class="descname">$regex</tt><a class="headerlink" href="#_S_regex" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> operator provides regular expression
+capabilities in queries. MongoDB uses Perl compatible regular
+expressions (i.e. &#8220;PCRE.&#8221;))The following examples are equivalent:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="sr">/acme.*corp/i</span> <span class="p">}</span> <span class="p">);</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$regex</span><span class="o">:</span> <span class="s1">&#39;acme.*corp&#39;</span><span class="p">,</span> <span class="nx">$options</span><span class="o">:</span> <span class="s1">&#39;i&#39;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>These expressions match all documents in <tt class="docutils literal"><span class="pre">collection</span></tt> where the
+value of <tt class="docutils literal"><span class="pre">field</span></tt> matches the case-insensitive regular expression
+<tt class="docutils literal"><span class="pre">acme.*corp</span></tt>.</p>
+<p><a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> uses &#8220;Perl Compatible Regular Expressions&#8221; (PCRE) as the
+matching engine.</p>
+<dl class="operator">
+<dt id="_S_options">
+<tt class="descname">$options</tt><a class="headerlink" href="#_S_options" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> provides four option flags:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">i</span></tt> toggles case insensitivity, and allows all letters in the
+pattern to match upper and lower cases.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">m</span></tt> toggles multiline regular expression. Without this option,
+all regular expression match within one line.</p>
+<p>If there are no newline characters (e.g. <tt class="docutils literal"><span class="pre">\n</span></tt>) or no
+start/end of line construct, the <tt class="docutils literal"><span class="pre">m</span></tt> option has no effect.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">x</span></tt> toggles an &#8220;extended&#8221; capability. When set,
+<a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> ignores all white space characters unless
+escaped or included in a character class.</p>
+<p>Additionally, it ignores characters between an un-escaped <tt class="docutils literal"><span class="pre">#</span></tt>
+character and the next new line, so that you may include
+comments in complicated patterns. This only applies to data
+characters; white space characters may never appear within
+special character sequences in a pattern.</p>
+<p>The <tt class="docutils literal"><span class="pre">x</span></tt> option does not affect the handling of the VT character
+(i.e. code 11.)</p>
+</li>
+</ul>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.9.0.</span></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">s</span></tt> allows the dot (e.g. <tt class="docutils literal"><span class="pre">.</span></tt>) character to match all
+characters <em>including</em> newline characters.</li>
+</ul>
+<p><a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> only provides the <tt class="docutils literal"><span class="pre">i</span></tt> and <tt class="docutils literal"><span class="pre">m</span></tt> options in the
+short JavaScript syntax (i.e. <tt class="docutils literal"><span class="pre">/acme.*corp/i</span></tt>). To use <tt class="docutils literal"><span class="pre">x</span></tt>
+and <tt class="docutils literal"><span class="pre">s</span></tt> you must use the &#8220;<a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a>&#8221; operator with the
+&#8220;<a class="reference internal" href="../operators.html#_S_options" title="$options"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$options</span></tt></a>&#8221; syntax.</p>
+</dd></dl>
+
+<p>To combine a regular expression match with other operators, you
+need to specify the &#8220;<a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a>&#8221; operator. For example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">$regex</span><span class="o">:</span> <span class="sr">/acme.*corp/i</span><span class="p">,</span> <span class="nx">$nin</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;acmeblahcorp&#39;</span> <span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</div>
+<p>This expression returns all instances of <tt class="docutils literal"><span class="pre">field</span></tt> in
+<tt class="docutils literal"><span class="pre">collection</span></tt> that match the case insensitive regular expression
+<tt class="docutils literal"><span class="pre">acme.*corp</span></tt> that <em>don&#8217;t</em> match <tt class="docutils literal"><span class="pre">acmeblahcorp</span></tt>.</p>
+<p><a class="reference internal" href="../operators.html#_S_regex" title="$regex"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$regex</span></tt></a> uses <a class="reference internal" href="../glossary.html#term-index"><em class="xref std std-term">indexes</em></a> only when the
+regular expression has an anchor for the beginning (i.e. <tt class="docutils literal"><span class="pre">^</span></tt>)
+of a string. Additionally, while <tt class="docutils literal"><span class="pre">/^a/</span></tt>, <tt class="docutils literal"><span class="pre">/^a.*/</span></tt>, and
+<tt class="docutils literal"><span class="pre">/^a.*$/</span></tt> are equivalent, they have different performance
+characteristics. All of these expressions use an index if an
+appropriate index exists; however, <tt class="docutils literal"><span class="pre">/^a.*/</span></tt>, and <tt class="docutils literal"><span class="pre">/^a.*$/</span></tt>
+are slower. <tt class="docutils literal"><span class="pre">/^a/</span></tt> can stop scanning after matching the prefix.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="query.html" title="Previous Section: $query">&lt; &nbsp; $query</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="rename.html" title="Next Section: $rename">$rename &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

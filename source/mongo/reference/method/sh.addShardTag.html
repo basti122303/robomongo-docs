@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>sh.addShardTag() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/sh.addShardTag" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="sh.addTagRange()" href="sh.addTagRange.html" />
+<link rel="prev" title="sh.addShard()" href="sh.addShard.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="sh-addshardtag">
+<h1>sh.addShardTag()<a class="headerlink" href="#sh-addshardtag" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="sh.addShardTag">
+<tt class="descclassname">sh.</tt><tt class="descname">addShardTag</tt><big>(</big><em>shard</em>, <em>tag</em><big>)</big><a class="headerlink" href="#sh.addShardTag" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.2.</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>shard</strong> &#8211; Specifies the name of the shard that you want to give
+a specific tag.</li>
+<li><strong>tag</strong> &#8211; Specifies the name of the tag that you want to add to
+the shard.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#sh.addShardTag" title="sh.addShardTag"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShardTag()</span></tt></a> associates a shard with a tag or
+identifier. MongoDB can use these identifiers, to &#8220;home&#8221; or attach
+(i.e. with <a class="reference internal" href="sh.addTagRange.html#sh.addTagRange" title="sh.addTagRange"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addTagRange()</span></tt></a>) specific data to a specific
+shard.</p>
+<p>Always issue <a class="reference internal" href="#sh.addShardTag" title="sh.addShardTag"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sh.addShardTag()</span></tt></a> when connected to a
+<a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> instance. The following example adds three tags,
+<tt class="docutils literal"><span class="pre">LGA</span></tt>, <tt class="docutils literal"><span class="pre">EWR</span></tt>, and <tt class="docutils literal"><span class="pre">JFK</span></tt>, to three shards:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">sh</span><span class="p">.</span><span class="nx">addShardTag</span><span class="p">(</span><span class="s2">&quot;shard0000&quot;</span><span class="p">,</span> <span class="s2">&quot;LGA&quot;</span><span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">addShardTag</span><span class="p">(</span><span class="s2">&quot;shard0001&quot;</span><span class="p">,</span> <span class="s2">&quot;EWR&quot;</span><span class="p">)</span>
+<span class="nx">sh</span><span class="p">.</span><span class="nx">addShardTag</span><span class="p">(</span><span class="s2">&quot;shard0002&quot;</span><span class="p">,</span> <span class="s2">&quot;JFK&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="sh.addShard.html" title="Previous Section: sh.addShard()">&lt; &nbsp; sh.addShard()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="sh.addTagRange.html" title="Next Section: sh.addTagRange()">sh.addTagRange() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

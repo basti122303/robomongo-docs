@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Aggregation &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/aggregation" />
+
+    
+    
+    <link rel="stylesheet" href="_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="about.html" />
+<link rel="top" title="MongoDB Manual" href="index.html" />
+<link rel="next" title="Aggregation Framework" href="applications/aggregation.html" />
+<link rel="prev" title="Delete" href="applications/delete.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="aggregation">
+<span id="aggregation-framework"></span><h1>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this headline">¶</a></h1>
+<p>In version 2.2, MongoDB introduced the <a class="reference internal" href="applications/aggregation.html"><em>aggregation framework</em></a> that provides a powerful and flexible set
+of tools to use for many data aggregation tasks. If you&#8217;re familiar with data aggregation in SQL, consider the
+<a class="reference internal" href="reference/sql-aggregation-comparison.html"><em>SQL to Aggregation Framework Mapping Chart</em></a> document as an introduction to
+some of the basic concepts in the aggregation framework. Consider the
+full documentation of the aggregation framework here:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="applications/aggregation.html">Aggregation Framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#framework-components">Framework Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#use">Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#optimizing-performance">Optimizing Performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#sharded-operation">Sharded Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/aggregation.html#limitations">Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/aggregation-examples.html">Aggregation Framework Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/aggregation-examples.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/aggregation-examples.html#aggregations-using-the-zip-code-data-set">Aggregations using the Zip Code Data Set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/aggregation-examples.html#aggregation-with-user-preference-data">Aggregation with User Preference Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/aggregation.html">Aggregation Framework Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/aggregation.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/aggregation.html#expressions">Expressions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="applications/map-reduce.html">Map-Reduce</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#map-reduce-examples">Map-Reduce Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#incremental-map-reduce">Incremental Map-Reduce</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#temporary-collection">Temporary Collection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#concurrency">Concurrency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#sharded-cluster">Sharded Cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications/map-reduce.html#troubleshooting-map-reduce-operations">Troubleshooting Map-Reduce Operations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>In addition to the aggregation framework, MongoDB provides simple
+<a class="reference internal" href="reference/simple-aggregation.html"><em>aggregation methods and commands</em></a>,
+that you may find useful for some classes of tasks:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/simple-aggregation.html">Simple Aggregation Methods and Commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/simple-aggregation.html#count">Count</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/simple-aggregation.html#distinct">Distinct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/simple-aggregation.html#group">Group</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="applications/delete.html" title="Previous Section: Delete">&lt; &nbsp; Delete</a></li>
+<li id="btnvnx"><a href="applications/aggregation.html" title="Next Section: Aggregation Framework">Aggregation Framework &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

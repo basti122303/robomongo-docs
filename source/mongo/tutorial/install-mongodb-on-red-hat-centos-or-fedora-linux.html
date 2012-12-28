@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Install MongoDB on Red Hat Enterprise, CentOS, or Fedora Linux &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Installing MongoDB" href="../installation.html" />
+<link rel="next" title="Install MongoDB on Ubuntu" href="install-mongodb-on-ubuntu.html" />
+<link rel="prev" title="Installing MongoDB" href="../installation.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="install-mongodb-on-red-hat-enterprise-centos-or-fedora-linux">
+<h1>Install MongoDB on Red Hat Enterprise, CentOS, or Fedora Linux<a class="headerlink" href="#install-mongodb-on-red-hat-enterprise-centos-or-fedora-linux" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial outlines the basic installation process for deploying
+<a class="reference internal" href="../reference/glossary.html#term-mongodb"><em class="xref std std-term">MongoDB</em></a> on Red Hat Enterprise Linux, CentOS Linux, Fedora Linux
+and related systems. This procedure uses <tt class="docutils literal"><span class="pre">.rpm</span></tt> packages as the
+basis of the installation. 10gen publishes packages of the MongoDB
+releases as <tt class="docutils literal"><span class="pre">.rpm</span></tt> packages for easy installation and management for
+users of Debian systems. While some of these distributions include
+their own MongoDB packages, the 10gen packages are generally more up
+to date.</p>
+<p>This tutorial includes: an overview of the available packages,
+instructions for configuring the package manager, the process install
+packages from the 10gen repository, and preliminary MongoDB
+configuration and operation.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>The documentation of following related processes and
+concepts.</p>
+<p>Other installation tutorials:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="install-mongodb-on-debian-or-ubuntu-linux.html"><em>Install MongoDB on Debian or Ubuntu Linux</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-debian.html"><em>Install MongoDB on Debian</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-ubuntu.html"><em>Install MongoDB on Ubuntu</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-linux.html"><em>Install MongoDB on Linux</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-os-x.html"><em>Install MongoDB on OS X</em></a></li>
+<li><a class="reference internal" href="install-mongodb-on-windows.html"><em>Install MongoDB on Windows</em></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="package-options">
+<h2>Package Options<a class="headerlink" href="#package-options" title="Permalink to this headline">¶</a></h2>
+<p>The 10gen repository contains four packages:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mongo-10gen</span></tt></p>
+<p>This package contains MongoDB tools from latest <strong>stable</strong>
+release. Install this package on all production MongoDB hosts and
+optionally on other systems from which you may need to administer
+MongoDB systems.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mongo-10gen-server</span></tt></p>
+<p>This package contains the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+daemons from the latest <strong>stable</strong> release and associated
+configuration and init scripts.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mongo18-10gen</span></tt></p>
+<p>This package contains MongoDB tools from previous release. Install
+this package on all production MongoDB hosts and optionally on other
+systems from which you may need to administer MongoDB systems.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">mongo18-10gen-server</span></tt></p>
+<p>This package contains the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> and <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>
+daemons from previous stable release and associated configuration and init
+scripts.</p>
+</li>
+</ul>
+<p>The MongoDB tools included in the <tt class="docutils literal"><span class="pre">mongo-10gen</span></tt> packages are:</p>
+<ul class="simple">
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongostat</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongotop</span></tt></li>
+<li><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">bsondump</span></tt></li>
+</ul>
+</div>
+<div class="section" id="installing-mongodb">
+<h2>Installing MongoDB<a class="headerlink" href="#installing-mongodb" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="configure-package-management-system-yum">
+<h3>Configure Package Management System (YUM)<a class="headerlink" href="#configure-package-management-system-yum" title="Permalink to this headline">¶</a></h3>
+<p>Create a <tt class="docutils literal"><span class="pre">/etc/yum.repos.d/10gen.repo</span></tt> file to hold information
+about your repository. If you are running a 64-bit system
+(recommended,) place the following configuration in
+<tt class="docutils literal"><span class="pre">/etc/yum.repos.d/10gen.repo</span></tt> file:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="k">[10gen]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">10gen Repository</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://downloads-distro.mongodb.org/repo/redhat/os/x86_64</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+<span class="na">enabled</span><span class="o">=</span><span class="s">1</span>
+</pre></div>
+</div>
+<p>If you are running a 32-bit system, which isn&#8217;t recommended for
+production deployments, place the following configuration in
+<tt class="docutils literal"><span class="pre">/etc/yum.repos.d/10gen.repo</span></tt> file:</p>
+<div class="highlight-cfg"><div class="highlight"><pre><span class="k">[10gen]</span>
+<span class="na">name</span><span class="o">=</span><span class="s">10gen Repository</span>
+<span class="na">baseurl</span><span class="o">=</span><span class="s">http://downloads-distro.mongodb.org/repo/redhat/os/i686</span>
+<span class="na">gpgcheck</span><span class="o">=</span><span class="s">0</span>
+<span class="na">enabled</span><span class="o">=</span><span class="s">1</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-packages">
+<h3>Installing Packages<a class="headerlink" href="#installing-packages" title="Permalink to this headline">¶</a></h3>
+<p>Issue the following command (as root or with <tt class="docutils literal"><span class="pre">sudo</span></tt>) to install the
+latest stable version of MongoDB and the associated tools:</p>
+<div class="highlight-sh"><div class="highlight"><pre>yum install mongo-10gen mongo-10gen-server
+</pre></div>
+</div>
+<p>When this command completes, you have successfully installed MongoDB!
+Continue for configuration and start-up suggestions.</p>
+</div>
+</div>
+<div class="section" id="configure-mongodb">
+<h2>Configure MongoDB<a class="headerlink" href="#configure-mongodb" title="Permalink to this headline">¶</a></h2>
+<p>These packages configure MongoDB using the <tt class="docutils literal"><span class="pre">/etc/mongod.conf</span></tt> file
+in conjunction with the <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control script</em></a>.  You can find the init
+script at <tt class="docutils literal"><span class="pre">/etc/rc.d/init.d/mongod</span></tt>.</p>
+<p>This MongoDB instance will store its data files in the
+<tt class="docutils literal"><span class="pre">/var/lib/mongo</span></tt> and its log files in <tt class="docutils literal"><span class="pre">/var/log/mongo</span></tt>, and
+run using the <tt class="docutils literal"><span class="pre">mongod</span></tt> user account.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you change the user that runs the MongoDB process, you will need
+to modify the access control rights to the <tt class="docutils literal"><span class="pre">/var/lib/mongo</span></tt> and
+<tt class="docutils literal"><span class="pre">/var/log/mongo</span></tt> directories.</p>
+</div>
+</div>
+<div class="section" id="control-mongodb">
+<h2>Control MongoDB<a class="headerlink" href="#control-mongodb" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">With the introduction of <tt class="docutils literal"><span class="pre">systemd</span></tt> in Fedora 15, the control
+scripts included in the packages available in the 10gen repository
+are not compatible with Fedora systems. A correction is
+forthcoming, see <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-7285">SERVER-7285</a> for more information, and in
+the mean time use your own control scripts <em>or</em> install using the
+procedure outlined in <a class="reference internal" href="install-mongodb-on-linux.html"><em>Install MongoDB on Linux</em></a>.</p>
+</div>
+<div class="section" id="start-mongodb">
+<h3>Start MongoDB<a class="headerlink" href="#start-mongodb" title="Permalink to this headline">¶</a></h3>
+<p>Start the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process by issuing the following command
+(as root, or with <tt class="docutils literal"><span class="pre">sudo</span></tt>):</p>
+<div class="highlight-sh"><div class="highlight"><pre>service mongod start
+</pre></div>
+</div>
+<p>You can verify that the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process has started
+successfully by checking the contents of the log file at
+<tt class="docutils literal"><span class="pre">/var/log/mongo/mongod.log</span></tt>.</p>
+<p>You may optionally, ensure that MongoDB will start following a system
+reboot, by issuing the following command (with root privileges:)</p>
+<div class="highlight-sh"><div class="highlight"><pre>chkconfig mongod on
+</pre></div>
+</div>
+</div>
+<div class="section" id="stop-mongodb">
+<h3>Stop MongoDB<a class="headerlink" href="#stop-mongodb" title="Permalink to this headline">¶</a></h3>
+<p>Stop the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process by issuing the following command
+(as root, or with <tt class="docutils literal"><span class="pre">sudo</span></tt>):</p>
+<div class="highlight-sh"><div class="highlight"><pre>service mongod stop
+</pre></div>
+</div>
+</div>
+<div class="section" id="restart-mongodb">
+<h3>Restart MongoDB<a class="headerlink" href="#restart-mongodb" title="Permalink to this headline">¶</a></h3>
+<p>You can restart the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process by issuing the following
+command (as root, or with <tt class="docutils literal"><span class="pre">sudo</span></tt>):</p>
+<div class="highlight-sh"><div class="highlight"><pre>service mongod restart
+</pre></div>
+</div>
+<p>Follow the state of this process by watching the output in the
+<tt class="docutils literal"><span class="pre">/var/log/mongo/mongod.log</span></tt> file to watch for errors or important
+messages from the server.</p>
+<p>You can restart the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process by issuing the following
+command (as root, or with <tt class="docutils literal"><span class="pre">sudo</span></tt>):</p>
+</div>
+<div class="section" id="control-mongos">
+<h3>Control <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a><a class="headerlink" href="#control-mongos" title="Permalink to this headline">¶</a></h3>
+<p>As of the current release, there are no <a class="reference internal" href="../reference/glossary.html#term-101"><em class="xref std std-term">control scripts</em></a> for <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>. <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> is only
+used in sharding deployments and typically do not run on the same
+systems where <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> runs. You can use the <tt class="docutils literal"><span class="pre">mongodb</span></tt>
+script referenced above to derive your own <a class="reference internal" href="../reference/config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a> control
+script.</p>
+</div>
+<div class="section" id="selinux-considerations">
+<h3>SELinux Considerations<a class="headerlink" href="#selinux-considerations" title="Permalink to this headline">¶</a></h3>
+<p>You must SELinux to allow MongoDB to start on Fedora
+systems. Administrators have two options:</p>
+<ul class="simple">
+<li>enable access to the relevant ports (e.g. 27017) for SELinux. See
+<a class="reference internal" href="../administration/security.html#security-port-numbers"><em>Interfaces and Port Numbers</em></a> for more information on MongoDB&#8217;s
+default ports.</li>
+<li>disable SELinux entirely. This requires a system reboot and may have
+larger implications for your deployment.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="using-mongodb">
+<h2>Using MongoDB<a class="headerlink" href="#using-mongodb" title="Permalink to this headline">¶</a></h2>
+<p>Among the tools included in the <tt class="docutils literal"><span class="pre">mongo-10gen</span></tt> package, is the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell. You can connect to your MongoDB instance by
+issuing the following command at the system prompt:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongo
+</pre></div>
+</div>
+<p>This will connect to the database running on the localhost interface
+by default. At the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> prompt, issue the following two
+commands to insert a record in the &#8220;test&#8221; <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">collection</em></a> of the
+(default) &#8220;test&#8221; database and then retrieve that document.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">test</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt>&#8221; and &#8220;<a class="reference internal" href="../reference/javascript.html"><em>JavaScript Interface</em></a>&#8220;</p>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../installation.html" title="Previous Section: Installing MongoDB">&lt; &nbsp; Installing MongoDB</a></li>
+<li id="btnvup"><a href="../installation.html" title="Parent Section: Installing MongoDB" >&#47;&#92;&nbsp; Installing MongoDB</a></li>
+<li id="btnvnx"><a href="install-mongodb-on-ubuntu.html" title="Next Section: Install MongoDB on Ubuntu">Install MongoDB on Ubuntu &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

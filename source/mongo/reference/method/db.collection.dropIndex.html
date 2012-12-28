@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.collection.dropIndex() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.collection.dropIndex" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.collection.dropIndexes()" href="db.collection.dropIndexes.html" />
+<link rel="prev" title="db.collection.drop()" href="db.collection.drop.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-collection-dropindex">
+<h1>db.collection.dropIndex()<a class="headerlink" href="#db-collection-dropindex" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.collection.dropIndex">
+<tt class="descclassname">db.collection.</tt><tt class="descname">dropIndex</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#db.collection.dropIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drops or removes the specified index from a collection. The
+<a class="reference internal" href="#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> method provides a wrapper around
+the <a class="reference internal" href="../commands.html#dropIndexes" title="dropIndexes"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">dropIndexes</span></tt></a> command.</p>
+<p>The <a class="reference internal" href="#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> method takes the following
+parameter:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>index</strong> &#8211; Specifies either the name or the key of the index to drop. You <strong>must</strong>
+use the name of the index if you specified a name during the
+index creation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> method cannot drop the
+<tt class="docutils literal"><span class="pre">_id</span></tt> index. Use the <a class="reference internal" href="db.collection.getIndexes.html#db.collection.getIndexes" title="db.collection.getIndexes"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.getIndexes()</span></tt></a> method
+to view all indexes on a collection.</p>
+<p>Consider the following examples of the
+<a class="reference internal" href="#db.collection.dropIndex" title="db.collection.dropIndex"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.dropIndex()</span></tt></a> method that assumes the
+following indexes on the collection <tt class="docutils literal"><span class="pre">pets</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">getIndexes</span><span class="p">()</span>
+<span class="p">[</span>
+   <span class="p">{</span>  <span class="s2">&quot;v&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+      <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;test.pets&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;_id_&quot;</span>
+   <span class="p">},</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;v&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;cat&quot;</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">},</span>
+      <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;test.pets&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;catIdx&quot;</span>
+   <span class="p">},</span>
+   <span class="p">{</span>
+      <span class="s2">&quot;v&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;key&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;cat&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;dog&quot;</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">},</span>
+      <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;test.pets&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="o">:</span> <span class="s2">&quot;cat_1_dog_-1&quot;</span>
+   <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">To drop the index on the field <tt class="docutils literal"><span class="pre">cat</span></tt>, you must use the index
+name <tt class="docutils literal"><span class="pre">catIdx</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">dropIndex</span><span class="p">(</span> <span class="s1">&#39;catIdx&#39;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">To drop the index on the fields <tt class="docutils literal"><span class="pre">cat</span></tt> and <tt class="docutils literal"><span class="pre">dog</span></tt>, you use
+either the index name <tt class="docutils literal"><span class="pre">cat_1_dog_-1</span></tt> or the key <tt class="docutils literal"><span class="pre">{</span> <span class="pre">&quot;cat&quot;</span> <span class="pre">:</span> <span class="pre">1,</span>
+<span class="pre">&quot;dog&quot;</span> <span class="pre">:</span> <span class="pre">-1</span> <span class="pre">}</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">dropIndex</span><span class="p">(</span> <span class="s1">&#39;cat_1_dog_-1&#39;</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">dropIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">cat</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">dog</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.collection.drop.html" title="Previous Section: db.collection.drop()">&lt; &nbsp; db.collection.drop()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.collection.dropIndexes.html" title="Next Section: db.collection.dropIndexes()">db.collection.dropIndexes() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

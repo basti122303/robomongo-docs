@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>getCmdLineOpts &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/getCmdLineOpts" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="getLastError" href="getLastError.html" />
+<link rel="prev" title="geoWalk" href="geoWalk.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="getcmdlineopts">
+<h1>getCmdLineOpts<a class="headerlink" href="#getcmdlineopts" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="getCmdLineOpts">
+<tt class="descname">getCmdLineOpts</tt><a class="headerlink" href="#getCmdLineOpts" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#getCmdLineOpts" title="getCmdLineOpts"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getCmdLineOpts</span></tt></a> command returns a document containing
+command line options used to start the given <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">getCmdLineOpts</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>This command returns a document with two fields, <tt class="docutils literal"><span class="pre">argv</span></tt> and
+<tt class="docutils literal"><span class="pre">parsed</span></tt>. The <tt class="docutils literal"><span class="pre">argv</span></tt> field contains an array with each item
+from the command string used to invoke <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. The document
+in the <tt class="docutils literal"><span class="pre">parsed</span></tt> field includes all runtime options, including
+those parsed from the command line and those specified in the
+configuration file, if specified.</p>
+<p>Consider the following example output of
+<a class="reference internal" href="../commands.html#getCmdLineOpts" title="getCmdLineOpts"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">getCmdLineOpts</span></tt></a>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+        <span class="s2">&quot;argv&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="s2">&quot;/usr/bin/mongod&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;--config&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;/etc/mongodb.conf&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;--fork&quot;</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;parsed&quot;</span> <span class="o">:</span> <span class="p">{</span>
+               <span class="s2">&quot;bind_ip&quot;</span> <span class="o">:</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;config&quot;</span> <span class="o">:</span> <span class="s2">&quot;/etc/mongodb/mongodb.conf&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;dbpath&quot;</span> <span class="o">:</span> <span class="s2">&quot;/srv/mongodb&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;fork&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+               <span class="s2">&quot;logappend&quot;</span> <span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;logpath&quot;</span> <span class="o">:</span> <span class="s2">&quot;/var/log/mongodb/mongod.log&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;quiet&quot;</span> <span class="o">:</span> <span class="s2">&quot;true&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="http://docs.mongodb.org/manual/administration/import-export/">http://docs.mongodb.org/manual/administration/import-export/</a></p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="geoWalk.html" title="Previous Section: geoWalk">&lt; &nbsp; geoWalk</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="getLastError.html" title="Next Section: getLastError">getLastError &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

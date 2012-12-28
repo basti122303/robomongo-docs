@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>$or &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/operator/or" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Query, Update, Projection, and Aggregation Operators" href="../operator.html" />
+<link rel="next" title="$orderby" href="orderby.html" />
+<link rel="prev" title="$not" href="not.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="or">
+<h1>$or<a class="headerlink" href="#or" title="Permalink to this headline">¶</a></h1>
+<dl class="operator">
+<dt id="_S_or">
+<tt class="descname">$or</tt><a class="headerlink" href="#_S_or" title="Permalink to this definition">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 1.6.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">Changed in version 2.0: </span>You may nest <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operations; however, these
+expressions are not as efficiently optimized as top-level.</p>
+<p><em>Syntax</em>: <tt class="docutils literal"><span class="pre">{</span> <span class="pre">$or:</span> <span class="pre">[</span> <span class="pre">{</span> <span class="pre">&lt;expression1&gt;</span> <span class="pre">},</span> <span class="pre">{</span> <span class="pre">&lt;expression2&gt;</span> <span class="pre">},</span> <span class="pre">...</span> <span class="pre">,</span> <span class="pre">{</span> <span class="pre">&lt;expressionN&gt;</span> <span class="pre">}</span> <span class="pre">]</span> <span class="pre">}</span></tt></p>
+<p>The <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator performs a logical <tt class="docutils literal"><span class="pre">OR</span></tt> operation on an array of
+<em>two or more</em> <tt class="docutils literal"><span class="pre">&lt;expressions&gt;</span></tt> and selects the documents that satisfy
+<em>at least</em> one of the <tt class="docutils literal"><span class="pre">&lt;expressions&gt;</span></tt>.</p>
+<p>Consider the following query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span><span class="mf">1.99</span><span class="p">,</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span> <span class="mi">20</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt> collection
+where:</p>
+<ul class="simple">
+<li>the <tt class="docutils literal"><span class="pre">price</span></tt> field value equals <tt class="docutils literal"><span class="pre">1.99</span></tt> <em>and</em></li>
+<li>either the <tt class="docutils literal"><span class="pre">qty</span></tt> field value is less than <tt class="docutils literal"><span class="pre">20</span></tt> <strong>or</strong> the
+<tt class="docutils literal"><span class="pre">sale</span></tt> field value is <tt class="docutils literal"><span class="pre">true</span></tt>.</li>
+</ul>
+<p>Consider the following example which uses the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator to select
+fields from embedded documents:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span><span class="mf">10.99</span> <span class="p">},</span> <span class="p">{</span> <span class="s2">&quot;carrier.state&quot;</span><span class="o">:</span> <span class="s2">&quot;NY&quot;</span><span class="p">}</span> <span class="p">]</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span><span class="o">:</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This <a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a> operation will set
+the value of the <tt class="docutils literal"><span class="pre">sale</span></tt> field in the documents in the
+<tt class="docutils literal"><span class="pre">inventory</span></tt> collection where:</p>
+<ul class="simple">
+<li>the <tt class="docutils literal"><span class="pre">price</span></tt> field value equals <tt class="docutils literal"><span class="pre">10.99</span></tt> <strong>or</strong></li>
+<li>the <tt class="docutils literal"><span class="pre">carrier</span></tt> embedded document contains a field <tt class="docutils literal"><span class="pre">state</span></tt> whose
+value equals <tt class="docutils literal"><span class="pre">NY</span></tt>.</li>
+</ul>
+<p>When using <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> with <tt class="docutils literal"><span class="pre">&lt;expressions&gt;</span></tt> that are equality
+checks for the value of the same field, choose the <a class="reference internal" href="../operators.html#_S_in" title="$in"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$in</span></tt></a>
+operator over the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator.</p>
+<p>Consider the query to select all documents in the <tt class="docutils literal"><span class="pre">inventory</span></tt>
+collection where:</p>
+<ul class="simple">
+<li>either <tt class="docutils literal"><span class="pre">price</span></tt> field value equals <tt class="docutils literal"><span class="pre">1.99</span></tt> <em>or</em> the <tt class="docutils literal"><span class="pre">sale</span></tt>
+field value equals <tt class="docutils literal"><span class="pre">true</span></tt>, <strong>and</strong></li>
+<li>either <tt class="docutils literal"><span class="pre">qty</span></tt> field value equals <tt class="docutils literal"><span class="pre">20</span></tt> <em>or</em> <tt class="docutils literal"><span class="pre">qty</span></tt> field value
+equals <tt class="docutils literal"><span class="pre">50</span></tt>,</li>
+</ul>
+<p>The most effective query would be:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span> <span class="p">(</span> <span class="p">{</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.99</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">],</span> <span class="nx">qty</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$in</span><span class="o">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Consider the following behaviors when using the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a>
+operator:</p>
+<ul>
+<li><p class="first">When using indexes with <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> queries, remember that
+each clause of an <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> query will execute in parallel.
+These clauses can each use their own index. Consider the following
+query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span> <span class="p">(</span> <span class="p">{</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.99</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For this query, you would create one index on <tt class="docutils literal"><span class="pre">price</span></tt> (
+<tt class="docutils literal"><span class="pre">db.inventory.ensureIndex(</span> <span class="pre">{</span> <span class="pre">price:</span> <span class="pre">1</span> <span class="pre">}</span> <span class="pre">)</span></tt> ) and another index
+on <tt class="docutils literal"><span class="pre">sale</span></tt> ( <tt class="docutils literal"><span class="pre">db.inventory.ensureIndex(</span> <span class="pre">{</span> <span class="pre">sale:</span> <span class="pre">1</span> <span class="pre">}</span> <span class="pre">)</span></tt> ) rather
+than a compound index.</p>
+</li>
+<li><p class="first">Also, when using the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator with the
+<a class="reference internal" href="../method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> method in a query, the query will
+<strong>not</strong> use the indexes on the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> fields. Consider the following
+query which adds a <a class="reference internal" href="../method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> method to the above query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">inventory</span><span class="p">.</span><span class="nx">find</span> <span class="p">(</span> <span class="p">{</span> <span class="nx">$or</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">price</span><span class="o">:</span> <span class="mf">1.99</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">sale</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">]</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">({</span><span class="nx">item</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This modified query will not use the index on <tt class="docutils literal"><span class="pre">price</span></tt> nor the
+index on <tt class="docutils literal"><span class="pre">sale</span></tt>.</p>
+</li>
+<li><p class="first">You cannot use the <a class="reference internal" href="../operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> with <tt class="docutils literal"><span class="pre">2d</span></tt> <a class="reference internal" href="../../core/geospatial-indexes.html"><em>geospatial
+queries</em></a>.</p>
+</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>,
+<a class="reference internal" href="../method/db.collection.update.html#db.collection.update" title="db.collection.update"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">update()</span></tt></a>, <a class="reference internal" href="../operators.html#_S_set" title="$set"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$set</span></tt></a>,
+<a class="reference internal" href="../operators.html#_S_and" title="$and"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$and</span></tt></a>, <a class="reference internal" href="../method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="not.html" title="Previous Section: $not">&lt; &nbsp; $not</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="orderby.html" title="Next Section: $orderby">$orderby &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

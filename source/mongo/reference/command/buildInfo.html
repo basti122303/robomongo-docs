@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>buildInfo &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/buildInfo" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="checkShardingIndex (internal)" href="checkShardingIndex.html" />
+<link rel="prev" title="availableQueryOptions (internal)" href="availableQueryOptions.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="buildinfo">
+<h1>buildInfo<a class="headerlink" href="#buildinfo" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="buildInfo">
+<tt class="descname">buildInfo</tt><a class="headerlink" href="#buildInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#buildInfo" title="buildInfo"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">buildInfo</span></tt></a> command is an administrative command which
+returns a build summary for the current <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre>  <span class="p">{</span> <span class="nx">buildInfo</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+
+<span class="nx">The</span> <span class="nx">information</span> <span class="nx">provided</span> <span class="nx">includes</span> <span class="nx">the</span> <span class="nx">following</span><span class="o">:</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>The version of MongoDB currently running.</li>
+<li>The information about the system that built the
+&#8220;<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>&#8221; binary, including a timestamp for the build.</li>
+<li>The architecture of the binary (i.e. 64 or 32 bits.)</li>
+<li>The maximum allowable <a class="reference internal" href="../glossary.html#term-bson"><em class="xref std std-term">BSON</em></a> object size in bytes (in the field <tt class="docutils literal"><span class="pre">maxBsonObjectSize</span></tt>.)</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="availableQueryOptions.html" title="Previous Section: availableQueryOptions (internal)">&lt; &nbsp; availableQueryOptions (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="checkShardingIndex.html" title="Next Section: checkShardingIndex (internal)">checkShardingIndex (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

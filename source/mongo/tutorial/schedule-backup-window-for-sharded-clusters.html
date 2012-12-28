@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Schedule Backup Window for Sharded Clusters &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/schedule-backup-window-for-sharded-clusters" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Sharding" href="../sharding.html" />
+<link rel="next" title="Administration" href="../administration.html" />
+<link rel="prev" title="Restore Sharded Clusters" href="restore-sharded-cluster.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="schedule-backup-window-for-sharded-clusters">
+<h1>Schedule Backup Window for Sharded Clusters<a class="headerlink" href="#schedule-backup-window-for-sharded-clusters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>In a <a class="reference internal" href="../reference/glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded cluster</em></a>, the balancer process is responsible for
+distributing sharded data around the cluster, so that each
+<a class="reference internal" href="../reference/glossary.html#term-shard"><em class="xref std std-term">shard</em></a> has roughly the same amount of data.</p>
+<p>However, when creating backups from a sharded cluster it&#8217;s important
+that you disable the balancer while taking backups to ensure that no
+chunk migrations affect the content of the backup captured by the
+backup procedure. Using the procedure outlined in the section
+<a class="reference internal" href="../administration/sharding.html#sharding-balancing-disable-temporally"><em>Disable the Balancer</em></a> you can stop the balancer
+process temporarily using a manual process. As an alternative you can
+use this procedure to define a balancing window so that the balancer
+is always during your automated backup operation.</p>
+</div>
+<div class="section" id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Permalink to this headline">¶</a></h2>
+<p>If you have an automated backup schedule, you can disable all
+balancing operations for a period of time. For instance, consider the
+following command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">use</span> <span class="nx">config</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;balancer&quot;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">$set</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">activeWindow</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">start</span> <span class="o">:</span> <span class="s2">&quot;6:00&quot;</span><span class="p">,</span> <span class="nx">stop</span> <span class="o">:</span> <span class="s2">&quot;23:00&quot;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">},</span> <span class="kc">true</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation configures the balancer to run between 6:00 am and
+11:00pm, server time. Schedule your backup operation to run <em>and
+complete</em> in this time. Ensure that the backup can complete during the
+window when the balancer is running <em>and</em> that the balancer can
+effectively balance the collection among the shards in the window
+allotted to each.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="restore-sharded-cluster.html" title="Previous Section: Restore Sharded Clusters">&lt; &nbsp; Restore Sharded Clusters</a></li>
+<li id="btnvup"><a href="../sharding.html" title="Parent Section: Sharding" >&#47;&#92;&nbsp; Sharding</a></li>
+<li id="btnvnx"><a href="../administration.html" title="Next Section: Administration">Administration &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

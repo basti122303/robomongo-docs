@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Indexing Strategies &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/indexes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Indexes" href="../indexes.html" />
+<link rel="next" title="Geospatial Queries with 2d Indexes" href="geospatial-indexes.html" />
+<link rel="prev" title="Indexing Operations" href="../administration/indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="indexing-strategies">
+<h1>Indexing Strategies<a class="headerlink" href="#indexing-strategies" title="Permalink to this headline">¶</a></h1>
+<p>This document provides strategies for indexing in MongoDB. For
+fundamentals of MongoDB indexing, see <a class="reference internal" href="../core/indexes.html"><em>Indexing Overview</em></a>. For
+operational guidelines and procedures, see
+<a class="reference internal" href="../administration/indexes.html"><em>Indexing Operations</em></a>.</p>
+<div class="section" id="strategies">
+<h2>Strategies<a class="headerlink" href="#strategies" title="Permalink to this headline">¶</a></h2>
+<p>The best indexes for your application are based on a number of factors,
+including the kinds of queries you expect, the ratio of reads to writes,
+and the amount of free memory on your system.</p>
+<p>When developing your indexing strategy you should have a deep
+understanding of:</p>
+<ul class="simple">
+<li>The application&#8217;s queries.</li>
+<li>The relative frequency of each query in the application.</li>
+<li>The current indexes created for your collections.</li>
+<li>Which indexes the most common queries use.</li>
+</ul>
+<p>The best overall strategy for designing indexes is to profile a variety
+of index configurations with data sets similar to the ones you&#8217;ll be
+running in production to see which configurations perform best.</p>
+<p>MongoDB can only use <em>one</em> index to support any given
+operation. However, each clause of an <a class="reference internal" href="../reference/operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> query can use
+its own index.</p>
+</div>
+<div class="section" id="create-indexes-to-support-your-queries">
+<span id="indexes-create-to-match-queries"></span><h2>Create Indexes to Support Your Queries<a class="headerlink" href="#create-indexes-to-support-your-queries" title="Permalink to this headline">¶</a></h2>
+<p>If you only ever query on a single key in a given collection, then you need
+to create just one single-key index for that collection. For example, you
+might create an index on <tt class="docutils literal"><span class="pre">category</span></tt> in the <tt class="docutils literal"><span class="pre">product</span></tt> collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;category&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>However, if you sometimes query on only one key and at other times
+query on that key combined with a second key, then creating a
+<a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound index</em></a> is more efficient. MongoDB
+will use the compound index for both queries. For example, you might
+create an index on both <tt class="docutils literal"><span class="pre">category</span></tt> and <tt class="docutils literal"><span class="pre">item</span></tt>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">products</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;category&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This allows you both options. You can query on just <tt class="docutils literal"><span class="pre">category</span></tt>, and
+you also can query on <tt class="docutils literal"><span class="pre">category</span></tt> combined with <tt class="docutils literal"><span class="pre">item</span></tt>.
+(To query on multiple keys and sort the results, see <a class="reference internal" href="#index-sort"><em>Use Indexes to Sort Query Results</em></a>.)</p>
+<p>With the exception of queries that use the <a class="reference internal" href="../reference/operators.html#_S_or" title="$or"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$or</span></tt></a> operator, a
+query cannot use multiple indexes. A query must use only one index.</p>
+</div>
+<div class="section" id="use-compound-indexes-to-support-several-different-queries">
+<span id="indexes-compound-key-indexes"></span><span id="compound-key-indexes"></span><h2>Use Compound Indexes to Support Several Different Queries<a class="headerlink" href="#use-compound-indexes-to-support-several-different-queries" title="Permalink to this headline">¶</a></h2>
+<p>A single <a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound index</em></a> on multiple fields
+can support all the queries that search a &#8220;prefix&#8221; subset of those fields.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following index on a collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">z</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Can support queries that the following indexes support:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>There are some situations where the prefix indexes may offer better
+query performance: for example if <tt class="docutils literal"><span class="pre">z</span></tt> is a large array.</p>
+<p>The <tt class="docutils literal"><span class="pre">{</span> <span class="pre">x:</span> <span class="pre">1,</span> <span class="pre">y:</span> <span class="pre">1,</span> <span class="pre">z:</span> <span class="pre">1</span> <span class="pre">}</span></tt> index can also support many of the same
+queries as the following index:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">z</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Also, <tt class="docutils literal"><span class="pre">{</span> <span class="pre">x:</span> <span class="pre">1,</span> <span class="pre">z:</span> <span class="pre">1</span> <span class="pre">}</span></tt> has an additional use. Given the following
+query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">x</span><span class="o">:</span> <span class="mi">5</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">z</span><span class="o">:</span> <span class="mi">1</span><span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p class="last">The <tt class="docutils literal"><span class="pre">{</span> <span class="pre">x:</span> <span class="pre">1,</span> <span class="pre">z:</span> <span class="pre">1</span> <span class="pre">}</span></tt> index supports both the query and the sort
+operation, while the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">x:</span> <span class="pre">1,</span> <span class="pre">y:</span> <span class="pre">1,</span> <span class="pre">z:</span> <span class="pre">1</span> <span class="pre">}</span></tt> index only supports
+the query. For more information on sorting, see
+<a class="reference internal" href="#sorting-with-indexes"><em>Use Indexes to Sort Query Results</em></a>.</p>
+</div>
+</div>
+<div class="section" id="create-indexes-that-support-covered-queries">
+<span id="indexes-covered-queries"></span><span id="covered-queries"></span><h2>Create Indexes that Support Covered Queries<a class="headerlink" href="#create-indexes-that-support-covered-queries" title="Permalink to this headline">¶</a></h2>
+<p>A covered index query is a query in which all the queried fields are
+part of an index. They are &#8220;covered queries&#8221; because an index &#8220;covers&#8221; the query.
+MongoDB can fulfill the query by using <em>only</em> the index. MongoDB need
+not scan documents from the database.</p>
+<p>Querying <em>only</em> the index is much faster than querying documents. Index
+keys are typically smaller than the documents they catalog, and indexes
+are typically stored in RAM or located sequentially on disk.</p>
+<p>Mongod automatically uses a covered query when possible. To ensure use
+of a covered query, create an index that includes all the fields listed
+in the query result. This means that the <a class="reference internal" href="../reference/glossary.html#term-projection"><em class="xref std std-term">projection</em></a> document
+given to a query (to specify which fields MongoDB returns from
+the result set) must
+explicitly exclude the <tt class="docutils literal"><span class="pre">_id</span></tt> field from the result set, unless the
+index includes <tt class="docutils literal"><span class="pre">_id</span></tt>.</p>
+<p>MongoDB cannot use a covered query if any of the indexed fields in any
+of the documents in the collection includes an array. If an indexed field
+is an array, the index becomes a <a class="reference internal" href="../core/indexes.html#index-type-multikey"><em>multi-key index</em></a> index and cannot support a covered query.</p>
+<p>To test whether MongoDB used a covered query, use
+<a class="reference internal" href="../reference/method/cursor.explain.html#cursor.explain" title="cursor.explain"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">explain()</span></tt></a>. If the output displays <tt class="docutils literal"><span class="pre">true</span></tt>
+for the <tt class="docutils literal"><span class="pre">indexOnly</span></tt> field, MongoDB used a covered query. For
+more information see <a class="reference internal" href="../administration/indexes.html#indexes-measuring-use"><em>Measure Index Use</em></a>.</p>
+</div>
+<div class="section" id="use-indexes-to-sort-query-results">
+<span id="sorting-with-indexes"></span><span id="index-sort"></span><h2>Use Indexes to Sort Query Results<a class="headerlink" href="#use-indexes-to-sort-query-results" title="Permalink to this headline">¶</a></h2>
+<p>For the fastest performance when sorting query results by a given field,
+create a sorted index on that field.</p>
+<p>To sort query results on multiple fields, create a <a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound
+index</em></a>. MongoDB sorts results based on the field
+order in the index. For queries that include a sort that uses a
+compound index, ensure that all fields before the first sorted field
+are equality matches.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>If you create the following index:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">c</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">d</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The following query and sort operations can use the index:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">4</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">b</span><span class="o">:</span><span class="mi">5</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">5</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">c</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">5</span><span class="p">,</span> <span class="nx">c</span><span class="o">:</span><span class="mi">4</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">3</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">d</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span><span class="mi">4</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span><span class="mi">5</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">5</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">3</span><span class="p">,</span> <span class="nx">d</span><span class="o">:</span><span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span><span class="mi">4</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">c</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">a</span><span class="o">:</span><span class="mi">5</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span><span class="mi">3</span><span class="p">,</span> <span class="nx">c</span><span class="o">:</span><span class="p">{</span> <span class="nx">$lt</span><span class="o">:</span><span class="mi">2</span> <span class="p">},</span> <span class="nx">d</span><span class="o">:</span><span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span><span class="mi">4</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">c</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>However, the following queries cannot sort the results using the
+index:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">().</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">b</span><span class="o">:</span><span class="mi">5</span> <span class="p">}</span> <span class="p">).</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="nx">b</span><span class="o">:</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For in-memory sorts that do not use an index, the <a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> operation is significantly slower. The
+<a class="reference internal" href="../reference/method/cursor.sort.html#cursor.sort" title="cursor.sort"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">sort()</span></tt></a> operation will abort when it uses 32
+megabytes of memory.</p>
+</div>
+</div>
+<div class="section" id="ensure-indexes-fit-ram">
+<span id="indexes-ensure-indexes-fit-ram"></span><h2>Ensure Indexes Fit RAM<a class="headerlink" href="#ensure-indexes-fit-ram" title="Permalink to this headline">¶</a></h2>
+<p>For fastest processing, ensure that your indexes fit entirely in RAM so
+that the system can avoid reading the index from disk.</p>
+<p>To check the size of your indexes, use the
+<a class="reference internal" href="../reference/method/db.collection.totalIndexSize.html#db.collection.totalIndexSize" title="db.collection.totalIndexSize"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.totalIndexSize()</span></tt></a> helper, which returns data in
+bytes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">totalIndexSize</span><span class="p">()</span>
+<span class="mi">4294976499</span>
+</pre></div>
+</div>
+<p>The above example shows an index size of almost 4.3 gigabytes. To ensure
+this index fits in RAM, you must not only have more than that much RAM
+available but also must have RAM available for the rest of the
+<a class="reference internal" href="../reference/glossary.html#term-working-set"><em class="xref std std-term">working set</em></a>. Also remember:</p>
+<p>If you have and use multiple collections, you must consider the size
+of all indexes on all collections. The indexes and the working set must be able to
+fit in RAM at the same time.</p>
+<p>There are some limited cases where indexes do not need
+to fit in RAM. See <a class="reference internal" href="#indexing-right-handed"><em>Indexes that Hold Only Recent Values in RAM</em></a>.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">For additional <a class="reference internal" href="../reference/collection-statistics.html"><em>collection statistics</em></a>, use <a class="reference internal" href="../reference/commands.html#collStats" title="collStats"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">collStats</span></tt></a> or
+<a class="reference internal" href="../reference/method/db.collection.stats.html#db.collection.stats" title="db.collection.stats"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.stats()</span></tt></a>.</p>
+</div>
+<div class="section" id="indexes-that-hold-only-recent-values-in-ram">
+<span id="indexing-right-handed"></span><h3>Indexes that Hold Only Recent Values in RAM<a class="headerlink" href="#indexes-that-hold-only-recent-values-in-ram" title="Permalink to this headline">¶</a></h3>
+<p>Indexes do not have to fit <em>entirely</em> into RAM in all cases. If the
+value of the indexed field grows with every insert, and most queries
+select recently added documents; then MongoDB only needs to keep the
+parts of the index that hold the most recent or &#8220;right-most&#8221; values in
+RAM. This allows for efficient index use for read and write
+operations and minimize the amount of RAM required to support the
+index.</p>
+</div>
+</div>
+<div class="section" id="create-queries-that-ensure-selectivity">
+<span id="index-selectivity"></span><h2>Create Queries that Ensure Selectivity<a class="headerlink" href="#create-queries-that-ensure-selectivity" title="Permalink to this headline">¶</a></h2>
+<p>Selectivity is the ability of a query to narrow results using the index.
+Effective indexes are more selective and allow MongoDB to use the index
+for a larger portion of the work associated with fulfilling the query.</p>
+<p>To ensure selectivity,
+write queries that limit the number of possible documents with the
+indexed field. Write queries that are appropriately selective relative
+to your indexed data.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Suppose you have a field called <tt class="docutils literal"><span class="pre">status</span></tt> where the possible values
+are <tt class="docutils literal"><span class="pre">new</span></tt> and <tt class="docutils literal"><span class="pre">processed</span></tt>. If you add an index on <tt class="docutils literal"><span class="pre">status</span></tt>
+you&#8217;ve created a low-selectivity index. The index will
+be of little help in locating records.</p>
+<p>A better strategy, depending on your queries, would be to create a
+<a class="reference internal" href="../core/indexes.html#index-type-compound"><em>compound index</em></a> that includes the
+low-selectivity field and another field. For example, you could
+create a compound index on <tt class="docutils literal"><span class="pre">status</span></tt> and <tt class="docutils literal"><span class="pre">created_at.</span></tt></p>
+<p class="last">Another option, again depending on your use case, might be to use
+separate collections, one for each status.</p>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Consider an index <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a</span> <span class="pre">:</span> <span class="pre">1</span> <span class="pre">}</span></tt> (i.e. an index on the key <tt class="docutils literal"><span class="pre">a</span></tt>
+sorted in ascending order) on a collection where <tt class="docutils literal"><span class="pre">a</span></tt> has three
+values evenly distributed across the collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;ab&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;cd&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;ef&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;jk&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;lm&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;no&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;pq&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;rs&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;tv&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>If you query for <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">2,</span> <span class="pre">b:</span> <span class="pre">&quot;no&quot;</span> <span class="pre">}</span></tt> MongoDB must scan 3
+<a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">documents</em></a> in the collection to return the one
+matching result. Similarly, a query for <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">{</span> <span class="pre">$gt:</span> <span class="pre">1},</span> <span class="pre">b:</span> <span class="pre">&quot;tv&quot;</span> <span class="pre">}</span></tt>
+must scan 6 documents, also to return one result.</p>
+<p>Consider the same index on a collection where <tt class="docutils literal"><span class="pre">a</span></tt> has <em>nine</em> values
+evenly distributed across the collection:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;ab&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;cd&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;ef&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;jk&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;lm&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;no&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">7</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;pq&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;rs&quot;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(),</span> <span class="nx">a</span><span class="o">:</span> <span class="mi">9</span><span class="p">,</span> <span class="nx">b</span><span class="o">:</span> <span class="s2">&quot;tv&quot;</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>If you query for <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">2,</span> <span class="pre">b:</span> <span class="pre">&quot;cd&quot;</span> <span class="pre">}</span></tt>, MongoDB must scan only one
+document to fulfill the query. The index and query are more selective
+because the values of <tt class="docutils literal"><span class="pre">a</span></tt> are evenly distributed <em>and</em> the query
+can select a specific document using the index.</p>
+<p class="last">However, although the index on <tt class="docutils literal"><span class="pre">a</span></tt> is more selective, a query such
+as <tt class="docutils literal"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">{</span> <span class="pre">$gt:</span> <span class="pre">5</span> <span class="pre">},</span> <span class="pre">b:</span> <span class="pre">&quot;tv&quot;</span> <span class="pre">}</span></tt> would still need to scan 4
+documents.</p>
+</div>
+<p>If overall selectivity is low, and if MongoDB must read a number of
+documents to return results, then some queries may perform faster
+without indexes. To determine performance, see
+<a class="reference internal" href="../administration/indexes.html#indexes-measuring-use"><em>Measure Index Use</em></a>.</p>
+</div>
+<div class="section" id="consider-performance-when-creating-indexes-for-write-heavy-applications">
+<h2>Consider Performance when Creating Indexes for Write-heavy Applications<a class="headerlink" href="#consider-performance-when-creating-indexes-for-write-heavy-applications" title="Permalink to this headline">¶</a></h2>
+<p>If your application is write-heavy, then be careful when creating new
+indexes, since each additional index with impose a
+write-performance penalty. In general, don&#8217;t be careless about adding
+indexes. Add indexes to complement your queries. Always have
+a good reason for adding a new index, and be sure to benchmark
+alternative strategies.</p>
+<div class="section" id="consider-insert-throughput">
+<h3>Consider Insert Throughput<a class="headerlink" href="#consider-insert-throughput" title="Permalink to this headline">¶</a></h3>
+<p>MongoDB must update <em>all</em> indexes associated with a collection after
+every insert, update, or delete operation. For update operations, if
+the updated document does not move to a new location, then MongoDB only
+modifies the updated fields in the index. Therefore, every index on a
+collection adds some amount of overhead to these write operations. In
+almost every case, the performance gains that indexes realize for read
+operations are worth the insertion penalty. However, in some cases:</p>
+<ul class="simple">
+<li>An index to support an infrequent query might incur more
+insert-related costs than savings in read-time.</li>
+<li>If you have many indexes on a collection with a high insert throughput
+and a number of related indexes, you may find better overall
+performance with a smaller number of indexes, even if some queries
+are less optimally supported by an index.</li>
+<li>If your indexes and queries are not sufficiently <a class="reference internal" href="#index-selectivity"><em>selective</em></a>, the speed improvements for query operations
+may not offset the costs of maintaining an index. For more
+information see <a class="reference internal" href="#index-selectivity"><em>Create Queries that Ensure Selectivity</em></a>.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../administration/indexes.html" title="Previous Section: Indexing Operations">&lt; &nbsp; Indexing Operations</a></li>
+<li id="btnvup"><a href="../indexes.html" title="Parent Section: Indexes" >&#47;&#92;&nbsp; Indexes</a></li>
+<li id="btnvnx"><a href="geospatial-indexes.html" title="Next Section: Geospatial Queries with 2d Indexes">Geospatial Queries with 2d Indexes &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

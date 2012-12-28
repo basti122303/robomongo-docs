@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Model Tree Structures with Child References &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/model-tree-structures-with-child-references" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Model Tree Structures with an Array of Ancestors" href="model-tree-structures-with-ancestors-array.html" />
+<link rel="prev" title="Model Tree Structures with Parent References" href="model-tree-structures-with-parent-references.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="model-tree-structures-with-child-references">
+<h1>Model Tree Structures with Child References<a class="headerlink" href="#model-tree-structures-with-child-references" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Data in MongoDB has a <em>flexible schema</em>. <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">Collections</em></a> do not enforce <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a> structure. Decisions
+that affect how you model data can affect application performance and
+database capacity. See <a class="reference internal" href="../core/data-modeling.html"><em>Data Modeling Considerations for MongoDB Applications</em></a> for a full high
+level overview of data modeling in MongoDB.</p>
+<p>This document describes a data model that describes a tree-like structure
+in MongoDB documents by storing <a class="reference internal" href="../core/data-modeling.html#data-modeling-referencing"><em>references</em></a> in the parent-nodes to children nodes.</p>
+</div>
+<div class="section" id="pattern">
+<h2>Pattern<a class="headerlink" href="#pattern" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Child References</em> pattern stores each tree node in a document; in
+addition to the tree node, document stores in an array the id(s) of the
+node&#8217;s children.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Child References</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="s2">&quot;Postgres&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="s2">&quot;Languages&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">children</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The query to retrieve the immediate children of a node is fast and
+straightforward:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">children</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">children</span></tt> to enable fast
+search by the child nodes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">children</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can query for a node in the <tt class="docutils literal"><span class="pre">children</span></tt> field to find its parent
+node as well as its siblings:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">children</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <em>Child References</em> pattern provides a suitable solution to tree storage
+as long as no operations on subtrees are necessary. This pattern may
+also provide a suitable solution for storing graphs where a node may
+have multiple parents.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="model-tree-structures-with-parent-references.html" title="Previous Section: Model Tree Structures with Parent References">&lt; &nbsp; Model Tree Structures with Parent References</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="model-tree-structures-with-ancestors-array.html" title="Next Section: Model Tree Structures with an Array of Ancestors">Model Tree Structures with an Array of Ancestors &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

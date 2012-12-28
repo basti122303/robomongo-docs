@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>db.repairDatabase() &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/method/db.repairDatabase" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="JavaScript Methods" href="../method.html" />
+<link rel="next" title="db.resetError()" href="db.resetError.html" />
+<link rel="prev" title="db.removeUser()" href="db.removeUser.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="db-repairdatabase">
+<h1>db.repairDatabase()<a class="headerlink" href="#db-repairdatabase" title="Permalink to this headline">¶</a></h1>
+<dl class="method">
+<dt id="db.repairDatabase">
+<tt class="descclassname">db.</tt><tt class="descname">repairDatabase</tt><big>(</big><big>)</big><a class="headerlink" href="#db.repairDatabase" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In general, if you have an intact copy of your data, such as
+would exist on a very recent backup or an intact member of a
+<a class="reference internal" href="../glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>, <strong>do not</strong> use <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>
+or related options like <a class="reference internal" href="#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a> in the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell or <a class="reference internal" href="../mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">mongod --repair</em></a>. Restore
+from an intact copy of your data.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When using <a class="reference internal" href="../glossary.html#term-journal"><em class="xref std std-term">journaling</em></a>, there is almost never
+any need to run <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>. In the event of an
+unclean shutdown, the server will be able restore the data files
+to a pristine state automatically.</p>
+</div>
+<p><a class="reference internal" href="#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a> provides a wrapper around the database
+command <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a>, and has the same effect as
+the run-time option <a class="reference internal" href="../mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">mongod --repair</em></a> option, limited to
+<em>only</em> the current database. See <a class="reference internal" href="../commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> for
+full documentation.</p>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="db.removeUser.html" title="Previous Section: db.removeUser()">&lt; &nbsp; db.removeUser()</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="db.resetError.html" title="Next Section: db.resetError()">db.resetError() &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

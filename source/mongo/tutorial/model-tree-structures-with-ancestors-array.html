@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Model Tree Structures with an Array of Ancestors &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/model-tree-structures-with-ancestors-array" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Application Development" href="../applications.html" />
+<link rel="next" title="Model Tree Structures with Materialized Paths" href="model-tree-structures-with-materialized-paths.html" />
+<link rel="prev" title="Model Tree Structures with Child References" href="model-tree-structures-with-child-references.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="model-tree-structures-with-an-array-of-ancestors">
+<h1>Model Tree Structures with an Array of Ancestors<a class="headerlink" href="#model-tree-structures-with-an-array-of-ancestors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Data in MongoDB has a <em>flexible schema</em>. <a class="reference internal" href="../reference/glossary.html#term-collection"><em class="xref std std-term">Collections</em></a> do not enforce <a class="reference internal" href="../reference/glossary.html#term-document"><em class="xref std std-term">document</em></a> structure. Decisions
+that affect how you model data can affect application performance and
+database capacity. See <a class="reference internal" href="../core/data-modeling.html"><em>Data Modeling Considerations for MongoDB Applications</em></a> for a full high
+level overview of data modeling in MongoDB.</p>
+<p>This document describes a data model that describes a tree-like
+structure in MongoDB documents using <a class="reference internal" href="../core/data-modeling.html#data-modeling-referencing"><em>references</em></a> to parent nodes and an array that stores
+all ancestors.</p>
+</div>
+<div class="section" id="pattern">
+<h2>Pattern<a class="headerlink" href="#pattern" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Array of Ancestors</em> pattern stores each tree node in a document;
+in addition to the tree node, document stores in an array the id(s) of
+the node&#8217;s ancestors or path.</p>
+<p>Consider the following example that models a tree of categories using
+<em>Array of Ancestors</em>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Postgres&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Databases&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Languages&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Books&quot;</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span> <span class="p">}</span> <span class="p">)</span>
+<span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;Books&quot;</span><span class="p">,</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="p">[</span> <span class="p">],</span> <span class="nx">parent</span><span class="o">:</span> <span class="kc">null</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The query to retrieve the ancestors or path of a node is fast and
+straightforward:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(</span> <span class="p">{</span> <span class="nx">_id</span><span class="o">:</span> <span class="s2">&quot;MongoDB&quot;</span> <span class="p">}</span> <span class="p">).</span><span class="nx">ancestors</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can create an index on the field <tt class="docutils literal"><span class="pre">ancestors</span></tt> to enable fast
+search by the ancestors nodes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">ensureIndex</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">You can query by the <tt class="docutils literal"><span class="pre">ancestors</span></tt> to find all its descendants:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">categories</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">ancestors</span><span class="o">:</span> <span class="s2">&quot;Programming&quot;</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The <em>Array of Ancestors</em> pattern provides a fast and efficient solution
+to find the descendants and the ancestors of a node by creating an
+index on the elements of the ancestors field. This makes <em>Array of
+Ancestors</em> a good choice for working with subtrees.</p>
+<p>The <em>Array of Ancestors</em> pattern is slightly slower than the
+<em>Materialized Paths</em> pattern but is more straightforward to use.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="model-tree-structures-with-child-references.html" title="Previous Section: Model Tree Structures with Child References">&lt; &nbsp; Model Tree Structures with Child References</a></li>
+<li id="btnvup"><a href="../applications.html" title="Parent Section: Application Development" >&#47;&#92;&nbsp; Application Development</a></li>
+<li id="btnvnx"><a href="model-tree-structures-with-materialized-paths.html" title="Next Section: Model Tree Structures with Materialized Paths">Model Tree Structures with Materialized Paths &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

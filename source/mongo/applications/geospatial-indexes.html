@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Geospatial Queries with 2d Indexes &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/applications/geospatial-indexes" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Indexes" href="../indexes.html" />
+<link rel="next" title="2d Geospatial Indexes" href="../core/geospatial-indexes.html" />
+<link rel="prev" title="Indexing Strategies" href="indexes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="geospatial-queries-with-2d-indexes">
+<h1>Geospatial Queries with <tt class="docutils literal"><span class="pre">2d</span></tt> Indexes<a class="headerlink" href="#geospatial-queries-with-2d-indexes" title="Permalink to this headline">¶</a></h1>
+<p>MongoDB provides support for querying location-based data using
+special geospatial indexes. For an introduction to these <tt class="docutils literal"><span class="pre">2d</span></tt>
+indexes, see <a class="reference internal" href="../core/geospatial-indexes.html"><em>2d Geospatial Indexes</em></a>.</p>
+<p>MongoDB supports the following geospatial query types:</p>
+<ul class="simple">
+<li>Proximity queries, which select documents based on distance to a
+given point. See <a class="reference internal" href="#geospatial-indexes-proximity"><em>Proximity Queries</em></a>.</li>
+<li>Bounded queries, which select documents that have coordinates within
+a specified area. See <a class="reference internal" href="#geospatial-indexes-bounded"><em>Bounded Queries</em></a>.</li>
+<li>Exact queries, which select documents with an exact coordinate pair,
+which has limited applicability. See <a class="reference internal" href="#geospatial-indexes-exact-match"><em>Query for Exact Matches</em></a>.</li>
+</ul>
+<div class="section" id="proximity-queries">
+<span id="geospatial-indexes-proximity"></span><span id="geospatial-indexes-near"></span><span id="index-0"></span><h2>Proximity Queries<a class="headerlink" href="#proximity-queries" title="Permalink to this headline">¶</a></h2>
+<p>Proximity queries select the documents closest to the point specified
+in the query. To perform proximity queries you use either the
+<a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method with the
+<a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> operator or you use the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>
+command.</p>
+<p>The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method with the
+<a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> operator returns 100 documents by default and sorts
+the results by distance. The <a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> operator uses the
+following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="p">{</span> <span class="nx">$near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following query</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="nx">loc</span><span class="o">:</span> <span class="p">{</span><span class="nx">$near</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">70</span><span class="p">,</span><span class="mi">40</span><span class="p">]</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>returns output similar to the following:</p>
+<div class="last highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot; ... &quot;</span><span class="p">),</span> <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">73</span><span class="p">,</span> <span class="mi">40</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command returns more information than does the
+<a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> operator but does not sort results. The
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command also offers additional operators, such as
+operators to query for <a class="reference internal" href="#geospatial-indexes-distance"><em>maximum</em></a> or
+<a class="reference internal" href="#geospatial-indexes-spherical"><em>spherical</em></a> distance. For a list of
+operators, see <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>.</p>
+<p>Without additional operators, the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command uses the
+following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span><span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;[collection]&quot;</span><span class="p">,</span> <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>The following command returns the same results as the
+<tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">near</span></tt> in the previous example but with more information:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span><span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;places&quot;</span><span class="p">,</span> <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This operation will return the following output:</p>
+<blockquote class="last">
+<div><div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s2">&quot;ns&quot;</span> <span class="o">:</span> <span class="s2">&quot;test.places&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;near&quot;</span> <span class="o">:</span> <span class="s2">&quot;0110000111111000000111111000000111111000000111111000&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+         <span class="s2">&quot;dis&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+         <span class="s2">&quot;obj&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot; ... &quot;</span><span class="p">),</span>
+            <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="o">-</span><span class="mi">73</span><span class="p">,</span>
+               <span class="mi">40</span>
+            <span class="p">]</span>
+         <span class="p">}</span>
+      <span class="p">}</span>
+   <span class="p">],</span>
+   <span class="s2">&quot;stats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;time&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="s2">&quot;btreelocs&quot;</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s2">&quot;nscanned&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;objectsLoaded&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="s2">&quot;avgDistance&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="s2">&quot;maxDistance&quot;</span> <span class="o">:</span> <span class="mf">3.0000188685220253</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="distance-queries">
+<span id="geospatial-indexes-distance"></span><span id="index-1"></span><h2>Distance Queries<a class="headerlink" href="#distance-queries" title="Permalink to this headline">¶</a></h2>
+<p>You can limit a proximity query to those documents that fall within a
+maximum distance of a point. You specify the maximum distance using the
+units specified by the coordinate system. For example, if the coordinate
+system uses meters, you specify maximum distance in meters.</p>
+<p>To specify distance using the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>
+method, use <a class="reference internal" href="../reference/operators.html#_S_maxDistance" title="$maxDistance"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$maxDistance</span></tt></a> operator. Use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="p">{</span> <span class="nx">$near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span> <span class="p">}</span> <span class="p">,</span> <span class="nx">$maxDistance</span> <span class="o">:</span> <span class="nx">z</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>To specify distance with the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command, use the
+<tt class="docutils literal"><span class="pre">maxDistance</span></tt> option. Use the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;collection&quot;</span><span class="p">,</span> <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">],</span> <span class="nx">maxDistance</span><span class="o">:</span> <span class="nx">z</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="limit-the-number-of-results">
+<span id="geospatial-indexes-limit"></span><h2>Limit the Number of Results<a class="headerlink" href="#limit-the-number-of-results" title="Permalink to this headline">¶</a></h2>
+<p>By default, geospatial queries using <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method return 100 documents, sorted by
+distance.</p>
+<p>To limit the result when using the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method, use the <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method, as in the following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="p">{</span> <span class="nx">$near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">limit</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">n</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To limit the result set when using the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command, use
+the <tt class="docutils literal"><span class="pre">num</span></tt> option. The following is a prototype of the command:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;collection&quot;</span><span class="p">,</span> <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">],</span> <span class="nx">num</span><span class="o">:</span> <span class="nx">z</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method and <tt class="docutils literal"><span class="pre">near</span></tt> parameter
+to <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> do not limit geospatial query results by
+distance, only the number of results. To limit geospatial search
+results by distance, please see the <a class="reference internal" href="#geospatial-indexes-distance"><em>Distance Queries</em></a>
+section.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The <a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method and <tt class="docutils literal"><span class="pre">num</span></tt> option have
+different performance characteristics. Geospatial queries using
+<a class="reference internal" href="../reference/method/cursor.limit.html#cursor.limit" title="cursor.limit"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">limit()</span></tt></a> method are slower than using
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>.</p>
+<p class="last">Geospatial queries with the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a>
+method will return 100 documents, sort them, and finally limit the
+result set. Geospatial queries with the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> and
+<tt class="docutils literal"><span class="pre">num</span></tt> option will only return the specified number of unsorted
+documents.</p>
+</div>
+<div class="section" id="bounded-queries">
+<span id="geospatial-indexes-bounded"></span><span id="geospatial-indexes-within"></span><h3>Bounded Queries<a class="headerlink" href="#bounded-queries" title="Permalink to this headline">¶</a></h3>
+<p>Bounded queries return documents within a shape defined using the
+<a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator. MongoDB&#8217;s bounded queries support the
+following shapes:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#geospatial-indexes-circles"><em>Circles</em></a></li>
+<li><a class="reference internal" href="#geospatial-indexes-rectangles"><em>Rectangles</em></a></li>
+<li><a class="reference internal" href="#geospatial-indexes-polygons"><em>Polygons</em></a></li>
+</ul>
+<p>Bounded queries do not return sorted results. As a result MongoDB can
+return bounded queries more quickly than <a class="reference internal" href="#geospatial-indexes-proximity"><em>proximity queries</em></a>. Bounded queries have the following
+form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;</span> <span class="o">:</span>
+                           <span class="p">{</span> <span class="s2">&quot;$within&quot;</span> <span class="o">:</span>
+                             <span class="p">{</span> <span class="o">&lt;</span><span class="nx">shape</span><span class="o">&gt;</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">shape</span> <span class="nx">dimensions</span><span class="o">&gt;</span> <span class="p">}</span>
+                           <span class="p">}</span>
+                    <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following sections describe each of the shapes supported by
+bounded queries:</p>
+</div>
+</div>
+<div class="section" id="circles">
+<span id="geospatial-indexes-circles"></span><h2>Circles<a class="headerlink" href="#circles" title="Permalink to this headline">¶</a></h2>
+<p>To query for documents with coordinates inside the bounds of a circle,
+specify the center and the radius of the circle using the
+<a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator and <a class="reference internal" href="../reference/operators.html#_S_center" title="$center"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$center</span></tt></a> option. Consider
+the following prototype query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;field&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$center&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="nx">center</span><span class="p">,</span> <span class="nx">radius</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following example query returns all documents that have coordinates
+that exist within the circle centered on <tt class="docutils literal"><span class="pre">[-74,</span> <span class="pre">40.74]</span></tt> and with a
+radius of <tt class="docutils literal"><span class="pre">10</span></tt>, using a geospatial index on the <tt class="docutils literal"><span class="pre">loc</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span>
+                            <span class="p">{</span> <span class="s2">&quot;$center&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="p">[</span><span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span><span class="p">],</span> <span class="mi">10</span> <span class="p">]</span> <span class="p">}</span>
+                         <span class="p">}</span>
+                <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator using <a class="reference internal" href="../reference/operators.html#_S_center" title="$center"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$center</span></tt></a> is similar
+to using <a class="reference internal" href="../reference/operators.html#_S_maxDistance" title="$maxDistance"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$maxDistance</span></tt></a>, but <a class="reference internal" href="../reference/operators.html#_S_center" title="$center"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$center</span></tt></a> has
+different performance characteristics. MongoDB does not sort queries
+that use the <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator are not sorted, unlike
+queries using the <a class="reference internal" href="../reference/operators.html#_S_near" title="$near"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$near</span></tt></a> operator.</p>
+</div>
+<div class="section" id="rectangles">
+<span id="geospatial-indexes-rectangles"></span><h2>Rectangles<a class="headerlink" href="#rectangles" title="Permalink to this headline">¶</a></h2>
+<p>To query for documents with coordinates inside the bounds of a
+rectangle, specify the lower-left and upper-right corners of the
+rectangle using the <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator and <a class="reference internal" href="../reference/operators.html#_S_box" title="$box"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$box</span></tt></a>
+option. Consider the following prototype query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;field&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$box&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="nx">coordinate0</span><span class="p">,</span> <span class="nx">coordinate1</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The following query returns all documents that have coordinates
+that exist within the rectangle where the lower-left corner is at
+<tt class="docutils literal"><span class="pre">[</span> <span class="pre">0,</span> <span class="pre">0</span> <span class="pre">]</span></tt> and the upper-right corner is at <tt class="docutils literal"><span class="pre">[</span> <span class="pre">3,</span> <span class="pre">3</span> <span class="pre">]</span></tt>, using a
+geospatial index on the <tt class="docutils literal"><span class="pre">loc</span></tt> field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$box&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="polygons">
+<span id="geospatial-indexes-polygons"></span><h2>Polygons<a class="headerlink" href="#polygons" title="Permalink to this headline">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">New in version 1.9: </span>Support for polygon queries.</p>
+<p>To query for documents with coordinates inside of a polygon, specify the points
+of the polygon in an array, using the the <a class="reference internal" href="../reference/operators.html#_S_within" title="$within"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$within</span></tt></a> operator
+with the <a class="reference internal" href="../reference/operators.html#_S_polygon" title="$polygon"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$polygon</span></tt></a> option. MongoDB automatically connects the
+last point in the array to the first point. Consider the following
+prototype query:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span> <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$polygon&quot;</span><span class="o">:</span> <span class="p">[</span> <span class="nx">points</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>The following query returns all documents that have coordinates
+that exist within the polygon defined by <tt class="docutils literal"><span class="pre">[</span> <span class="pre">[0,0],</span> <span class="pre">[3,3],</span> <span class="pre">[6,0]</span> <span class="pre">]</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">places</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span> <span class="s2">&quot;loc&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$within&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$polygon&quot;</span><span class="o">:</span>
+                                     <span class="p">[</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span> <span class="p">}</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<span class="target" id="index-2"></span><div class="section" id="query-for-exact-matches">
+<span id="geospatial-indexes-exact-match"></span><span id="index-3"></span><h3>Query for Exact Matches<a class="headerlink" href="#query-for-exact-matches" title="Permalink to this headline">¶</a></h3>
+<p>You can use the <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.find()</span></tt></a> method to query for an
+exact match on a location. These queries have the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">location</span> <span class="nx">field</span><span class="o">&gt;:</span> <span class="p">[</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This query will return any documents with the value of <tt class="docutils literal"><span class="pre">[</span> <span class="pre">x,</span> <span class="pre">y</span> <span class="pre">]</span></tt>.</p>
+<p>Exact geospatial queries only applicability for a limited selection of
+cases, the <a class="reference internal" href="#geospatial-indexes-proximity"><em>proximity</em></a> and
+<a class="reference internal" href="#geospatial-indexes-bounded"><em>bounded</em></a> queries provide more useful
+results for more applications.</p>
+</div>
+<div class="section" id="calculate-distances-using-spherical-geometry">
+<span id="geospatial-indexes-spherical"></span><h3>Calculate Distances Using Spherical Geometry<a class="headerlink" href="#calculate-distances-using-spherical-geometry" title="Permalink to this headline">¶</a></h3>
+<p>When you query using the <tt class="docutils literal"><span class="pre">2d</span></tt> index, MongoDB calculates distances
+using flat geometry by default, which models points on a flat surface.</p>
+<p>Optionally, you may instruct MongoDB to calculate distances using spherical geometry, which
+models points on a spherical surface. Spherical geometry is useful for
+modeling coordinates on the surface of Earth.</p>
+<p>To calculate distances using spherical geometry, use MongoDB&#8217;s
+spherical query operators and options:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method with the
+<a class="reference internal" href="../reference/operators.html#_S_nearSphere" title="$nearSphere"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$nearSphere</span></tt></a> operator.</li>
+<li><a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method with the
+<a class="reference internal" href="../reference/operators.html#_S_centerSphere" title="$centerSphere"><tt class="xref mongodb mongodb-operator docutils literal"><span class="pre">$centerSphere</span></tt></a>.</li>
+<li><a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command with the <tt class="docutils literal"><span class="pre">{</span> <span class="pre">spherical:</span> <span class="pre">true</span> <span class="pre">}</span></tt> option.</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../reference/operators.html#geospatial-query-operators"><em>Geospatial</em></a>.</p>
+</div>
+<p>For more information on differences between flat and spherical distance
+calculation, see <a class="reference internal" href="../core/geospatial-indexes.html#geospatial-indexes-distance-calculation"><em>Distance Calculation</em></a>.</p>
+</div>
+<div class="section" id="distance-multiplier">
+<span id="geospatial-indexes-distance-multiplier"></span><h3>Distance Multiplier<a class="headerlink" href="#distance-multiplier" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt> option <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> returns
+distances only after multiplying the results by command by an assigned
+value. This allows MongoDB to return converted values, and removes the
+requirement to convert units in application logic.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Because <tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt> is an option to
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>, the multiplication operation occurs on the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process. The operation adds a slight overhead to
+the operation of <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a>.</p>
+</div>
+<p>Using <tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt> in spherical queries allows one to use
+results from the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command without radian to
+distance conversion. The following example uses <tt class="docutils literal"><span class="pre">distanceMultiplier</span></tt>
+in the <a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command with a <a class="reference internal" href="#geospatial-indexes-spherical"><em>spherical</em></a> example:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoNear</span><span class="o">:</span> <span class="s2">&quot;places&quot;</span><span class="p">,</span>
+                 <span class="nx">near</span><span class="o">:</span> <span class="p">[</span> <span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span> <span class="p">],</span>
+                 <span class="nx">spherical</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+                 <span class="nx">distanceMultiplier</span><span class="o">:</span> <span class="mf">3963.192</span>
+               <span class="p">}</span>  <span class="p">)</span>
+</pre></div>
+</div>
+<p>The output of the above operation would resemble the following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+   <span class="c1">// [ ... ]</span>
+   <span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+         <span class="s2">&quot;dis&quot;</span> <span class="o">:</span> <span class="mf">73.46525170413567</span><span class="p">,</span>
+         <span class="s2">&quot;obj&quot;</span> <span class="o">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span> <span class="p">...</span> <span class="p">)</span>
+            <span class="s2">&quot;loc&quot;</span> <span class="o">:</span> <span class="p">[</span>
+               <span class="o">-</span><span class="mi">73</span><span class="p">,</span>
+               <span class="mi">40</span>
+            <span class="p">]</span>
+         <span class="p">}</span>
+      <span class="p">}</span>
+   <span class="p">],</span>
+   <span class="s2">&quot;stats&quot;</span> <span class="o">:</span> <span class="p">{</span>
+      <span class="c1">// [ ... ]</span>
+      <span class="s2">&quot;avgDistance&quot;</span> <span class="o">:</span> <span class="mf">0.01853688938212826</span><span class="p">,</span>
+      <span class="s2">&quot;maxDistance&quot;</span> <span class="o">:</span> <span class="mf">0.01853714811400047</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="#geospatial-indexes-distance"><em>Distance operator</em></a>.</p>
+</div>
+</div>
+<div class="section" id="querying-haystack-indexes">
+<span id="geospatial-indexes-haystack-queries"></span><h3>Querying Haystack Indexes<a class="headerlink" href="#querying-haystack-indexes" title="Permalink to this headline">¶</a></h3>
+<p>Haystack indexes are a special <tt class="docutils literal"><span class="pre">2d</span></tt> geospatial index that optimized
+to return results over small areas. To create geospatial indexes see
+<a class="reference internal" href="../core/geospatial-indexes.html#geospatial-indexes-haystack-index"><em>Haystack Indexes</em></a>.</p>
+<p>To query the haystack index, use the <a class="reference internal" href="../reference/commands.html#geoSearch" title="geoSearch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoSearch</span></tt></a>
+command. You must specify both the coordinate and other field to
+<a class="reference internal" href="../reference/commands.html#geoSearch" title="geoSearch"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoSearch</span></tt></a>, which take the following form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoSearch</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">collection</span><span class="o">&gt;</span><span class="p">,</span>
+                 <span class="nx">search</span><span class="o">:</span> <span class="p">{</span> <span class="o">&lt;</span><span class="nx">field</span><span class="o">&gt;:</span> <span class="o">&lt;</span><span class="nx">value</span><span class="o">&gt;</span> <span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>For example, to return all documents with the value <tt class="docutils literal"><span class="pre">restaurants</span></tt> in
+the <tt class="docutils literal"><span class="pre">type</span></tt> field near the example point, the command would resemble:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">geoSearch</span><span class="o">:</span> <span class="s2">&quot;places&quot;</span><span class="p">,</span>
+                 <span class="nx">search</span><span class="o">:</span> <span class="p">{</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;restaurant&quot;</span> <span class="p">},</span>
+                 <span class="nx">near</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">74</span><span class="p">,</span> <span class="mf">40.74</span><span class="p">]</span> <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Haystack indexes are not suited to returning a full list of the
+closest documents to a particular location, as the closest
+documents could be far away compared to the <tt class="docutils literal"><span class="pre">bucketSize</span></tt>.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><a class="reference internal" href="#geospatial-indexes-spherical"><em>Spherical query operations</em></a>
+are not currently supported by haystack indexes.</p>
+<p class="last">The <a class="reference internal" href="../reference/method/db.collection.find.html#db.collection.find" title="db.collection.find"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">find()</span></tt></a> method and
+<a class="reference internal" href="../reference/commands.html#geoNear" title="geoNear"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">geoNear</span></tt></a> command cannot access the haystack index.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="indexes.html" title="Previous Section: Indexing Strategies">&lt; &nbsp; Indexing Strategies</a></li>
+<li id="btnvup"><a href="../indexes.html" title="Parent Section: Indexes" >&#47;&#92;&nbsp; Indexes</a></li>
+<li id="btnvnx"><a href="../core/geospatial-indexes.html" title="Next Section: 2d Geospatial Indexes">2d Geospatial Indexes &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

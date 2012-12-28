@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>logRotate &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/logRotate" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="logout" href="logout.html" />
+<link rel="prev" title="listShards" href="listShards.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="logrotate">
+<h1>logRotate<a class="headerlink" href="#logrotate" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt id="logRotate">
+<tt class="descname">logRotate</tt><a class="headerlink" href="#logRotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> command is an administrative command that
+allows you to rotate
+the MongoDB logs to prevent a single logfile from consuming too
+much disk space.
+You must issue the
+<a class="reference internal" href="../commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a>
+command against the <a class="reference internal" href="../glossary.html#term-admin-database"><em class="xref std std-term">admin database</em></a> in the form:</p>
+<blockquote>
+<div>{ logRotate: 1 }</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance needs to be running with the
+<a class="reference internal" href="../mongod.html#cmdoption-mongod--logpath"><em class="xref std std-option">--logpath [file]</em></a> option.</p>
+</div>
+<p>You may also rotate the logs by sending a <tt class="docutils literal"><span class="pre">SIGUSR1</span></tt> signal to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> process.
+If your <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> has a process ID of 2200, here&#8217;s how to
+send the signal on Linux:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">kill</span> -SIGUSR1 2200
+</pre></div>
+</div>
+<p><a class="reference internal" href="../commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> renames the existing log file by
+appending the current timestamp to the filename.  The appended
+timestamp has the following form:</p>
+<div class="highlight-none"><div class="highlight"><pre>&lt;YYYY&gt;-&lt;mm&gt;-&lt;DD&gt;T&lt;HH&gt;-&lt;MM&gt;-&lt;SS&gt;
+</pre></div>
+</div>
+<p>Then <a class="reference internal" href="../commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> creates a new log file with the same
+name as originally specified by the <a class="reference internal" href="../configuration-options.html#logpath" title="logpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">logpath</span></tt></a> setting to
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> or <a class="reference internal" href="../config-database.html#mongos" title="mongos"><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongos</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last versionadded">
+<span class="versionmodified">New in version 2.0.3: </span>The <a class="reference internal" href="../commands.html#logRotate" title="logRotate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">logRotate</span></tt></a> command is available to
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances running on Windows systems with
+MongoDB release 2.0.3 and higher.</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="listShards.html" title="Previous Section: listShards">&lt; &nbsp; listShards</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="logout.html" title="Next Section: logout">logout &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

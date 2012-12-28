@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Recover MongoDB Data following Unexpected Shutdown &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/tutorial/recover-data-following-unexpected-shutdown" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="Administration" href="../administration.html" />
+<link rel="next" title="Convert a Replica Set to a Replicated Sharded Cluster" href="convert-replica-set-to-replicated-shard-cluster.html" />
+<link rel="prev" title="Production Notes" href="../administration/production-notes.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="recover-mongodb-data-following-unexpected-shutdown">
+<h1>Recover MongoDB Data following Unexpected Shutdown<a class="headerlink" href="#recover-mongodb-data-following-unexpected-shutdown" title="Permalink to this headline">¶</a></h1>
+<p>If MongoDB does not shutdown cleanly <a class="footnote-reference" href="#clean-shutdown" id="id1">[1]</a> the on-disk
+representation of the data files will likely reflect an inconsistent
+state which could lead to data corruption. <a class="footnote-reference" href="#validation" id="id2">[2]</a></p>
+<p>To prevent data inconsistency and corruption, always shut down the
+database cleanly and use the <a class="reference internal" href="../reference/configuration-options.html#setting-journal"><em>durability journaling</em></a>. The journal writes data to disk every 100
+milliseconds by default and ensures that MongoDB can
+recover to a consistent state even in the case of an unclean shutdown due to
+power loss or other system failure.</p>
+<p>If you are <em>not</em> running as part of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a> <strong>and</strong> do
+<em>not</em> have journaling enabled, use the following procedure to recover
+data that may be in an inconsistent state. If you are running as part
+of a replica set, you should <em>always</em> restore from a backup or restart
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance with an empty <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> and
+allow MongoDB to resync the data.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">The <a class="reference internal" href="../administration.html"><em>Administration</em></a> documents, including
+<a class="reference internal" href="../core/replication-internals.html#replica-set-syncing"><em>Replica Set Syncing</em></a>, and the
+documentation on the <a class="reference internal" href="../reference/configuration-options.html#repair" title="repair"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">repair</span></tt></a>, <a class="reference internal" href="../reference/configuration-options.html#repairpath" title="repairpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">repairpath</span></tt></a>, and
+<a class="reference internal" href="../reference/connection-string.html#journal" title="journal"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">journal</span></tt></a> settings.</p>
+</div>
+<table class="docutils footnote" frame="void" id="clean-shutdown" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>To ensure a clean shut down, use the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--shutdown"><em class="xref std std-option">mongod --shutdown</em></a> option, your control script,
+&#8220;Control-C&#8221; (when running <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> in interactive mode,)
+or <tt class="docutils literal"><span class="pre">kill</span> <span class="pre">$(pidof</span> <span class="pre">mongod)</span></tt> or <tt class="docutils literal"><span class="pre">kill</span> <span class="pre">-2</span> <span class="pre">$(pidof</span> <span class="pre">mongod)</span></tt>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="validation" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>You can also use the <a class="reference internal" href="../reference/method/db.collection.validate.html#db.collection.validate" title="db.collection.validate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.validate()</span></tt></a>
+method to test the integrity of a single collection. However, this
+process is time consuming, and without journaling you can safely
+assume that the data is in an invalid state and you should either
+run the repair operation or resync from an intact member of the
+replica set.</td></tr>
+</tbody>
+</table>
+<div class="section" id="process">
+<h2>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="indications">
+<h3>Indications<a class="headerlink" href="#indications" title="Permalink to this headline">¶</a></h3>
+<p>When you are aware of a <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running without
+journaling that stops unexpectedly <strong>and</strong> you&#8217;re not running with
+replication, you should always run the repair operation before
+starting MongoDB again. If you&#8217;re using replication, then restore from
+a backup and allow replication to <a class="reference internal" href="../core/replication-internals.html#replica-set-syncing"><em>synchronize</em></a> your data.</p>
+<p>If the <tt class="docutils literal"><span class="pre">mongod.lock</span></tt> file in the data directory specified by
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a>, <tt class="docutils literal"><span class="pre">/data/db</span></tt> by default, is <em>not</em> a zero-byte file,
+then <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will refuse to start, and you will find a
+message that contains the following line in your MongoDB log our
+output:</p>
+<div class="highlight-none"><div class="highlight"><pre>Unclean shutdown detected.
+</pre></div>
+</div>
+<p>This indicates that you need to remove the lockfile and run repair. If
+you run repair when the <tt class="docutils literal"><span class="pre">mongodb.lock</span></tt> file exists without the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repairpath"><em class="xref std std-option">mongod --repairpath</em></a> option, you will see a message that
+contains the following line:</p>
+<div class="highlight-none"><div class="highlight"><pre>old lock file: /data/db/mongod.lock. probably means unclean shutdown
+</pre></div>
+</div>
+<p>You must remove the lockfile <strong>and</strong> run the repair operation before
+starting the database normally using the following procedure:</p>
+</div>
+<div class="section" id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Recovering a member of a replica set.</p>
+<p class="last">Do not use this procedure to recover a member of a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica set</em></a>.
+Instead you should either restore from a <a class="reference internal" href="../administration/backups.html"><em>backup</em></a>
+or resync from an intact member of the set, as described in <a class="reference internal" href="../administration/replica-sets.html#replica-set-resync-stale-member"><em>Resyncing a Member of a Replica Set</em></a>.</p>
+</div>
+<p>There are two processes to repair data files that result from an
+unexpected shutdown:</p>
+<ol class="arabic">
+<li><p class="first">Use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a> option in
+conjunction with the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repairpath"><em class="xref std std-option">--repairpath</em></a>
+option. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will read the existing data files, and
+write the existing data to new data files. This does not modify or
+alter the existing data files.</p>
+<p>You do not need to remove the <tt class="docutils literal"><span class="pre">mongod.lock</span></tt> file before using
+this procedure.</p>
+</li>
+<li><p class="first">Use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a> option.
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> will read the existing data files, write the
+existing data to new files and replace the existing, possibly
+corrupt, files with new files.</p>
+<p>You must remove the <tt class="docutils literal"><span class="pre">mongod.lock</span></tt> file before using this
+procedure.</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a> functionality is also
+available in the shell with the <a class="reference internal" href="../reference/method/db.repairDatabase.html#db.repairDatabase" title="db.repairDatabase"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.repairDatabase()</span></tt></a>
+helper for the <a class="reference internal" href="../reference/commands.html#repairDatabase" title="repairDatabase"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">repairDatabase</span></tt></a> command.</p>
+</div>
+</div>
+<div class="section" id="procedures">
+<h3>Procedures<a class="headerlink" href="#procedures" title="Permalink to this headline">¶</a></h3>
+<p>To repair your data files using the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repairpath"><em class="xref std std-option">--repairpath</em></a>
+option to preserve the original data files unmodified:</p>
+<ol class="arabic">
+<li><p class="first">Start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a>
+to read the existing data files.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db --repair --repairpath /data/db0
+</pre></div>
+</div>
+<p>When this completes, the new repaired data files will be in the
+<tt class="docutils literal"><span class="pre">/data/db0</span></tt> directory.</p>
+</li>
+<li><p class="first">Start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using the following invocation to point the
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> at <tt class="docutils literal"><span class="pre">/data/db2</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db0
+</pre></div>
+</div>
+<p>Once you confirm that the data files are operational you may delete
+or archive the data files in the <tt class="docutils literal"><span class="pre">/data/db</span></tt> directory.</p>
+</li>
+</ol>
+<p>To repair your data files without preserving the original files, do
+not use the <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repairpath"><em class="xref std std-option">--repairpath</em></a> option, as in
+the following procedure:</p>
+<ol class="arabic">
+<li><p class="first">Remove the stale lock file:</p>
+<div class="highlight-sh"><div class="highlight"><pre>rm /data/db/mongod.lock
+</pre></div>
+</div>
+<p>Replace <tt class="docutils literal"><span class="pre">/data/db</span></tt> with your <a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> where your MongoDB
+instance&#8217;s data files reside.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">After you remove the <tt class="docutils literal"><span class="pre">mongod.lock</span></tt> file you <em>must</em> run the
+<a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a> process before using your
+database.</p>
+</div>
+</li>
+<li><p class="first">Start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using <a class="reference internal" href="../reference/mongod.html#cmdoption-mongod--repair"><em class="xref std std-option">--repair</em></a>
+to read the existing data files.</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db --repair
+</pre></div>
+</div>
+<p>When this completes, the repaired data files will replace the
+original data files in the <tt class="docutils literal"><span class="pre">/data/db</span></tt> directory.</p>
+</li>
+<li><p class="first">Start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> using the following invocation to point the
+<a class="reference internal" href="../reference/configuration-options.html#dbpath" title="dbpath"><tt class="xref mongodb mongodb-setting docutils literal"><span class="pre">dbpath</span></tt></a> at <tt class="docutils literal"><span class="pre">/data/db</span></tt>:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongod --dbpath /data/db
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="mongod-lock">
+<h2><tt class="docutils literal"><span class="pre">mongod.lock</span></tt><a class="headerlink" href="#mongod-lock" title="Permalink to this headline">¶</a></h2>
+<p>In normal operation, you should <strong>never</strong> remove the <tt class="docutils literal"><span class="pre">mongod.lock</span></tt>
+file and start <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. Instead use one of the above methods
+to recover the database and remove the lock files. In dire
+situations you can remove the lockfile, and start the database using the
+possibly corrupt files, and attempt to recover data from the database;
+however, it&#8217;s impossible to predict the state of the database in these
+situations.</p>
+<p>If you are not running with journaling, and your database shuts down
+unexpectedly for <em>any</em> reason, you should always proceed <em>as if</em> your database
+is in an inconsistent and likely corrupt state. If at all possible restore
+from <a class="reference internal" href="../administration/backups.html"><em>backup</em></a> or if running as a <a class="reference internal" href="../reference/glossary.html#term-replica-set"><em class="xref std std-term">replica
+set</em></a> resync from an intact member of the set, as described in <a class="reference internal" href="../administration/replica-sets.html#replica-set-resync-stale-member"><em>Resyncing a Member of a Replica Set</em></a>.</p>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="../administration/production-notes.html" title="Previous Section: Production Notes">&lt; &nbsp; Production Notes</a></li>
+<li id="btnvup"><a href="../administration.html" title="Parent Section: Administration" >&#47;&#92;&nbsp; Administration</a></li>
+<li id="btnvnx"><a href="convert-replica-set-to-replicated-shard-cluster.html" title="Next Section: Convert a Replica Set to a Replicated Sharded Cluster">Convert a Replica Set to a Replicated Sharded Cluster &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

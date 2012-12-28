@@ -1,0 +1,323 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>group &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/group" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="handshake (internal)" href="handshake.html" />
+<link rel="prev" title="godinsert (internal)" href="godinsert.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="group">
+<h1>group<a class="headerlink" href="#group" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">group</tt></dt>
+<dd><p>The <a class="reference internal" href="../commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> command groups documents in a collection by
+the specified key and performs simple aggregation functions such as
+computing counts and sums. The command is analogous to a <tt class="docutils literal"><span class="pre">SELECT</span>
+<span class="pre">...</span> <span class="pre">GROUP</span> <span class="pre">BY</span></tt> statement in SQL. The command returns a document with
+the grouped records as well as the command meta-data.</p>
+<p>The <a class="reference internal" href="../commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> command takes the following prototype
+form:</p>
+<div class="highlight-none"><div class="highlight"><pre>{ group: { ns: &lt;namespace&gt;,
+           key: &lt;key&gt;,
+           $reduce: &lt;reduce function&gt;,
+           $keyf: &lt;key function&gt;,
+           cond: &lt;query&gt;,
+           finalize: &lt;finalize function&gt; } }
+</pre></div>
+</div>
+<p>The command fields are as follows:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Fields:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ns</strong> &#8211; Specifies the collection from which to perform the group by
+operation.</li>
+<li><strong>key</strong> &#8211; Specifies one or more document fields to group. Returns
+a &#8220;key object&#8221; for use as the grouping key.</li>
+<li><strong>$reduce</strong> &#8211; Specifies an aggregation function that operates on
+the documents during the grouping operation, such as
+compute a sum or a count. The aggregation function
+takes two arguments: the current document and an
+aggregation result document for that group.</li>
+<li><strong>initial</strong> &#8211; Initializes the aggregation result document.</li>
+<li><strong>$keyf</strong> &#8211; Optional. Alternative to the <tt class="docutils literal"><span class="pre">key</span></tt> field. Specifies a
+function that creates a &#8220;key object&#8221; for
+use as the grouping key. Use the <tt class="docutils literal"><span class="pre">keyf</span></tt> instead of
+<tt class="docutils literal"><span class="pre">key</span></tt> to group by calculated fields rather than
+existing document fields.</li>
+<li><strong>cond</strong> &#8211; Optional. Specifies the selection criteria to determine
+which documents in the collection to process. If the
+<tt class="docutils literal"><span class="pre">cond</span></tt> field is omitted, the
+<a class="reference internal" href="../method/db.collection.group.html#db.collection.group" title="db.collection.group"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.group()</span></tt></a> processes all the
+documents in the collection for the group operation.</li>
+<li><strong>finalize</strong> &#8211; <p>Optional. Specifies a function that runs each item
+in the result set before <a class="reference internal" href="../method/db.collection.group.html#db.collection.group" title="db.collection.group"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.group()</span></tt></a>
+returns the final value. This function
+can either modify the result document or
+replace the result document as a whole.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unlike the <tt class="docutils literal"><span class="pre">$keyf</span></tt> and the <tt class="docutils literal"><span class="pre">$reduce</span></tt> fields
+that specify a function, the field name is
+<tt class="docutils literal"><span class="pre">finalize</span></tt> and not <tt class="docutils literal"><span class="pre">$finalize</span></tt>.</p>
+</div>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<ul class="last simple">
+<li>The <a class="reference internal" href="../commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> command does not work with
+<a class="reference internal" href="../glossary.html#term-sharded-cluster"><em class="xref std std-term">sharded clusters</em></a>. Use the
+<a class="reference internal" href="../glossary.html#term-aggregation-framework"><em class="xref std std-term">aggregation framework</em></a> or <a class="reference internal" href="../glossary.html#term-map-reduce"><em class="xref std std-term">map-reduce</em></a> in
+<a class="reference internal" href="../glossary.html#term-sharding"><em class="xref std std-term">sharded environments</em></a>.</li>
+<li>The <a class="reference internal" href="../commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> command takes a read lock and does not
+allow any other threads to execute JavaScript while it is
+running.</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The result set must fit within the <a class="reference internal" href="../limits.html#limit-bson-document-size"><em>maximum BSON document
+size</em></a>.</p>
+<p class="last">Additionally, in version 2.2, the returned array can contain at most 20,000
+elements; i.e. at most 20,000 unique groupings. For group by
+operations that results in more than 20,000 unique groupings, use
+<a class="reference internal" href="../commands.html#mapReduce" title="mapReduce"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">mapReduce</span></tt></a>. Previous versions had a limit of 10,000
+elements.</p>
+</div>
+<p>For the shell, MongoDB provides a wrapper method
+<a class="reference internal" href="../method/db.collection.group.html#db.collection.group" title="db.collection.group"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.group()</span></tt></a>; however, the
+<a class="reference internal" href="../method/db.collection.group.html#db.collection.group" title="db.collection.group"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.group()</span></tt></a> method takes the <tt class="docutils literal"><span class="pre">keyf</span></tt> field and
+the <tt class="docutils literal"><span class="pre">reduce</span></tt> field whereas the <a class="reference internal" href="../commands.html#group" title="group"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">group</span></tt></a> command takes
+the <tt class="docutils literal"><span class="pre">$keyf</span></tt> field and the <tt class="docutils literal"><span class="pre">$reduce</span></tt> field.</p>
+<p>Consider the following examples of the <a class="reference internal" href="../method/db.collection.group.html#db.collection.group" title="db.collection.group"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">db.collection.group()</span></tt></a> method:</p>
+<p>The examples assume an <tt class="docutils literal"><span class="pre">orders</span></tt> collection with documents of the
+following prototype:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">_id</span><span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;5085a95c8fada716c89d0021&quot;</span><span class="p">),</span>
+  <span class="nx">ord_dt</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span>
+  <span class="nx">ship_dt</span><span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-02T04:00:00Z&quot;</span><span class="p">),</span>
+  <span class="nx">item</span><span class="o">:</span> <span class="p">{</span> <span class="nx">sku</span><span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span>
+          <span class="nx">price</span><span class="o">:</span> <span class="mf">1.99</span><span class="p">,</span>
+          <span class="nx">uom</span><span class="o">:</span> <span class="s2">&quot;pcs&quot;</span><span class="p">,</span>
+          <span class="nx">qty</span><span class="o">:</span> <span class="mi">25</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul>
+<li><p class="first">The following example groups by the <tt class="docutils literal"><span class="pre">ord_dt</span></tt> and <tt class="docutils literal"><span class="pre">item.sku</span></tt>
+fields those documents that have <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than
+<tt class="docutils literal"><span class="pre">01/01/2012</span></tt>:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">group</span><span class="o">:</span>
+                   <span class="p">{</span>
+                     <span class="nx">ns</span><span class="o">:</span> <span class="s1">&#39;orders&#39;</span><span class="p">,</span>
+                     <span class="nx">key</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;item.sku&#39;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+                     <span class="nx">cond</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span> <span class="s1">&#39;01/01/2012&#39;</span> <span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                     <span class="nx">$reduce</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">curr</span><span class="p">,</span> <span class="nx">result</span> <span class="p">)</span> <span class="p">{</span> <span class="p">},</span>
+                     <span class="nx">initial</span><span class="o">:</span> <span class="p">{</span> <span class="p">}</span>
+                   <span class="p">}</span>
+                <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The result is a documents that contain the <tt class="docutils literal"><span class="pre">retval</span></tt> field which
+contains the group by records, the <tt class="docutils literal"><span class="pre">count</span></tt> field which contains
+the total number of documents grouped, the <tt class="docutils literal"><span class="pre">keys</span></tt> field which
+contains the number of unique groupings (i.e. number of elements
+in the <tt class="docutils literal"><span class="pre">retval</span></tt>), and the <tt class="docutils literal"><span class="pre">ok</span></tt> field which contains the
+command status:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;retval&quot;</span> <span class="o">:</span>
+      <span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;bcd123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;efg456&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;efg456&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;ijk123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-05-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-05-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-08T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-08T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">}</span>
+      <span class="p">],</span>
+  <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">13</span><span class="p">,</span>
+  <span class="s2">&quot;keys&quot;</span> <span class="o">:</span> <span class="mi">11</span><span class="p">,</span>
+  <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The method call is analogous to the SQL statement:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ord_dt</span><span class="p">,</span> <span class="n">item_sku</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">WHERE</span> <span class="n">ord_dt</span> <span class="o">&gt;</span> <span class="s1">&#39;01/01/2012&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">ord_dt</span><span class="p">,</span> <span class="n">item_sku</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following example groups by the <tt class="docutils literal"><span class="pre">ord_dt</span></tt> and <tt class="docutils literal"><span class="pre">item.sku</span></tt>
+fields, those documents that have <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than
+<tt class="docutils literal"><span class="pre">01/01/2012</span></tt> and calculates the sum of the <tt class="docutils literal"><span class="pre">qty</span></tt> field for each
+grouping:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">group</span><span class="o">:</span>
+                   <span class="p">{</span>
+                     <span class="nx">ns</span><span class="o">:</span> <span class="s1">&#39;orders&#39;</span><span class="p">,</span>
+                     <span class="nx">key</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;item.sku&#39;</span><span class="o">:</span> <span class="mi">1</span> <span class="p">},</span>
+                     <span class="nx">cond</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span> <span class="s1">&#39;01/01/2012&#39;</span> <span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                     <span class="nx">$reduce</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">curr</span><span class="p">,</span> <span class="nx">result</span> <span class="p">)</span> <span class="p">{</span>
+                                  <span class="nx">result</span><span class="p">.</span><span class="nx">total</span> <span class="o">+=</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">item</span><span class="p">.</span><span class="nx">qty</span><span class="p">;</span>
+                              <span class="p">},</span>
+                     <span class="nx">initial</span><span class="o">:</span> <span class="p">{</span> <span class="nx">total</span> <span class="o">:</span> <span class="mi">0</span> <span class="p">}</span>
+                   <span class="p">}</span>
+                <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">retval</span></tt> field of the returned document is an array of
+documents that contain the group by fields and the calculated
+aggregation field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;retval&quot;</span> <span class="o">:</span>
+      <span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;bcd123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-07-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;efg456&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">10</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;efg456&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">15</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;ijk123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">20</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-05-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">45</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-05-01T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-08T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc123&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;ord_dt&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;2012-06-08T04:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;item.sku&quot;</span> <span class="o">:</span> <span class="s2">&quot;abc456&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">25</span> <span class="p">}</span>
+      <span class="p">],</span>
+  <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">13</span><span class="p">,</span>
+  <span class="s2">&quot;keys&quot;</span> <span class="o">:</span> <span class="mi">11</span><span class="p">,</span>
+  <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>The method call is analogous to the SQL statement:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">ord_dt</span><span class="p">,</span> <span class="n">item_sku</span><span class="p">,</span> <span class="k">SUM</span><span class="p">(</span><span class="n">item_qty</span><span class="p">)</span> <span class="k">as</span> <span class="n">total</span>
+<span class="k">FROM</span> <span class="n">orders</span>
+<span class="k">WHERE</span> <span class="n">ord_dt</span> <span class="o">&gt;</span> <span class="s1">&#39;01/01/2012&#39;</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">ord_dt</span><span class="p">,</span> <span class="n">item_sku</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The following example groups by the calculated <tt class="docutils literal"><span class="pre">day_of_week</span></tt> field,
+those documents that have <tt class="docutils literal"><span class="pre">ord_dt</span></tt> greater than <tt class="docutils literal"><span class="pre">01/01/2012</span></tt> and
+calculates the sum, count, and average of the <tt class="docutils literal"><span class="pre">qty</span></tt> field for each
+grouping:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span> <span class="p">{</span> <span class="nx">group</span><span class="o">:</span>
+                   <span class="p">{</span>
+                     <span class="nx">ns</span><span class="o">:</span> <span class="s1">&#39;orders&#39;</span><span class="p">,</span>
+                     <span class="nx">$keyf</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span> <span class="p">{</span>
+                               <span class="k">return</span> <span class="p">{</span> <span class="nx">day_of_week</span><span class="o">:</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">ord_dt</span><span class="p">.</span><span class="nx">getDay</span><span class="p">()</span> <span class="p">}</span> <span class="p">;</span> <span class="p">},</span>
+                     <span class="nx">cond</span><span class="o">:</span> <span class="p">{</span> <span class="nx">ord_dt</span><span class="o">:</span> <span class="p">{</span> <span class="nx">$gt</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span> <span class="s1">&#39;01/01/2012&#39;</span> <span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+                     <span class="nx">$reduce</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span> <span class="nx">curr</span><span class="p">,</span> <span class="nx">result</span> <span class="p">)</span> <span class="p">{</span>
+                                  <span class="nx">result</span><span class="p">.</span><span class="nx">total</span> <span class="o">+=</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">item</span><span class="p">.</span><span class="nx">qty</span><span class="p">;</span>
+                                  <span class="nx">result</span><span class="p">.</span><span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+                              <span class="p">},</span>
+                     <span class="nx">initial</span><span class="o">:</span> <span class="p">{</span> <span class="nx">total</span> <span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span> <span class="p">},</span>
+                     <span class="nx">finalize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+                                 <span class="kd">var</span> <span class="nx">weekdays</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;Sunday&quot;</span><span class="p">,</span> <span class="s2">&quot;Monday&quot;</span><span class="p">,</span> <span class="s2">&quot;Tuesday&quot;</span><span class="p">,</span>
+                                                  <span class="s2">&quot;Wednesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Thursday&quot;</span><span class="p">,</span>
+                                                  <span class="s2">&quot;Friday&quot;</span><span class="p">,</span> <span class="s2">&quot;Saturday&quot;</span> <span class="p">];</span>
+
+                                 <span class="nx">result</span><span class="p">.</span><span class="nx">day_of_week</span> <span class="o">=</span> <span class="nx">weekdays</span><span class="p">[</span><span class="nx">result</span><span class="p">.</span><span class="nx">day_of_week</span><span class="p">];</span>
+                                 <span class="nx">result</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span> <span class="o">/</span> <span class="nx">result</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+                     <span class="p">}</span>
+
+                   <span class="p">}</span>
+                <span class="p">}</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">retval</span></tt> field of the returned document is an array of
+documents that contain the group by fields and the calculated
+aggregation field:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="s2">&quot;retval&quot;</span> <span class="o">:</span>
+      <span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;day_of_week&quot;</span> <span class="o">:</span> <span class="s2">&quot;Sunday&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;day_of_week&quot;</span> <span class="o">:</span> <span class="s2">&quot;Friday&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">110</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mi">18</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">&quot;day_of_week&quot;</span> <span class="o">:</span> <span class="s2">&quot;Tuesday&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">70</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mi">23</span> <span class="p">}</span>
+
+      <span class="p">],</span>
+  <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">13</span><span class="p">,</span>
+  <span class="s2">&quot;keys&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="../../applications/aggregation.html"><em>Aggregation Framework</em></a></p>
+</div>
+</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="godinsert.html" title="Previous Section: godinsert (internal)">&lt; &nbsp; godinsert (internal)</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="handshake.html" title="Next Section: handshake (internal)">handshake (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>aggregate &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/command/aggregate" />
+
+    
+    
+    <link rel="stylesheet" href="../../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../../about.html" />
+<link rel="top" title="MongoDB Manual" href="../../index.html" />
+<link rel="up" title="Database Commands" href="../command.html" />
+<link rel="next" title="applyOps (internal)" href="applyOps.html" />
+<link rel="prev" title="addShard" href="addShard.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="aggregate">
+<h1>aggregate<a class="headerlink" href="#aggregate" title="Permalink to this headline">¶</a></h1>
+<dl class="dbcommand">
+<dt>
+<tt class="descname">aggregate</tt></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">New in version 2.1.0.</span></p>
+<p><a class="reference internal" href="../commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-dbcommand docutils literal"><span class="pre">aggregate</span></tt></a> implements the <a class="reference internal" href="../glossary.html#term-aggregation-framework"><em class="xref std std-term">aggregation
+framework</em></a>. Consider the following prototype form:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="p">{</span> <span class="nx">aggregate</span><span class="o">:</span> <span class="s2">&quot;[collection]&quot;</span><span class="p">,</span> <span class="nx">pipeline</span><span class="o">:</span> <span class="p">[</span><span class="nx">pipeline</span><span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">[collection]</span></tt> specifies the name of the collection that
+contains the data that you wish to aggregate. The <tt class="docutils literal"><span class="pre">pipeline</span></tt>
+argument holds an array that contains the specification for the
+aggregation operation. Consider the following example from the
+<a class="reference internal" href="../../applications/aggregation.html"><em>aggregation documentation</em></a>.</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
+<span class="p">{</span> <span class="nx">aggregate</span> <span class="o">:</span> <span class="s2">&quot;article&quot;</span><span class="p">,</span> <span class="nx">pipeline</span> <span class="o">:</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+     <span class="nx">tags</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$unwind</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$group</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span><span class="p">,</span>
+     <span class="nx">authors</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$addToSet</span> <span class="o">:</span> <span class="s2">&quot;$author&quot;</span> <span class="p">}</span>
+  <span class="p">}</span> <span class="p">}</span>
+ <span class="p">]</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>More typically this operation would use the <a class="reference internal" href="../commands.html#aggregate" title="aggregate"><tt class="xref mongodb mongodb-method docutils literal"><span class="pre">aggregate</span></tt></a>
+helper in the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongo</span></tt> shell, and would resemble the
+following:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">db</span><span class="p">.</span><span class="nx">article</span><span class="p">.</span><span class="nx">aggregate</span><span class="p">(</span>
+  <span class="p">{</span> <span class="nx">$project</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">author</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+     <span class="nx">tags</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="p">}</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$unwind</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="nx">$group</span> <span class="o">:</span> <span class="p">{</span>
+     <span class="nx">_id</span> <span class="o">:</span> <span class="s2">&quot;$tags&quot;</span><span class="p">,</span>
+     <span class="nx">authors</span> <span class="o">:</span> <span class="p">{</span> <span class="nx">$addToSet</span> <span class="o">:</span> <span class="s2">&quot;$author&quot;</span> <span class="p">}</span>
+  <span class="p">}</span> <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>For more aggregation documentation, please see:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../../applications/aggregation.html"><em>Aggregation Framework</em></a></li>
+<li><a class="reference internal" href="../aggregation.html"><em>Aggregation Framework Reference</em></a></li>
+<li><a class="reference internal" href="../../tutorial/aggregation-examples.html"><em>Aggregation Framework Examples</em></a></li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="addShard.html" title="Previous Section: addShard">&lt; &nbsp; addShard</a></li>
+<li id="btnvup"><a href="../../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="applyOps.html" title="Next Section: applyOps (internal)">applyOps (internal) &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>mongofiles &mdash; MongoDB Manual</title>
+
+    <link rel="shortcut icon" href="http://media.mongodb.org/favicon.ico" />
+    <meta name="robots" content="index" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="canonical" href="http://docs.mongodb.org/master/reference/mongofiles" />
+
+    
+    
+    <link rel="stylesheet" href="../_static/mongodb-docs.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.2.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  false
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+      <link rel="search" type="application/opensearchdescription+xml" href="http://docs.mongodb.org/osd.xml" title="MongoDB Help"/>
+<link rel="author" title="About these documents" href="../about.html" />
+<link rel="top" title="MongoDB Manual" href="../index.html" />
+<link rel="up" title="MongoDB Package Components" href="components.html" />
+<link rel="next" title="Configuration File Options" href="configuration-options.html" />
+<link rel="prev" title="mongosniff" href="mongosniff.html" />
+<!-- Put the following javascript before the closing </head> tag. -->
+<script>
+  (function() {
+    var cx = '017213726194841070573:WMX6838984';
+    var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+        '//www.google.com/cse/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+  </head>
+  <body>  
+    <div class="document">
+      <div class="documentwrapper">
+          <div class="body">
+            <div id="cse-results"><gcse:searchresults></gcse:searchresults></div>
+            
+  <div class="section" id="mongofiles">
+<span id="id1"></span><h1><tt class="docutils literal"><span class="pre">mongofiles</span></tt><a class="headerlink" href="#mongofiles" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="synopsis">
+<h2>Synopsis<a class="headerlink" href="#synopsis" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> utility makes it possible to manipulate files
+stored in your MongoDB instance in <a class="reference internal" href="glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> objects from the
+command line. It is particularly useful as it provides an interface
+between objects stored in your file system and GridFS.</p>
+<p>All <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> commands take arguments in three groups:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#mongofiles-options"><em>Options</em></a>. You may use one or more of
+these options to control the behavior of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt>.</li>
+<li><a class="reference internal" href="#mongofiles-commands"><em>Commands</em></a>. Use one of these commands to
+determine the action of <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt>.</li>
+<li>A file name representing either the name of a file on your system&#8217;s
+file system, a GridFS object.</li>
+</ol>
+<p><tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt>, like <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongodump</span></tt>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoexport</span></tt>,
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongoimport</span></tt>, and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongorestore</span></tt>, can access data
+stored in a MongoDB data directory without requiring a running
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance, if no other <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> is running.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For <a class="reference internal" href="glossary.html#term-replica-set"><em class="xref std std-term">replica sets</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> can
+only read from the set&#8217;s &#8216;<a class="reference internal" href="glossary.html#term-primary"><em class="xref std std-term">primary</em></a>.</p>
+</div>
+</div>
+<div class="section" id="commands">
+<span id="mongofiles-commands"></span><h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<dl class="binary">
+<dt>
+<tt class="descname">mongofiles</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">list &lt;prefix&gt;</tt></dt>
+<dd><p>Lists the files in the GridFS store. The characters specified after
+<tt class="docutils literal"><span class="pre">list</span></tt> (e.g. <tt class="docutils literal"><span class="pre">&lt;prefix&gt;</span></tt>) optionally limit the list of
+returned items to files that begin with that string of characters.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">search &lt;string&gt;</tt></dt>
+<dd><p>Lists the files in the GridFS store with names that match any
+portion of <tt class="docutils literal"><span class="pre">&lt;string&gt;</span></tt>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">put &lt;filename&gt;</tt></dt>
+<dd><p>Copy the specified file from the local file system into GridFS
+storage.</p>
+<p>Here, <tt class="docutils literal"><span class="pre">&lt;filename&gt;</span></tt> refers to the name the object will have in
+GridFS, and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> assumes that this reflects the name the
+file has on the local file system. If the local filename is
+different use the <a class="reference internal" href="#cmdoption-mongofiles--local"><em class="xref std std-option">mongofiles --local</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">get &lt;filename&gt;</tt></dt>
+<dd><p>Copy the specified file from GridFS storage to the local file
+system.</p>
+<p>Here, <tt class="docutils literal"><span class="pre">&lt;filename&gt;</span></tt> refers to the name the object will have in
+GridFS, and <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> assumes that this reflects the name the
+file has on the local file system. If the local filename is
+different use the <a class="reference internal" href="#cmdoption-mongofiles--local"><em class="xref std std-option">mongofiles --local</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt>
+<tt class="descname">delete &lt;filename&gt;</tt></dt>
+<dd><p>Delete the specified file from GridFS storage.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="options">
+<span id="mongofiles-options"></span><h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<dl class="option">
+<dt id="cmdoption-mongofiles--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a basic help and usage text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--verbose">
+<tt class="descname">--verbose</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-v</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increases the amount of internal reporting returned on the command
+line. Increase the verbosity with the <tt class="docutils literal"><span class="pre">-v</span></tt> form by including
+the option multiple times, (e.g. <tt class="docutils literal"><span class="pre">-vvvvv</span></tt>.)</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the version of the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> utility.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--host">
+<tt class="descname">--host</tt><tt class="descclassname"> &lt;hostname&gt;&lt;:port&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a resolvable hostname for the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> that
+holds your GridFS system. By default <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> attempts
+to connect to a MongoDB process ruining on the localhost port
+number <tt class="docutils literal"><span class="pre">27017</span></tt>.</p>
+<p>Optionally, specify a port number to connect a MongoDB instance
+running on a port other than 27017.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--port">
+<tt class="descname">--port</tt><tt class="descclassname"> &lt;port&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the port number, if the MongoDB instance is not running on
+the standard port. (i.e. <tt class="docutils literal"><span class="pre">27017</span></tt>) You may also specify a port
+number using the <a class="reference internal" href="#cmdoption-mongofiles--host"><em class="xref std std-option">mongofiles --host</em></a> command.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--ipv6">
+<tt class="descname">--ipv6</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--ipv6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables IPv6 support that allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> to connect
+to the MongoDB instance using an IPv6 network. All MongoDB programs
+and processes, including <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt>, disable IPv6
+support by default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--username">
+<tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a username to authenticate to the MongoDB instance, if your
+database requires authentication. Use in conjunction with the
+<a class="reference internal" href="#cmdoption-mongofiles--password"><em class="xref std std-option">mongofiles --password</em></a> option to supply a password.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--password">
+<tt class="descname">--password</tt><tt class="descclassname"> &lt;password&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies a password to authenticate to the MongoDB instance. Use
+in conjunction with the <a class="reference internal" href="#cmdoption-mongofiles--username"><em class="xref std std-option">mongofiles --username</em></a> option to
+supply a username.</p>
+<p>If you specify a <a class="reference internal" href="#cmdoption-mongofiles--username"><em class="xref std std-option">--username</em></a>
+without the <a class="reference internal" href="#cmdoption-mongofiles--password"><em class="xref std std-option">--password</em></a> option, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt>
+will prompt for a password interactively.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--dbpath">
+<tt class="descname">--dbpath</tt><tt class="descclassname"> &lt;path&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--dbpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the directory of the MongoDB data files. If used, the
+<a class="reference internal" href="#cmdoption-mongofiles--dbpath"><em class="xref std std-option">--dbpath</em></a> option enables <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> to attach directly to
+local data files interact with the GridFS data without the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>. To run with <a class="reference internal" href="#cmdoption-mongofiles--dbpath"><em class="xref std std-option">--dbpath</em></a>, <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> needs to lock
+access to the data directory: as a result, no <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> can access
+the same path while the process runs.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--directoryperdb">
+<tt class="descname">--directoryperdb</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--directoryperdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongofiles--directoryperdb"><em class="xref std std-option">--directoryperdb</em></a> in conjunction with the corresponding
+option to <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt>, which allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> when
+running with the <a class="reference internal" href="#cmdoption-mongofiles--dbpath"><em class="xref std std-option">--dbpath</em></a> option and MongoDB uses an
+on-disk format where every database has a distinct
+directory. This option is only relevant when specifying the
+<a class="reference internal" href="#cmdoption-mongofiles--dbpath"><em class="xref std std-option">--dbpath</em></a> option.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--journal">
+<tt class="descname">--journal</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> operations to use the durability
+<a class="reference internal" href="glossary.html#term-journal"><em class="xref std std-term">journal</em></a> when running with <a class="reference internal" href="#cmdoption-mongofiles--dbpath"><em class="xref std std-option">--dbpath</em></a>
+to ensure that the database maintains a recoverable state. This
+forces <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> to record all data on disk regularly.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--db">
+<tt class="descname">--db</tt><tt class="descclassname"> &lt;db&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-d</tt><tt class="descclassname"> &lt;db&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the <a class="reference internal" href="#cmdoption-mongofiles--db"><em class="xref std std-option">--db</em></a> option to specify the MongoDB database that stores
+or will store the GridFS files.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--collection">
+<tt class="descname">--collection</tt><tt class="descclassname"> &lt;collection&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-c</tt><tt class="descclassname"> &lt;collection&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>This option has no use in this context and a future release may
+remove it. See <a class="reference external" href="https://jira.mongodb.org/browse/SERVER-4931">SERVER-4931</a> for more information.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--local">
+<tt class="descname">--local</tt><tt class="descclassname"> &lt;filename&gt;</tt><tt class="descclassname">, </tt><tt class="descname">-l</tt><tt class="descclassname"> &lt;filename&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the local filesystem name of a file for get and put
+operations.</p>
+<p>In the <strong class="command">mongofiles put</strong> and <strong class="command">mongofiles get</strong>
+commands the required <tt class="docutils literal"><span class="pre">&lt;filename&gt;</span></tt> modifier refers to the name
+the object will have in GridFS. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> assumes that
+this reflects the file&#8217;s name on the local file
+system. This setting overrides this default.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--type">
+<tt class="descname">--type</tt><tt class="descclassname"> &lt;MIME&gt;, t &lt;MIME&gt;</tt><a class="headerlink" href="#cmdoption-mongofiles--type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides the ability to specify a <a class="reference internal" href="glossary.html#term-mime"><em class="xref std std-term">MIME</em></a> type to describe the
+file inserted into GridFS storage. <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> omits this
+option in the default operation.</p>
+<p>Use only with <strong class="command">mongofiles put</strong> operations.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-mongofiles--replace">
+<tt class="descname">--replace</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">-r</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-mongofiles--replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alters the behavior of <strong class="command">mongofiles put</strong> to replace
+existing GridFS objects with the specified local file, rather than
+adding an additional object with the same name.</p>
+<p>In the default operation, files will not be overwritten by a
+<strong class="command">mongofiles put</strong> option.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="use">
+<h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<p>To return a list of all files in a <a class="reference internal" href="glossary.html#term-gridfs"><em class="xref std std-term">GridFS</em></a> collection in the
+<tt class="docutils literal"><span class="pre">records</span></tt> database, use the following invocation at the system shell:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records list
+</pre></div>
+</div>
+<p>This <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongofiles</span></tt> instance will connect to the
+<tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instance running on the <tt class="docutils literal"><span class="pre">27017</span></tt> localhost
+interface to specify the same operation on a different port or
+hostname, and issue a command that resembles one of the following:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles --port 37017 -d records list
+mongofiles --hostname db1.example.net -d records list
+mongofiles --hostname db1.example.net --port 37017 -d records list
+</pre></div>
+</div>
+<p>Modify any of the following commands as needed if you&#8217;re connecting
+the <tt class="xref mongodb mongodb-program docutils literal"><span class="pre">mongod</span></tt> instances on different ports or hosts.</p>
+<p>To upload a file named <tt class="docutils literal"><span class="pre">32-corinth.lp</span></tt> to the GridFS collection in
+the <tt class="docutils literal"><span class="pre">records</span></tt> database, you can use the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records put 32-corinth.lp
+</pre></div>
+</div>
+<p>To delete the <tt class="docutils literal"><span class="pre">32-corinth.lp</span></tt> file from this GridFS collection in
+the <tt class="docutils literal"><span class="pre">records</span></tt> database, you can use the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records delete 32-corinth.lp
+</pre></div>
+</div>
+<p>To search for files in the GridFS collection in the <tt class="docutils literal"><span class="pre">records</span></tt>
+database that have the string <tt class="docutils literal"><span class="pre">corinth</span></tt> in their names, you can use
+following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records search corinth
+</pre></div>
+</div>
+<p>To list all files in the GridFS collection in the <tt class="docutils literal"><span class="pre">records</span></tt> database
+that begin with the string <tt class="docutils literal"><span class="pre">32</span></tt>, you can use the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records list 32
+</pre></div>
+</div>
+<p>To fetch the file from the GridFS collection in the <tt class="docutils literal"><span class="pre">records</span></tt>
+database named <tt class="docutils literal"><span class="pre">32-corinth.lp</span></tt>, you can use the following command:</p>
+<div class="highlight-sh"><div class="highlight"><pre>mongofiles -d records get 32-corinth.lp
+</pre></div>
+</div>
+</div>
+</div>
+
+
+<div id="btnv">
+<ul id="btnvl">
+<li id="btnvpr"><a href="mongosniff.html" title="Previous Section: mongosniff">&lt; &nbsp; mongosniff</a></li>
+<li id="btnvup"><a href="../reference.html" title="Parent Section: Reference" >&#47;&#92;&nbsp; Reference</a></li>
+<li id="btnvnx"><a href="configuration-options.html" title="Next Section: Configuration File Options">Configuration File Options &nbsp;&gt;</a></li>
+</ul>
+</div>
+</div>
+      </div>
+ 
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+        &copy; Copyright 2011-2012, 10gen, Inc.  Licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons</a>.
+
+    <p>MongoDB&reg;, Mongo&reg;, and the leaf logo are registered trademarks of 10gen, Inc.</p>
+    <p>The MongoDB Documentation Project uses <a href="https://github.com/mongodb/docs">GitHub</a>. Fork the repository and submit pull requests to contribute.</p>
+    <p>If you find any issues with the documentation feel free to open a <a href="http://jira.mongodb.org/browse/DOCS">Jira Case</a> and we'll work to resolve it promptly.</p>
+
+  </div>
+
+  </body>
+</html>
