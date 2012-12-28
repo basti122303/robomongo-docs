@@ -42,7 +42,7 @@ I assume that python already installed on machine and added to PATH.
 
 	 md build
 
-	 make html``
+	 make html
 
 6. After build done go to the ``/build/master/html`` and copy content to the robomongo docs repository.
 
