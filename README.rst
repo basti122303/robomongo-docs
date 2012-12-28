@@ -15,34 +15,34 @@ I assume that python already installed on machine and added to PATH.
 
 2. Install sphinx documentation:
 
-	 sudo easy_install -U Sphinx
+  ``sudo easy_install -U Sphinx``
 
 3. Clone mongodb documentation source from github:
 
-     git clone git://github.com/mongodb/docs
+  ``git clone git://github.com/mongodb/docs``
 
 4. Adjust layout here. -> /themes/mongodb/layout.html
 
-    * Remove Left Sidebar - Set ``render_sidebar`` variable to false at the top and remove:
+  * Remove Left Sidebar - Set ``render_sidebar`` variable to false at the top and remove:
      
-     {%- block sidebar2 %}{{ sidebar() }}{% endblock %}
+  ``{%- block sidebar2 %}{{ sidebar() }}{% endblock %}``
 
 
-    * Remove Header -- remove following parts:
+  * Remove Header -- remove following parts:
 
-     {%- block header %} .. {%- endblock %}``
+ ``{%- block header %} .. {%- endblock %}
 
-     {%- block analytics %}
-	 {%- include "analytics.html" %}
-     {%- endblock %}`` 
+   {%- block analytics %}
+   {%- include "analytics.html" %}
+   {%- endblock %}`` 
 
 5. Navigate to the ``docs`` folder and create folder with name ``build``:
 
-     cd docs/
+ ``cd docs/
 
-     md build
+   md build
 
-     make html
+   make html``
 
 6. After build done go to the ``/build/master/html`` and copy content to the robomongo docs repository.
 
