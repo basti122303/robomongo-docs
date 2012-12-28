@@ -23,12 +23,12 @@ I assume that python already installed on machine and added to PATH.
 
 4. Adjust layout here. -> /themes/mongodb/layout.html
 
-  * Remove Left Sidebar - Set ``render_sidebar`` variable to false at the top and remove:
+* Remove Left Sidebar - Set ``render_sidebar`` variable to false at the top and remove:
      
      {%- block sidebar2 %}{{ sidebar() }}{% endblock %}
 
 
-  * Remove Header -- remove following parts:
+* Remove Header -- remove following parts:
 
 	 {%- block header %} .. {%- endblock %}
 
