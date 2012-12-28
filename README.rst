@@ -23,13 +23,25 @@ I assume that python already installed on machine and added to PATH.
 
 4. Adjust layout here. -> /themes/mongodb/layout.html
 
-    * Remove Left Sidebar
-    * Remove Header
+    * Remove Left Sidebar - Set ``render_sidebar`` variable to false at the top and remove:
+     
+     {%- block sidebar2 %}{{ sidebar() }}{% endblock %}
+
+
+    * Remove Header -- remove following parts:
+
+     {%- block header %} .. {%- endblock %}``
+
+     {%- block analytics %}
+	 {%- include "analytics.html" %}
+     {%- endblock %}`` 
 
 5. Navigate to the ``docs`` folder and create folder with name ``build``:
 
      cd docs/
+
      md build
+
      make html
 
 6. After build done go to the ``/build/master/html`` and copy content to the robomongo docs repository.
